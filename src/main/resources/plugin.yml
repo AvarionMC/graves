@@ -1,0 +1,30 @@
+name: ${project.name}
+description: ${project.description}
+version: ${project.version}
+main: com.rngservers.graves.Main
+api-version: 1.13
+author: RandomUnknown
+
+commands:
+  graves:
+    description: Graves info
+    default: true
+    usage: /graves
+    aliases: [graves, grave, deathchests, deathchest, dc, death]
+
+permissions:
+  graves.place:
+    default: true
+    description: Can place a graves
+  graves.open:
+    default: true
+    description: Can open a grave
+  graves.break:
+    default: true
+    description: Can break a grave
+  graves.bypass:
+    default: op
+    description: Bypass grave protection
+  graves.reload:
+    default: op
+    description: Reload Graves
