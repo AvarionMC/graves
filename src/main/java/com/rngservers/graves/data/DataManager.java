@@ -1,8 +1,8 @@
 package com.rngservers.graves.data;
 
 import com.rngservers.graves.Main;
-import com.rngservers.graves.chest.Grave;
-import com.rngservers.graves.chest.GraveManager;
+import com.rngservers.graves.grave.Grave;
+import com.rngservers.graves.grave.GraveManager;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;

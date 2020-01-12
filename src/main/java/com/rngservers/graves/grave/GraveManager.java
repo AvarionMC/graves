@@ -1,4 +1,4 @@
-package com.rngservers.graves.chest;
+package com.rngservers.graves.grave;
 
 import com.rngservers.graves.Main;
 import com.rngservers.graves.data.DataManager;
@@ -39,13 +39,15 @@ public class GraveManager {
                 if (!graves.isEmpty()) {
                     for (Iterator<Map.Entry<Location, Grave>> iterator = graves.entrySet()
                             .iterator(); iterator.hasNext(); ) {
-                        Map.Entry<Location, Grave> entry = iterator.next();
-                        Grave grave = entry.getValue();
-                        Integer graveTime = plugin.getConfig().getInt("settings.graveTime") * 1000;
-                        Long diff = System.currentTimeMillis() - grave.getTime();
-                        if (diff >= graveTime) {
-                            dropGrave(grave);
-                            removeGrave(grave);
+                        if (iterator.hasNext()) {
+                            Map.Entry<Location, Grave> entry = iterator.next();
+                            Grave grave = entry.getValue();
+                            Integer graveTime = plugin.getConfig().getInt("settings.graveTime") * 1000;
+                            Long diff = System.currentTimeMillis() - grave.getTime();
+                            if (diff >= graveTime) {
+                                dropGrave(grave);
+                                removeGrave(grave);
+                            }
                         }
                     }
                 }

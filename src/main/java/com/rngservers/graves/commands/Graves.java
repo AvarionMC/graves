@@ -18,7 +18,7 @@ public class Graves implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        String version = "1.0";
+        String version = "1.1";
         String author = "RandomUnknown";
 
         if (args.length < 1) {

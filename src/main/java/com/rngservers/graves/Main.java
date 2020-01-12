@@ -1,6 +1,6 @@
 package com.rngservers.graves;
 
-import com.rngservers.graves.chest.GraveManager;
+import com.rngservers.graves.grave.GraveManager;
 import com.rngservers.graves.commands.Graves;
 import com.rngservers.graves.data.DataManager;
 import com.rngservers.graves.events.Events;

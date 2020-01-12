@@ -1,4 +1,4 @@
-package com.rngservers.graves.chest;
+package com.rngservers.graves.grave;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

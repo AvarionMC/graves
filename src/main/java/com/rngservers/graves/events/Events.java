@@ -1,8 +1,8 @@
 package com.rngservers.graves.events;
 
 import com.rngservers.graves.Main;
-import com.rngservers.graves.chest.Grave;
-import com.rngservers.graves.chest.GraveManager;
+import com.rngservers.graves.grave.Grave;
+import com.rngservers.graves.grave.GraveManager;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -12,6 +12,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -172,6 +173,14 @@ public class Events implements Listener {
                 graveManager.graveProtected(event.getPlayer(), event.getBlock().getLocation());
                 event.setCancelled(true);
             }
+        }
+    }
+
+    @EventHandler
+    public void onGraveBreakNaturally(BlockFromToEvent event) {
+        Grave grave = graveManager.getGrave(event.getToBlock().getLocation());
+        if (grave != null) {
+            event.setCancelled(true);
         }
     }
 
