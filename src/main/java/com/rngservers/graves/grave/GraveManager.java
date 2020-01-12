@@ -7,14 +7,12 @@ import org.apache.commons.lang.WordUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.ExperienceOrb;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -190,22 +188,31 @@ public class GraveManager {
     }
 
     public void removeGrave(Grave grave) {
-        removeGrave(grave.getLocation());
+        Material replace = grave.getReplace();
+        if (replace == null) {
+            replace = Material.AIR;
+        }
+        grave.getLocation().getBlock().setType(replace);
+
+        data.removeGrave(grave);
+        graves.remove(grave);
+
+        closeGrave(grave);
+        lootSound(grave.getLocation());
     }
 
     public void removeGrave(Location location) {
-        location = roundLocation(location);
-        if (graves.containsKey(location)) {
-            Material replace = graves.get(location).getReplace();
-            if (replace == null) {
-                replace = Material.AIR;
-            }
-            location.getBlock().setType(replace);
+        Grave grave = graves.get(roundLocation(location));
+        if (grave != null) {
+            removeGrave(grave);
+        }
+    }
 
-            data.removeGrave(graves.get(location));
-            graves.remove(location);
-
-            lootSound(location);
+    public void closeGrave(Grave grave) {
+        List<HumanEntity> viewers = grave.getInventory().getViewers();
+        for (HumanEntity viewer : new ArrayList<>(viewers)) {
+            grave.getInventory().getViewers().remove(viewer);
+            viewer.closeInventory();
         }
     }
 
@@ -226,12 +233,16 @@ public class GraveManager {
             if (!expMessage.equals("")) {
                 player.sendMessage(expMessage);
             }
+            grave.setExperience(null);
         }
     }
 
     public void dropExperience(Grave grave) {
-        ExperienceOrb eo = (ExperienceOrb) grave.getLocation().getWorld().spawnEntity(grave.getLocation(), EntityType.EXPERIENCE_ORB);
-        eo.setExperience(grave.getExperience());
+        if (grave.getExperience() != null && grave.getExperience() > 0) {
+            ExperienceOrb eo = (ExperienceOrb) grave.getLocation().getWorld().spawnEntity(grave.getLocation(), EntityType.EXPERIENCE_ORB);
+            eo.setExperience(grave.getExperience());
+            grave.setExperience(null);
+        }
     }
 
     public void lootSound(Location location) {

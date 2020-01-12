@@ -8,7 +8,6 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -31,7 +30,7 @@ public class Events implements Listener {
         this.graveManager = chestManager;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         if (!event.getEntity().hasPermission("graves.place")) {
             return;
@@ -44,7 +43,7 @@ public class Events implements Listener {
                 event.getEntity().getInventory().clear();
                 Boolean expStore = plugin.getConfig().getBoolean("settings.expStore");
                 if (expStore) {
-                    event.setNewLevel(0);
+                    event.setNewTotalExp(0);
                     event.setDroppedExp(0);
                 }
             }
@@ -122,14 +121,15 @@ public class Events implements Listener {
             }
             Grave grave = (Grave) event.getInventory().getHolder();
             if (grave.getItemAmount() == 0) {
-                graveManager.removeGrave(grave.getLocation());
                 String lootMessage = plugin.getConfig().getString("settings.lootMessage")
                         .replace("&", "§");
                 if (!lootMessage.equals("")) {
                     event.getPlayer().sendMessage(lootMessage);
                 }
                 Player player = (Player) event.getPlayer();
+                grave.getInventory().getViewers().remove(player);
                 graveManager.giveExperience(grave, player);
+                graveManager.removeGrave(grave);
             }
         }
     }
@@ -184,7 +184,7 @@ public class Events implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler
     public void onGraveExplode(EntityExplodeEvent event) {
         Iterator<Block> iterator = event.blockList().iterator();
         while (iterator.hasNext()) {
