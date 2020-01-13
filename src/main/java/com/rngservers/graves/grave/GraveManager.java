@@ -44,6 +44,7 @@ public class GraveManager {
                             Long diff = System.currentTimeMillis() - grave.getTime();
                             if (diff >= graveTime) {
                                 dropGrave(grave);
+                                dropExperience(grave);
                                 removeGrave(grave);
                             }
                         }
@@ -84,6 +85,7 @@ public class GraveManager {
         grave.setPlayer(player);
         grave.setKiller(player.getKiller());
         grave.setReplace(location.getBlock().getType());
+
         Boolean expStore = plugin.getConfig().getBoolean("settings.expStore");
         if (expStore) {
             grave.setExperience(player.getTotalExperience());
@@ -195,17 +197,10 @@ public class GraveManager {
         grave.getLocation().getBlock().setType(replace);
 
         data.removeGrave(grave);
-        graves.remove(grave);
+        graves.remove(grave.getLocation());
 
         closeGrave(grave);
         lootSound(grave.getLocation());
-    }
-
-    public void removeGrave(Location location) {
-        Grave grave = graves.get(roundLocation(location));
-        if (grave != null) {
-            removeGrave(grave);
-        }
     }
 
     public void closeGrave(Grave grave) {

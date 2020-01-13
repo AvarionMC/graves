@@ -18,14 +18,14 @@ public class Graves implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        String version = "1.2";
+        String version = "1.3";
         String author = "RandomUnknown";
 
         if (args.length < 1) {
             sender.sendMessage(
                     ChatColor.DARK_GRAY + "» " + ChatColor.GOLD + "Graves " + ChatColor.GRAY + "v" + version);
             sender.sendMessage(
-                    ChatColor.GRAY + "/dc " + ChatColor.DARK_GRAY + "-" + ChatColor.RESET + " Plugin info");
+                    ChatColor.GRAY + "/graves " + ChatColor.DARK_GRAY + "-" + ChatColor.RESET + " Plugin info");
             if (sender.hasPermission("graves.reload")) {
                 sender.sendMessage(ChatColor.GRAY + "/graves reload " + ChatColor.DARK_GRAY + "-" + ChatColor.RESET
                         + " Reload plugin");
