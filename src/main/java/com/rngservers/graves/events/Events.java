@@ -45,6 +45,7 @@ public class Events implements Listener {
                 if (expStore) {
                     event.setNewTotalExp(0);
                     event.setDroppedExp(0);
+                    event.setKeepLevel(false);
                 }
             }
         }
