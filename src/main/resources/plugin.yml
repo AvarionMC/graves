@@ -28,3 +28,6 @@ permissions:
   graves.reload:
     default: op
     description: Reload Graves
+  graves.cleanup:
+    default: op
+    description: Cleanup holograms

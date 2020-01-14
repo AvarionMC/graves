@@ -21,7 +21,7 @@ public class Graves implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        String version = "1.4";
+        String version = "1.5";
         String author = "RandomUnknown";
 
         if (args.length < 1) {
@@ -29,12 +29,26 @@ public class Graves implements CommandExecutor {
                     ChatColor.DARK_GRAY + "» " + ChatColor.GOLD + "Graves " + ChatColor.GRAY + "v" + version);
             sender.sendMessage(
                     ChatColor.GRAY + "/graves " + ChatColor.DARK_GRAY + "-" + ChatColor.RESET + " Plugin info");
+            if (sender.hasPermission("graves.cleanup")) {
+                sender.sendMessage(ChatColor.GRAY + "/graves cleanup " + ChatColor.DARK_GRAY + "-" + ChatColor.RESET
+                        + " Remove all holograms");
+            }
             if (sender.hasPermission("graves.reload")) {
                 sender.sendMessage(ChatColor.GRAY + "/graves reload " + ChatColor.DARK_GRAY + "-" + ChatColor.RESET
                         + " Reload plugin");
             }
             sender.sendMessage(ChatColor.DARK_GRAY + "Author: " + ChatColor.GRAY + author);
             return true;
+        }
+        if (args[0].equals("cleanup")) {
+            if (!sender.hasPermission("graves.cleanup")) {
+                sender.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.GOLD + "Graves" + ChatColor.DARK_GRAY + "]"
+                        + ChatColor.RESET + " No Permission!");
+                return true;
+            }
+            Integer count = graveManager.cleanupHolograms();
+            sender.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.GOLD + "Graves" + ChatColor.DARK_GRAY + "]"
+                    + ChatColor.RESET + " Removed " + ChatColor.GOLD + count.toString() + ChatColor.WHITE + " holograms!");
         }
         if (args[0].equals("reload")) {
             if (!sender.hasPermission("graves.reload")) {

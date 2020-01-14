@@ -165,8 +165,16 @@ public class GraveManager {
         grave.getLocation().getBlock().setType(graveBlock);
         String graveHeadName = plugin.getConfig().getString("settings.graveHeadSkin");
         if (graveBlock.equals(Material.PLAYER_HEAD)) {
+            if (grave.getPlayer() != null) {
+
+            }
             Rotatable skullRotate = (Rotatable) grave.getLocation().getBlock().getBlockData();
-            BlockFace skullBlockFace = getSkullBlockFace(grave.getPlayer().getPlayer());
+            BlockFace skullBlockFace = null;
+            if (grave.getPlayer() != null) {
+                skullBlockFace = getSkullBlockFace(grave.getPlayer().getPlayer());
+            } else {
+                skullBlockFace = BlockFace.NORTH;
+            }
             Skull skull = (Skull) grave.getLocation().getBlock().getState();
             if (skullBlockFace != null) {
                 skullRotate.setRotation(skullBlockFace);
@@ -230,12 +238,12 @@ public class GraveManager {
         }
         grave.getLocation().getBlock().setType(replace);
 
-        data.removeGrave(grave);
-        graves.remove(grave.getLocation());
-
         closeGrave(grave);
         lootSound(grave.getLocation());
         removeHologram(grave);
+
+        data.removeGrave(grave);
+        graves.remove(grave.getLocation());
     }
 
     public void closeGrave(Grave grave) {
@@ -294,11 +302,39 @@ public class GraveManager {
         Integer graveTime = plugin.getConfig().getInt("settings.graveTime") * 1000;
         Long time = (graveTime - (System.currentTimeMillis() - grave.getTime())) / 1000;
         String timeString = getTimeString(time);
-        return hologramLines.get(lineNumber).replace("$player", grave.getPlayer().getName())
+        String line = hologramLines.get(lineNumber)
                 .replace("$time", timeString)
+                .replace("$player", "$entity")
                 .replace("$itemCount", getItemAmount(grave.getInventory()).toString())
-                .replace("$xp", grave.getExperience().toString())
                 .replace("&", "§");
+                if (grave.getPlayer() != null) {
+                    line = line.replace("$entity", grave.getPlayer().getName());
+                } else if (grave.getEntityType() != null) {
+                    line = line.replace("$entity", getEntityName(grave.getEntityType()));
+                }
+                if (grave.getExperience() != null) {
+                    line = line.replace("$xp", grave.getExperience().toString());
+                } else {
+                    line = line.replace("$xp", "0");
+                }
+        return line;
+    }
+
+    public Integer cleanupHolograms() {
+        Integer count = 0;
+        for (World world : plugin.getServer().getWorlds()) {
+            for (Entity entity : world.getEntities()) {
+                if (entity instanceof ArmorStand) {
+                    for (String tag : entity.getScoreboardTags()) {
+                        if (tag.contains("graveHologram")) {
+                            entity.remove();
+                            count++;
+                        }
+                    }
+                }
+            }
+        }
+        return count;
     }
 
     public void createHologram(Grave grave) {
@@ -314,14 +350,13 @@ public class GraveManager {
         Integer lineNumber = 0;
         for (String ignored : plugin.getConfig().getStringList("settings.hologramLines")) {
             ArmorStand armorStand = location.getWorld().spawn(location, ArmorStand.class);
+            armorStand.setInvulnerable(true);
             armorStand.setSmall(true);
             armorStand.setGravity(false);
             armorStand.setVisible(false);
             armorStand.setCustomName(parseHologram(lineNumber, grave));
             armorStand.setCustomNameVisible(true);
-            armorStand.addScoreboardTag("graveHologramLine:" + lineNumber);
-            armorStand.addScoreboardTag("graveHologramCords:" + grave.getLocation().getX() + "_" +
-                    grave.getLocation().getY() + "_" + grave.getLocation().getZ());
+            armorStand.addScoreboardTag("graveHologram");
             location.add(0, 0.25, 0);
             grave.addHologram(armorStand.getUniqueId(), lineNumber);
             lineNumber++;
@@ -335,7 +370,9 @@ public class GraveManager {
                 if (iterator.hasNext()) {
                     Map.Entry<UUID, Integer> entry = iterator.next();
                     ArmorStand armorStand = (ArmorStand) plugin.getServer().getEntity(entry.getKey());
-                    armorStand.remove();
+                    if (armorStand != null) {
+                        armorStand.remove();
+                    }
                     iterator.remove();
                 }
             }

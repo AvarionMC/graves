@@ -39,7 +39,7 @@ settings:
 
   hologram: true
   hologramLines:
-    - "&6$player's &fGrave"
+    - "&$entity's &fGrave"
     - "&6$itemCount &fItems &f/ &6$xp&fxp"
     - "&6$time &fleft"
 
