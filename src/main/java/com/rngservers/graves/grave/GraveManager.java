@@ -250,9 +250,9 @@ public class GraveManager {
         for (ItemStack item : grave.getInventory()) {
             if (item != null) {
                 grave.getLocation().getWorld().dropItemNaturally(grave.getLocation(), item);
-                grave.getInventory().remove(item);
             }
         }
+        grave.getInventory().clear();
     }
 
     public void giveExperience(Grave grave, Player player) {
