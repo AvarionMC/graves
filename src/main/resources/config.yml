@@ -37,13 +37,21 @@ settings:
     #- ZOMBIE
     #- ALL
 
-  timeSecond: "$s seconds"
-  timeMinute: "$m minutes"
-  timeHour: "$h hours"
-  timeDay: "$d days"
+  hologram: true
+  hologramLines:
+    - "&6$player's &fGrave"
+    - "&6$itemCount &fItems &f/ &6$xp&fxp"
+    - "&6$time &fleft"
+
+  timeSecond: "&6$s&fs "
+  timeMinute: "&6$m&fm "
+  timeHour: "&6$h&fh "
+  timeDay: "&6$d&fd "
 
   # What blocks can graves replace.
   graveReplace:
+    - TORCH
+    - REDSTONE_TORCH
     - LAVA
     - WATER
     - GRASS

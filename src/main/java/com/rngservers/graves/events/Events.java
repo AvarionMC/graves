@@ -38,7 +38,7 @@ public class Events implements Listener {
         List<String> graveEntities = plugin.getConfig().getStringList("settings.graveEntities");
         if (graveEntities.contains(event.getEntity().getType().toString()) || graveEntities.contains("ALL")) {
             if (graveManager.getItemAmount(event.getEntity().getInventory()) > 0) {
-                graveManager.newGrave(event.getEntity());
+                graveManager.createGrave(event.getEntity());
                 event.getDrops().clear();
                 event.getEntity().getInventory().clear();
                 Boolean expStore = plugin.getConfig().getBoolean("settings.expStore");
@@ -58,7 +58,7 @@ public class Events implements Listener {
         List<String> graveEntities = plugin.getConfig().getStringList("settings.graveEntities");
         if (graveEntities.contains(event.getEntity().getType().toString()) || graveEntities.contains("ALL")) {
             if (event.getDrops().size() > 0) {
-                graveManager.newGrave(event.getEntity(), event.getDrops());
+                graveManager.createGrave(event.getEntity(), event.getDrops());
                 event.getDrops().clear();
             }
         }

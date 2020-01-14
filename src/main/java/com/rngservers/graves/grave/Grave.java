@@ -8,6 +8,10 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 public class Grave implements InventoryHolder {
     private Location location;
     private Inventory inventory;
@@ -17,11 +21,11 @@ public class Grave implements InventoryHolder {
     private OfflinePlayer player;
     private OfflinePlayer killer;
     private Long time;
+    private Map<UUID, Integer> holograms = new HashMap<>();
 
     public Grave(Location location, Inventory itemInventory, String title) {
         this.location = location;
         this.time = System.currentTimeMillis();
-
         inventory = Bukkit.getServer().createInventory(this, 54, title);
         inventory.setContents(itemInventory.getContents());
     }
@@ -58,6 +62,10 @@ public class Grave implements InventoryHolder {
         return time;
     }
 
+    public void setTime(Long time) {
+        this.time = time;
+    }
+
     public Integer getItemAmount() {
         return GraveManager.getItemAmount(inventory);
     }
@@ -80,5 +88,17 @@ public class Grave implements InventoryHolder {
 
     public void setKiller(OfflinePlayer killer) {
         this.killer = killer;
+    }
+
+    public void setHolograms(Map<UUID, Integer> holograms) {
+        this.holograms = holograms;
+    }
+
+    public void addHologram(UUID uuid, Integer lineNumber) {
+        this.holograms.put(uuid, lineNumber);
+    }
+
+    public Map<UUID, Integer> getHolograms() {
+        return holograms;
     }
 }

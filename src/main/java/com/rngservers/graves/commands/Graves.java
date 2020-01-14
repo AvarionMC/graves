@@ -2,6 +2,7 @@ package com.rngservers.graves.commands;
 
 import com.rngservers.graves.Main;
 import com.rngservers.graves.data.DataManager;
+import com.rngservers.graves.grave.GraveManager;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -10,15 +11,17 @@ import org.bukkit.command.CommandSender;
 public class Graves implements CommandExecutor {
     private Main plugin;
     private DataManager data;
+    private GraveManager graveManager;
 
-    public Graves(Main plugin, DataManager data) {
+    public Graves(Main plugin, DataManager data, GraveManager graveManager) {
         this.plugin = plugin;
         this.data = data;
+        this.graveManager = graveManager;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        String version = "1.3";
+        String version = "1.4";
         String author = "RandomUnknown";
 
         if (args.length < 1) {
@@ -41,6 +44,8 @@ public class Graves implements CommandExecutor {
             }
             plugin.reloadConfig();
             data.graveReplaceLoad();
+            graveManager.graveHeadLoad();
+            graveManager.hologramLinesLoad();
             sender.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.GOLD + "Graves" + ChatColor.DARK_GRAY + "]"
                     + ChatColor.RESET + " Reloaded config file!");
         }

@@ -50,21 +50,22 @@ public class DataManager {
 
                 Material replace = Material.matchMaterial(data.getString(worlds + "." + cords + ".replace"));
                 Integer experience = data.getInt(worlds + "." + cords + ".experience");
+                Long time = data.getLong(worlds + "." + cords + ".time");
 
                 Grave grave = null;
                 if (data.isSet(worlds + "." + cords + ".player")) {
                     OfflinePlayer player = plugin.getServer().getOfflinePlayer(UUID.fromString(data.getString(worlds + "." + cords + ".player")));
-                    grave = createGrave(location, items.toArray(new ItemStack[0]), experience, replace, player);
-
+                    grave = createGrave(location, items.toArray(new ItemStack[0]), time, experience, replace, player);
                 } else if (data.isSet(worlds + "." + cords + ".entity")) {
                     EntityType entityType = EntityType.valueOf(data.getString(worlds + "." + cords + ".entity"));
-                    grave = createGrave(location, items.toArray(new ItemStack[0]), experience, replace, entityType);
+                    grave = createGrave(location, items.toArray(new ItemStack[0]), time, experience, replace, entityType);
                 }
                 if (grave != null) {
                     if (data.isSet(worlds + "." + cords + ".killer")) {
                         OfflinePlayer killer = plugin.getServer().getOfflinePlayer(UUID.fromString(data.getString(worlds + "." + cords + ".killer")));
                         grave.setKiller(killer);
                     }
+                    grave.setHolograms(convertListHologram(data.getStringList(worlds + "." + cords + ".hologram")));
                     graves.put(location, grave);
                     data.set(worlds + "." + cords, null);
                 }
@@ -74,39 +75,40 @@ public class DataManager {
         return graves;
     }
 
-    public Grave createGrave(Location location, ItemStack[] items, Integer experience, Material replace, OfflinePlayer player) {
-        Inventory inventory = plugin.getServer().createInventory(null, 54);
-        for (ItemStack item : items) {
-            if (item != null) {
-                inventory.addItem(item);
-            }
-        }
+    public Grave createGrave(Location location, ItemStack[] items, Long time, Integer experience, Material replace, OfflinePlayer player) {
         String graveTitle = plugin.getConfig().getString("settings.graveTitle")
                 .replace("$entity", player.getName()).replace("&", "§");
+        if (graveTitle.equals("")) {
+            graveTitle = player.getName() + "'s Grave";
+        }
 
-        Grave grave = new Grave(location, inventory, graveTitle);
+        Grave grave = createGrave(location, items, time, experience, replace, graveTitle);
         grave.setPlayer(player);
-        grave.setReplace(replace);
-        grave.setExperience(experience);
-
         return grave;
     }
 
-    public Grave createGrave(Location location, ItemStack[] items, Integer experience, Material replace, EntityType entityType) {
+    public Grave createGrave(Location location, ItemStack[] items, Long time, Integer experience, Material replace, EntityType entityType) {
+        String graveTitle = plugin.getConfig().getString("settings.graveTitle")
+                .replace("$entity", GraveManager.getEntityName(entityType)).replace("&", "§");
+        if (graveTitle.equals("")) {
+            graveTitle = GraveManager.getEntityName(entityType) + "'s Grave";
+        }
+        Grave grave = createGrave(location, items, time, experience, replace, graveTitle);
+        grave.setEntityType(entityType);
+        return grave;
+    }
+
+    private Grave createGrave(Location location, ItemStack[] items, Long time, Integer experience, Material replace, String graveTitle) {
         Inventory inventory = plugin.getServer().createInventory(null, 54);
         for (ItemStack item : items) {
             if (item != null) {
                 inventory.addItem(item);
             }
         }
-        String graveTitle = plugin.getConfig().getString("settings.graveTitle")
-                .replace("$entity", GraveManager.getEntityName(entityType)).replace("&", "§");
-
         Grave grave = new Grave(location, inventory, graveTitle);
-        grave.setEntityType(entityType);
         grave.setReplace(replace);
         grave.setExperience(experience);
-
+        grave.setTime(time);
         return grave;
     }
 
@@ -128,11 +130,14 @@ public class DataManager {
             }
             data.set(world + "." + x + "_" + y + "_" + z + ".time", grave.getTime());
             data.set(world + "." + x + "_" + y + "_" + z + ".replace", grave.getReplace().toString());
+            if (!grave.getHolograms().isEmpty()) {
+                data.set(world + "." + x + "_" + y + "_" + z + ".hologram", convertMapHologram(grave.getHolograms()));
+            }
             if (grave.getKiller() != null) {
                 data.set(world + "." + x + "_" + y + "_" + z + ".killer", grave.getKiller().getUniqueId().toString());
             }
             if (grave.getExperience() != null) {
-                data.set(world + "." + x + "_" + y + "_" + z + ".experience", grave.getExperience().toString());
+                data.set(world + "." + x + "_" + y + "_" + z + ".experience", grave.getExperience());
             }
             int counter = 0;
             for (ItemStack item : inventory.getStorageContents()) {
@@ -143,6 +148,30 @@ public class DataManager {
             }
         }
         saveData();
+    }
+
+    public List<String> convertMapHologram(Map<UUID, Integer> map) {
+        List<String> list = new ArrayList<>();
+        for (Iterator<Map.Entry<UUID, Integer>> iterator = map.entrySet()
+                .iterator(); iterator.hasNext(); ) {
+            if (iterator.hasNext()) {
+                Map.Entry<UUID, Integer> entry = iterator.next();
+                list.add(entry.getKey().toString() + ":" + entry.getValue().toString());
+            }
+        }
+        return list;
+    }
+
+    public Map<UUID, Integer> convertListHologram(List<String> list) {
+        Map<UUID, Integer> map = new HashMap<>();
+
+        for (String string : list) {
+            String[] parts = string.split(":");
+            UUID uuid = UUID.fromString(parts[0]);
+            Integer lineNumber = Integer.parseInt(parts[1]);
+            map.put(uuid, lineNumber);
+        }
+        return map;
     }
 
     public void removeGrave(Grave grave) {

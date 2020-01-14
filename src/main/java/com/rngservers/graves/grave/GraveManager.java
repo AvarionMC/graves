@@ -6,28 +6,32 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Skull;
+import org.bukkit.block.data.Rotatable;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class GraveManager {
     private Main plugin;
     DataManager data;
     private Map<Location, Grave> graves;
+    private OfflinePlayer graveHead;
+    private List<String> hologramLines = new ArrayList<>();
 
     public GraveManager(Main plugin, DataManager data) {
         this.plugin = plugin;
         this.data = data;
         graves = data.getSavedGraves();
+        graveHeadLoad();
+        hologramLinesLoad();
         removeGraveTimer();
+        hologramUpdater();
     }
 
     public void removeGraveTimer() {
@@ -54,6 +58,26 @@ public class GraveManager {
         }.runTaskTimer(plugin, 0L, 20L);
     }
 
+
+    public void hologramUpdater() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!graves.isEmpty()) {
+                    for (Iterator<Map.Entry<Location, Grave>> iterator = graves.entrySet()
+                            .iterator(); iterator.hasNext(); ) {
+                        if (iterator.hasNext()) {
+                            Map.Entry<Location, Grave> entry = iterator.next();
+                            if (entry.getValue() != null) {
+                                updateHologram(entry.getValue());
+                            }
+                        }
+                    }
+                }
+            }
+        }.runTaskTimer(plugin, 0L, 20L);
+    }
+
     public Grave getGrave(Location location) {
         return graves.get(roundLocation(location));
     }
@@ -64,7 +88,7 @@ public class GraveManager {
         }
     }
 
-    public void newGrave(Player player) {
+    public void createGrave(Player player) {
         Location location = getPlaceLocation(player.getLocation());
         if (location == null) {
             String graveFailure = plugin.getConfig().getString("settings.graveFailure")
@@ -107,7 +131,7 @@ public class GraveManager {
         }
     }
 
-    public void newGrave(LivingEntity entity, List<ItemStack> items) {
+    public void createGrave(LivingEntity entity, List<ItemStack> items) {
         Location location = getPlaceLocation(entity.getLocation());
         if (location == null) {
             return;
@@ -131,6 +155,40 @@ public class GraveManager {
         placeGrave(grave);
 
         graves.put(location, grave);
+    }
+
+    public void placeGrave(Grave grave) {
+        Material graveBlock = Material.matchMaterial(plugin.getConfig().getString("settings.graveBlock"));
+        if (graveBlock == null) {
+            graveBlock = Material.CHEST;
+        }
+        grave.getLocation().getBlock().setType(graveBlock);
+        String graveHeadName = plugin.getConfig().getString("settings.graveHeadSkin");
+        if (graveBlock.equals(Material.PLAYER_HEAD)) {
+            Rotatable skullRotate = (Rotatable) grave.getLocation().getBlock().getBlockData();
+            BlockFace skullBlockFace = getSkullBlockFace(grave.getPlayer().getPlayer());
+            Skull skull = (Skull) grave.getLocation().getBlock().getState();
+            if (skullBlockFace != null) {
+                skullRotate.setRotation(skullBlockFace);
+                skull.setBlockData(skullRotate);
+            }
+            if (graveHeadName.equals("$entity") || graveHeadName.equals("")) {
+                if (grave.getPlayer() != null) {
+                    skull.setOwningPlayer(grave.getPlayer());
+                } else if (grave.getEntityType() != null) {
+                    plugin.getServer().broadcastMessage("TODO, Mob heads");
+                }
+            } else {
+                if (graveHead != null) {
+                    skull.setOwningPlayer(graveHead);
+                }
+            }
+            skull.update();
+        }
+        Boolean hologram = plugin.getConfig().getBoolean("settings.hologram");
+        if (hologram) {
+            createHologram(grave);
+        }
     }
 
     public Location getPlaceLocation(Location location) {
@@ -165,30 +223,6 @@ public class GraveManager {
         return null;
     }
 
-    @SuppressWarnings("deprecation")
-    public void placeGrave(Grave grave) {
-        Material graveBlock = Material.matchMaterial(plugin.getConfig().getString("settings.graveBlock"));
-        if (graveBlock == null) {
-            graveBlock = Material.CHEST;
-        }
-        grave.getLocation().getBlock().setType(graveBlock);
-        String graveHeadSkin = plugin.getConfig().getString("settings.graveHeadSkin");
-        if (graveBlock.equals(Material.PLAYER_HEAD)) {
-            Skull skull = (Skull) grave.getLocation().getBlock().getState();
-            if (graveHeadSkin.equals("$entity") || graveHeadSkin.equals("")) {
-                if (grave.getPlayer() != null) {
-                    skull.setOwningPlayer(grave.getPlayer());
-                } else if (grave.getEntityType() != null) {
-                    plugin.getServer().broadcastMessage("TODO, Mob heads");
-                }
-            } else {
-                OfflinePlayer player = plugin.getServer().getOfflinePlayer("MHF_Chest");
-                skull.setOwningPlayer(player);
-            }
-            skull.update();
-        }
-    }
-
     public void removeGrave(Grave grave) {
         Material replace = grave.getReplace();
         if (replace == null) {
@@ -201,6 +235,7 @@ public class GraveManager {
 
         closeGrave(grave);
         lootSound(grave.getLocation());
+        removeHologram(grave);
     }
 
     public void closeGrave(Grave grave) {
@@ -240,6 +275,73 @@ public class GraveManager {
         }
     }
 
+    public void updateHologram(Grave grave) {
+        if (!grave.getHolograms().isEmpty()) {
+            for (Iterator<Map.Entry<UUID, Integer>> iterator = grave.getHolograms().entrySet()
+                    .iterator(); iterator.hasNext(); ) {
+                if (iterator.hasNext()) {
+                    Map.Entry<UUID, Integer> entry = iterator.next();
+                    ArmorStand armorStand = (ArmorStand) plugin.getServer().getEntity(entry.getKey());
+                    if (armorStand != null) {
+                        armorStand.setCustomName(parseHologram(entry.getValue(), grave));
+                    }
+                }
+            }
+        }
+    }
+
+    public String parseHologram(Integer lineNumber, Grave grave) {
+        Integer graveTime = plugin.getConfig().getInt("settings.graveTime") * 1000;
+        Long time = (graveTime - (System.currentTimeMillis() - grave.getTime())) / 1000;
+        String timeString = getTimeString(time);
+        return hologramLines.get(lineNumber).replace("$player", grave.getPlayer().getName())
+                .replace("$time", timeString)
+                .replace("$itemCount", getItemAmount(grave.getInventory()).toString())
+                .replace("$xp", grave.getExperience().toString())
+                .replace("&", "§");
+    }
+
+    public void createHologram(Grave grave) {
+        Material graveBlock = Material.matchMaterial(plugin.getConfig().getString("settings.graveBlock"));
+        if (graveBlock == null) {
+            graveBlock = Material.CHEST;
+        }
+        Location location = grave.getLocation().clone().add(0.5, 0, 0.5);
+        if (graveBlock.equals(Material.PLAYER_HEAD)) {
+            location.subtract(0, 0.40, 0);
+        }
+
+        Integer lineNumber = 0;
+        for (String ignored : plugin.getConfig().getStringList("settings.hologramLines")) {
+            ArmorStand armorStand = location.getWorld().spawn(location, ArmorStand.class);
+            armorStand.setSmall(true);
+            armorStand.setGravity(false);
+            armorStand.setVisible(false);
+            armorStand.setCustomName(parseHologram(lineNumber, grave));
+            armorStand.setCustomNameVisible(true);
+            armorStand.addScoreboardTag("graveHologramLine:" + lineNumber);
+            armorStand.addScoreboardTag("graveHologramCords:" + grave.getLocation().getX() + "_" +
+                    grave.getLocation().getY() + "_" + grave.getLocation().getZ());
+            location.add(0, 0.25, 0);
+            grave.addHologram(armorStand.getUniqueId(), lineNumber);
+            lineNumber++;
+        }
+    }
+
+    public void removeHologram(Grave grave) {
+        if (!grave.getHolograms().isEmpty()) {
+            for (Iterator<Map.Entry<UUID, Integer>> iterator = grave.getHolograms().entrySet()
+                    .iterator(); iterator.hasNext(); ) {
+                if (iterator.hasNext()) {
+                    Map.Entry<UUID, Integer> entry = iterator.next();
+                    ArmorStand armorStand = (ArmorStand) plugin.getServer().getEntity(entry.getKey());
+                    armorStand.remove();
+                    iterator.remove();
+                }
+            }
+        }
+    }
+
     public void lootSound(Location location) {
         String lootSound = plugin.getConfig().getString("settings.lootSound");
         if (!lootSound.equals("")) {
@@ -271,17 +373,33 @@ public class GraveManager {
         }
     }
 
-    static public String getEntityName(EntityType entityType) {
+    @SuppressWarnings("deprecation")
+    public void graveHeadLoad() {
+        String graveHeadName = plugin.getConfig().getString("settings.graveHeadSkin");
+        if (!graveHeadName.equals("")) {
+            graveHead = plugin.getServer().getOfflinePlayer(graveHeadName);
+        }
+    }
+
+    public void hologramLinesLoad() {
+        hologramLines.clear();
+        for (String line : plugin.getConfig().getStringList("settings.hologramLines")) {
+            hologramLines.add(line);
+        }
+        Collections.reverse(hologramLines);
+    }
+
+    public static String getEntityName(EntityType entityType) {
         String name = WordUtils.capitalizeFully(entityType.toString()).replace("_", " ");
         return name;
     }
 
-    static public Location roundLocation(Location location) {
+    public static Location roundLocation(Location location) {
         return new Location(location.getWorld(), Math.round(location.getBlockX()), Math.round(location.getY()),
                 Math.round(location.getBlockZ()));
     }
 
-    static public Integer getItemAmount(Inventory inventory) {
+    public static Integer getItemAmount(Inventory inventory) {
         Integer count = 0;
         for (ItemStack item : inventory.getStorageContents()) {
             if (item != null) {
@@ -291,12 +409,39 @@ public class GraveManager {
         return count;
     }
 
+    private static BlockFace getSkullBlockFace(Player player) {
+        float direction = player.getLocation().getYaw() % 360;
+        if (direction < 0) {
+            direction += 360;
+        }
+        direction = Math.round(direction / 45);
+        switch ((int) direction) {
+            case 0:
+                return BlockFace.NORTH;
+            case 1:
+                return BlockFace.NORTH_EAST;
+            case 2:
+                return BlockFace.EAST;
+            case 3:
+                return BlockFace.SOUTH_EAST;
+            case 4:
+                return BlockFace.SOUTH;
+            case 5:
+                return BlockFace.SOUTH_WEST;
+            case 6:
+                return BlockFace.WEST;
+            case 7:
+                return BlockFace.NORTH_WEST;
+            default:
+                return null;
+        }
+    }
+
     public String getTimeString(Long seconds) {
         int day = (int) TimeUnit.SECONDS.toDays(seconds);
         long hour = TimeUnit.SECONDS.toHours(seconds) - (day * 24);
         long minute = TimeUnit.SECONDS.toMinutes(seconds) - (TimeUnit.SECONDS.toHours(seconds) * 60);
         long second = TimeUnit.SECONDS.toSeconds(seconds) - (TimeUnit.SECONDS.toMinutes(seconds) * 60);
-
         String timeDay = "";
         String timeHour = "";
         String timeMinute = "";
@@ -317,7 +462,6 @@ public class GraveManager {
             timeSecond = plugin.getConfig().getString("settings.timeSecond").replace("$s", String.valueOf(second))
                     .replace("&", "§");
         }
-
         return StringUtils.normalizeSpace(timeDay + timeHour + timeMinute + timeSecond);
     }
 }
