@@ -38,6 +38,7 @@ settings:
     #- ALL
 
   hologram: true
+  hologramOpen: true # Will right clicking a hologram open the grave.
   hologramLines:
     - "&6$entity's &fGrave"
     - "&6$itemCount &fItems &f/ &6$xp&fxp"

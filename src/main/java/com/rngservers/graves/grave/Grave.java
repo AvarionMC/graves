@@ -26,7 +26,7 @@ public class Grave implements InventoryHolder {
     public Grave(Location location, Inventory itemInventory, String title) {
         this.location = location;
         this.time = System.currentTimeMillis();
-        inventory = Bukkit.getServer().createInventory(this, 54, title);
+        inventory = Bukkit.getServer().createInventory(this, itemInventory.getSize(), title);
         inventory.setContents(itemInventory.getContents());
     }
 

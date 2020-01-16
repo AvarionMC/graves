@@ -19,6 +19,9 @@ permissions:
   graves.open:
     default: true
     description: Can open a grave
+  graves.autoloot:
+    default: true
+    description: Can Autoloot a grave
   graves.break:
     default: true
     description: Can break a grave

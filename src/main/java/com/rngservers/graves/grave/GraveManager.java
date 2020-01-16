@@ -4,7 +4,10 @@ import com.rngservers.graves.Main;
 import com.rngservers.graves.data.DataManager;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
-import org.bukkit.*;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Skull;
@@ -12,6 +15,7 @@ import org.bukkit.block.data.Rotatable;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
@@ -19,19 +23,20 @@ import java.util.concurrent.TimeUnit;
 
 public class GraveManager {
     private Main plugin;
-    DataManager data;
+    private DataManager data;
+    private Messages messages;
     private Map<Location, Grave> graves;
     private OfflinePlayer graveHead;
     private List<String> hologramLines = new ArrayList<>();
 
-    public GraveManager(Main plugin, DataManager data) {
+    public GraveManager(Main plugin, DataManager data, Messages messages) {
         this.plugin = plugin;
         this.data = data;
+        this.messages = messages;
         graves = data.getSavedGraves();
         graveHeadLoad();
         hologramLinesLoad();
         removeGraveTimer();
-        hologramUpdater();
     }
 
     public void removeGraveTimer() {
@@ -39,38 +44,18 @@ public class GraveManager {
             @Override
             public void run() {
                 if (!graves.isEmpty()) {
-                    for (Iterator<Map.Entry<Location, Grave>> iterator = graves.entrySet()
-                            .iterator(); iterator.hasNext(); ) {
-                        if (iterator.hasNext()) {
-                            Map.Entry<Location, Grave> entry = iterator.next();
-                            Grave grave = entry.getValue();
-                            Integer graveTime = plugin.getConfig().getInt("settings.graveTime") * 1000;
-                            Long diff = System.currentTimeMillis() - grave.getTime();
-                            if (diff >= graveTime) {
-                                dropGrave(grave);
-                                dropExperience(grave);
-                                removeGrave(grave);
-                            }
-                        }
-                    }
-                }
-            }
-        }.runTaskTimer(plugin, 0L, 20L);
-    }
-
-
-    public void hologramUpdater() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!graves.isEmpty()) {
-                    for (Iterator<Map.Entry<Location, Grave>> iterator = graves.entrySet()
-                            .iterator(); iterator.hasNext(); ) {
-                        if (iterator.hasNext()) {
-                            Map.Entry<Location, Grave> entry = iterator.next();
-                            if (entry.getValue() != null) {
-                                updateHologram(entry.getValue());
-                            }
+                    Iterator iterator = graves.entrySet().iterator();
+                    while (iterator.hasNext()) {
+                        Map.Entry<Location, Grave> entry = (Map.Entry<Location, Grave>) iterator.next();
+                        Grave grave = entry.getValue();
+                        updateHologram(grave);
+                        Integer graveTime = plugin.getConfig().getInt("settings.graveTime") * 1000;
+                        Long diff = System.currentTimeMillis() - grave.getTime();
+                        if (diff >= graveTime) {
+                            dropGrave(grave);
+                            dropExperience(grave);
+                            removeHologram(grave);
+                            removeGrave(grave);
                         }
                     }
                 }
@@ -99,7 +84,7 @@ public class GraveManager {
             return;
         }
 
-        Inventory inventory = player.getInventory();
+        Inventory inventory = formatInventory(player.getInventory());
         String graveTitle = plugin.getConfig().getString("settings.graveTitle")
                 .replace("$entity", player.getName()).replace("&", "§");
         if (graveTitle.equals("")) {
@@ -131,13 +116,31 @@ public class GraveManager {
         }
     }
 
+    public Inventory formatInventory(PlayerInventory inventory) {
+        Integer itemAmount = getItemAmount(inventory);
+        Inventory newInventory = plugin.getServer().createInventory(null, getGraveSize(itemAmount));
+        List<ItemStack> armor = Arrays.asList(inventory.getArmorContents());
+        Collections.reverse(armor);
+        for (ItemStack item : armor) {
+            if (item != null) {
+                newInventory.addItem(item);
+            }
+        }
+        inventory.setArmorContents(new ItemStack[]{});
+        for (ItemStack item : inventory.getContents()) {
+            if (item != null) {
+                newInventory.addItem(item);
+            }
+        }
+        return newInventory;
+    }
+
     public void createGrave(LivingEntity entity, List<ItemStack> items) {
         Location location = getPlaceLocation(entity.getLocation());
         if (location == null) {
             return;
         }
-
-        Inventory inventory = plugin.getServer().createInventory(null, 54);
+        Inventory inventory = plugin.getServer().createInventory(null, getGraveSize(items.size()));
         for (ItemStack item : items) {
             if (item != null) {
                 inventory.addItem(item);
@@ -151,9 +154,7 @@ public class GraveManager {
         Grave grave = new Grave(roundLocation(location), inventory, graveTitle);
         grave.setEntityType(entity.getType());
         grave.setReplace(location.getBlock().getType());
-
         placeGrave(grave);
-
         graves.put(location, grave);
     }
 
@@ -237,13 +238,19 @@ public class GraveManager {
             replace = Material.AIR;
         }
         grave.getLocation().getBlock().setType(replace);
-
         closeGrave(grave);
-        lootSound(grave.getLocation());
-        removeHologram(grave);
-
-        data.removeGrave(grave);
         graves.remove(grave.getLocation());
+    }
+
+    public void dropGrave(Grave grave) {
+        if (grave != null) {
+            for (ItemStack item : grave.getInventory()) {
+                if (item != null) {
+                    grave.getLocation().getWorld().dropItemNaturally(grave.getLocation(), item);
+                }
+            }
+            grave.getInventory().clear();
+        }
     }
 
     public void closeGrave(Grave grave) {
@@ -254,13 +261,47 @@ public class GraveManager {
         }
     }
 
-    public void dropGrave(Grave grave) {
-        for (ItemStack item : grave.getInventory()) {
-            if (item != null) {
-                grave.getLocation().getWorld().dropItemNaturally(grave.getLocation(), item);
+    public void closeGraves() {
+        if (!graves.isEmpty()) {
+            Iterator iterator = graves.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<Location, Grave> entry = (Map.Entry<Location, Grave>) iterator.next();
+                Grave grave = entry.getValue();
+                List<HumanEntity> viewers = grave.getInventory().getViewers();
+                for (HumanEntity viewer : new ArrayList<>(viewers)) {
+                    grave.getInventory().getViewers().remove(viewer);
+                    viewer.closeInventory();
+                }
             }
         }
-        grave.getInventory().clear();
+    }
+
+    public Boolean hasPermission(Grave grave, Player player) {
+        Boolean isOwner = false;
+        Boolean isKiller = false;
+        Boolean ignore = false;
+        if (player.hasPermission("graves.bypass")) {
+            ignore = true;
+        }
+        Boolean graveProtected = plugin.getConfig().getBoolean("settings.graveProtected");
+        if (graveProtected) {
+            if (player.equals(grave.getPlayer())) {
+                isOwner = true;
+            }
+        } else {
+            ignore = true;
+        }
+        Boolean killerOpen = plugin.getConfig().getBoolean("settings.killerOpen");
+        if (killerOpen) {
+            if (player.equals(grave.getKiller())) {
+                isKiller = true;
+            }
+        }
+        if (isOwner || isKiller || ignore) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void giveExperience(Grave grave, Player player) {
@@ -284,18 +325,116 @@ public class GraveManager {
     }
 
     public void updateHologram(Grave grave) {
-        if (!grave.getHolograms().isEmpty()) {
-            for (Iterator<Map.Entry<UUID, Integer>> iterator = grave.getHolograms().entrySet()
-                    .iterator(); iterator.hasNext(); ) {
-                if (iterator.hasNext()) {
-                    Map.Entry<UUID, Integer> entry = iterator.next();
-                    ArmorStand armorStand = (ArmorStand) plugin.getServer().getEntity(entry.getKey());
-                    if (armorStand != null) {
-                        armorStand.setCustomName(parseHologram(entry.getValue(), grave));
+        Boolean hologram = plugin.getConfig().getBoolean("settings.hologram");
+        if (hologram) {
+            if (!grave.getHolograms().isEmpty()) {
+                for (Iterator<Map.Entry<UUID, Integer>> iterator = grave.getHolograms().entrySet()
+                        .iterator(); iterator.hasNext(); ) {
+                    if (iterator.hasNext()) {
+                        Map.Entry<UUID, Integer> entry = iterator.next();
+                        ArmorStand armorStand = (ArmorStand) plugin.getServer().getEntity(entry.getKey());
+                        if (armorStand != null) {
+                            armorStand.setCustomName(parseHologram(entry.getValue(), grave));
+                        }
                     }
                 }
             }
         }
+    }
+
+    public void autoLoot(Grave grave, Player player) {
+        equipArmor(grave.getInventory(), player);
+        equipItems(grave.getInventory(), player);
+        if (checkEmpty(grave)) {
+            messages.graveLoot(grave.getLocation(), player);
+            giveExperience(grave, player);
+            removeHologram(grave);
+            removeGrave(grave);
+        }
+    }
+
+    public void equipArmor(Inventory inventory, Player player) {
+        ItemStack helmet = inventory.getItem(0);
+        ItemStack chestplate = inventory.getItem(1);
+        ItemStack leggings = inventory.getItem(2);
+        ItemStack boots = inventory.getItem(3);
+
+        if (helmet != null) {
+            if (helmet.getType().equals(Material.DIAMOND_HELMET) || helmet.getType().equals(Material.GOLDEN_HELMET)
+                    || helmet.getType().equals(Material.IRON_HELMET) || helmet.getType().equals(Material.LEATHER_HELMET)
+                    || helmet.getType().equals(Material.CHAINMAIL_HELMET) || helmet.getType().equals(Material.TURTLE_HELMET)) {
+                if (player.getInventory().getHelmet() == null) {
+                    player.getInventory().setHelmet(helmet);
+                    inventory.removeItem(helmet);
+                }
+            }
+        }
+        if (chestplate != null) {
+            if (chestplate.getType().equals(Material.DIAMOND_CHESTPLATE) || chestplate.getType().equals(Material.GOLDEN_CHESTPLATE)
+                    || chestplate.getType().equals(Material.IRON_CHESTPLATE) || chestplate.getType().equals(Material.LEATHER_CHESTPLATE)
+                    || chestplate.getType().equals(Material.CHAINMAIL_CHESTPLATE)) {
+                if (player.getInventory().getChestplate() == null) {
+                    player.getInventory().setChestplate(chestplate);
+                    inventory.removeItem(chestplate);
+                }
+            }
+        }
+        if (leggings != null) {
+            if (leggings.getType().equals(Material.DIAMOND_LEGGINGS) || leggings.getType().equals(Material.GOLDEN_LEGGINGS)
+                    || leggings.getType().equals(Material.IRON_LEGGINGS) || leggings.getType().equals(Material.LEATHER_LEGGINGS)
+                    || leggings.getType().equals(Material.CHAINMAIL_LEGGINGS)) {
+                if (player.getInventory().getLeggings() == null) {
+                    player.getInventory().setLeggings(leggings);
+                    inventory.removeItem(leggings);
+                }
+            }
+        }
+        if (boots != null) {
+            if (boots.getType().equals(Material.DIAMOND_BOOTS) || boots.getType().equals(Material.GOLDEN_BOOTS)
+                    || boots.getType().equals(Material.IRON_BOOTS) || boots.getType().equals(Material.LEATHER_BOOTS)
+                    || boots.getType().equals(Material.CHAINMAIL_BOOTS)) {
+                if (player.getInventory().getBoots() == null) {
+                    player.getInventory().setBoots(boots);
+                    inventory.removeItem(boots);
+                }
+            }
+        }
+    }
+
+    public Boolean checkEmpty(Grave grave) {
+        if (grave.getItemAmount() == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void equipItems(Inventory inventory, Player player) {
+        Integer freeSlots = freeSlots(player);
+        Integer counter = 0;
+        for (ItemStack item : inventory.getContents()) {
+            if (item != null) {
+                if (counter < freeSlots) {
+                    player.getInventory().addItem(item);
+                    inventory.removeItem(item);
+                    counter++;
+                }
+            }
+        }
+    }
+
+    public Integer freeSlots(Player player) {
+        Integer freeSlots = 0;
+        Integer counter = 0;
+        for (ItemStack item : player.getInventory().getStorageContents()) {
+            if (counter <= 36) {
+                if (item == null) {
+                    freeSlots++;
+                    counter++;
+                }
+            }
+        }
+        return freeSlots;
     }
 
     public String parseHologram(Integer lineNumber, Grave grave) {
@@ -307,16 +446,16 @@ public class GraveManager {
                 .replace("$player", "$entity")
                 .replace("$itemCount", getItemAmount(grave.getInventory()).toString())
                 .replace("&", "§");
-                if (grave.getPlayer() != null) {
-                    line = line.replace("$entity", grave.getPlayer().getName());
-                } else if (grave.getEntityType() != null) {
-                    line = line.replace("$entity", getEntityName(grave.getEntityType()));
-                }
-                if (grave.getExperience() != null) {
-                    line = line.replace("$xp", grave.getExperience().toString());
-                } else {
-                    line = line.replace("$xp", "0");
-                }
+        if (grave.getPlayer() != null) {
+            line = line.replace("$entity", grave.getPlayer().getName());
+        } else if (grave.getEntityType() != null) {
+            line = line.replace("$entity", getEntityName(grave.getEntityType()));
+        }
+        if (grave.getExperience() != null) {
+            line = line.replace("$xp", grave.getExperience().toString());
+        } else {
+            line = line.replace("$xp", "0");
+        }
         return line;
     }
 
@@ -357,6 +496,8 @@ public class GraveManager {
             armorStand.setCustomName(parseHologram(lineNumber, grave));
             armorStand.setCustomNameVisible(true);
             armorStand.addScoreboardTag("graveHologram");
+            armorStand.addScoreboardTag("graveHologramLocation:" + grave.getLocation().getWorld().getName() + "_"
+                    + grave.getLocation().getX() + "_" + grave.getLocation().getY() + "_" + grave.getLocation().getZ());
             location.add(0, 0.25, 0);
             grave.addHologram(armorStand.getUniqueId(), lineNumber);
             lineNumber++;
@@ -379,35 +520,19 @@ public class GraveManager {
         }
     }
 
-    public void lootSound(Location location) {
-        String lootSound = plugin.getConfig().getString("settings.lootSound");
-        if (!lootSound.equals("")) {
-            location.getWorld().playSound(location, Sound.valueOf(lootSound.toUpperCase()), 1, 1);
+    public Grave getGraveFromHologram(ArmorStand armorStand) {
+        for (String tag : armorStand.getScoreboardTags()) {
+            if (tag.contains("graveHologramLocation:")) {
+                String[] cords = tag.replace("graveHologramLocation:", "").split("_");
+                World world = plugin.getServer().getWorld(cords[0]);
+                Double x = Double.parseDouble(cords[1]);
+                Double y = Double.parseDouble(cords[2]);
+                Double z = Double.parseDouble(cords[3]);
+                Location location = new Location(world, x, y, z);
+                return getGrave(location);
+            }
         }
-        String lootEffect = plugin.getConfig().getString("settings.lootEffect");
-        if (!lootEffect.equals("")) {
-            location.getWorld().playEffect(location, Effect.valueOf(lootEffect), 0);
-        }
-    }
-
-    public void graveProtected(Player player, Location location) {
-        String graveProtectedMessage = plugin.getConfig().getString("settings.graveProtectedMessage")
-                .replace("&", "§");
-        if (!graveProtectedMessage.equals("")) {
-            player.sendMessage(graveProtectedMessage);
-        }
-        String graveProtectedSound = plugin.getConfig().getString("settings.graveProtectedSound");
-        if (!graveProtectedSound.equals("")) {
-            location.getWorld().playSound(location, Sound.valueOf(graveProtectedSound.toUpperCase()), 1, 1);
-        }
-    }
-
-    public void permissionDenied(Player player) {
-        String permissionDenied = plugin.getConfig().getString("settings.permissionDenied")
-                .replace("&", "§");
-        if (!permissionDenied.equals("")) {
-            player.sendMessage(permissionDenied);
-        }
+        return null;
     }
 
     @SuppressWarnings("deprecation")
@@ -438,12 +563,31 @@ public class GraveManager {
 
     public static Integer getItemAmount(Inventory inventory) {
         Integer count = 0;
-        for (ItemStack item : inventory.getStorageContents()) {
+        for (ItemStack item : inventory.getContents()) {
             if (item != null) {
                 count++;
             }
         }
         return count;
+    }
+
+    public static Integer getGraveSize(Integer size) {
+        if (size <= 9) {
+            return 9;
+        }
+        if (size <= 18) {
+            return 18;
+        }
+        if (size <= 27) {
+            return 27;
+        }
+        if (size <= 36) {
+            return 36;
+        }
+        if (size <= 45) {
+            return 45;
+        }
+        return 54;
     }
 
     private static BlockFace getSkullBlockFace(Player player) {
