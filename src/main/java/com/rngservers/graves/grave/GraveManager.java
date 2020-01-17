@@ -44,18 +44,20 @@ public class GraveManager {
             @Override
             public void run() {
                 if (!graves.isEmpty()) {
-                    Iterator iterator = graves.entrySet().iterator();
+                    Iterator<Map.Entry<Location, Grave>> iterator = graves.entrySet().iterator();
                     while (iterator.hasNext()) {
-                        Map.Entry<Location, Grave> entry = (Map.Entry<Location, Grave>) iterator.next();
-                        Grave grave = entry.getValue();
-                        updateHologram(grave);
-                        Integer graveTime = plugin.getConfig().getInt("settings.graveTime") * 1000;
-                        Long diff = System.currentTimeMillis() - grave.getTime();
-                        if (diff >= graveTime) {
-                            dropGrave(grave);
-                            dropExperience(grave);
-                            removeHologram(grave);
-                            removeGrave(grave);
+                        Map.Entry<Location, Grave> entry = iterator.next();
+                        if (entry != null) {
+                            Grave grave = entry.getValue();
+                            updateHologram(grave);
+                            Integer graveTime = plugin.getConfig().getInt("settings.graveTime") * 1000;
+                            Long diff = System.currentTimeMillis() - grave.getTime();
+                            if (diff >= graveTime) {
+                                dropGrave(grave);
+                                dropExperience(grave);
+                                removeHologram(grave);
+                                removeGrave(grave);
+                            }
                         }
                     }
                 }
