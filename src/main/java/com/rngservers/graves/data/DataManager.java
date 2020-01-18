@@ -51,6 +51,7 @@ public class DataManager {
                 Material replace = Material.matchMaterial(data.getString(worlds + "." + cords + ".replace"));
                 Integer experience = data.getInt(worlds + "." + cords + ".experience");
                 Long time = data.getLong(worlds + "." + cords + ".time");
+                Integer aliveTime = data.getInt(worlds + "." + cords + ".alive");
 
                 OfflinePlayer player = null;
                 EntityType entityType = null;
@@ -73,7 +74,8 @@ public class DataManager {
                     OfflinePlayer killer = plugin.getServer().getOfflinePlayer(UUID.fromString(data.getString(worlds + "." + cords + ".killer")));
                     grave.setKiller(killer);
                 }
-                grave.setTime(time);
+                grave.setCreatedTime(time);
+                grave.setAliveTime(aliveTime);
                 grave.setExperience(experience);
                 grave.setReplace(replace);
                 grave.setPlayer(player);
@@ -118,8 +120,7 @@ public class DataManager {
         if (grave.getItemAmount() == 0) {
             return;
         }
-        Inventory inventory = grave.getInventory();
-        if (grave != null && grave.getLocation() != null && grave.getInventory() != null) {
+        if (grave != null && grave.getLocation().getWorld() != null && grave.getInventory() != null) {
             String world = grave.getLocation().getWorld().getName();
             int x = grave.getLocation().getBlockX();
             int y = grave.getLocation().getBlockY();
@@ -130,7 +131,8 @@ public class DataManager {
             } else if (grave.getEntityType() != null) {
                 data.set(world + "." + x + "_" + y + "_" + z + ".entity", grave.getEntityType().toString());
             }
-            data.set(world + "." + x + "_" + y + "_" + z + ".time", grave.getTime());
+            data.set(world + "." + x + "_" + y + "_" + z + ".time", grave.getCreatedTime());
+            data.set(world + "." + x + "_" + y + "_" + z + ".alive", grave.getAliveTime());
             data.set(world + "." + x + "_" + y + "_" + z + ".replace", grave.getReplace().toString());
             if (!grave.getHolograms().isEmpty()) {
                 data.set(world + "." + x + "_" + y + "_" + z + ".hologram", convertMapHologram(grave.getHolograms()));
@@ -142,7 +144,7 @@ public class DataManager {
                 data.set(world + "." + x + "_" + y + "_" + z + ".experience", grave.getExperience());
             }
             int counter = 0;
-            for (ItemStack item : inventory.getStorageContents()) {
+            for (ItemStack item : grave.getInventory()) {
                 if (item != null) {
                     data.set(world + "." + x + "_" + y + "_" + z + ".items." + counter, item);
                     counter++;

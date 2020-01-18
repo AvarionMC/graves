@@ -3,6 +3,7 @@ configVersion: 1
 settings:
   # To disable messages set to ""
 
+  #graveTime will be used for players who do not have the permission "graves.time.", It will also be used for entity graves.
   graveTime: 10800 # (Second) How long death chests should stay alive for, 10800 = 3 hours.
   #graveBlock: CHEST # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
   graveBlock: PLAYER_HEAD # If player head.

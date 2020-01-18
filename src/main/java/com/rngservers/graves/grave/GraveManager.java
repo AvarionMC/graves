@@ -16,6 +16,7 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
@@ -25,18 +26,29 @@ public class GraveManager {
     private Main plugin;
     private DataManager data;
     private Messages messages;
-    private Map<Location, Grave> graves;
-    private OfflinePlayer graveHead;
+    private Map<Location, Grave> graves = new HashMap<>();
     private List<String> hologramLines = new ArrayList<>();
+    private OfflinePlayer graveHead;
 
     public GraveManager(Main plugin, DataManager data, Messages messages) {
         this.plugin = plugin;
         this.data = data;
         this.messages = messages;
-        graves = data.getSavedGraves();
+        getSavedGraves();
         graveHeadLoad();
         hologramLinesLoad();
         removeGraveTimer();
+    }
+
+    public void getSavedGraves() {
+        plugin.getServer().getLogger().info("[Graves] Waiting 5 seconds before loading saved graves.");
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                graves = data.getSavedGraves();
+                plugin.getServer().getLogger().info("[Graves] Loaded saved graves!");
+            }
+        }.runTaskLater(plugin, 100L);
     }
 
     public void removeGraveTimer() {
@@ -44,19 +56,23 @@ public class GraveManager {
             @Override
             public void run() {
                 if (!graves.isEmpty()) {
-                    Iterator<Map.Entry<Location, Grave>> iterator = graves.entrySet().iterator();
+                    Iterator iterator = graves.entrySet().iterator();
                     while (iterator.hasNext()) {
-                        Map.Entry<Location, Grave> entry = iterator.next();
-                        if (entry != null) {
-                            Grave grave = entry.getValue();
-                            updateHologram(grave);
-                            Integer graveTime = plugin.getConfig().getInt("settings.graveTime") * 1000;
-                            Long diff = System.currentTimeMillis() - grave.getTime();
-                            if (diff >= graveTime) {
-                                dropGrave(grave);
-                                dropExperience(grave);
-                                removeHologram(grave);
-                                removeGrave(grave);
+                        Object next = iterator.next();
+                        if (next != null) {
+                            Map.Entry<Location, Grave> entry = (Map.Entry<Location, Grave>) next;
+                            if (entry != null) {
+                                Grave grave = entry.getValue();
+                                if (plugin.getServer().getWorlds().contains(grave.getLocation().getWorld())) { // Check if world is valid
+                                    updateHologram(grave);
+                                    Long diff = System.currentTimeMillis() - grave.getCreatedTime();
+                                    if (diff >= grave.getAliveTime()) {
+                                        dropGrave(grave);
+                                        dropExperience(grave);
+                                        removeHologram(grave);
+                                        removeGrave(grave);
+                                    }
+                                }
                             }
                         }
                     }
@@ -73,6 +89,27 @@ public class GraveManager {
         for (Map.Entry<Location, Grave> entry : graves.entrySet()) {
             data.saveGrave(entry.getValue());
         }
+    }
+
+    public Integer getGraveTime(Player player) {
+        List<Integer> gravePermissions = new ArrayList<>();
+        for (PermissionAttachmentInfo perm : player.getEffectivePermissions()) {
+            if (perm.getPermission().contains("graves.time.")) {
+                try {
+                    gravePermissions.add(Integer.parseInt(perm.getPermission().replace("graves.time.", "")));
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        }
+        if (!gravePermissions.isEmpty()) {
+            return Collections.max(gravePermissions) * 1000;
+        } else {
+            return getGraveTime();
+        }
+    }
+
+    public Integer getGraveTime() {
+        return plugin.getConfig().getInt("settings.graveTime") * 1000;
     }
 
     public void createGrave(Player player) {
@@ -93,6 +130,7 @@ public class GraveManager {
             graveTitle = player.getName() + "'s Grave";
         }
         Grave grave = new Grave(roundLocation(location), inventory, graveTitle);
+        grave.setAliveTime(getGraveTime(player));
         grave.setPlayer(player);
         grave.setKiller(player.getKiller());
         grave.setReplace(location.getBlock().getType());
@@ -154,6 +192,7 @@ public class GraveManager {
             graveTitle = getEntityName(entity.getType()) + "'s Grave";
         }
         Grave grave = new Grave(roundLocation(location), inventory, graveTitle);
+        grave.setAliveTime(getGraveTime());
         grave.setEntityType(entity.getType());
         grave.setReplace(location.getBlock().getType());
         placeGrave(grave);
@@ -440,8 +479,7 @@ public class GraveManager {
     }
 
     public String parseHologram(Integer lineNumber, Grave grave) {
-        Integer graveTime = plugin.getConfig().getInt("settings.graveTime") * 1000;
-        Long time = (graveTime - (System.currentTimeMillis() - grave.getTime())) / 1000;
+        Long time = (grave.getAliveTime() - (System.currentTimeMillis() - grave.getCreatedTime())) / 1000;
         String timeString = getTimeString(time);
         String line = hologramLines.get(lineNumber)
                 .replace("$time", timeString)
@@ -526,12 +564,15 @@ public class GraveManager {
         for (String tag : armorStand.getScoreboardTags()) {
             if (tag.contains("graveHologramLocation:")) {
                 String[] cords = tag.replace("graveHologramLocation:", "").split("_");
-                World world = plugin.getServer().getWorld(cords[0]);
-                Double x = Double.parseDouble(cords[1]);
-                Double y = Double.parseDouble(cords[2]);
-                Double z = Double.parseDouble(cords[3]);
-                Location location = new Location(world, x, y, z);
-                return getGrave(location);
+                try {
+                    World world = plugin.getServer().getWorld(cords[0]);
+                    Double x = Double.parseDouble(cords[1]);
+                    Double y = Double.parseDouble(cords[2]);
+                    Double z = Double.parseDouble(cords[3]);
+                    Location location = new Location(world, x, y, z);
+                    return getGrave(location);
+                } catch (NumberFormatException ignored) {
+                }
             }
         }
         return null;

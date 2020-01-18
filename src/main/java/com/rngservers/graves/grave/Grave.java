@@ -20,12 +20,13 @@ public class Grave implements InventoryHolder {
     private EntityType entity;
     private OfflinePlayer player;
     private OfflinePlayer killer;
-    private Long time;
+    private Long createdTime;
+    private Integer aliveTime;
     private Map<UUID, Integer> holograms = new HashMap<>();
 
     public Grave(Location location, Inventory itemInventory, String title) {
         this.location = location;
-        this.time = System.currentTimeMillis();
+        this.createdTime = System.currentTimeMillis();
         inventory = Bukkit.getServer().createInventory(this, itemInventory.getSize(), title);
         inventory.setContents(itemInventory.getContents());
     }
@@ -58,12 +59,12 @@ public class Grave implements InventoryHolder {
         return killer;
     }
 
-    public Long getTime() {
-        return time;
+    public Long getCreatedTime() {
+        return createdTime;
     }
 
-    public void setTime(Long time) {
-        this.time = time;
+    public void setCreatedTime(Long createdTime) {
+        this.createdTime = createdTime;
     }
 
     public Integer getItemAmount() {
@@ -88,6 +89,14 @@ public class Grave implements InventoryHolder {
 
     public void setKiller(OfflinePlayer killer) {
         this.killer = killer;
+    }
+
+    public Integer getAliveTime() {
+        return aliveTime;
+    }
+
+    public void setAliveTime(Integer aliveTime) {
+        this.aliveTime = aliveTime;
     }
 
     public void setHolograms(Map<UUID, Integer> holograms) {
