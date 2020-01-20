@@ -8,21 +8,22 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class Grave implements InventoryHolder {
     private Location location;
     private Inventory inventory;
-    private Integer experience;
+    private Integer level;
+    private Float experience;
     private Material replace;
     private EntityType entity;
     private OfflinePlayer player;
     private OfflinePlayer killer;
     private Long createdTime;
     private Integer aliveTime;
-    private Map<UUID, Integer> holograms = new HashMap<>();
+    private ConcurrentMap<UUID, Integer> holograms = new ConcurrentHashMap<>();
 
     public Grave(Location location, Inventory itemInventory, String title) {
         this.location = location;
@@ -39,7 +40,11 @@ public class Grave implements InventoryHolder {
         return inventory;
     }
 
-    public Integer getExperience() {
+    public Integer getLevel() {
+        return level;
+    }
+
+    public Float getExperience() {
         return experience;
     }
 
@@ -71,7 +76,11 @@ public class Grave implements InventoryHolder {
         return GraveManager.getItemAmount(inventory);
     }
 
-    public void setExperience(Integer experience) {
+    public void setLevel(Integer level) {
+        this.level = level;
+    }
+
+    public void setExperience(Float experience) {
         this.experience = experience;
     }
 
@@ -99,7 +108,7 @@ public class Grave implements InventoryHolder {
         this.aliveTime = aliveTime;
     }
 
-    public void setHolograms(Map<UUID, Integer> holograms) {
+    public void setHolograms(ConcurrentMap<UUID, Integer> holograms) {
         this.holograms = holograms;
     }
 
@@ -107,7 +116,7 @@ public class Grave implements InventoryHolder {
         this.holograms.put(uuid, lineNumber);
     }
 
-    public Map<UUID, Integer> getHolograms() {
+    public ConcurrentMap<UUID, Integer> getHolograms() {
         return holograms;
     }
 }

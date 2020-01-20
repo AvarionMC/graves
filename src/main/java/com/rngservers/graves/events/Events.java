@@ -4,7 +4,7 @@ import com.rngservers.graves.Main;
 import com.rngservers.graves.grave.Grave;
 import com.rngservers.graves.grave.GraveManager;
 import com.rngservers.graves.grave.Messages;
-import org.bukkit.Material;
+import com.rngservers.graves.gui.GUIManager;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
@@ -17,7 +17,9 @@ import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
@@ -27,11 +29,13 @@ import java.util.List;
 public class Events implements Listener {
     private Main plugin;
     private GraveManager graveManager;
+    private GUIManager guiManager;
     private Messages messages;
 
-    public Events(Main plugin, GraveManager chestManager, Messages messages) {
+    public Events(Main plugin, GraveManager chestManager, GUIManager guiManager, Messages messages) {
         this.plugin = plugin;
         this.graveManager = chestManager;
+        this.guiManager = guiManager;
         this.messages = messages;
     }
 
@@ -43,14 +47,19 @@ public class Events implements Listener {
         List<String> graveEntities = plugin.getConfig().getStringList("settings.graveEntities");
         if (graveEntities.contains(event.getEntity().getType().toString()) || graveEntities.contains("ALL")) {
             if (graveManager.getItemAmount(event.getEntity().getInventory()) > 0) {
-                graveManager.createGrave(event.getEntity());
-                event.getDrops().clear();
-                event.getEntity().getInventory().clear();
-                Boolean expStore = plugin.getConfig().getBoolean("settings.expStore");
-                if (expStore) {
-                    event.setNewTotalExp(0);
-                    event.setDroppedExp(0);
-                    event.setKeepLevel(false);
+                Grave grave = graveManager.createGrave(event.getEntity());
+                if (grave != null) {
+                    event.getDrops().clear();
+                    event.getEntity().getInventory().clear();
+                    Boolean expStore = plugin.getConfig().getBoolean("settings.expStore");
+                    if (expStore) {
+                        grave.setLevel(event.getEntity().getLevel());
+                        grave.setExperience(event.getEntity().getExp());
+                        event.setNewExp(0);
+                        event.setNewTotalExp(0);
+                        event.setDroppedExp(0);
+                        event.setKeepLevel(false);
+                    }
                 }
             }
         }
@@ -64,8 +73,18 @@ public class Events implements Listener {
         List<String> graveEntities = plugin.getConfig().getStringList("settings.graveEntities");
         if (graveEntities.contains(event.getEntity().getType().toString()) || graveEntities.contains("ALL")) {
             if (event.getDrops().size() > 0) {
-                graveManager.createGrave(event.getEntity(), event.getDrops());
-                event.getDrops().clear();
+                Grave grave = graveManager.createGrave(event.getEntity(), event.getDrops());
+                if (grave != null) {
+                    event.getDrops().clear();
+                    // TODO
+                    /*
+                    Boolean expStore = plugin.getConfig().getBoolean("settings.expStore");
+                    if (expStore) {
+                        //grave.setExperience(event.getDroppedExp());
+                        event.setDroppedExp(0);
+                    }
+                     */
+                }
             }
         }
     }
@@ -187,6 +206,7 @@ public class Events implements Listener {
                 messages.graveLoot(grave.getLocation(), player);
                 graveManager.giveExperience(grave, player);
                 graveManager.removeHologram(grave);
+                graveManager.replaceGrave(grave);
                 graveManager.removeGrave(grave);
             }
         }
@@ -196,38 +216,12 @@ public class Events implements Listener {
     public void onGraveBreak(BlockBreakEvent event) {
         Grave grave = graveManager.getGrave(event.getBlock().getLocation());
         if (grave != null) {
-            if (!event.getPlayer().hasPermission("graves.break")) {
-                messages.permissionDenied(event.getPlayer());
-                event.setCancelled(true);
-                return;
-            }
-            Boolean isOwner = false;
-            Boolean isKiller = false;
-            Boolean ignore = false;
-
-            if (event.getPlayer().hasPermission("graves.bypass")) {
-                ignore = true;
-            }
-            Boolean graveProtected = plugin.getConfig().getBoolean("settings.graveProtected");
-            if (graveProtected) {
-                if (event.getPlayer().equals(grave.getPlayer())) {
-                    isOwner = true;
-                }
-            } else {
-                ignore = true;
-            }
-            Boolean killerOpen = plugin.getConfig().getBoolean("settings.killerOpen");
-            if (killerOpen) {
-                if (event.getPlayer().equals(grave.getKiller())) {
-                    isKiller = true;
-                }
-            }
-            if (isOwner || isKiller || ignore) {
+            if (graveManager.hasPermission(grave, event.getPlayer())) {
                 graveManager.dropGrave(grave);
                 graveManager.dropExperience(grave);
                 graveManager.removeHologram(grave);
+                graveManager.replaceGrave(grave);
                 graveManager.removeGrave(grave);
-                event.getBlock().setType(Material.AIR);
             } else {
                 messages.graveProtected(event.getPlayer(), event.getBlock().getLocation());
                 event.setCancelled(true);
@@ -255,9 +249,41 @@ public class Events implements Listener {
                     graveManager.dropGrave(grave);
                     graveManager.dropExperience(grave);
                     graveManager.removeHologram(grave);
+                    graveManager.replaceGrave(grave);
                     graveManager.removeGrave(grave);
                 } else {
                     event.blockList().remove(block);
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        String title = event.getView().getTitle();
+        Player player = (Player) event.getView().getPlayer();
+        if (title.startsWith("§5§3§1§6§r§0§r")) {
+            if (event.getSlotType().equals(InventoryType.SlotType.CONTAINER)) {
+                event.setCancelled(true);
+                Boolean graveTeleport = plugin.getConfig().getBoolean("settings.graveTeleport");
+                if (event.getCurrentItem() != null) {
+                    if (graveTeleport) {
+                        if (player.hasPermission("graves.teleport")) {
+                            guiManager.teleportGrave(player, event.getCurrentItem());
+                        } else {
+                            messages.permissionDenied(player);
+                        }
+                    } else {
+                        if (player.hasPermission("graves.bypass")) {
+                            guiManager.teleportGrave(player, event.getCurrentItem());
+                        } else {
+                            String graveTeleportDisabled = plugin.getConfig().getString("settings.graveTeleportDisabled")
+                                    .replace("&", "§");
+                            if (!graveTeleportDisabled.equals("")) {
+                                player.sendMessage(graveTeleportDisabled);
+                            }
+                        }
+                    }
                 }
             }
         }

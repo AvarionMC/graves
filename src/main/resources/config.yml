@@ -1,14 +1,23 @@
 configVersion: 1
 
 settings:
-  # To disable messages set to ""
+  # You can customize everything in this plugin, certain configurations may break the plugin.
+  # Say for example you disable all ways to access a grave, or make it so graves never spawn.
+  # Be mindful while editing the config, it is very powerful. I put comments on most options to help.
+  # If something is not working as expected please report it in the discussion.
+  # https://www.spigotmc.org/resources/graves.74208/
 
+  # If you uncomment something make sure it is not repeated twice! You can remove or comment out the old option.
+
+  # To disable messages set them to ""
   #graveTime will be used for players who do not have the permission "graves.time.", It will also be used for entity graves.
   graveTime: 10800 # (Second) How long death chests should stay alive for, 10800 = 3 hours.
   #graveBlock: CHEST # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
   graveBlock: PLAYER_HEAD # If player head.
+  #graveBlock: AIR # Disable the graveBlock feature, if this is disabled you will want holograms or particles enabled so people can still open graves.
   #graveHeadSkin: "$entity" # If graveHeadSkin is set to "$entity", it will get the skin of the player or entity.
   graveHeadSkin: MHF_Chest # MHF_Chest is a mini chest.
+  graveAirHeight: 1 # If the graveBlock is set to air how high will the hologram be off the ground, 0 is touching the ground.
   graveTitle: "$entity's Grave" # Grave chest title.
   graveBreak: true # Can graves be broken.
   graveExplode: true # Can graves be blown up.
@@ -22,14 +31,17 @@ settings:
   graveOpenSound: BLOCK_CHEST_OPEN # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
   graveCloseSound: BLOCK_CHEST_CLOSE # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
 
-  deathMessage: "&8[&6Graves&8] &fYou have a death chest at &6$x&fx, &6$y&fy, &6$z&fz that lasts for &6$time&f!"
+  deathMessage: "&8[&6Graves&8] &fYou have a death chest at &6$x&fx, &6$y&fy, &6$z&fz that lasts for &6$time&f!" # Death message.
+
+  graveTimeoutDrop: true # When a grave times out drop everything in it. If false it gets destroyed.
+  placeGround: true # If the player dies in the air should the grave find the ground under the player to place it on.
 
   lootMessage: "&8[&6Graves&8] &fGrave looted!"
   lootSound: ENTITY_DONKEY_CHEST # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
   lootEffect: MOBSPAWNER_FLAMES # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Effect.html
 
   expStore: true # Should the players EXP be stored in the grave.
-  expMessage: "&8[&6Graves&8] &fReceived &6$xpxp &ffrom grave!"
+  expMessage: "&8[&6Graves&8] &fLooted &6$level &flevels from grave!"
 
   permissionDenied: "&8[&6Graves&8] &fPermission Denied!"
 
@@ -42,16 +54,31 @@ settings:
   hologramOpen: true # Will right clicking a hologram open the grave.
   hologramLines:
     - "&6$entity's &fGrave"
-    - "&6$itemCount &fItems &f/ &6$xp&fxp"
+    - "&6$itemCount &fItems &f/ &6$level &fLevels"
     - "&6$time &fleft"
+
+  guiTitle: "$player's Graves"
+  guiGrave: "&fGrave: &6$x&fx, &6$y&fy, &6$z&fz"
+  guiEmpty: "&8[&6Graves&8] &fYou don't have any graves!"
+  guiLore:
+    - "&7Items: &f$item"
+    - "&7Levels: &f$level"
+
+  graveTeleport: false # Can the player teleport to their grave from the Graves GUI.
+  graveTeleportMessage: "&8[&6Graves&8] &fYou teleported to you grave!"
+  graveTeleportDisabled: "&8[&6Graves&8] &fGrave teleportation is disabled!"
 
   timeSecond: "&6$s&fs "
   timeMinute: "&6$m&fm "
   timeHour: "&6$h&fh "
   timeDay: "&6$d&fd "
 
-  # What blocks can graves replace.
-  graveReplace:
+  # If a player dies in these blocks a grave will not be created.
+  graveIgnoreMessage: "&8[&6Graves&8] &fA grave was not created because you died in &6$block&f!"
+  graveIgnore: # Uncomment lava if you don't want graves being created in lava. You can add more to the list if you want.
+  #- LAVA
+
+  graveReplace: # What blocks can graves replace.
     - TORCH
     - REDSTONE_TORCH
     - LAVA

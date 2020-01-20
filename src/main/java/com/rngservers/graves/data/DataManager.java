@@ -16,7 +16,12 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class DataManager {
     private Main plugin;
@@ -30,8 +35,8 @@ public class DataManager {
         graveReplaceLoad();
     }
 
-    public Map<Location, Grave> getSavedGraves() {
-        Map<Location, Grave> graves = new HashMap<>();
+    public ConcurrentMap<Location, Grave> getSavedGraves() {
+        ConcurrentMap<Location, Grave> graves = new ConcurrentHashMap<>();
         for (String worlds : data.getKeys(false)) {
             for (String cords : data.getConfigurationSection(worlds).getKeys(false)) {
                 String[] cord = cords.split("_");
@@ -49,7 +54,6 @@ public class DataManager {
                 }
 
                 Material replace = Material.matchMaterial(data.getString(worlds + "." + cords + ".replace"));
-                Integer experience = data.getInt(worlds + "." + cords + ".experience");
                 Long time = data.getLong(worlds + "." + cords + ".time");
                 Integer aliveTime = data.getInt(worlds + "." + cords + ".alive");
 
@@ -76,13 +80,24 @@ public class DataManager {
                 }
                 grave.setCreatedTime(time);
                 grave.setAliveTime(aliveTime);
-                grave.setExperience(experience);
+                if (data.isSet(worlds + "." + cords + ".level")) {
+                    Integer level = data.getInt(worlds + "." + cords + ".level");
+                    grave.setLevel(level);
+                }
+                if (data.isSet(worlds + "." + cords + ".experience")) {
+                    Float experience = (float) data.getDouble(worlds + "." + cords + ".experience");
+                    grave.setExperience(experience);
+                }
                 grave.setReplace(replace);
                 grave.setPlayer(player);
                 grave.setHolograms(convertListHologram(data.getStringList(worlds + "." + cords + ".hologram")));
-                graves.put(location, grave);
+                if (location != null && grave != null) {
+                    graves.put(location, grave);
+                }
+                data.set(worlds + "." + cords, null);
             }
         }
+        saveData();
         dataFile.delete();
         return graves;
     }
@@ -98,15 +113,15 @@ public class DataManager {
 
     public String graveTitle(EntityType entityType) {
         String graveTitle = plugin.getConfig().getString("settings.graveTitle")
-                .replace("$entity", GraveManager.getEntityName(entityType)).replace("&", "§");
+                .replace("$entity", GraveManager.formatString(entityType.toString())).replace("&", "§");
         if (graveTitle.equals("")) {
-            graveTitle = GraveManager.getEntityName(entityType) + "'s Grave";
+            graveTitle = GraveManager.formatString(entityType.toString()) + "'s Grave";
         }
         return graveTitle;
     }
 
     private Grave createGrave(Location location, List<ItemStack> items, String graveTitle) {
-        Inventory inventory = plugin.getServer().createInventory(null, GraveManager.getGraveSize(items.size()));
+        Inventory inventory = plugin.getServer().createInventory(null, GraveManager.getInventorySize(items.size()));
         for (ItemStack item : items) {
             if (item != null) {
                 inventory.addItem(item);
@@ -140,6 +155,9 @@ public class DataManager {
             if (grave.getKiller() != null) {
                 data.set(world + "." + x + "_" + y + "_" + z + ".killer", grave.getKiller().getUniqueId().toString());
             }
+            if (grave.getLevel() != null) {
+                data.set(world + "." + x + "_" + y + "_" + z + ".experience", grave.getLevel());
+            }
             if (grave.getExperience() != null) {
                 data.set(world + "." + x + "_" + y + "_" + z + ".experience", grave.getExperience());
             }
@@ -150,25 +168,24 @@ public class DataManager {
                     counter++;
                 }
             }
+            saveData();
         }
-        saveData();
     }
 
-    public List<String> convertMapHologram(Map<UUID, Integer> map) {
+    public List<String> convertMapHologram(ConcurrentMap<UUID, Integer> map) {
         List<String> list = new ArrayList<>();
-        for (Iterator<Map.Entry<UUID, Integer>> iterator = map.entrySet()
+        for (Iterator<ConcurrentMap.Entry<UUID, Integer>> iterator = map.entrySet()
                 .iterator(); iterator.hasNext(); ) {
             if (iterator.hasNext()) {
-                Map.Entry<UUID, Integer> entry = iterator.next();
+                ConcurrentMap.Entry<UUID, Integer> entry = iterator.next();
                 list.add(entry.getKey().toString() + ":" + entry.getValue().toString());
             }
         }
         return list;
     }
 
-    public Map<UUID, Integer> convertListHologram(List<String> list) {
-        Map<UUID, Integer> map = new HashMap<>();
-
+    public ConcurrentMap<UUID, Integer> convertListHologram(List<String> list) {
+        ConcurrentMap<UUID, Integer> map = new ConcurrentHashMap<>();
         for (String string : list) {
             String[] parts = string.split(":");
             UUID uuid = UUID.fromString(parts[0]);

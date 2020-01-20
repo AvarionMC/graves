@@ -25,6 +25,15 @@ permissions:
   graves.break:
     default: true
     description: Can break a grave
+  graves.gui:
+    default: true
+    description: Can view graves
+  graves.gui.other:
+    default: op
+    description: Can view other peoples graves
+  graves.teleport:
+    default: true
+    description: Can teleport to grave
   graves.bypass:
     default: op
     description: Bypass grave protection

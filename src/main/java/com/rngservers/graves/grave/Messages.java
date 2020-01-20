@@ -4,6 +4,7 @@ import com.rngservers.graves.Main;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class Messages {
@@ -57,11 +58,11 @@ public class Messages {
         }
     }
 
-    public void permissionDenied(Player player) {
+    public void permissionDenied(CommandSender sender) {
         String permissionDenied = plugin.getConfig().getString("settings.permissionDenied")
                 .replace("&", "§");
         if (!permissionDenied.equals("")) {
-            player.sendMessage(permissionDenied);
+            sender.sendMessage(permissionDenied);
         }
     }
 }
