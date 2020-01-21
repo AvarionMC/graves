@@ -31,6 +31,9 @@ permissions:
   graves.gui.other:
     default: op
     description: Can view other peoples graves
+  graves.experience:
+    default: true
+    description: Can store experience in graves
   graves.teleport:
     default: true
     description: Can teleport to grave

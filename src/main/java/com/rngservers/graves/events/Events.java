@@ -51,13 +51,15 @@ public class Events implements Listener {
                 if (grave != null) {
                     event.getDrops().clear();
                     event.getEntity().getInventory().clear();
-                    Boolean expStore = plugin.getConfig().getBoolean("settings.expStore");
-                    if (expStore) {
-                        grave.setLevel(event.getEntity().getLevel());
-                        event.setNewExp(0);
-                        event.setNewTotalExp(0);
-                        event.setDroppedExp(0);
-                        event.setKeepLevel(false);
+                    if (event.getEntity().hasPermission("graves.experience")) {
+                        Boolean expStore = plugin.getConfig().getBoolean("settings.expStore");
+                        if (expStore) {
+                            grave.setLevel(event.getEntity().getLevel());
+                            event.setNewExp(0);
+                            event.setNewTotalExp(0);
+                            event.setDroppedExp(0);
+                            event.setKeepLevel(false);
+                        }
                     }
                 }
             }
