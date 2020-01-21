@@ -84,10 +84,6 @@ public class DataManager {
                     Integer level = data.getInt(worlds + "." + cords + ".level");
                     grave.setLevel(level);
                 }
-                if (data.isSet(worlds + "." + cords + ".experience")) {
-                    Float experience = (float) data.getDouble(worlds + "." + cords + ".experience");
-                    grave.setExperience(experience);
-                }
                 grave.setReplace(replace);
                 grave.setPlayer(player);
                 grave.setHolograms(convertListHologram(data.getStringList(worlds + "." + cords + ".hologram")));
@@ -156,10 +152,7 @@ public class DataManager {
                 data.set(world + "." + x + "_" + y + "_" + z + ".killer", grave.getKiller().getUniqueId().toString());
             }
             if (grave.getLevel() != null) {
-                data.set(world + "." + x + "_" + y + "_" + z + ".experience", grave.getLevel());
-            }
-            if (grave.getExperience() != null) {
-                data.set(world + "." + x + "_" + y + "_" + z + ".experience", grave.getExperience());
+                data.set(world + "." + x + "_" + y + "_" + z + ".level", grave.getLevel());
             }
             int counter = 0;
             for (ItemStack item : grave.getInventory()) {

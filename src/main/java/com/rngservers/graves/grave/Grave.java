@@ -16,7 +16,6 @@ public class Grave implements InventoryHolder {
     private Location location;
     private Inventory inventory;
     private Integer level;
-    private Float experience;
     private Material replace;
     private EntityType entity;
     private OfflinePlayer player;
@@ -42,10 +41,6 @@ public class Grave implements InventoryHolder {
 
     public Integer getLevel() {
         return level;
-    }
-
-    public Float getExperience() {
-        return experience;
     }
 
     public Material getReplace() {
@@ -78,10 +73,6 @@ public class Grave implements InventoryHolder {
 
     public void setLevel(Integer level) {
         this.level = level;
-    }
-
-    public void setExperience(Float experience) {
-        this.experience = experience;
     }
 
     public void setReplace(Material replace) {

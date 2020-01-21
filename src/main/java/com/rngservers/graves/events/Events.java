@@ -54,7 +54,6 @@ public class Events implements Listener {
                     Boolean expStore = plugin.getConfig().getBoolean("settings.expStore");
                     if (expStore) {
                         grave.setLevel(event.getEntity().getLevel());
-                        grave.setExperience(event.getEntity().getExp());
                         event.setNewExp(0);
                         event.setNewTotalExp(0);
                         event.setDroppedExp(0);

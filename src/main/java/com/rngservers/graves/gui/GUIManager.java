@@ -106,9 +106,8 @@ public class GUIManager {
                         .replace("&", "§");
                 if (grave.getLevel() != null && grave.getLevel() > 0) {
                     line = line.replace("$level", grave.getLevel().toString());
-                }
-                if (grave.getExperience() != null && grave.getExperience() > 0) {
-                    line = line.replace("$level", grave.getExperience().toString());
+                } else {
+                    line = line.replace("$level", "0");
                 }
                 lores.add(line);
             }

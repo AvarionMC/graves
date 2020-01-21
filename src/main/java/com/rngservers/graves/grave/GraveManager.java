@@ -388,23 +388,11 @@ public class GraveManager {
 
     public void giveExperience(Grave grave, Player player) {
         String expMessage = plugin.getConfig().getString("settings.expMessage").replace("&", "§");
-        Boolean message = false;
         if (grave.getLevel() != null && grave.getLevel() > 0) {
             expMessage = expMessage.replace("$level", grave.getLevel().toString());
             player.setLevel(player.getLevel() + grave.getLevel());
             grave.setLevel(null);
-            message = true;
-        }
-        if (grave.getExperience() != null && grave.getExperience() > 0) {
-            expMessage = expMessage.replace("$xp", grave.getExperience().toString());
-            player.setExp(player.getExp() + grave.getExperience());
-            grave.setExperience(null);
-            message = true;
-        }
-        if (message) {
-            if (!expMessage.equals("")) {
-                player.sendMessage(expMessage);
-            }
+            player.sendMessage(expMessage);
         }
     }
 
@@ -421,7 +409,7 @@ public class GraveManager {
 
     public void destroyGrave(Grave grave) {
         grave.getInventory().clear();
-        grave.setExperience(null);
+        grave.setLevel(null);
     }
 
     public void updateHologram(Grave grave) {
@@ -555,12 +543,6 @@ public class GraveManager {
             line = line.replace("$level", grave.getLevel().toString());
         } else {
             line = line.replace("$level", "0");
-        }
-        if (grave.getExperience() != null) {
-            Double experience = Math.round(grave.getExperience().doubleValue() * 100.0) / 100.0;
-            line = line.replace("$xp", experience.toString());
-        } else {
-            line = line.replace("$xp", "0");
         }
         return line;
     }

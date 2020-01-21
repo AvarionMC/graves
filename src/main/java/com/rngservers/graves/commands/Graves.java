@@ -98,7 +98,7 @@ public class Graves implements CommandExecutor {
     }
 
     public void help(CommandSender sender) {
-        String version = "2.0";
+        String version = "2.1";
         String author = "RandomUnknown";
 
         sender.sendMessage(
@@ -110,7 +110,7 @@ public class Graves implements CommandExecutor {
         if (sender.hasPermission("graves.gui")) {
             if (sender.hasPermission("graves.gui.other")) {
                 sender.sendMessage(
-                        ChatColor.GRAY + "/graves list {player}" + ChatColor.DARK_GRAY + "-" + ChatColor.RESET + " Player graves");
+                        ChatColor.GRAY + "/graves list {player} " + ChatColor.DARK_GRAY + "-" + ChatColor.RESET + " Player graves");
             } else {
                 sender.sendMessage(
                         ChatColor.GRAY + "/graves list " + ChatColor.DARK_GRAY + "-" + ChatColor.RESET + " Player graves");
