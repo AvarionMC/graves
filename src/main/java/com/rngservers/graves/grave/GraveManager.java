@@ -288,8 +288,8 @@ public class GraveManager {
         Block block = location.getBlock();
         int max = 0;
         while (max <= 256) {
-            if (data.graveReplace().contains(block.getType())) {
-                return block.getLocation();
+            if (!data.graveReplace().contains(block.getType()) && !block.getType().isAir()) {
+                return block.getLocation().add(0, 1, 0);
             }
             block = block.getLocation().subtract(0, 1, 0).getBlock();
             max++;
