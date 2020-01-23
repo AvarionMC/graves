@@ -26,6 +26,7 @@ public final class Main extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        graveManager.removeHolograms();
         graveManager.closeGraves();
         graveManager.saveGraves();
     }

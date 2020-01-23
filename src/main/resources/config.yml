@@ -11,7 +11,7 @@ settings:
 
   # To disable messages set them to ""
   #graveTime will be used for players who do not have the permission "graves.time.", It will also be used for entity graves.
-  graveTime: 10800 # (Second) How long death chests should stay alive for, 10800 = 3 hours.
+  graveTime: 10800 # (Second) How long death chests should stay alive for, 10800 = 3 hours, 0 lasts forever.
   #graveBlock: CHEST # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
   graveBlock: PLAYER_HEAD # If player head.
   #graveBlock: AIR # Disable the graveBlock feature, if this is disabled you will want holograms or particles enabled so people can still open graves.
@@ -19,12 +19,20 @@ settings:
   graveHeadSkin: MHF_Chest # MHF_Chest is a mini chest.
   graveAirHeight: 1 # If the graveBlock is set to air how high will the hologram be off the ground, 0 is touching the ground.
   graveTitle: "$entity's Grave" # Grave chest title.
+
   graveBreak: true # Can graves be broken.
   graveExplode: true # Can graves be blown up.
-  graveProtected: false # Is the grave protected from others opening it.
+
+  # If you want to show the locked state of a grave you can add $protect to the hologram and lore.
+  graveProtected: false # Enable the grave protection feature.
   graveProtectedMessage: "&8[&6Graves&8] &fThis grave is protected!"
-  graveProtectedSound: BLOCK_CHEST_LOCKED
-  killerOpen: true # Can the killer open the killed players grave, this will bypass graveProtected.
+  graveProtectedSound: BLOCK_CHEST_LOCKED # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
+  graveProtectedKillerOpen: true # Can the killer open the killed players grave, this will bypass graveProtected.
+  graveProtectedProtectedMessage: "&c&lProtected"
+  graveProtectedUnprotectedMessage: "&a&lUnprotected"
+  graveProtectedChange: true # Can the player change if their grave is protected by right clicking it in the graves GUI.
+  graveProtectedChangeSound: ENTITY_DONKEY_CHEST # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
+  graveProtectedTime: 300 # Seconds, 300 = 5 minutes. Set to 0 to always stay locked.
 
   graveFailure: "&8[&6Graves&8] &fA grave was unable to be placed! Item's dropped on ground." # Can't place grave message.
 
@@ -53,6 +61,7 @@ settings:
   hologram: true
   hologramOpen: true # Will right clicking a hologram open the grave.
   hologramLines:
+    #- "&6$protect" # Show if a grave protected.
     - "&6$entity's &fGrave"
     - "&6$itemCount &fItems &f/ &6$level &fLevels"
     - "&6$time &fleft"
@@ -61,6 +70,8 @@ settings:
   guiGrave: "&fGrave: &6$x&fx, &6$y&fy, &6$z&fz"
   guiEmpty: "&8[&6Graves&8] &fYou don't have any graves!"
   guiLore:
+    #- "&7$protect" # If you are using grave protection you might want to allow the player to see if their grave is protected. And tell them how to change the protection.
+    #- "&7Right click to change protection"
     - "&7Items: &f$item"
     - "&7Levels: &f$level"
 
@@ -72,6 +83,7 @@ settings:
   timeMinute: "&6$m&fm "
   timeHour: "&6$h&fh "
   timeDay: "&6$d&fd "
+  timeInfinite: "&6Infinite"
 
   # If a player dies in these blocks a grave will not be created.
   graveIgnoreMessage: "&8[&6Graves&8] &fA grave was not created because you died in &6$block&f!"

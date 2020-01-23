@@ -18,6 +18,7 @@ import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -240,7 +241,7 @@ public class Events implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onGraveExplode(EntityExplodeEvent event) {
         Iterator<Block> iterator = event.blockList().iterator();
         while (iterator.hasNext()) {
@@ -255,7 +256,7 @@ public class Events implements Listener {
                     graveManager.replaceGrave(grave);
                     graveManager.removeGrave(grave);
                 } else {
-                    event.blockList().remove(block);
+                    iterator.remove();
                 }
             }
         }
@@ -270,6 +271,25 @@ public class Events implements Listener {
                 event.setCancelled(true);
                 Boolean graveTeleport = plugin.getConfig().getBoolean("settings.graveTeleport");
                 if (event.getCurrentItem() != null) {
+                    if (event.getClick().equals(ClickType.RIGHT)) {
+                        Boolean graveProtectedChange = plugin.getConfig().getBoolean("settings.graveProtectedChange");
+                        if (graveProtectedChange) {
+                            Grave grave = graveManager.getGrave(guiManager.getGraveLocation(event.getCurrentItem()));
+                            Long diff = System.currentTimeMillis() - grave.getCreatedTime();
+                            if (grave != null) {
+                                if (grave.getProtectTime() == null || diff < grave.getProtectTime()) {
+                                    if (grave.getProtected()) {
+                                        graveManager.protectGrave(grave, false);
+                                    } else {
+                                        graveManager.protectGrave(grave, true);
+                                    }
+                                    graveManager.updateHologram(grave);
+                                    guiManager.openGraveGUI(player, grave.getPlayer());
+                                    return;
+                                }
+                            }
+                        }
+                    }
                     if (graveTeleport) {
                         if (player.hasPermission("graves.teleport")) {
                             guiManager.teleportGrave(player, event.getCurrentItem());

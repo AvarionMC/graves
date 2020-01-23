@@ -91,6 +91,8 @@ public class Graves implements CommandExecutor {
             graveManager.graveHeadLoad();
             graveManager.graveIgnoreLoad();
             graveManager.hologramLinesLoad();
+            graveManager.removeHolograms();
+            graveManager.createHolograms();
             sender.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.GOLD + "Graves" + ChatColor.DARK_GRAY + "]"
                     + ChatColor.RESET + " Reloaded config file!");
         }
@@ -98,7 +100,7 @@ public class Graves implements CommandExecutor {
     }
 
     public void help(CommandSender sender) {
-        String version = "2.2";
+        String version = "2.3";
         String author = "RandomUnknown";
 
         sender.sendMessage(

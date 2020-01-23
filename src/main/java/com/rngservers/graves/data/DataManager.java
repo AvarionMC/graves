@@ -17,7 +17,6 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -55,7 +54,10 @@ public class DataManager {
 
                 Material replace = Material.matchMaterial(data.getString(worlds + "." + cords + ".replace"));
                 Long time = data.getLong(worlds + "." + cords + ".time");
-                Integer aliveTime = data.getInt(worlds + "." + cords + ".alive");
+                Integer aliveTime = null;
+                if (data.isSet(worlds + "." + cords + ".alive")) {
+                    aliveTime = data.getInt(worlds + "." + cords + ".alive");
+                }
 
                 OfflinePlayer player = null;
                 EntityType entityType = null;
@@ -80,13 +82,22 @@ public class DataManager {
                 }
                 grave.setCreatedTime(time);
                 grave.setAliveTime(aliveTime);
+
+                Boolean protect = data.getBoolean(worlds + "." + cords + ".protect");
+                grave.setProtected(protect);
+
+                Integer protectTime = data.getInt(worlds + "." + cords + ".protectTime");
+                if (protectTime == 0) {
+                    protectTime = null;
+                }
+                grave.setProtectTime(protectTime);
+
                 if (data.isSet(worlds + "." + cords + ".level")) {
                     Integer level = data.getInt(worlds + "." + cords + ".level");
                     grave.setLevel(level);
                 }
                 grave.setReplace(replace);
                 grave.setPlayer(player);
-                grave.setHolograms(convertListHologram(data.getStringList(worlds + "." + cords + ".hologram")));
                 if (location != null && grave != null) {
                     graves.put(location, grave);
                 }
@@ -145,14 +156,19 @@ public class DataManager {
             data.set(world + "." + x + "_" + y + "_" + z + ".time", grave.getCreatedTime());
             data.set(world + "." + x + "_" + y + "_" + z + ".alive", grave.getAliveTime());
             data.set(world + "." + x + "_" + y + "_" + z + ".replace", grave.getReplace().toString());
-            if (!grave.getHolograms().isEmpty()) {
-                data.set(world + "." + x + "_" + y + "_" + z + ".hologram", convertMapHologram(grave.getHolograms()));
-            }
             if (grave.getKiller() != null) {
                 data.set(world + "." + x + "_" + y + "_" + z + ".killer", grave.getKiller().getUniqueId().toString());
             }
             if (grave.getLevel() != null) {
                 data.set(world + "." + x + "_" + y + "_" + z + ".level", grave.getLevel());
+            }
+            if (grave.getProtected() != null) {
+                data.set(world + "." + x + "_" + y + "_" + z + ".protect", grave.getProtected());
+            }
+            if (grave.getProtectTime() != null) {
+                data.set(world + "." + x + "_" + y + "_" + z + ".protectTime", grave.getProtectTime());
+            } else {
+                data.set(world + "." + x + "_" + y + "_" + z + ".protectTime", 0);
             }
             int counter = 0;
             for (ItemStack item : grave.getInventory()) {
@@ -163,29 +179,6 @@ public class DataManager {
             }
             saveData();
         }
-    }
-
-    public List<String> convertMapHologram(ConcurrentMap<UUID, Integer> map) {
-        List<String> list = new ArrayList<>();
-        for (Iterator<ConcurrentMap.Entry<UUID, Integer>> iterator = map.entrySet()
-                .iterator(); iterator.hasNext(); ) {
-            if (iterator.hasNext()) {
-                ConcurrentMap.Entry<UUID, Integer> entry = iterator.next();
-                list.add(entry.getKey().toString() + ":" + entry.getValue().toString());
-            }
-        }
-        return list;
-    }
-
-    public ConcurrentMap<UUID, Integer> convertListHologram(List<String> list) {
-        ConcurrentMap<UUID, Integer> map = new ConcurrentHashMap<>();
-        for (String string : list) {
-            String[] parts = string.split(":");
-            UUID uuid = UUID.fromString(parts[0]);
-            Integer lineNumber = Integer.parseInt(parts[1]);
-            map.put(uuid, lineNumber);
-        }
-        return map;
     }
 
     public void saveData() {

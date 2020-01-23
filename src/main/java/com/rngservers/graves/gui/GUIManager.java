@@ -24,7 +24,17 @@ public class GUIManager {
     }
 
     public void teleportGrave(Player player, ItemStack item) {
-        NamespacedKey key = new NamespacedKey(plugin, "graveLocation");
+        Location location = getGraveLocation(item);
+        location.add(0.5D, 1.0D, 0.5D);
+        player.teleport(location);
+        String graveTeleportMessage = plugin.getConfig().getString("settings.graveTeleportMessage").replace("&", "§");
+        if (!graveTeleportMessage.equals("")) {
+            player.sendMessage(graveTeleportMessage);
+        }
+    }
+
+    public Location getGraveLocation(ItemStack item) {
+        NamespacedKey key = new NamespacedKey(this.plugin, "graveLocation");
         String[] cords = item.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING).split("_");
         try {
             World world = plugin.getServer().getWorld(cords[0]);
@@ -32,13 +42,9 @@ public class GUIManager {
             Double y = Double.parseDouble(cords[2]);
             Double z = Double.parseDouble(cords[3]);
             Location location = new Location(world, x, y, z);
-            location.add(0.5, 1, 0.5);
-            player.teleport(location);
-            String graveTeleportMessage = plugin.getConfig().getString("settings.graveTeleportMessage").replace("&", "§");
-            if (!graveTeleportMessage.equals("")) {
-                player.sendMessage(graveTeleportMessage);
-            }
+            return location;
         } catch (NumberFormatException ignored) {
+            return null;
         }
     }
 
@@ -103,6 +109,7 @@ public class GUIManager {
                         .replace("$x", String.valueOf(grave.getLocation().getBlockX()))
                         .replace("$y", String.valueOf(grave.getLocation().getBlockY()))
                         .replace("$z", String.valueOf(grave.getLocation().getBlockZ()))
+                        .replace("$protect", graveManager.parseProtect(grave))
                         .replace("&", "§");
                 if (grave.getLevel() != null && grave.getLevel() > 0) {
                     line = line.replace("$level", grave.getLevel().toString());

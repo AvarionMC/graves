@@ -58,6 +58,13 @@ public class Messages {
         }
     }
 
+    public void graveChangeProtect(Location location) {
+        String graveProtectedChangeSound = plugin.getConfig().getString("settings.graveProtectedChangeSound");
+        if (!graveProtectedChangeSound.equals("")) {
+            location.getWorld().playSound(location, Sound.valueOf(graveProtectedChangeSound.toUpperCase()), 1.0F, 1.0F);
+        }
+    }
+
     public void permissionDenied(CommandSender sender) {
         String permissionDenied = plugin.getConfig().getString("settings.permissionDenied")
                 .replace("&", "§");

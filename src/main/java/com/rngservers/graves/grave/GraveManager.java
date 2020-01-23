@@ -49,6 +49,7 @@ public class GraveManager {
             @Override
             public void run() {
                 graves = data.getSavedGraves();
+                createHolograms();
                 plugin.getServer().getLogger().info("[Graves] Loaded saved graves!");
             }
         }.runTaskLater(plugin, 20L);
@@ -65,20 +66,28 @@ public class GraveManager {
             public void run() {
                 for (ConcurrentMap.Entry<Location, Grave> entry : graves.entrySet()) {
                     Grave grave = entry.getValue();
-                    if (plugin.getServer().getWorlds().contains(grave.getLocation().getWorld())) { // Check if world is valid
+                    if (plugin.getServer().getWorlds().contains(grave.getLocation().getWorld())) {
                         updateHologram(grave);
-                        Long diff = System.currentTimeMillis() - grave.getCreatedTime();
-                        if (diff >= grave.getAliveTime()) {
-                            Boolean graveTimeoutDrop = plugin.getConfig().getBoolean("settings.graveTimeoutDrop");
-                            if (graveTimeoutDrop) {
-                                dropGrave(grave);
-                                dropExperience(grave);
-                            } else {
-                                destroyGrave(grave);
+                        if (grave.getProtectTime() != null && grave.getProtected()) {
+                            Long diff = System.currentTimeMillis() - grave.getCreatedTime();
+                            if (diff >= grave.getProtectTime()) {
+                                protectGrave(grave, false);
                             }
-                            removeHologram(grave);
-                            replaceGrave(grave);
-                            removeGrave(grave);
+                        }
+                        if (grave.getAliveTime() != null) {
+                            Long diff = System.currentTimeMillis() - grave.getCreatedTime();
+                            if (diff >= grave.getAliveTime()) {
+                                Boolean graveTimeoutDrop = plugin.getConfig().getBoolean("settings.graveTimeoutDrop");
+                                if (graveTimeoutDrop) {
+                                    dropGrave(grave);
+                                    dropExperience(grave);
+                                } else {
+                                    destroyGrave(grave);
+                                }
+                                removeHologram(grave);
+                                replaceGrave(grave);
+                                removeGrave(grave);
+                            }
                         }
                     }
                 }
@@ -124,7 +133,60 @@ public class GraveManager {
     }
 
     public Integer getGraveTime() {
-        return plugin.getConfig().getInt("settings.graveTime") * 1000;
+        Integer graveTime = plugin.getConfig().getInt("settings.graveTime") * 1000;
+        if (graveTime > 0) {
+            return graveTime;
+        } else {
+            return null;
+        }
+    }
+
+    public void protectGrave(Grave grave, Boolean protect) {
+        grave.setProtected(protect);
+        messages.graveChangeProtect(grave.getLocation());
+    }
+
+    public String parseProtect(Grave grave) {
+        String protect;
+        if (grave.getProtected().booleanValue()) {
+            protect = plugin.getConfig().getString("settings.graveProtectedProtectedMessage");
+        } else {
+            protect = plugin.getConfig().getString("settings.graveProtectedUnprotectedMessage");
+        }
+        if (grave.getProtectTime() != null) {
+            Long protectTime = (grave.getProtectTime().intValue() - System.currentTimeMillis() - grave.getCreatedTime().longValue()) / 1000;
+            protect.replace("$time", getTimeString(protectTime));
+        } else {
+            String timeInfinite = plugin.getConfig().getString("settings.timeInfinite");
+            protect.replace("$time", timeInfinite);
+        }
+        return protect.replace("&", "§");
+    }
+
+
+    public Integer getProtectTime(Player player) {
+        List<Integer> gravePermissions = new ArrayList<>();
+        for (PermissionAttachmentInfo perm : player.getEffectivePermissions()) {
+            if (perm.getPermission().contains("graves.protect.")) {
+                try {
+                    gravePermissions.add(Integer.parseInt(perm.getPermission().replace("graves.protect.", "")));
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        }
+        if (!gravePermissions.isEmpty()) {
+            return Collections.max(gravePermissions) * 1000;
+        }
+        return getProtectTime();
+    }
+
+
+    public Integer getProtectTime() {
+        Integer graveTime = plugin.getConfig().getInt("settings.graveProtectedTime") * 1000;
+        if (graveTime.intValue() > 0) {
+            return graveTime;
+        }
+        return null;
     }
 
     public Grave createGrave(Player player) {
@@ -155,6 +217,11 @@ public class GraveManager {
         }
         Grave grave = new Grave(roundLocation(location), inventory, graveTitle);
         grave.setAliveTime(getGraveTime(player));
+        Boolean graveProtected = plugin.getConfig().getBoolean("settings.graveProtected");
+        if (graveProtected) {
+            grave.setProtected(true);
+            grave.setProtectTime(getProtectTime(player));
+        }
         grave.setPlayer(player);
         grave.setKiller(player.getKiller());
         grave.setReplace(location.getBlock().getType());
@@ -358,16 +425,43 @@ public class GraveManager {
         }
     }
 
+    public void removeHolograms() {
+        if (!this.graves.isEmpty()) {
+            Iterator iterator = this.graves.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<Location, Grave> entry = (Map.Entry) iterator.next();
+                this.removeHologram(entry.getValue());
+            }
+        }
+    }
+
+    public void createHolograms() {
+        if (!this.graves.isEmpty()) {
+            Iterator iterator = this.graves.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<Location, Grave> entry = (Map.Entry) iterator.next();
+                Grave grave = entry.getValue();
+                if (grave.getHolograms().isEmpty()) {
+                    this.createHologram(grave);
+                }
+            }
+        }
+    }
+
     public Boolean hasPermission(Grave grave, Player player) {
         Boolean owner = false;
         Boolean killer = false;
         Boolean bypass = false;
+        Boolean unprotect = false;
         Boolean entity = false;
         if (player.hasPermission("graves.bypass")) {
             bypass = true;
         }
         if (grave.getEntityType() != null) {
             entity = true;
+        }
+        if (grave.getProtected() != null && !grave.getProtected()) {
+            unprotect = true;
         }
         Boolean graveProtected = plugin.getConfig().getBoolean("settings.graveProtected");
         if (graveProtected) {
@@ -387,7 +481,7 @@ public class GraveManager {
                 }
             }
         }
-        if (owner || killer || entity || bypass) {
+        if (owner || killer || entity || unprotect || bypass) {
             return true;
         } else {
             return false;
@@ -535,13 +629,32 @@ public class GraveManager {
     }
 
     public String parseHologram(Integer lineNumber, Grave grave) {
-        Long time = (grave.getAliveTime() - (System.currentTimeMillis() - grave.getCreatedTime())) / 1000;
-        String timeString = getTimeString(time);
-        String line = hologramLines.get(lineNumber)
-                .replace("$time", timeString)
-                .replace("$player", "$entity")
-                .replace("$itemCount", getItemAmount(grave.getInventory()).toString())
-                .replace("&", "§");
+        String line = hologramLines.get(lineNumber.intValue()).replace("$itemCount", grave.getItemAmount().toString()).replace("&", "§");
+        if (grave.getAliveTime() != null) {
+            Long aliveTime = (grave.getAliveTime() - System.currentTimeMillis() - grave.getCreatedTime()) / 1000;
+            String timeString = getTimeString(aliveTime);
+            line = line.replace("$time", timeString);
+        } else {
+            String timeInfinite = plugin.getConfig().getString("settings.timeInfinite").replace("&", "§");
+            line = line.replace("$time", timeInfinite);
+        }
+        if (grave.getProtected() != null) {
+            String protect;
+            if (grave.getProtected().booleanValue()) {
+                protect = plugin.getConfig().getString("settings.graveProtectedProtectedMessage");
+            } else {
+                protect = plugin.getConfig().getString("settings.graveProtectedUnprotectedMessage");
+            }
+            if (grave.getProtectTime() != null) {
+                Long protectTime = (grave.getProtectTime() - System.currentTimeMillis() - grave.getCreatedTime()) / 1000;
+                protect.replace("$time", getTimeString(protectTime));
+            } else {
+                String timeInfinite = plugin.getConfig().getString("settings.timeInfinite");
+                protect.replace("$time", timeInfinite);
+            }
+            protect = protect.replace("&", "§");
+            line = line.replace("$protect", protect);
+        }
         if (grave.getPlayer() != null) {
             line = line.replace("$entity", grave.getPlayer().getName());
         } else if (grave.getEntityType() != null) {

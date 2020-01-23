@@ -22,6 +22,8 @@ public class Grave implements InventoryHolder {
     private OfflinePlayer killer;
     private Long createdTime;
     private Integer aliveTime;
+    private Boolean protect;
+    private Integer protectTime;
     private ConcurrentMap<UUID, Integer> holograms = new ConcurrentHashMap<>();
 
     public Grave(Location location, Inventory itemInventory, String title) {
@@ -32,35 +34,47 @@ public class Grave implements InventoryHolder {
     }
 
     public Location getLocation() {
-        return location;
+        return this.location;
     }
 
     public Inventory getInventory() {
-        return inventory;
+        return this.inventory;
     }
 
     public Integer getLevel() {
-        return level;
+        return this.level;
     }
 
     public Material getReplace() {
-        return replace;
+        return this.replace;
     }
 
     public EntityType getEntityType() {
-        return entity;
+        return this.entity;
     }
 
     public OfflinePlayer getPlayer() {
-        return player;
+        return this.player;
     }
 
     public OfflinePlayer getKiller() {
-        return killer;
+        return this.killer;
     }
 
     public Long getCreatedTime() {
-        return createdTime;
+        return this.createdTime;
+    }
+
+    public Boolean getProtected() {
+        return this.protect;
+    }
+
+    public Integer getProtectTime() {
+        return this.protectTime;
+    }
+
+    public void setProtected(Boolean protect) {
+        this.protect = protect;
     }
 
     public void setCreatedTime(Long createdTime) {
@@ -68,7 +82,7 @@ public class Grave implements InventoryHolder {
     }
 
     public Integer getItemAmount() {
-        return GraveManager.getItemAmount(inventory);
+        return GraveManager.getItemAmount(this.inventory);
     }
 
     public void setLevel(Integer level) {
@@ -91,8 +105,12 @@ public class Grave implements InventoryHolder {
         this.killer = killer;
     }
 
+    public void setProtectTime(Integer protectTime) {
+        this.protectTime = protectTime;
+    }
+
     public Integer getAliveTime() {
-        return aliveTime;
+        return this.aliveTime;
     }
 
     public void setAliveTime(Integer aliveTime) {
@@ -108,6 +126,6 @@ public class Grave implements InventoryHolder {
     }
 
     public ConcurrentMap<UUID, Integer> getHolograms() {
-        return holograms;
+        return this.holograms;
     }
 }
