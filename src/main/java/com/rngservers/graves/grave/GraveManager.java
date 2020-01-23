@@ -362,24 +362,32 @@ public class GraveManager {
         Boolean owner = false;
         Boolean killer = false;
         Boolean bypass = false;
+        Boolean entity = false;
         if (player.hasPermission("graves.bypass")) {
             bypass = true;
         }
+        if (grave.getEntityType() != null) {
+            entity = true;
+        }
         Boolean graveProtected = plugin.getConfig().getBoolean("settings.graveProtected");
         if (graveProtected) {
-            if (player.getUniqueId().equals(grave.getPlayer().getUniqueId())) {
-                owner = true;
+            if (grave.getPlayer() != null) {
+                if (player.getUniqueId().equals(grave.getPlayer().getUniqueId())) {
+                    owner = true;
+                }
             }
         } else {
             bypass = true;
         }
         Boolean killerOpen = plugin.getConfig().getBoolean("settings.killerOpen");
         if (killerOpen) {
-            if (player.getUniqueId().equals(grave.getKiller().getUniqueId())) {
-                killer = true;
+            if (grave.getKiller() != null) {
+                if (player.getUniqueId().equals(grave.getKiller().getUniqueId())) {
+                    killer = true;
+                }
             }
         }
-        if (owner || killer || bypass) {
+        if (owner || killer || entity || bypass) {
             return true;
         } else {
             return false;
