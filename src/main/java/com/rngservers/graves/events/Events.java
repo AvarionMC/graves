@@ -22,6 +22,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 
 import java.util.Iterator;
 import java.util.List;
@@ -92,7 +93,7 @@ public class Events implements Listener {
 
     @EventHandler
     public void onGraveOpen(PlayerInteractEvent event) {
-        if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+        if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK) || event.getHand().equals(EquipmentSlot.HAND)) {
             return;
         }
         if (event.getPlayer().hasPermission("graves.autoloot")) {

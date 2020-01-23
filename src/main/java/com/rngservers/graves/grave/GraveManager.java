@@ -89,7 +89,7 @@ public class GraveManager {
     public ConcurrentMap<Location, Grave> getGraves(OfflinePlayer player) {
         ConcurrentMap<Location, Grave> playerGraves = new ConcurrentHashMap<>();
         for (ConcurrentMap.Entry<Location, Grave> entry : graves.entrySet()) {
-            if (entry.getValue().getPlayer().equals(player)) {
+            if (entry.getValue().getPlayer().getUniqueId().equals(player.getUniqueId())) {
                 playerGraves.put(entry.getKey(), entry.getValue());
             }
         }
@@ -367,7 +367,7 @@ public class GraveManager {
         }
         Boolean graveProtected = plugin.getConfig().getBoolean("settings.graveProtected");
         if (graveProtected) {
-            if (player.equals(grave.getPlayer())) {
+            if (player.getUniqueId().equals(grave.getPlayer().getUniqueId())) {
                 owner = true;
             }
         } else {
@@ -375,7 +375,7 @@ public class GraveManager {
         }
         Boolean killerOpen = plugin.getConfig().getBoolean("settings.killerOpen");
         if (killerOpen) {
-            if (player.equals(grave.getKiller())) {
+            if (player.getUniqueId().equals(grave.getKiller().getUniqueId())) {
                 killer = true;
             }
         }

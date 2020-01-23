@@ -98,7 +98,7 @@ public class Graves implements CommandExecutor {
     }
 
     public void help(CommandSender sender) {
-        String version = "2.1";
+        String version = "2.2";
         String author = "RandomUnknown";
 
         sender.sendMessage(
