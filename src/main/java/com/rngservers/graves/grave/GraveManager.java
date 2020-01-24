@@ -148,13 +148,13 @@ public class GraveManager {
 
     public String parseProtect(Grave grave) {
         String protect;
-        if (grave.getProtected().booleanValue()) {
+        if (grave.getProtected()) {
             protect = plugin.getConfig().getString("settings.graveProtectedProtectedMessage");
         } else {
             protect = plugin.getConfig().getString("settings.graveProtectedUnprotectedMessage");
         }
         if (grave.getProtectTime() != null) {
-            Long protectTime = (grave.getProtectTime().intValue() - System.currentTimeMillis() - grave.getCreatedTime().longValue()) / 1000;
+            Long protectTime = (grave.getProtectTime() - System.currentTimeMillis() - grave.getCreatedTime()) / 1000;
             protect.replace("$time", getTimeString(protectTime));
         } else {
             String timeInfinite = plugin.getConfig().getString("settings.timeInfinite");
@@ -183,7 +183,7 @@ public class GraveManager {
 
     public Integer getProtectTime() {
         Integer graveTime = plugin.getConfig().getInt("settings.graveProtectedTime") * 1000;
-        if (graveTime.intValue() > 0) {
+        if (graveTime > 0) {
             return graveTime;
         }
         return null;
@@ -629,9 +629,9 @@ public class GraveManager {
     }
 
     public String parseHologram(Integer lineNumber, Grave grave) {
-        String line = hologramLines.get(lineNumber.intValue()).replace("$itemCount", grave.getItemAmount().toString()).replace("&", "§");
+        String line = hologramLines.get(lineNumber).replace("$itemCount", grave.getItemAmount().toString()).replace("&", "§");
         if (grave.getAliveTime() != null) {
-            Long aliveTime = (grave.getAliveTime() - System.currentTimeMillis() - grave.getCreatedTime()) / 1000;
+            Long aliveTime = (grave.getAliveTime() - (System.currentTimeMillis() - grave.getCreatedTime())) / 1000;
             String timeString = getTimeString(aliveTime);
             line = line.replace("$time", timeString);
         } else {
@@ -640,13 +640,13 @@ public class GraveManager {
         }
         if (grave.getProtected() != null) {
             String protect;
-            if (grave.getProtected().booleanValue()) {
+            if (grave.getProtected()) {
                 protect = plugin.getConfig().getString("settings.graveProtectedProtectedMessage");
             } else {
                 protect = plugin.getConfig().getString("settings.graveProtectedUnprotectedMessage");
             }
             if (grave.getProtectTime() != null) {
-                Long protectTime = (grave.getProtectTime() - System.currentTimeMillis() - grave.getCreatedTime()) / 1000;
+                Long protectTime = (grave.getProtectTime() - (System.currentTimeMillis() - grave.getCreatedTime())) / 1000;
                 protect.replace("$time", getTimeString(protectTime));
             } else {
                 String timeInfinite = plugin.getConfig().getString("settings.timeInfinite");
