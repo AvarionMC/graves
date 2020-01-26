@@ -3,6 +3,7 @@ package com.rngservers.graves.gui;
 import com.rngservers.graves.Main;
 import com.rngservers.graves.grave.Grave;
 import com.rngservers.graves.grave.GraveManager;
+import com.rngservers.graves.hooks.Vault;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -17,25 +18,47 @@ import java.util.concurrent.ConcurrentMap;
 public class GUIManager {
     private Main plugin;
     private GraveManager graveManager;
+    private Vault vault;
 
-    public GUIManager(Main plugin, GraveManager graveManager) {
+    public GUIManager(Main plugin, GraveManager graveManager, Vault vault) {
         this.plugin = plugin;
         this.graveManager = graveManager;
+        this.vault = vault;
     }
 
     public void teleportGrave(Player player, ItemStack item) {
+        if (vault != null) {
+            Double graveTeleportCost = plugin.getConfig().getDouble("settings.graveTeleportCost");
+            Double balance = vault.getEconomy().getBalance(player);
+            if (balance < graveTeleportCost) {
+                String notEnoughMoneyMessage = plugin.getConfig().getString("settings.notEnoughMoneyMessage")
+                        .replace("$money", graveTeleportCost.toString()).replace("&", "§");
+                if (!notEnoughMoneyMessage.equals("")) {
+                    player.sendMessage(notEnoughMoneyMessage);
+                }
+                return;
+            } else {
+                vault.getEconomy().withdrawPlayer(player, graveTeleportCost);
+            }
+        }
         Location location = getGraveLocation(item);
-        location.add(0.5D, 1.0D, 0.5D);
-        player.teleport(location);
-        String graveTeleportMessage = plugin.getConfig().getString("settings.graveTeleportMessage").replace("&", "§");
-        if (!graveTeleportMessage.equals("")) {
-            player.sendMessage(graveTeleportMessage);
+        if (location != null) {
+            location.add(0.5, 1.0, 0.5);
+            player.teleport(location);
+            String graveTeleportMessage = plugin.getConfig().getString("settings.graveTeleportMessage").replace("&", "§");
+            if (!graveTeleportMessage.equals("")) {
+                player.sendMessage(graveTeleportMessage);
+            }
+            String graveTeleportSound = plugin.getConfig().getString("settings.graveTeleportSound");
+            if (!graveTeleportSound.equals("")) {
+                player.getWorld().playSound(player.getLocation(), Sound.valueOf(graveTeleportSound.toUpperCase()), 1.0F, 1.0F);
+            }
         }
     }
 
     public Location getGraveLocation(ItemStack item) {
         NamespacedKey key = new NamespacedKey(this.plugin, "graveLocation");
-        String[] cords = item.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING).split("_");
+        String[] cords = item.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING).split("#");
         try {
             World world = plugin.getServer().getWorld(cords[0]);
             Double x = Double.parseDouble(cords[1]);
@@ -127,8 +150,8 @@ public class GUIManager {
             meta.setLore(lores);
             item.setItemMeta(meta);
             NamespacedKey key = new NamespacedKey(plugin, "graveLocation");
-            String keyValue = grave.getLocation().getWorld().getName() + "_"
-                    + grave.getLocation().getX() + "_" + grave.getLocation().getY() + "_" + grave.getLocation().getZ();
+            String keyValue = grave.getLocation().getWorld().getName() + "#"
+                    + grave.getLocation().getX() + "#" + grave.getLocation().getY() + "#" + grave.getLocation().getZ();
             item.getItemMeta().getPersistentDataContainer().set(key, PersistentDataType.STRING, keyValue);
             if (item != null) {
                 items.add(item);

@@ -8,8 +8,14 @@ settings:
   # https://www.spigotmc.org/resources/graves.74208/
 
   # If you uncomment something make sure it is not repeated twice! You can remove or comment out the old option.
-
   # To disable messages set them to ""
+
+  worlds: # What worlds will graves spawn in.
+    - world
+    - world_nether
+    - world_the_end
+    - ALL # Enable in all worlds
+
   #graveTime will be used for players who do not have the permission "graves.time.", It will also be used for entity graves.
   graveTime: 10800 # (Second) How long death chests should stay alive for, 10800 = 3 hours, 0 lasts forever.
   #graveBlock: CHEST # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
@@ -76,14 +82,20 @@ settings:
     - "&7Levels: &f$level"
 
   graveTeleport: false # Can the player teleport to their grave from the Graves GUI.
-  graveTeleportMessage: "&8[&6Graves&8] &fYou teleported to you grave!"
+  graveTeleportCost: 5 # How much it costs to teleport to a grave, you need Vault for this.
+  graveTeleportMessage: "&8[&6Graves&8] &fYou teleported to your grave!"
+  graveTeleportSound: ENTITY_ENDERMAN_TELEPORT # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
   graveTeleportDisabled: "&8[&6Graves&8] &fGrave teleportation is disabled!"
+
+  notEnoughMoneyMessage: "&8[&6Graves&8] &fYou don't have enough money! You need $6$money&f!"
 
   timeSecond: "&6$s&fs "
   timeMinute: "&6$m&fm "
   timeHour: "&6$h&fh "
   timeDay: "&6$d&fd "
   timeInfinite: "&6Infinite"
+
+  ignoreKeepInventory: false # Should the plugin ignore the keep inventory gamerule.
 
   # If a player dies in these blocks a grave will not be created.
   graveIgnoreMessage: "&8[&6Graves&8] &fA grave was not created because you died in &6$block&f!"

@@ -4,10 +4,7 @@ import com.rngservers.graves.Main;
 import com.rngservers.graves.data.DataManager;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Skull;
@@ -15,8 +12,9 @@ import org.bukkit.block.data.Rotatable;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.permissions.PermissionAttachmentInfo;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
@@ -148,7 +146,7 @@ public class GraveManager {
 
     public String parseProtect(Grave grave) {
         String protect;
-        if (grave.getProtected()) {
+        if (grave.getProtected() != null && grave.getProtected()) {
             protect = plugin.getConfig().getString("settings.graveProtectedProtectedMessage");
         } else {
             protect = plugin.getConfig().getString("settings.graveProtectedUnprotectedMessage");
@@ -189,7 +187,7 @@ public class GraveManager {
         return null;
     }
 
-    public Grave createGrave(Player player) {
+    public Grave createGrave(Player player, List<ItemStack> items) {
         if (graveIgnore.contains(player.getLocation().getBlock().getType())) {
             String graveIgnoreMessage = plugin.getConfig().getString("settings.graveIgnoreMessage")
                     .replace("$block", formatString(player.getLocation().getBlock().getType().toString()))
@@ -209,7 +207,7 @@ public class GraveManager {
             return null;
         }
 
-        Inventory inventory = formatInventory(player.getInventory());
+        Inventory inventory = createInventory(items);
         String graveTitle = plugin.getConfig().getString("settings.graveTitle")
                 .replace("$entity", player.getName()).replace("&", "§");
         if (graveTitle.equals("")) {
@@ -244,6 +242,9 @@ public class GraveManager {
     }
 
     public Grave createGrave(LivingEntity entity, List<ItemStack> items) {
+        if (graveIgnore.contains(entity.getLocation().getBlock().getType())) {
+            return null;
+        }
         Location location = getPlaceLocation(entity.getLocation());
         if (location == null) {
             return null;
@@ -268,21 +269,10 @@ public class GraveManager {
         return grave;
     }
 
-    public Inventory formatInventory(PlayerInventory inventory) {
-        Integer itemAmount = getItemAmount(inventory);
-        Inventory newInventory = plugin.getServer().createInventory(null, getInventorySize(itemAmount));
-        List<ItemStack> armor = Arrays.asList(inventory.getArmorContents());
-        Collections.reverse(armor);
-        for (ItemStack item : armor) {
-            if (item != null) {
-                newInventory.addItem(item);
-            }
-        }
-        inventory.setArmorContents(new ItemStack[]{});
-        for (ItemStack item : inventory.getContents()) {
-            if (item != null) {
-                newInventory.addItem(item);
-            }
+    public Inventory createInventory(List<ItemStack> items) {
+        Inventory newInventory = plugin.getServer().createInventory(null, getInventorySize(items.size()));
+        for (ItemStack item : items) {
+            newInventory.addItem(item);
         }
         return newInventory;
     }
@@ -341,7 +331,7 @@ public class GraveManager {
         if (data.graveReplace().contains(location.getBlock().getType()) || data.graveReplace().contains("ALL")) {
             return location;
         }
-        if (location.getBlock().getType().isAir()) {
+        if (isAir(location.getBlock().getType())) {
             return location;
         }
         Location top = getTop(location);
@@ -355,7 +345,7 @@ public class GraveManager {
         Block block = location.getBlock();
         int max = 0;
         while (max <= 256) {
-            if (!data.graveReplace().contains(block.getType()) && !block.getType().isAir()) {
+            if (!data.graveReplace().contains(block.getType()) && !isAir(block.getType())) {
                 return block.getLocation().add(0, 1, 0);
             }
             block = block.getLocation().subtract(0, 1, 0).getBlock();
@@ -364,12 +354,23 @@ public class GraveManager {
         return null;
     }
 
+    public boolean isAir(Material material) {
+        switch (material) {
+            case AIR:
+            case CAVE_AIR:
+            case VOID_AIR:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     public Location getTop(Location location) {
         location.setY(256);
         Block block = location.getBlock();
         int max = 0;
         while (max <= 256) {
-            if (data.graveReplace().contains(block.getType()) || !block.getType().isAir()) {
+            if (data.graveReplace().contains(block.getType()) || !isAir(block.getType())) {
                 return block.getLocation().add(0, 1, 0);
             }
             block = block.getLocation().subtract(0, 1, 0).getBlock();
@@ -499,14 +500,35 @@ public class GraveManager {
     }
 
     public void dropExperience(Grave grave) {
-        /*
-        if (grave.getExperience() != null && grave.getExperience() > 0) {
-            // TODO
-            //ExperienceOrb orb = (ExperienceOrb) grave.getLocation().getWorld().spawnEntity(grave.getLocation(), EntityType.EXPERIENCE_ORB);
-            //orb.setExperience(grave.getExperience());
-            grave.setExperience(null);
+        if (grave.getLevel() != null && grave.getLevel() > 0) {
+            ItemStack bottle = getBottle(grave);
+            grave.getLocation().getWorld().dropItemNaturally(grave.getLocation(), bottle);
         }
-         */
+    }
+
+    public ItemStack getBottle(Grave grave) {
+        ItemStack bottle = new ItemStack(Material.EXPERIENCE_BOTTLE, 1);
+        ItemMeta meta = bottle.getItemMeta();
+        NamespacedKey key = new NamespacedKey(this.plugin, "graveExperience");
+        meta.getPersistentDataContainer().set(key, PersistentDataType.INTEGER, grave.getLevel());
+        String levelString = "Levels";
+        if (grave.getLevel() <= 1) {
+            levelString = "Level";
+        }
+        meta.setDisplayName(ChatColor.YELLOW + grave.getLevel().toString() + " " + levelString);
+        bottle.setItemMeta(meta);
+        grave.setLevel(null);
+        return bottle;
+    }
+
+    public Integer getBottleLevel(ItemStack bottle) {
+        if (bottle != null) {
+            NamespacedKey key = new NamespacedKey(this.plugin, "graveExperience");
+            if (bottle.hasItemMeta() && bottle.getItemMeta().getPersistentDataContainer().has(key, PersistentDataType.INTEGER)) {
+                return bottle.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.INTEGER);
+            }
+        }
+        return null;
     }
 
     public void destroyGrave(Grave grave) {
@@ -545,51 +567,80 @@ public class GraveManager {
     }
 
     public void equipArmor(Inventory inventory, Player player) {
-        ItemStack helmet = inventory.getItem(0);
-        ItemStack chestplate = inventory.getItem(1);
-        ItemStack leggings = inventory.getItem(2);
-        ItemStack boots = inventory.getItem(3);
-
-        if (helmet != null) {
-            if (helmet.getType().equals(Material.DIAMOND_HELMET) || helmet.getType().equals(Material.GOLDEN_HELMET)
-                    || helmet.getType().equals(Material.IRON_HELMET) || helmet.getType().equals(Material.LEATHER_HELMET)
-                    || helmet.getType().equals(Material.CHAINMAIL_HELMET) || helmet.getType().equals(Material.TURTLE_HELMET)) {
+        List<ItemStack> items = Arrays.asList(inventory.getContents());
+        Collections.reverse(items);
+        for (ItemStack item : items) {
+            if (item != null) {
                 if (player.getInventory().getHelmet() == null) {
-                    player.getInventory().setHelmet(helmet);
-                    inventory.removeItem(helmet);
+                    if (isHelmet(item.getType())) {
+                        player.getInventory().setHelmet(item);
+                        inventory.removeItem(item);
+                    }
                 }
-            }
-        }
-        if (chestplate != null) {
-            if (chestplate.getType().equals(Material.DIAMOND_CHESTPLATE) || chestplate.getType().equals(Material.GOLDEN_CHESTPLATE)
-                    || chestplate.getType().equals(Material.IRON_CHESTPLATE) || chestplate.getType().equals(Material.LEATHER_CHESTPLATE)
-                    || chestplate.getType().equals(Material.CHAINMAIL_CHESTPLATE)) {
                 if (player.getInventory().getChestplate() == null) {
-                    player.getInventory().setChestplate(chestplate);
-                    inventory.removeItem(chestplate);
+                    if (isChestplate(item.getType())) {
+                        player.getInventory().setChestplate(item);
+                        inventory.removeItem(item);
+                    }
                 }
-            }
-        }
-        if (leggings != null) {
-            if (leggings.getType().equals(Material.DIAMOND_LEGGINGS) || leggings.getType().equals(Material.GOLDEN_LEGGINGS)
-                    || leggings.getType().equals(Material.IRON_LEGGINGS) || leggings.getType().equals(Material.LEATHER_LEGGINGS)
-                    || leggings.getType().equals(Material.CHAINMAIL_LEGGINGS)) {
                 if (player.getInventory().getLeggings() == null) {
-                    player.getInventory().setLeggings(leggings);
-                    inventory.removeItem(leggings);
+                    if (isLeggings(item.getType())) {
+                        player.getInventory().setLeggings(item);
+                        inventory.removeItem(item);
+                    }
                 }
-            }
-        }
-        if (boots != null) {
-            if (boots.getType().equals(Material.DIAMOND_BOOTS) || boots.getType().equals(Material.GOLDEN_BOOTS)
-                    || boots.getType().equals(Material.IRON_BOOTS) || boots.getType().equals(Material.LEATHER_BOOTS)
-                    || boots.getType().equals(Material.CHAINMAIL_BOOTS)) {
                 if (player.getInventory().getBoots() == null) {
-                    player.getInventory().setBoots(boots);
-                    inventory.removeItem(boots);
+                    if (isBoots(item.getType())) {
+                        player.getInventory().setBoots(item);
+                        inventory.removeItem(item);
+                    }
                 }
             }
         }
+    }
+
+    public Boolean isHelmet(Material material) {
+        if (material != null) {
+            if (material.equals(Material.DIAMOND_HELMET) || material.equals(Material.GOLDEN_HELMET)
+                    || material.equals(Material.IRON_HELMET) || material.equals(Material.LEATHER_HELMET)
+                    || material.equals(Material.CHAINMAIL_HELMET) || material.equals(Material.TURTLE_HELMET)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Boolean isChestplate(Material material) {
+        if (material != null) {
+            if (material.equals(Material.DIAMOND_CHESTPLATE) || material.equals(Material.GOLDEN_CHESTPLATE)
+                    || material.equals(Material.IRON_CHESTPLATE) || material.equals(Material.LEATHER_CHESTPLATE)
+                    || material.equals(Material.CHAINMAIL_CHESTPLATE)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Boolean isLeggings(Material material) {
+        if (material != null) {
+            if (material.equals(Material.DIAMOND_LEGGINGS) || material.equals(Material.GOLDEN_LEGGINGS)
+                    || material.equals(Material.IRON_LEGGINGS) || material.equals(Material.LEATHER_LEGGINGS)
+                    || material.equals(Material.CHAINMAIL_LEGGINGS)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Boolean isBoots(Material material) {
+        if (material != null) {
+            if (material.equals(Material.DIAMOND_BOOTS) || material.equals(Material.GOLDEN_BOOTS)
+                    || material.equals(Material.IRON_BOOTS) || material.equals(Material.LEATHER_BOOTS)
+                    || material.equals(Material.CHAINMAIL_BOOTS)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Boolean checkEmpty(Grave grave) {
@@ -710,8 +761,8 @@ public class GraveManager {
             armorStand.setCustomName(parseHologram(lineNumber, grave));
             armorStand.setCustomNameVisible(true);
             armorStand.addScoreboardTag("graveHologram");
-            armorStand.addScoreboardTag("graveHologramLocation:" + grave.getLocation().getWorld().getName() + "_"
-                    + grave.getLocation().getX() + "_" + grave.getLocation().getY() + "_" + grave.getLocation().getZ());
+            armorStand.addScoreboardTag("graveHologramLocation:" + grave.getLocation().getWorld().getName() + "#"
+                    + grave.getLocation().getX() + "#" + grave.getLocation().getY() + "#" + grave.getLocation().getZ());
             location.add(0, 0.25, 0);
             grave.addHologram(armorStand.getUniqueId(), lineNumber);
             lineNumber++;
@@ -737,7 +788,7 @@ public class GraveManager {
     public Grave getGraveFromHologram(ArmorStand armorStand) {
         for (String tag : armorStand.getScoreboardTags()) {
             if (tag.contains("graveHologramLocation:")) {
-                String[] cords = tag.replace("graveHologramLocation:", "").split("_");
+                String[] cords = tag.replace("graveHologramLocation:", "").split("#");
                 try {
                     World world = plugin.getServer().getWorld(cords[0]);
                     Double x = Double.parseDouble(cords[1]);
@@ -745,15 +796,11 @@ public class GraveManager {
                     Double z = Double.parseDouble(cords[3]);
                     Location location = new Location(world, x, y, z);
                     return getGrave(location);
-                } catch (NumberFormatException ignored) {
+                } catch (NumberFormatException | ArrayIndexOutOfBoundsException ignored) {
                 }
             }
         }
         return null;
-    }
-
-    public List<Material> getGraveIgnore() {
-        return graveIgnore;
     }
 
     @SuppressWarnings("deprecation")
