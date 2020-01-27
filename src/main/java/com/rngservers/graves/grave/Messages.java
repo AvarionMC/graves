@@ -46,6 +46,14 @@ public class Messages {
         }
     }
 
+    public void graveMax(Player player) {
+        String graveMaxMessage = plugin.getConfig().getString("settings.graveMaxMessage")
+                .replace("&", "§");
+        if (!graveMaxMessage.equals("")) {
+            player.sendMessage(graveMaxMessage);
+        }
+    }
+
     public void graveProtected(Player player, Location location) {
         String graveProtectedMessage = plugin.getConfig().getString("settings.graveProtectedMessage")
                 .replace("&", "§");
@@ -55,6 +63,15 @@ public class Messages {
         String graveProtectedSound = plugin.getConfig().getString("settings.graveProtectedSound");
         if (!graveProtectedSound.equals("")) {
             location.getWorld().playSound(location, Sound.valueOf(graveProtectedSound.toUpperCase()), 1, 1);
+        }
+    }
+
+    public void graveTokenNoTokenMessage(Player player) {
+        String graveTokenName = plugin.getConfig().getString("settings.graveTokenName").replace("&", "§");
+        String graveTokenNoTokenMessage = plugin.getConfig().getString("settings.graveTokenNoTokenMessage")
+                .replace("$name", graveTokenName).replace("&", "§");
+        if (!graveTokenNoTokenMessage.equals("")) {
+            player.sendMessage(graveTokenNoTokenMessage);
         }
     }
 

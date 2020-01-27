@@ -129,16 +129,17 @@ public class GUIManager {
                 String line = ChatColor.GRAY + lore.replace("$location", "LOC")
                         .replace("$item", grave.getItemAmount().toString())
                         .replace("$time", "Time")
-                        .replace("$x", String.valueOf(grave.getLocation().getBlockX()))
-                        .replace("$y", String.valueOf(grave.getLocation().getBlockY()))
-                        .replace("$z", String.valueOf(grave.getLocation().getBlockZ()))
                         .replace("$protect", graveManager.parseProtect(grave))
+                        .replace("$level", "$xp")
                         .replace("&", "§");
-                if (grave.getLevel() != null && grave.getLevel() > 0) {
-                    line = line.replace("$level", grave.getLevel().toString());
+                if (grave.getExperience() != null && grave.getExperience() > 0) {
+                    line = line.replace("$xp", grave.getExperience().toString());
                 } else {
-                    line = line.replace("$level", "0");
+                    line = line.replace("$xp", "0");
                 }
+                line.replace("$x", String.valueOf(grave.getLocation().getBlockX()))
+                        .replace("$y", String.valueOf(grave.getLocation().getBlockY()))
+                        .replace("$z", String.valueOf(grave.getLocation().getBlockZ()));
                 lores.add(line);
             }
             String guiGrave = plugin.getConfig().getString("settings.guiGrave")

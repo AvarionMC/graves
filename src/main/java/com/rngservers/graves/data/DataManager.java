@@ -94,7 +94,7 @@ public class DataManager {
 
                 if (data.isSet(worlds + "." + cords + ".level")) {
                     Integer level = data.getInt(worlds + "." + cords + ".level");
-                    grave.setLevel(level);
+                    grave.setExperience(level);
                 }
                 grave.setReplace(replace);
                 grave.setPlayer(player);
@@ -159,8 +159,8 @@ public class DataManager {
             if (grave.getKiller() != null) {
                 data.set(world + "." + x + "_" + y + "_" + z + ".killer", grave.getKiller().getUniqueId().toString());
             }
-            if (grave.getLevel() != null) {
-                data.set(world + "." + x + "_" + y + "_" + z + ".level", grave.getLevel());
+            if (grave.getExperience() != null) {
+                data.set(world + "." + x + "_" + y + "_" + z + ".level", grave.getExperience());
             }
             if (grave.getProtected() != null) {
                 data.set(world + "." + x + "_" + y + "_" + z + ".protect", grave.getProtected());

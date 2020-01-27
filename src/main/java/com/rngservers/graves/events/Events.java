@@ -18,7 +18,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -27,6 +26,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Iterator;
 import java.util.List;
@@ -54,6 +54,27 @@ public class Events implements Listener {
                 return;
             }
         }
+        Integer graveMax = plugin.getConfig().getInt("settings.graveMax");
+        if (graveMax > 0) {
+            if (graveManager.getGraves(event.getEntity()).size() >= graveMax) {
+                messages.graveMax(event.getEntity());
+                return;
+            }
+        }
+        Boolean graveToken = plugin.getConfig().getBoolean("settings.graveToken");
+        if (graveToken) {
+            ItemStack token =  graveManager.getGraveTokenFromPlayer(event.getEntity());
+            if (token != null) {
+                Iterator<ItemStack> iterator = event.getDrops().iterator();
+                while (iterator.hasNext()) {
+                    ItemStack item = iterator.next();
+                    item.setAmount(item.getAmount() - 1);
+                }
+            } else {
+                messages.graveTokenNoTokenMessage(event.getEntity());
+                return;
+            }
+        }
         List<String> worlds = plugin.getConfig().getStringList("settings.worlds");
         if (worlds.contains(event.getEntity().getLocation().getWorld().getName()) || worlds.contains("ALL")) {
             List<String> graveEntities = plugin.getConfig().getStringList("settings.graveEntities");
@@ -65,9 +86,7 @@ public class Events implements Listener {
                         if (event.getEntity().hasPermission("graves.experience")) {
                             Boolean expStore = plugin.getConfig().getBoolean("settings.expStore");
                             if (expStore) {
-                                grave.setLevel(event.getEntity().getLevel());
-                                event.setNewExp(0);
-                                event.setNewTotalExp(0);
+                                grave.setExperience(event.getDroppedExp());
                                 event.setDroppedExp(0);
                                 event.setKeepLevel(false);
                             }
@@ -91,6 +110,8 @@ public class Events implements Listener {
                     Grave grave = graveManager.createGrave(event.getEntity(), event.getDrops());
                     if (grave != null) {
                         event.getDrops().clear();
+                        grave.setExperience(event.getDroppedExp());
+                        event.setDroppedExp(0);
                     }
                 }
             }
@@ -267,33 +288,6 @@ public class Events implements Listener {
                     iterator.remove();
                 }
             }
-        }
-    }
-
-    @EventHandler
-    public void onItemPickup(EntityPickupItemEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-        if (event.getEntity() instanceof Player) {
-            Integer level = graveManager.getBottleLevel(event.getItem().getItemStack());
-            if (level != null) {
-                Player player = (Player) event.getEntity();
-                player.setLevel(player.getLevel() + level);
-                event.getItem().remove();
-                event.setCancelled(true);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onInventoryClick(InventoryClickEvent event) {
-        Integer level = graveManager.getBottleLevel(event.getCurrentItem());
-        if (level != null) {
-            Player player = (Player) event.getWhoClicked();
-            player.setLevel(player.getLevel() + level);
-            event.getClickedInventory().removeItem(event.getCurrentItem());
-            event.setCancelled(true);
         }
     }
 

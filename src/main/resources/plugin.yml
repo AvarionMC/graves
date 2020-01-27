@@ -40,6 +40,9 @@ permissions:
   graves.bypass:
     default: op
     description: Bypass grave protection
+  graves.givetoken:
+    default: op
+    description: Give a grave token
   graves.reload:
     default: op
     description: Reload Graves

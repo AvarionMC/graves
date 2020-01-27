@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentMap;
 public class Grave implements InventoryHolder {
     private Location location;
     private Inventory inventory;
-    private Integer level;
+    private Integer experience;
     private Material replace;
     private EntityType entity;
     private OfflinePlayer player;
@@ -41,8 +41,8 @@ public class Grave implements InventoryHolder {
         return this.inventory;
     }
 
-    public Integer getLevel() {
-        return this.level;
+    public Integer getExperience() {
+        return this.experience;
     }
 
     public Material getReplace() {
@@ -85,8 +85,8 @@ public class Grave implements InventoryHolder {
         return GraveManager.getItemAmount(this.inventory);
     }
 
-    public void setLevel(Integer level) {
-        this.level = level;
+    public void setExperience(Integer experience) {
+        this.experience = experience;
     }
 
     public void setReplace(Material replace) {

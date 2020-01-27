@@ -7,10 +7,12 @@ import com.rngservers.graves.grave.GraveManager;
 import com.rngservers.graves.grave.Messages;
 import com.rngservers.graves.gui.GUIManager;
 import com.rngservers.graves.hooks.Vault;
+import com.rngservers.graves.recipe.RecipeManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Main extends JavaPlugin {
     GraveManager graveManager;
+    RecipeManager recipeManager;
 
     @Override
     public void onEnable() {
@@ -21,12 +23,16 @@ public final class Main extends JavaPlugin {
             vault = null;
         }
 
-        DataManager data = new DataManager(this);
         Messages messages = new Messages(this);
+        DataManager data = new DataManager(this);
         graveManager = new GraveManager(this, data, messages);
+
+        recipeManager = new RecipeManager(this, graveManager);
+        recipeManager.loadRecipes();
+
         GUIManager guiManager = new GUIManager(this, graveManager, vault);
 
-        this.getCommand("graves").setExecutor(new Graves(this, data, graveManager, guiManager, messages));
+        this.getCommand("graves").setExecutor(new Graves(this, data, graveManager, guiManager, recipeManager, messages));
         this.getServer().getPluginManager().registerEvents(new Events(this, graveManager, guiManager, messages), this);
     }
 
@@ -35,5 +41,6 @@ public final class Main extends JavaPlugin {
         graveManager.removeHolograms();
         graveManager.closeGraves();
         graveManager.saveGraves();
+        recipeManager.unloadRecipes();
     }
 }

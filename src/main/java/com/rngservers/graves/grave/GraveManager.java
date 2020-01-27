@@ -66,6 +66,7 @@ public class GraveManager {
                     Grave grave = entry.getValue();
                     if (plugin.getServer().getWorlds().contains(grave.getLocation().getWorld())) {
                         updateHologram(grave);
+                        removeBrokenHolograms();
                         if (grave.getProtectTime() != null && grave.getProtected()) {
                             Long diff = System.currentTimeMillis() - grave.getCreatedTime();
                             if (diff >= grave.getProtectTime()) {
@@ -137,6 +138,51 @@ public class GraveManager {
         } else {
             return null;
         }
+    }
+
+    public ItemStack getGraveTokenFromPlayer(Player player) {
+        for (ItemStack item : player.getInventory()) {
+            if (item != null) {
+                if (hasRecipeData(item)) {
+                    return item;
+                }
+            }
+        }
+        return null;
+    }
+
+    public ItemStack getGraveToken() {
+        Material tokenMaterial = Material.matchMaterial(plugin.getConfig().getString("settings.graveTokenItem"));
+        ItemStack item = new ItemStack(tokenMaterial);
+        setRecipeData(item);
+        ItemMeta meta = item.getItemMeta();
+
+        String graveTokenName = plugin.getConfig().getString("settings.graveTokenName").replace("&", "§");
+        meta.setDisplayName(graveTokenName);
+
+        List<String> graveTokenLore = plugin.getConfig().getStringList("settings.graveTokenLore");
+        List<String> graveTokenLoreReplaced = new ArrayList<>();
+        for (String lore : graveTokenLore) {
+            graveTokenLoreReplaced.add(lore.replace("&", "§"));
+        }
+        meta.setLore(graveTokenLoreReplaced);
+
+        item.setItemMeta(meta);
+        return item;
+    }
+
+
+    public ItemStack setRecipeData(ItemStack item) {
+        ItemMeta meta = item.getItemMeta();
+        NamespacedKey key = new NamespacedKey(plugin, "gravesRecipe");
+        meta.getPersistentDataContainer().set(key, PersistentDataType.INTEGER, 1);
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    public Boolean hasRecipeData(ItemStack item) {
+        NamespacedKey key = new NamespacedKey(plugin, "gravesRecipe");
+        return item.getItemMeta().getPersistentDataContainer().has(key, PersistentDataType.INTEGER);
     }
 
     public void protectGrave(Grave grave, Boolean protect) {
@@ -318,8 +364,17 @@ public class GraveManager {
 
     public Location getPlaceLocation(Location location) {
         location = roundLocation(location);
+        Boolean placeVoid = plugin.getConfig().getBoolean("settings.placeVoid");
         if (location.getY() < 0 || location.getY() > 256) {
-            return getTop(location);
+            if (placeVoid) {
+                Location top = getTop(location);
+                if (top != null) {
+                    return top;
+                }
+                return getVoid(location);
+            } else {
+                return null;
+            }
         }
         Boolean placeGround = plugin.getConfig().getBoolean("settings.placeGround");
         if (placeGround) {
@@ -354,17 +409,6 @@ public class GraveManager {
         return null;
     }
 
-    public boolean isAir(Material material) {
-        switch (material) {
-            case AIR:
-            case CAVE_AIR:
-            case VOID_AIR:
-                return true;
-            default:
-                return false;
-        }
-    }
-
     public Location getTop(Location location) {
         location.setY(256);
         Block block = location.getBlock();
@@ -377,6 +421,34 @@ public class GraveManager {
             max++;
         }
         return null;
+    }
+
+    public Location getVoid(Location location) {
+        location.setY(0);
+        Block block = location.getBlock();
+        int max = 0;
+        while (max <= 256) {
+            if (data.graveReplace().contains(block.getType())) {
+                return block.getLocation().add(0, 1, 0);
+            }
+            if (isAir(block.getType())) {
+                return block.getLocation();
+            }
+            block = block.getLocation().add(0, 1, 0).getBlock();
+            max++;
+        }
+        return null;
+    }
+
+    public boolean isAir(Material material) {
+        switch (material) {
+            case AIR:
+            case CAVE_AIR:
+            case VOID_AIR:
+                return true;
+            default:
+                return false;
+        }
     }
 
     public void replaceGrave(Grave grave) {
@@ -491,49 +563,27 @@ public class GraveManager {
 
     public void giveExperience(Grave grave, Player player) {
         String expMessage = plugin.getConfig().getString("settings.expMessage").replace("&", "§");
-        if (grave.getLevel() != null && grave.getLevel() > 0) {
-            expMessage = expMessage.replace("$level", grave.getLevel().toString());
-            player.setLevel(player.getLevel() + grave.getLevel());
-            grave.setLevel(null);
+        if (grave.getExperience() != null && grave.getExperience() > 0) {
+            expMessage = expMessage.replace("$level", "$xp");
+            expMessage = expMessage.replace("$xp", grave.getExperience().toString());
+            player.giveExp(grave.getExperience());
+            grave.setExperience(null);
             player.sendMessage(expMessage);
         }
     }
 
     public void dropExperience(Grave grave) {
-        if (grave.getLevel() != null && grave.getLevel() > 0) {
-            ItemStack bottle = getBottle(grave);
-            grave.getLocation().getWorld().dropItemNaturally(grave.getLocation(), bottle);
+        if (grave.getExperience() != null && grave.getExperience() > 0) {
+            ExperienceOrb orb = (ExperienceOrb) grave.getLocation().getWorld().spawnEntity(grave.getLocation(), EntityType.EXPERIENCE_ORB);
+            orb.setExperience(grave.getExperience());
+            grave.setExperience(null);
         }
-    }
 
-    public ItemStack getBottle(Grave grave) {
-        ItemStack bottle = new ItemStack(Material.EXPERIENCE_BOTTLE, 1);
-        ItemMeta meta = bottle.getItemMeta();
-        NamespacedKey key = new NamespacedKey(this.plugin, "graveExperience");
-        meta.getPersistentDataContainer().set(key, PersistentDataType.INTEGER, grave.getLevel());
-        String levelString = "Levels";
-        if (grave.getLevel() <= 1) {
-            levelString = "Level";
-        }
-        meta.setDisplayName(ChatColor.YELLOW + grave.getLevel().toString() + " " + levelString);
-        bottle.setItemMeta(meta);
-        grave.setLevel(null);
-        return bottle;
-    }
-
-    public Integer getBottleLevel(ItemStack bottle) {
-        if (bottle != null) {
-            NamespacedKey key = new NamespacedKey(this.plugin, "graveExperience");
-            if (bottle.hasItemMeta() && bottle.getItemMeta().getPersistentDataContainer().has(key, PersistentDataType.INTEGER)) {
-                return bottle.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.INTEGER);
-            }
-        }
-        return null;
     }
 
     public void destroyGrave(Grave grave) {
         grave.getInventory().clear();
-        grave.setLevel(null);
+        grave.setExperience(null);
     }
 
     public void updateHologram(Grave grave) {
@@ -711,10 +761,11 @@ public class GraveManager {
         } else if (grave.getEntityType() != null) {
             line = line.replace("$entity", formatString(grave.getEntityType().toString()));
         }
-        if (grave.getLevel() != null) {
-            line = line.replace("$level", grave.getLevel().toString());
+        line = line.replace("$level", "$xp");
+        if (grave.getExperience() != null) {
+            line = line.replace("$xp", grave.getExperience().toString());
         } else {
-            line = line.replace("$level", "0");
+            line = line.replace("$xp", "0");
         }
         return line;
     }
@@ -734,6 +785,20 @@ public class GraveManager {
             }
         }
         return count;
+    }
+
+    public void removeBrokenHolograms() {
+        for (World world : plugin.getServer().getWorlds()) {
+            for (Entity entity : world.getEntities()) {
+                if (entity instanceof ArmorStand) {
+                    ArmorStand armorStand = (ArmorStand) entity;
+                    Grave grave = getGraveFromHologram(armorStand);
+                    if (grave == null) {
+                        armorStand.remove();
+                    }
+                }
+            }
+        }
     }
 
     public void createHologram(Grave grave) {
