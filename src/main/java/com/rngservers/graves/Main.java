@@ -4,7 +4,7 @@ import com.rngservers.graves.commands.Graves;
 import com.rngservers.graves.data.DataManager;
 import com.rngservers.graves.events.Events;
 import com.rngservers.graves.grave.GraveManager;
-import com.rngservers.graves.grave.Messages;
+import com.rngservers.graves.messages.Messages;
 import com.rngservers.graves.gui.GUIManager;
 import com.rngservers.graves.hooks.Vault;
 import com.rngservers.graves.recipe.RecipeManager;

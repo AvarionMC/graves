@@ -89,7 +89,9 @@ public class GUIManager {
             }
             return;
         }
-        String guiName = plugin.getConfig().getString("settings.guiTitle").replace("$player", otherPlayer.getName())
+        String guiName = plugin.getConfig().getString("settings.guiTitle")
+                .replace("$entity", otherPlayer.getName())
+                .replace("$player", otherPlayer.getName())
                 .replace("&", "§");
         GravesGUI gui = new GravesGUI("§5§3§1§6§r§0§r" + guiName, graveItems, GraveManager.getInventorySize(graveItems.size()));
         gui.openInventory(player);
@@ -102,8 +104,8 @@ public class GUIManager {
         for (ConcurrentMap.Entry<Location, Grave> entry : graves.entrySet()) {
             Grave grave = entry.getValue();
             Material graveBlock = Material.matchMaterial(plugin.getConfig().getString("settings.graveBlock"));
-            if (graveBlock == null) {
-                graveBlock = Material.CHEST;
+            if (graveBlock == null || graveBlock.equals(Material.AIR)) {
+                graveBlock = Material.PLAYER_HEAD;
             }
             ItemStack item = new ItemStack(graveBlock, 1);
             ItemMeta meta = item.getItemMeta();

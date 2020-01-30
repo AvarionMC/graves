@@ -1,4 +1,4 @@
-package com.rngservers.graves.grave;
+package com.rngservers.graves.messages;
 
 import com.rngservers.graves.Main;
 import org.bukkit.Effect;

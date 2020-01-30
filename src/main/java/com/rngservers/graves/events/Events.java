@@ -3,7 +3,7 @@ package com.rngservers.graves.events;
 import com.rngservers.graves.Main;
 import com.rngservers.graves.grave.Grave;
 import com.rngservers.graves.grave.GraveManager;
-import com.rngservers.graves.grave.Messages;
+import com.rngservers.graves.messages.Messages;
 import com.rngservers.graves.gui.GUIManager;
 import org.bukkit.GameRule;
 import org.bukkit.block.Block;
@@ -28,6 +28,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -63,7 +64,7 @@ public class Events implements Listener {
         }
         Boolean graveToken = plugin.getConfig().getBoolean("settings.graveToken");
         if (graveToken) {
-            ItemStack token =  graveManager.getGraveTokenFromPlayer(event.getEntity());
+            ItemStack token = graveManager.getGraveTokenFromPlayer(event.getEntity());
             if (token != null) {
                 Iterator<ItemStack> iterator = event.getDrops().iterator();
                 while (iterator.hasNext()) {
@@ -75,14 +76,23 @@ public class Events implements Listener {
                 return;
             }
         }
+        List<ItemStack> newDrops = new ArrayList<>(event.getDrops());
+        event.getDrops().clear();
+        Iterator<ItemStack> iterator = newDrops.iterator();
+        while (iterator.hasNext()) {
+            ItemStack itemStack = iterator.next();
+            if (graveManager.shouldIgnore(itemStack)) {
+                iterator.remove();
+                event.getDrops().add(itemStack);
+            }
+        }
         List<String> worlds = plugin.getConfig().getStringList("settings.worlds");
         if (worlds.contains(event.getEntity().getLocation().getWorld().getName()) || worlds.contains("ALL")) {
             List<String> graveEntities = plugin.getConfig().getStringList("settings.graveEntities");
             if (graveEntities.contains(event.getEntity().getType().toString()) || graveEntities.contains("ALL")) {
-                if (graveManager.getItemAmount(event.getEntity().getInventory()) > 0) {
-                    Grave grave = graveManager.createGrave(event.getEntity(), event.getDrops());
+                if (newDrops.size() > 0) {
+                    Grave grave = graveManager.createGrave(event.getEntity(), newDrops);
                     if (grave != null) {
-                        event.getDrops().clear();
                         if (event.getEntity().hasPermission("graves.experience")) {
                             Boolean expStore = plugin.getConfig().getBoolean("settings.expStore");
                             if (expStore) {
@@ -91,6 +101,7 @@ public class Events implements Listener {
                                 event.setKeepLevel(false);
                             }
                         }
+                        graveManager.runCreateCommands(grave, event.getEntity());
                     }
                 }
             }
@@ -106,13 +117,23 @@ public class Events implements Listener {
         List<String> worlds = plugin.getConfig().getStringList("settings.worlds");
         if (worlds.contains(event.getEntity().getLocation().getWorld().getName()) || worlds.contains("ALL")) {
             if (graveEntities.contains(event.getEntity().getType().toString()) || graveEntities.contains("ALL")) {
-                if (event.getDrops().size() > 0) {
-                    Grave grave = graveManager.createGrave(event.getEntity(), event.getDrops());
+                List<ItemStack> newDrops = new ArrayList<>(event.getDrops());
+                event.getDrops().clear();
+                Iterator<ItemStack> iterator = newDrops.iterator();
+                while (iterator.hasNext()) {
+                    ItemStack itemStack = iterator.next();
+                    if (graveManager.shouldIgnore(itemStack)) {
+                        iterator.remove();
+                        event.getDrops().add(itemStack);
+                    }
+                }
+                if (newDrops.size() > 0) {
+                    Grave grave = graveManager.createGrave(event.getEntity(), newDrops);
                     if (grave != null) {
-                        event.getDrops().clear();
                         grave.setExperience(event.getDroppedExp());
                         event.setDroppedExp(0);
                     }
+                    graveManager.runCreateCommands(grave, event.getEntity());
                 }
             }
         }
@@ -138,6 +159,7 @@ public class Events implements Listener {
             if (graveManager.hasPermission(grave, event.getPlayer())) {
                 event.getPlayer().openInventory(grave.getInventory());
                 messages.graveOpen(grave.getLocation());
+                graveManager.runOpenCommands(grave, event.getPlayer());
             } else {
                 messages.graveProtected(event.getPlayer(), event.getClickedBlock().getLocation());
             }
@@ -161,6 +183,7 @@ public class Events implements Listener {
             if (graveManager.hasPermission(grave, event.getPlayer())) {
                 graveManager.autoLoot(grave, event.getPlayer());
                 messages.graveOpen(grave.getLocation());
+                graveManager.runLootCommands(grave, event.getPlayer());
             } else {
                 messages.graveProtected(event.getPlayer(), grave.getLocation());
             }
@@ -189,6 +212,7 @@ public class Events implements Listener {
                     if (graveManager.hasPermission(grave, event.getPlayer())) {
                         event.getPlayer().openInventory(grave.getInventory());
                         messages.graveOpen(grave.getLocation());
+                        graveManager.runLootCommands(grave, event.getPlayer());
                     } else {
                         messages.graveProtected(event.getPlayer(), grave.getLocation());
                     }
@@ -232,11 +256,12 @@ public class Events implements Listener {
             if (grave.getItemAmount() == 0) {
                 Player player = (Player) event.getPlayer();
                 grave.getInventory().getViewers().remove(player);
-                messages.graveLoot(grave.getLocation(), player);
                 graveManager.giveExperience(grave, player);
                 graveManager.removeHologram(grave);
                 graveManager.replaceGrave(grave);
                 graveManager.removeGrave(grave);
+                messages.graveLoot(grave.getLocation(), player);
+                graveManager.runLootCommands(grave, player);
             }
         }
     }
@@ -251,6 +276,7 @@ public class Events implements Listener {
                 graveManager.removeHologram(grave);
                 graveManager.replaceGrave(grave);
                 graveManager.removeGrave(grave);
+                graveManager.runBreakCommands(grave, event.getPlayer());
             } else {
                 messages.graveProtected(event.getPlayer(), event.getBlock().getLocation());
                 event.setCancelled(true);
@@ -284,6 +310,7 @@ public class Events implements Listener {
                     graveManager.removeHologram(grave);
                     graveManager.replaceGrave(grave);
                     graveManager.removeGrave(grave);
+                    graveManager.runExplodeCommands(grave, event.getEntity());
                 } else {
                     iterator.remove();
                 }

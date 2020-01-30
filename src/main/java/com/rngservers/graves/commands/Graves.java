@@ -3,7 +3,7 @@ package com.rngservers.graves.commands;
 import com.rngservers.graves.Main;
 import com.rngservers.graves.data.DataManager;
 import com.rngservers.graves.grave.GraveManager;
-import com.rngservers.graves.grave.Messages;
+import com.rngservers.graves.messages.Messages;
 import com.rngservers.graves.gui.GUIManager;
 import com.rngservers.graves.recipe.RecipeManager;
 import org.bukkit.ChatColor;
@@ -145,6 +145,7 @@ public class Graves implements CommandExecutor {
             plugin.reloadConfig();
             data.graveReplaceLoad();
             graveManager.graveHeadLoad();
+            graveManager.graveItemIgnoreLoad();
             graveManager.graveIgnoreLoad();
             graveManager.hologramLinesLoad();
             graveManager.removeHolograms();
@@ -158,7 +159,7 @@ public class Graves implements CommandExecutor {
     }
 
     public void help(CommandSender sender) {
-        String version = "2.5";
+        String version = "2.6";
         String author = "RandomUnknown";
 
         sender.sendMessage(

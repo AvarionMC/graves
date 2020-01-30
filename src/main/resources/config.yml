@@ -43,6 +43,14 @@ settings:
   graveProtectedChangeSound: ENTITY_DONKEY_CHEST # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
   graveProtectedTime: 300 # Seconds, 300 = 5 minutes. Set to 0 to always stay locked.
 
+  # Grave particle system.
+  graveParticle: false # Disabled by default.
+  #graveParticle: REDSTONE # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
+  graveParticleColor: ORANGE # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Color.html
+  graveParticleCount: 4 # Amount of particles.
+  graveParticleSize: 4 # Size of particles.
+  graveParticleHeight: 0 # Height of the particles.
+
   graveFailure: "&8[&6Graves&8] &fA grave was unable to be placed! Item's dropped on ground." # Can't place grave message.
 
   graveOpenSound: BLOCK_CHEST_OPEN # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
@@ -76,7 +84,7 @@ settings:
     - "&6$itemCount &fItems &f/ &6$xp&fxp"
     - "&6$time &fleft"
 
-  guiTitle: "$player's Graves"
+  guiTitle: "$entity's Graves"
   guiGrave: "&fGrave: &6$x&fx, &6$y&fy, &6$z&fz"
   guiEmpty: "&8[&6Graves&8] &fYou don't have any graves!"
   guiLore:
@@ -115,11 +123,37 @@ settings:
 
   ignoreKeepInventory: false # Should the plugin ignore the keep inventory gamerule.
 
+  graveCommandsOnlyPlayers: true # Should grave commands only execute on player graves. If false entity graves will execute commands.
+  # Run commands on grave actions, you can use the following placeholders.
+  # $entity, $owner, $x, $y, $z, $time.
+  graveLootCommands:
+    #- "say $entity looted $owner's grave"
+  graveCreateCommands:
+    #- "say $entity died at $xx $yy $zz, grave lasts for $time!"
+  graveOpenCommands:
+    #- "say $entity is looting $owner's grave!"
+  graveBreakCommands:
+    #- "say $entity broke $owner's grave!"
+  graveExplodeCommands:
+    #- "say $entity exploded $owner's grave!"
+
+  graveItemIgnore: # Items that graves will ignore, these items will be handled normally.
+    #- BEDROCK  # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+  graveItemIgnoreName: # If an item has this exact name it will be handled normally.
+    #- "&4Admin Sword"
+  graveItemIgnoreLore: # If an item has this exact line of lore it will be handled normally.
+    #- "Soulbound"
+  graveItemIgnoreNameContains: # If an item contains this string in the name it will be handled normally.
+    #- "Super Pickaxe"
+  graveItemIgnoreLoreContains: # If an item contains this string in the lore it will be handled normally.
+    #- "Ignore Lore"
+
   # If a player dies in these blocks a grave will not be created.
   graveIgnoreMessage: "&8[&6Graves&8] &fA grave was not created because you died in &6$block&f!"
   graveIgnore: # Uncomment lava if you don't want graves being created in lava. You can add more to the list if you want.
-  #- LAVA
+    #- LAVA
 
+  # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
   graveReplace: # What blocks can graves replace.
     - TORCH
     - REDSTONE_TORCH
