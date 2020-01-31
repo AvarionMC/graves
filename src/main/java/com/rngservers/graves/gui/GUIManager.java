@@ -132,11 +132,12 @@ public class GUIManager {
                         .replace("$item", grave.getItemAmount().toString())
                         .replace("$time", "Time")
                         .replace("$protect", graveManager.parseProtect(grave))
-                        .replace("$level", "$xp")
                         .replace("&", "§");
                 if (grave.getExperience() != null && grave.getExperience() > 0) {
+                    line = line.replace("$level", graveManager.getLevelFromExp(grave.getExperience()));
                     line = line.replace("$xp", grave.getExperience().toString());
                 } else {
+                    line = line.replace("$level", "0");
                     line = line.replace("$xp", "0");
                 }
                 line.replace("$x", String.valueOf(grave.getLocation().getBlockX()))

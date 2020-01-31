@@ -43,6 +43,9 @@ settings:
   graveProtectedChangeSound: ENTITY_DONKEY_CHEST # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
   graveProtectedTime: 300 # Seconds, 300 = 5 minutes. Set to 0 to always stay locked.
 
+  graveOnlyCanBuild: false # Only create graves where the player can build, should work with all protection plugins.
+  buildDeniedMessage: "&8[&6Graves&8] &fA grave was not created because you can't build there!"
+
   # Grave particle system.
   graveParticle: false # Disabled by default.
   #graveParticle: REDSTONE # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
@@ -66,8 +69,11 @@ settings:
   lootSound: ENTITY_DONKEY_CHEST # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
   lootEffect: MOBSPAWNER_FLAMES # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Effect.html
 
-  expStore: true # Should the players EXP be stored in the grave.
-  expMessage: "&8[&6Graves&8] &fLooted &6$xp&fxp from grave!"
+  # If expStore is false it will store what Minecraft would normally drop, if you want to fully disable it, set expStore to true and expStorePercent to 0.
+  expStore: true # Should all the players EXP be stored in the grave. If false only the vanilla drop amount will be stored.
+  expStorePercent: 0.8 # How much of the EXP should be stored, 0.8 = 80%, 1 = 100%, 0 = 0%.
+  expLevelRound: true # If using $level should it be rounded to a whole number.
+  expMessage: "&8[&6Graves&8] &fLooted &6$level &flevels from grave!"
 
   permissionDenied: "&8[&6Graves&8] &fPermission Denied!"
 
@@ -81,7 +87,7 @@ settings:
   hologramLines:
     #- "&6$protect" # Show if a grave protected.
     - "&6$entity's &fGrave"
-    - "&6$itemCount &fItems &f/ &6$xp&fxp"
+    - "&6$itemCount &fItems &f/ &6$level &fLevels"
     - "&6$time &fleft"
 
   guiTitle: "$entity's Graves"
@@ -91,7 +97,7 @@ settings:
     #- "&7$protect" # If you are using grave protection you might want to allow the player to see if their grave is protected. And tell them how to change the protection.
     #- "&7Right click to change protection"
     - "&7Items: &f$item"
-    - "&7EXP: &f$xp"
+    - "&7Levels: &f$level"
 
   graveTeleport: false # Can the player teleport to their grave from the Graves GUI.
   graveTeleportCost: 5 # How much it costs to teleport to a grave, you need Vault for this.

@@ -4,6 +4,7 @@ version: ${project.version}
 main: com.rngservers.graves.Main
 api-version: 1.13
 author: RandomUnknown
+softdepends: [Vault]
 
 commands:
   graves:

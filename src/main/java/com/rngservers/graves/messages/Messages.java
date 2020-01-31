@@ -54,6 +54,14 @@ public class Messages {
         }
     }
 
+    public void buildDenied(Player player) {
+        String buildDeniedMessage = plugin.getConfig().getString("settings.buildDeniedMessage")
+                .replace("&", "§");
+        if (!buildDeniedMessage.equals("")) {
+            player.sendMessage(buildDeniedMessage);
+        }
+    }
+
     public void graveProtected(Player player, Location location) {
         String graveProtectedMessage = plugin.getConfig().getString("settings.graveProtectedMessage")
                 .replace("&", "§");

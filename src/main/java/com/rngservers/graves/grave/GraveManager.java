@@ -10,9 +10,12 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Skull;
 import org.bukkit.block.data.Rotatable;
+import org.bukkit.block.data.Waterlogged;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.*;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.server.ServerCommandEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -352,7 +355,17 @@ public class GraveManager {
         if (graveBlock == null) {
             graveBlock = Material.CHEST;
         }
+        Boolean water = false;
+        if (grave.getLocation().getBlock().getType().equals(Material.WATER) ||
+                grave.getLocation().getBlock().getBlockData() instanceof Waterlogged) {
+            water = true;
+        }
         grave.getLocation().getBlock().setType(graveBlock);
+        if (!water && grave.getLocation().getBlock().getBlockData() instanceof Waterlogged) {
+            Waterlogged waterlogged = (Waterlogged) grave.getLocation().getBlock().getBlockData();
+            waterlogged.setWaterlogged(false);
+            grave.getLocation().getBlock().setBlockData(waterlogged);
+        }
         String graveHeadName = plugin.getConfig().getString("settings.graveHeadSkin");
         if (graveBlock.equals(Material.PLAYER_HEAD)) {
             Skull skull = (Skull) grave.getLocation().getBlock().getState();
@@ -588,7 +601,7 @@ public class GraveManager {
     public void giveExperience(Grave grave, Player player) {
         String expMessage = plugin.getConfig().getString("settings.expMessage").replace("&", "§");
         if (grave.getExperience() != null && grave.getExperience() > 0) {
-            expMessage = expMessage.replace("$level", "$xp");
+            expMessage = expMessage.replace("$level", getLevelFromExp(grave.getExperience()));
             expMessage = expMessage.replace("$xp", grave.getExperience().toString());
             player.giveExp(grave.getExperience());
             grave.setExperience(null);
@@ -602,7 +615,6 @@ public class GraveManager {
             orb.setExperience(grave.getExperience());
             grave.setExperience(null);
         }
-
     }
 
     public void destroyGrave(Grave grave) {
@@ -785,10 +797,11 @@ public class GraveManager {
         } else if (grave.getEntityType() != null) {
             line = line.replace("$entity", formatString(grave.getEntityType().toString()));
         }
-        line = line.replace("$level", "$xp");
         if (grave.getExperience() != null) {
+            line = line.replace("$level", getLevelFromExp(grave.getExperience()));
             line = line.replace("$xp", grave.getExperience().toString());
         } else {
+            line = line.replace("$level", "0");
             line = line.replace("$xp", "0");
         }
         return line;
@@ -1192,6 +1205,65 @@ public class GraveManager {
             default:
                 return null;
         }
+    }
+
+    public Boolean canBuild(Player player, Location location) {
+        BlockPlaceEvent placeEvent = new BlockPlaceEvent(location.getBlock(), location.getBlock().getState(), location.getBlock(), null, player, true, EquipmentSlot.HAND);
+        plugin.getServer().getPluginManager().callEvent(placeEvent);
+        if (placeEvent.canBuild()) {
+            return true;
+        }
+        return false;
+    }
+
+    public Integer getPlayerDropExp(Player player) {
+        Integer experience = getPlayerExp(player);
+        if (experience != null) {
+            Float expStorePercent = (float) plugin.getConfig().getDouble("settings.expStorePercent");
+            return (int) (experience * expStorePercent);
+        }
+        return null;
+    }
+
+    public Integer getPlayerExp(Player player) {
+        int experience = Math.round(getExpAtLevel(player.getLevel()) * player.getExp());
+        int level = player.getLevel();
+
+        while (level > 0) {
+            level--;
+            experience += getExpAtLevel(level);
+        }
+        if (experience < 0) {
+            return null;
+        }
+        return experience;
+    }
+
+    public Integer getExpAtLevel(Integer level) {
+        if (level <= 15) {
+            return 2 * level + 7;
+        }
+        if (level >= 16 && level <= 30) {
+            return 5 * level - 38;
+        }
+        return 9 * level - 158;
+    }
+
+    public String getLevelFromExp(long experience) {
+        double result = 0;
+        if (experience > 1395) {
+            result = (Math.sqrt(72 * experience - 54215) + 325) / 18;
+        } else if (experience > 315) {
+            result = Math.sqrt(40 * experience - 7839) / 10 + 8.1;
+        } else if (experience > 0) {
+            result = Math.sqrt(experience + 9) - 3;
+        }
+        result = Math.round(result * 100.0) / 100.0;
+        Boolean expLevelRound = plugin.getConfig().getBoolean("settings.expLevelRound");
+        if (expLevelRound) {
+            return String.valueOf((int) result);
+        }
+        return String.valueOf(result);
     }
 
     public String getTimeString(Long seconds) {

@@ -50,6 +50,13 @@ public class Events implements Listener {
         if (!event.getEntity().hasPermission("graves.place")) {
             return;
         }
+        Boolean graveOnlyCanBuild = plugin.getConfig().getBoolean("settings.graveOnlyCanBuild");
+        if (graveOnlyCanBuild) {
+            if (!graveManager.canBuild(event.getEntity(), event.getEntity().getLocation())) {
+                messages.buildDenied(event.getEntity());
+                return;
+            }
+        }
         if (!plugin.getConfig().getBoolean("settings.ignoreKeepInventory")) {
             if (event.getEntity().getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY)) {
                 return;
@@ -62,6 +69,7 @@ public class Events implements Listener {
                 return;
             }
         }
+        List<ItemStack> resetDrops = new ArrayList<>(event.getDrops());
         Boolean graveToken = plugin.getConfig().getBoolean("settings.graveToken");
         if (graveToken) {
             ItemStack token = graveManager.getGraveTokenFromPlayer(event.getEntity());
@@ -96,12 +104,20 @@ public class Events implements Listener {
                         if (event.getEntity().hasPermission("graves.experience")) {
                             Boolean expStore = plugin.getConfig().getBoolean("settings.expStore");
                             if (expStore) {
+                                Integer playerExp = graveManager.getPlayerDropExp(event.getEntity());
+                                if (playerExp != null) {
+                                    grave.setExperience(playerExp);
+                                }
+                            } else {
                                 grave.setExperience(event.getDroppedExp());
-                                event.setDroppedExp(0);
-                                event.setKeepLevel(false);
                             }
+                            event.setDroppedExp(0);
+                            event.setKeepLevel(false);
                         }
                         graveManager.runCreateCommands(grave, event.getEntity());
+                    } else {
+                        event.getDrops().clear();
+                        event.getDrops().addAll(resetDrops);
                     }
                 }
             }
@@ -113,6 +129,7 @@ public class Events implements Listener {
         if (event.getEntity() instanceof Player) {
             return;
         }
+        List<ItemStack> resetDrops = new ArrayList<>(event.getDrops());
         List<String> graveEntities = plugin.getConfig().getStringList("settings.graveEntities");
         List<String> worlds = plugin.getConfig().getStringList("settings.worlds");
         if (worlds.contains(event.getEntity().getLocation().getWorld().getName()) || worlds.contains("ALL")) {
@@ -132,6 +149,9 @@ public class Events implements Listener {
                     if (grave != null) {
                         grave.setExperience(event.getDroppedExp());
                         event.setDroppedExp(0);
+                    } else {
+                        event.getDrops().clear();
+                        event.getDrops().addAll(resetDrops);
                     }
                     graveManager.runCreateCommands(grave, event.getEntity());
                 }
