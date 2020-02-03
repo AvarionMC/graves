@@ -9,6 +9,7 @@ import org.bukkit.GameRule;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -16,6 +17,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -129,6 +131,14 @@ public class Events implements Listener {
         if (event.getEntity() instanceof Player) {
             return;
         }
+        Boolean graveZombieDrops = plugin.getConfig().getBoolean("settings.graveZombieDrops");
+        if (!graveZombieDrops) {
+            if (graveManager.isGraveZombie(event.getEntity())) {
+                event.getDrops().clear();
+                event.setDroppedExp(0);
+                return;
+            }
+        }
         List<ItemStack> resetDrops = new ArrayList<>(event.getDrops());
         List<String> graveEntities = plugin.getConfig().getStringList("settings.graveEntities");
         List<String> worlds = plugin.getConfig().getStringList("settings.worlds");
@@ -204,6 +214,10 @@ public class Events implements Listener {
                 graveManager.autoLoot(grave, event.getPlayer());
                 messages.graveOpen(grave.getLocation());
                 graveManager.runLootCommands(grave, event.getPlayer());
+                Boolean graveZombieOnlyBreak = plugin.getConfig().getBoolean("settings.graveZombieOnlyBreak");
+                if (!graveZombieOnlyBreak) {
+                    graveManager.graveSpawnZombie(grave, event.getPlayer());
+                }
             } else {
                 messages.graveProtected(event.getPlayer(), grave.getLocation());
             }
@@ -232,7 +246,11 @@ public class Events implements Listener {
                     if (graveManager.hasPermission(grave, event.getPlayer())) {
                         event.getPlayer().openInventory(grave.getInventory());
                         messages.graveOpen(grave.getLocation());
-                        graveManager.runLootCommands(grave, event.getPlayer());
+                        graveManager.runOpenCommands(grave, event.getPlayer());
+                        Boolean graveZombieOnlyBreak = plugin.getConfig().getBoolean("settings.graveZombieOnlyBreak");
+                        if (!graveZombieOnlyBreak) {
+                            graveManager.graveSpawnZombie(grave, event.getPlayer());
+                        }
                     } else {
                         messages.graveProtected(event.getPlayer(), grave.getLocation());
                     }
@@ -259,6 +277,11 @@ public class Events implements Listener {
                     if (graveManager.hasPermission(grave, event.getPlayer())) {
                         graveManager.autoLoot(grave, event.getPlayer());
                         messages.graveOpen(grave.getLocation());
+                        graveManager.runLootCommands(grave, event.getPlayer());
+                        Boolean graveZombieOnlyBreak = plugin.getConfig().getBoolean("settings.graveZombieOnlyBreak");
+                        if (!graveZombieOnlyBreak) {
+                            graveManager.graveSpawnZombie(grave, event.getPlayer());
+                        }
                     } else {
                         messages.graveProtected(event.getPlayer(), grave.getLocation());
                     }
@@ -282,6 +305,10 @@ public class Events implements Listener {
                 graveManager.removeGrave(grave);
                 messages.graveLoot(grave.getLocation(), player);
                 graveManager.runLootCommands(grave, player);
+                Boolean graveZombieOnlyBreak = plugin.getConfig().getBoolean("settings.graveZombieOnlyBreak");
+                if (!graveZombieOnlyBreak) {
+                    graveManager.graveSpawnZombie(grave, player);
+                }
             }
         }
     }
@@ -297,6 +324,7 @@ public class Events implements Listener {
                 graveManager.replaceGrave(grave);
                 graveManager.removeGrave(grave);
                 graveManager.runBreakCommands(grave, event.getPlayer());
+                graveManager.graveSpawnZombie(grave, event.getPlayer());
             } else {
                 messages.graveProtected(event.getPlayer(), event.getBlock().getLocation());
                 event.setCancelled(true);
@@ -307,6 +335,14 @@ public class Events implements Listener {
     @EventHandler
     public void onGraveBreakNaturally(BlockFromToEvent event) {
         Grave grave = graveManager.getGrave(event.getToBlock().getLocation());
+        if (grave != null) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPistonExtendGrave(BlockPistonExtendEvent event) {
+        Grave grave = graveManager.getGrave(event.getBlock().getRelative(event.getDirection()).getLocation());
         if (grave != null) {
             event.setCancelled(true);
         }
@@ -331,6 +367,10 @@ public class Events implements Listener {
                     graveManager.replaceGrave(grave);
                     graveManager.removeGrave(grave);
                     graveManager.runExplodeCommands(grave, event.getEntity());
+                    Boolean graveZombieExplode = plugin.getConfig().getBoolean("settings.graveZombieExplode");
+                    if (graveZombieExplode) {
+                        graveManager.spawnZombie(grave);
+                    }
                 } else {
                     iterator.remove();
                 }

@@ -33,13 +33,14 @@ public class RecipeManager {
         Material tokenMaterial = Material.matchMaterial(plugin.getConfig().getString("settings.graveTokenItem"));
         if (tokenMaterial != null) {
             Iterator<Recipe> recipes = plugin.getServer().recipeIterator();
-            Recipe recipe;
             while (recipes.hasNext()) {
-                recipe = recipes.next();
-                ItemStack item = recipe.getResult();
-                if (item.hasItemMeta()) {
-                    if (hasRecipeData(item)) {
-                        recipes.remove();
+                Recipe recipe = recipes.next();
+                if (recipe != null) {
+                    ItemStack item = recipe.getResult();
+                    if (item.hasItemMeta()) {
+                        if (hasRecipeData(item)) {
+                            recipes.remove();
+                        }
                     }
                 }
             }

@@ -82,6 +82,17 @@ settings:
     #- ZOMBIE
     #- ALL
 
+  graveZombieOwner: false # Should a grave spawn a zombie when it is looted by its owner.
+  graveZombieOther: true # Should a grave spawn a zombie if it is looted by another player.
+  graveZombieOnlyBreak: false # Should a zombie only spawn if the player broke the grave not open it.
+  graveZombieExplode: false # Should a grave spawn a zombie if it is blown up, this only works if the grave can be blown up.
+  graveZombieType: ZOMBIE # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/LivingEntity.html
+  graveZombieOwnerHead: true # Will the zombie have the owners head on.
+  graveZombieHealth: 20 # How much health the zombie has.
+  graveZombiePickup: false # Can the zombie pickup dropped items.
+  graveZombieDrops: false # Do grave zombies drop items, this may include the head it is wearing.
+  graveZombieName: "$owner's Zombie"
+
   hologram: true
   hologramOpen: true # Will right clicking a hologram open the grave.
   hologramLines:

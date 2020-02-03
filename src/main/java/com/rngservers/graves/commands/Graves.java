@@ -142,6 +142,7 @@ public class Graves implements CommandExecutor {
                 messages.permissionDenied(sender);
                 return true;
             }
+            plugin.saveDefaultConfig();
             plugin.reloadConfig();
             data.graveReplaceLoad();
             graveManager.graveHeadLoad();
@@ -159,7 +160,7 @@ public class Graves implements CommandExecutor {
     }
 
     public void help(CommandSender sender) {
-        String version = "2.7";
+        String version = "2.8";
         String author = "RandomUnknown";
 
         sender.sendMessage(

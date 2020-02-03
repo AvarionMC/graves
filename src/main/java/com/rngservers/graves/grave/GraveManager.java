@@ -19,6 +19,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -63,10 +64,6 @@ public class GraveManager {
         removeGraveTimer();
     }
 
-    public OfflinePlayer getGraveHead() {
-        return graveHead;
-    }
-
     public void removeGraveTimer() {
         new BukkitRunnable() {
             @Override
@@ -102,6 +99,10 @@ public class GraveManager {
                 }
             }
         }.runTaskTimer(plugin, 0L, 20L);
+    }
+
+    public OfflinePlayer getGraveHead() {
+        return graveHead;
     }
 
     public void graveParticle(Grave grave) {
@@ -831,7 +832,11 @@ public class GraveManager {
                     ArmorStand armorStand = (ArmorStand) entity;
                     Grave grave = getGraveFromHologram(armorStand);
                     if (grave == null) {
-                        armorStand.remove();
+                        for (String tag : armorStand.getScoreboardTags()) {
+                            if (tag.contains("graveHologram")) {
+                                armorStand.remove();
+                            }
+                        }
                     }
                 }
             }
@@ -988,6 +993,77 @@ public class GraveManager {
                 graveIgnore.add(material);
             }
         }
+    }
+
+    public void graveSpawnZombie(Grave grave, Player player) {
+        if (grave.getPlayer().getUniqueId().equals(player.getUniqueId())) {
+            Boolean graveZombieOwner = plugin.getConfig().getBoolean("settings.graveZombieOwner");
+            if (!graveZombieOwner) {
+                return;
+            }
+        } else {
+            Boolean graveZombieOther = plugin.getConfig().getBoolean("settings.graveZombieOther");
+            if (!graveZombieOther) {
+                return;
+            }
+        }
+        spawnZombie(grave, player);
+    }
+
+    public void spawnZombie(Grave grave, LivingEntity target) {
+        LivingEntity livingEntity = spawnZombie(grave);
+        if (livingEntity != null && livingEntity instanceof Monster) {
+            Monster monster = (Monster) livingEntity;
+            monster.setTarget(target);
+        }
+    }
+
+    public LivingEntity spawnZombie(Grave grave) {
+        if (grave.getPlayer() != null) {
+            EntityType graveZombieType = EntityType.ZOMBIE;
+            try {
+                graveZombieType = EntityType.valueOf(plugin.getConfig().getString("settings.graveZombieType").toUpperCase());
+            } catch (IllegalArgumentException ignored) {
+            }
+            if (graveZombieType == null) {
+                graveZombieType = EntityType.ZOMBIE;
+            }
+            LivingEntity livingEntity = (LivingEntity) grave.getLocation().getWorld().spawnEntity(grave.getLocation(), graveZombieType);
+            Boolean graveZombieOwnerHead = plugin.getConfig().getBoolean("settings.graveZombieOwnerHead");
+            if (graveZombieOwnerHead) {
+                livingEntity.getEquipment().setHelmet(getPlayerSkull(grave.getPlayer()));
+            }
+            Boolean graveZombiePickup = plugin.getConfig().getBoolean("settings.graveZombiePickup");
+            if (!graveZombiePickup) {
+                livingEntity.setCanPickupItems(false);
+            }
+            String graveZombieName = plugin.getConfig().getString("settings.graveZombieName")
+                    .replace("$owner", grave.getPlayer().getName())
+                    .replace("&", "§");
+            if (!graveZombieName.equals("")) {
+                livingEntity.setCustomName(graveZombieName);
+            }
+            livingEntity.getScoreboardTags().add("graveZombie");
+            return livingEntity;
+        }
+        return null;
+    }
+
+    public Boolean isGraveZombie(LivingEntity livingEntity) {
+        for (String tag : livingEntity.getScoreboardTags()) {
+            if (tag.contains("graveZombie")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public ItemStack getPlayerSkull(OfflinePlayer player) {
+        ItemStack item = new ItemStack(Material.PLAYER_HEAD, 1);
+        SkullMeta meta = (SkullMeta) item.getItemMeta();
+        meta.setOwningPlayer(player);
+        item.setItemMeta(meta);
+        return item;
     }
 
     public void hologramLinesLoad() {
