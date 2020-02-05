@@ -272,6 +272,13 @@ public class GraveManager {
             return null;
         }
         Location location = getPlaceLocation(player.getLocation());
+        Boolean graveOnlyCanBuild = plugin.getConfig().getBoolean("settings.graveOnlyCanBuild");
+        if (graveOnlyCanBuild) {
+            if (!canBuild(player, location)) {
+                messages.buildDenied(player);
+                return null;
+            }
+        }
         if (location == null) {
             String graveFailure = plugin.getConfig().getString("settings.graveFailure")
                     .replace("&", "§");
@@ -369,30 +376,32 @@ public class GraveManager {
         }
         String graveHeadName = plugin.getConfig().getString("settings.graveHeadSkin");
         if (graveBlock.equals(Material.PLAYER_HEAD)) {
-            Skull skull = (Skull) grave.getLocation().getBlock().getState();
-            Rotatable skullRotate = (Rotatable) grave.getLocation().getBlock().getBlockData();
-            BlockFace skullBlockFace;
-            if (grave.getPlayer() != null) {
-                skullBlockFace = getSkullBlockFace(grave.getPlayer().getPlayer());
-            } else {
-                skullBlockFace = BlockFace.NORTH;
-            }
-            if (skullBlockFace != null) {
-                skullRotate.setRotation(skullBlockFace);
-                skull.setBlockData(skullRotate);
-            }
-            if (graveHeadName.equals("$entity") || graveHeadName.equals("")) {
+            if (grave.getLocation().getBlock().getState() instanceof Skull) {
+                Skull skull = (Skull) grave.getLocation().getBlock().getState();
+                Rotatable skullRotate = (Rotatable) grave.getLocation().getBlock().getBlockData();
+                BlockFace skullBlockFace;
                 if (grave.getPlayer() != null) {
-                    skull.setOwningPlayer(grave.getPlayer());
-                } else if (grave.getEntityType() != null) {
-                    // TODO Mob heads
+                    skullBlockFace = getSkullBlockFace(grave.getPlayer().getPlayer());
+                } else {
+                    skullBlockFace = BlockFace.NORTH;
                 }
-            } else {
-                if (graveHead != null) {
-                    skull.setOwningPlayer(graveHead);
+                if (skullBlockFace != null) {
+                    skullRotate.setRotation(skullBlockFace);
+                    skull.setBlockData(skullRotate);
                 }
+                if (graveHeadName.equals("$entity") || graveHeadName.equals("")) {
+                    if (grave.getPlayer() != null) {
+                        skull.setOwningPlayer(grave.getPlayer());
+                    } else if (grave.getEntityType() != null) {
+                        // TODO Mob heads
+                    }
+                } else {
+                    if (graveHead != null) {
+                        skull.setOwningPlayer(graveHead);
+                    }
+                }
+                skull.update();
             }
-            skull.update();
         }
         Boolean hologram = plugin.getConfig().getBoolean("settings.hologram");
         if (hologram) {
@@ -412,6 +421,15 @@ public class GraveManager {
                 return getVoid(location);
             } else {
                 return null;
+            }
+        }
+        Boolean placeLavaTop = plugin.getConfig().getBoolean("settings.placeLavaTop");
+        if (placeLavaTop) {
+            if (location.getBlock().getType().equals(Material.LAVA)) {
+                Location lavaTop = getLavaTop(location);
+                if (lavaTop != null) {
+                    return lavaTop;
+                }
             }
         }
         Boolean placeGround = plugin.getConfig().getBoolean("settings.placeGround");
@@ -434,6 +452,72 @@ public class GraveManager {
         return null;
     }
 
+    public Location getTeleportLocation(Player player, Location location) {
+        location.add(0.5, 1.0, 0.5);
+        Boolean graveTeleportUnsafe = plugin.getConfig().getBoolean("settings.graveTeleportUnsafe");
+        if (graveTeleportUnsafe) {
+            return location;
+        }
+
+        if (isSafe(location)) {
+            return location;
+        }
+        Boolean graveTeleportTop = plugin.getConfig().getBoolean("settings.graveTeleportTop");
+        if (graveTeleportTop) {
+            Location highestBlock = getHighestBlock(location).add(0.5, 0, 0.5);
+            if (highestBlock != null) {
+                if (isSafe(highestBlock)) {
+                    String graveTeleportTopMessage = plugin.getConfig().getString("settings.graveTeleportTopMessage")
+                            .replace("&", "§");
+                    if (!graveTeleportTopMessage.equals("")) {
+                        player.sendMessage(graveTeleportTopMessage);
+                    }
+                    return highestBlock;
+                }
+            }
+        }
+        if (player.hasPermission("graves.bypass")) {
+            return location;
+        }
+        return null;
+    }
+
+    public Boolean isSafe(Location location) {
+        Location up = location.clone().add(0, 1, 0);
+        if (isLava(location)) {
+            return false;
+        }
+        if ((isAir(location.getBlock().getType()) || !isSoldNotLava(location.getBlock().getType())) &&
+                (isAir(up.getBlock().getType()) || !isSoldNotLava(up.getBlock().getType()))) {
+            return true;
+        }
+        return false;
+    }
+
+    public Boolean isSoldNotLava(Material material) {
+        if (material.isSolid() && !material.equals(Material.LAVA)) {
+            return true;
+        }
+        return false;
+    }
+
+    public Boolean isLava(Location location) {
+        Location up = location.clone().add(0, 1, 0);
+        Location below = location.clone().subtract(0, 1, 0);
+        if (location.getBlock().getType().equals(Material.LAVA) ||
+                up.getBlock().getType().equals(Material.LAVA) ||
+                below.getBlock().getType().equals(Material.LAVA)) {
+            return true;
+        }
+        return false;
+    }
+
+    public Location getHighestBlock(Location location) {
+        location = location.clone();
+        location.setY(256);
+        return getGround(location);
+    }
+
     public Location getGround(Location location) {
         Block block = location.getBlock();
         int max = 0;
@@ -453,6 +537,21 @@ public class GraveManager {
         int max = 0;
         while (max <= 256) {
             if (data.graveReplace().contains(block.getType()) || !isAir(block.getType())) {
+                return block.getLocation().add(0, 1, 0);
+            }
+            block = block.getLocation().subtract(0, 1, 0).getBlock();
+            max++;
+        }
+        return null;
+    }
+
+
+    public Location getLavaTop(Location location) {
+        location.setY(256);
+        Block block = location.getBlock();
+        int max = 0;
+        while (max <= 256) {
+            if ((data.graveReplace().contains(block.getType()) || isAir(block.getType())) && block.getType().equals(Material.LAVA)) {
                 return block.getLocation().add(0, 1, 0);
             }
             block = block.getLocation().subtract(0, 1, 0).getBlock();

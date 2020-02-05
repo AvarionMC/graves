@@ -27,8 +27,8 @@ public class GUIManager {
     }
 
     public void teleportGrave(Player player, ItemStack item) {
+        Double graveTeleportCost = plugin.getConfig().getDouble("settings.graveTeleportCost");
         if (vault != null) {
-            Double graveTeleportCost = plugin.getConfig().getDouble("settings.graveTeleportCost");
             Double balance = vault.getEconomy().getBalance(player);
             if (balance < graveTeleportCost) {
                 String notEnoughMoneyMessage = plugin.getConfig().getString("settings.notEnoughMoneyMessage")
@@ -43,15 +43,24 @@ public class GUIManager {
         }
         Location location = getGraveLocation(item);
         if (location != null) {
-            location.add(0.5, 1.0, 0.5);
-            player.teleport(location);
-            String graveTeleportMessage = plugin.getConfig().getString("settings.graveTeleportMessage").replace("&", "§");
-            if (!graveTeleportMessage.equals("")) {
-                player.sendMessage(graveTeleportMessage);
-            }
-            String graveTeleportSound = plugin.getConfig().getString("settings.graveTeleportSound");
-            if (!graveTeleportSound.equals("")) {
-                player.getWorld().playSound(player.getLocation(), Sound.valueOf(graveTeleportSound.toUpperCase()), 1.0F, 1.0F);
+            location = graveManager.getTeleportLocation(player, location);
+            if (location != null) {
+                player.teleport(location);
+                String graveTeleportMessage = plugin.getConfig().getString("settings.graveTeleportMessage")
+                        .replace("$money", graveTeleportCost.toString()).replace("&", "§");
+                if (!graveTeleportMessage.equals("")) {
+                    player.sendMessage(graveTeleportMessage);
+                }
+                String graveTeleportSound = plugin.getConfig().getString("settings.graveTeleportSound");
+                if (!graveTeleportSound.equals("")) {
+                    player.getWorld().playSound(player.getLocation(), Sound.valueOf(graveTeleportSound.toUpperCase()), 1.0F, 1.0F);
+                }
+            } else {
+                String graveTeleportFailedMessage = plugin.getConfig().getString("settings.graveTeleportFailedMessage")
+                        .replace("$money", graveTeleportCost.toString()).replace("&", "§");
+                if (!graveTeleportFailedMessage.equals("")) {
+                    player.sendMessage(graveTeleportFailedMessage);
+                }
             }
         }
     }

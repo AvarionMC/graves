@@ -9,7 +9,6 @@ import org.bukkit.GameRule;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -52,13 +51,6 @@ public class Events implements Listener {
         if (!event.getEntity().hasPermission("graves.place")) {
             return;
         }
-        Boolean graveOnlyCanBuild = plugin.getConfig().getBoolean("settings.graveOnlyCanBuild");
-        if (graveOnlyCanBuild) {
-            if (!graveManager.canBuild(event.getEntity(), event.getEntity().getLocation())) {
-                messages.buildDenied(event.getEntity());
-                return;
-            }
-        }
         if (!plugin.getConfig().getBoolean("settings.ignoreKeepInventory")) {
             if (event.getEntity().getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY)) {
                 return;
@@ -76,14 +68,9 @@ public class Events implements Listener {
         if (graveToken) {
             ItemStack token = graveManager.getGraveTokenFromPlayer(event.getEntity());
             if (token != null) {
-                Iterator<ItemStack> iterator = event.getDrops().iterator();
-                while (iterator.hasNext()) {
-                    ItemStack item = iterator.next();
-                    item.setAmount(item.getAmount() - 1);
-                }
+                token.setAmount(token.getAmount() - 1);
             } else {
                 messages.graveTokenNoTokenMessage(event.getEntity());
-                return;
             }
         }
         List<ItemStack> newDrops = new ArrayList<>(event.getDrops());

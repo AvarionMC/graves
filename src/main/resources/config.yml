@@ -63,6 +63,7 @@ settings:
 
   graveTimeoutDrop: true # When a grave times out drop everything in it. If false it gets destroyed.
   placeGround: true # If the player dies in the air should the grave find the ground under the player to place it on.
+  placeLavaTop: true # If the player dies in lava should it be placed at the top, this will override placeGround if it can.
   placeVoid: true # If the player died in the void, should it place a grave in the air.
 
   lootMessage: "&8[&6Graves&8] &fGrave looted!"
@@ -112,7 +113,11 @@ settings:
 
   graveTeleport: false # Can the player teleport to their grave from the Graves GUI.
   graveTeleportCost: 5 # How much it costs to teleport to a grave, you need Vault for this.
-  graveTeleportMessage: "&8[&6Graves&8] &fYou teleported to your grave!"
+  graveTeleportMessage: "&8[&6Graves&8] &fYou teleported to your grave for &6$money&f!"
+  graveTeleportUnsafe: false # Should players be allowed to always teleport to a grave even if unsafe.
+  graveTeleportTop: true # If the grave is in a unsafe location, should the player be teleported to the top. If this fails then the fail message will show.
+  graveTeleportTopMessage: "&8[&6Graves&8] &fGrave was in an unsafe location, you have been teleported nearby."
+  graveTeleportFailedMessage: "&8[&6Graves&8] &fTeleport failed! Teleport location is unsafe!"
   graveTeleportSound: ENTITY_ENDERMAN_TELEPORT # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
   graveTeleportDisabled: "&8[&6Graves&8] &fGrave teleportation is disabled!"
 
@@ -174,7 +179,6 @@ settings:
   graveReplace: # What blocks can graves replace.
     - TORCH
     - REDSTONE_TORCH
-    - LAVA
     - WATER
     - GRASS
     - TALL_GRASS
