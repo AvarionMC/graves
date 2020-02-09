@@ -62,15 +62,17 @@ public class GraveManager {
             }
         }.runTaskLater(plugin, 20L);
         removeGraveTimer();
+        updateGraveTimer();
     }
 
-    public void removeGraveTimer() {
+    public void updateGraveTimer() {
         new BukkitRunnable() {
             @Override
             public void run() {
                 for (ConcurrentMap.Entry<Location, Grave> entry : graves.entrySet()) {
                     Grave grave = entry.getValue();
-                    if (plugin.getServer().getWorlds().contains(grave.getLocation().getWorld())) {
+                    if (plugin.getServer().getWorlds().contains(grave.getLocation().getWorld()) &&
+                            grave.getLocation().getWorld().isChunkLoaded(grave.getLocation().getChunk())) {
                         updateHologram(grave);
                         graveParticle(grave);
                         removeBrokenHolograms();
@@ -80,6 +82,19 @@ public class GraveManager {
                                 protectGrave(grave, false);
                             }
                         }
+                    }
+                }
+            }
+        }.runTaskTimerAsynchronously(plugin, 0L, 20L);
+    }
+
+    public void removeGraveTimer() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (ConcurrentMap.Entry<Location, Grave> entry : graves.entrySet()) {
+                    Grave grave = entry.getValue();
+                    if (plugin.getServer().getWorlds().contains(grave.getLocation().getWorld())) {
                         if (grave.getAliveTime() != null) {
                             long diff = System.currentTimeMillis() - grave.getCreatedTime();
                             if (diff >= grave.getAliveTime()) {
@@ -235,23 +250,55 @@ public class GraveManager {
         return protect.replace("&", "§");
     }
 
-
     public Integer getProtectTime(Player player) {
+        Integer protectTime = getPermissionHighestInt(player, "graves.protect.");
+        if (protectTime != null) {
+            return protectTime * 1000;
+        } else {
+            return getProtectTime();
+        }
+    }
+
+    public Double getTeleportCost(Player player) {
+        Double teleportCost = getPermissionHighestDouble(player, "graves.teleport.");
+        if (teleportCost != null) {
+            return teleportCost;
+        } else {
+            return getTeleportCost();
+        }
+    }
+
+    public Integer getPermissionHighestInt(Player player, String permission) {
         List<Integer> gravePermissions = new ArrayList<>();
         for (PermissionAttachmentInfo perm : player.getEffectivePermissions()) {
-            if (perm.getPermission().contains("graves.protect.")) {
+            if (perm.getPermission().contains(permission)) {
                 try {
-                    gravePermissions.add(Integer.parseInt(perm.getPermission().replace("graves.protect.", "")));
+                    gravePermissions.add(Integer.parseInt(perm.getPermission().replace(permission, "")));
                 } catch (NumberFormatException ignored) {
                 }
             }
         }
         if (!gravePermissions.isEmpty()) {
-            return Collections.max(gravePermissions) * 1000;
+            return Collections.max(gravePermissions);
         }
-        return getProtectTime();
+        return null;
     }
 
+    public Double getPermissionHighestDouble(Player player, String permission) {
+        List<Double> gravePermissions = new ArrayList<>();
+        for (PermissionAttachmentInfo perm : player.getEffectivePermissions()) {
+            if (perm.getPermission().contains(permission)) {
+                try {
+                    gravePermissions.add(Double.parseDouble(perm.getPermission().replace(permission, "")));
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        }
+        if (!gravePermissions.isEmpty()) {
+            return Collections.max(gravePermissions);
+        }
+        return null;
+    }
 
     public Integer getProtectTime() {
         Integer graveTime = plugin.getConfig().getInt("settings.graveProtectedTime") * 1000;
@@ -259,6 +306,10 @@ public class GraveManager {
             return graveTime;
         }
         return null;
+    }
+
+    public Double getTeleportCost() {
+        return plugin.getConfig().getDouble("settings.graveTeleportCost");
     }
 
     public Grave createGrave(Player player, List<ItemStack> items) {
@@ -297,7 +348,7 @@ public class GraveManager {
         Grave grave = new Grave(roundLocation(location), inventory, graveTitle);
         grave.setAliveTime(getGraveTime(player));
         Boolean graveProtected = plugin.getConfig().getBoolean("settings.graveProtected");
-        if (graveProtected) {
+        if (graveProtected && player.hasPermission("graves.protection")) {
             grave.setProtected(true);
             grave.setProtectTime(getProtectTime(player));
         }
@@ -891,6 +942,8 @@ public class GraveManager {
             }
             protect = protect.replace("&", "§");
             line = line.replace("$protect", protect);
+        } else {
+            line = line.replace("$protect", plugin.getConfig().getString("settings.graveProtectedUnprotectedMessage").replace("&", "§"));
         }
         if (grave.getPlayer() != null) {
             line = line.replace("$entity", grave.getPlayer().getName());

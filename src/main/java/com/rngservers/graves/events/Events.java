@@ -71,6 +71,7 @@ public class Events implements Listener {
                 token.setAmount(token.getAmount() - 1);
             } else {
                 messages.graveTokenNoTokenMessage(event.getEntity());
+                return;
             }
         }
         List<ItemStack> newDrops = new ArrayList<>(event.getDrops());
@@ -234,10 +235,6 @@ public class Events implements Listener {
                         event.getPlayer().openInventory(grave.getInventory());
                         messages.graveOpen(grave.getLocation());
                         graveManager.runOpenCommands(grave, event.getPlayer());
-                        Boolean graveZombieOnlyBreak = plugin.getConfig().getBoolean("settings.graveZombieOnlyBreak");
-                        if (!graveZombieOnlyBreak) {
-                            graveManager.graveSpawnZombie(grave, event.getPlayer());
-                        }
                     } else {
                         messages.graveProtected(event.getPlayer(), grave.getLocation());
                     }
@@ -319,7 +316,7 @@ public class Events implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onGraveBreakNaturally(BlockFromToEvent event) {
         Grave grave = graveManager.getGrave(event.getToBlock().getLocation());
         if (grave != null) {
@@ -327,7 +324,7 @@ public class Events implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPistonExtendGrave(BlockPistonExtendEvent event) {
         Grave grave = graveManager.getGrave(event.getBlock().getRelative(event.getDirection()).getLocation());
         if (grave != null) {

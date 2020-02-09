@@ -27,7 +27,7 @@ public class GUIManager {
     }
 
     public void teleportGrave(Player player, ItemStack item) {
-        Double graveTeleportCost = plugin.getConfig().getDouble("settings.graveTeleportCost");
+        Double graveTeleportCost = graveManager.getTeleportCost(player);
         if (vault != null) {
             Double balance = vault.getEconomy().getBalance(player);
             if (balance < graveTeleportCost) {
@@ -66,7 +66,7 @@ public class GUIManager {
     }
 
     public Location getGraveLocation(ItemStack item) {
-        NamespacedKey key = new NamespacedKey(this.plugin, "graveLocation");
+        NamespacedKey key = new NamespacedKey(plugin, "graveLocation");
         String[] cords = item.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING).split("#");
         try {
             World world = plugin.getServer().getWorld(cords[0]);

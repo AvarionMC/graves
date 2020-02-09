@@ -35,6 +35,9 @@ permissions:
   graves.experience:
     default: true
     description: Can store experience in graves
+  graves.protection:
+    default: true
+    description: Can have protection on graves
   graves.teleport:
     default: true
     description: Can teleport to grave
