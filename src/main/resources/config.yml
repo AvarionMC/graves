@@ -54,6 +54,8 @@ settings:
   graveParticleSize: 4 # Size of particles.
   graveParticleHeight: 0 # Height of the particles.
 
+  graveAutoCleanup: true # Should the server auto clean up graves if they are broken.
+
   graveFailure: "&8[&6Graves&8] &fA grave was unable to be placed! Item's dropped on ground." # Can't place grave message.
 
   graveOpenSound: BLOCK_CHEST_OPEN # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html

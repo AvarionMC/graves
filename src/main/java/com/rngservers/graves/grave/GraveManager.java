@@ -75,7 +75,10 @@ public class GraveManager {
                             grave.getLocation().getWorld().isChunkLoaded(grave.getLocation().getChunk())) {
                         updateHologram(grave);
                         graveParticle(grave);
-                        removeBrokenHolograms();
+                        Boolean graveAutoCleanup = plugin.getConfig().getBoolean("settings.graveAutoCleanup");
+                        if (graveAutoCleanup) {
+                            cleanupBrokenHolograms();
+                        }
                         if (grave.getProtectTime() != null && grave.getProtected()) {
                             Long diff = System.currentTimeMillis() - grave.getCreatedTime();
                             if (diff >= grave.getProtectTime()) {
@@ -977,16 +980,18 @@ public class GraveManager {
         return count;
     }
 
-    public void removeBrokenHolograms() {
+    public void cleanupBrokenHolograms() {
         for (World world : plugin.getServer().getWorlds()) {
-            for (Entity entity : world.getEntities()) {
-                if (entity instanceof ArmorStand) {
-                    ArmorStand armorStand = (ArmorStand) entity;
-                    Grave grave = getGraveFromHologram(armorStand);
-                    if (grave == null) {
-                        for (String tag : armorStand.getScoreboardTags()) {
-                            if (tag.contains("graveHologram")) {
-                                armorStand.remove();
+            if (!world.getEntities().isEmpty()) {
+                for (Entity entity : world.getEntities()) {
+                    if (entity instanceof ArmorStand) {
+                        ArmorStand armorStand = (ArmorStand) entity;
+                        Grave grave = getGraveFromHologram(armorStand);
+                        if (grave == null) {
+                            for (String tag : armorStand.getScoreboardTags()) {
+                                if (tag.contains("graveHologram")) {
+                                    armorStand.remove();
+                                }
                             }
                         }
                     }
@@ -1148,7 +1153,7 @@ public class GraveManager {
     }
 
     public void graveSpawnZombie(Grave grave, Player player) {
-        if (grave.getPlayer().getUniqueId().equals(player.getUniqueId())) {
+        if (grave.getPlayer() != null && grave.getPlayer().getUniqueId().equals(player.getUniqueId())) {
             Boolean graveZombieOwner = plugin.getConfig().getBoolean("settings.graveZombieOwner");
             if (!graveZombieOwner) {
                 return;
