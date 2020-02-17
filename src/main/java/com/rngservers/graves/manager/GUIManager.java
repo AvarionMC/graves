@@ -1,35 +1,38 @@
-package com.rngservers.graves.gui;
+package com.rngservers.graves.manager;
 
-import com.rngservers.graves.Main;
-import com.rngservers.graves.grave.Grave;
-import com.rngservers.graves.grave.GraveManager;
-import com.rngservers.graves.hooks.Vault;
+import com.rngservers.graves.Graves;
+import com.rngservers.graves.inventory.GraveInventory;
+import com.rngservers.graves.inventory.GraveListInventory;
+import com.rngservers.graves.hooks.VaultHook;
 import org.bukkit.*;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
 
 public class GUIManager {
-    private Main plugin;
+    private Graves plugin;
     private GraveManager graveManager;
-    private Vault vault;
+    private VaultHook vaultHook;
 
-    public GUIManager(Main plugin, GraveManager graveManager, Vault vault) {
+    public GUIManager(Graves plugin, GraveManager graveManager, VaultHook vaultHook) {
         this.plugin = plugin;
         this.graveManager = graveManager;
-        this.vault = vault;
+        this.vaultHook = vaultHook;
     }
 
     public void teleportGrave(Player player, ItemStack item) {
         Double graveTeleportCost = graveManager.getTeleportCost(player);
-        if (vault != null) {
-            Double balance = vault.getEconomy().getBalance(player);
+        if (vaultHook != null) {
+            Double balance = vaultHook.getEconomy().getBalance(player);
             if (balance < graveTeleportCost) {
                 String notEnoughMoneyMessage = plugin.getConfig().getString("settings.notEnoughMoneyMessage")
                         .replace("$money", graveTeleportCost.toString()).replace("&", "§");
@@ -38,7 +41,7 @@ public class GUIManager {
                 }
                 return;
             } else {
-                vault.getEconomy().withdrawPlayer(player, graveTeleportCost);
+                vaultHook.getEconomy().withdrawPlayer(player, graveTeleportCost);
             }
         }
         Location location = getGraveLocation(item);
@@ -102,39 +105,49 @@ public class GUIManager {
                 .replace("$entity", otherPlayer.getName())
                 .replace("$player", otherPlayer.getName())
                 .replace("&", "§");
-        GravesGUI gui = new GravesGUI("§5§3§1§6§r§0§r" + guiName, graveItems, GraveManager.getInventorySize(graveItems.size()));
+        GraveListInventory gui = new GraveListInventory(guiName, graveItems, GraveManager.getInventorySize(graveItems.size()));
         gui.openInventory(player);
     }
 
+    @SuppressWarnings("deprecation")
+    public void addSkullItemStackTexture(ItemStack item, String base64) {
+        if (!base64.equals("")) {
+            UUID hashAsId = new UUID(base64.hashCode(), base64.hashCode());
+            plugin.getServer().getUnsafe().modifyItemStack(item, "{SkullOwner:{Id:\"" + hashAsId + "\",Properties:{textures:[{Value:\"" + base64 + "\"}]}}}");
+        }
+    }
+
     public List<ItemStack> graveItems(OfflinePlayer player) {
-        ConcurrentMap<Location, Grave> graves = graveManager.getGraves(player);
+        ConcurrentMap<Location, GraveInventory> graves = graveManager.getGraves(player);
         List<ItemStack> items = new ArrayList<>();
 
-        for (ConcurrentMap.Entry<Location, Grave> entry : graves.entrySet()) {
-            Grave grave = entry.getValue();
+        for (ConcurrentMap.Entry<Location, GraveInventory> entry : graves.entrySet()) {
+            GraveInventory grave = entry.getValue();
             Material graveBlock = Material.matchMaterial(plugin.getConfig().getString("settings.graveBlock"));
             if (graveBlock == null || graveBlock.equals(Material.AIR)) {
                 graveBlock = Material.PLAYER_HEAD;
             }
             ItemStack item = new ItemStack(graveBlock, 1);
+            String graveHeadSkin = plugin.getConfig().getString("settings.graveHeadSkin");
+            addSkullItemStackTexture(item, graveHeadSkin);
             ItemMeta meta = item.getItemMeta();
-            String graveHeadName = plugin.getConfig().getString("settings.graveHeadSkin");
             if (meta instanceof SkullMeta) {
                 SkullMeta skull = (SkullMeta) meta;
-                if (graveHeadName.equals("$entity") || graveHeadName.equals("")) {
+                if (graveHeadSkin.equals("$entity") || graveHeadSkin.equals("")) {
                     if (grave.getPlayer() != null) {
                         skull.setOwningPlayer(grave.getPlayer());
                     } else if (grave.getEntityType() != null) {
                         // TODO Mob heads
                     }
-                } else {
+                } else if (graveHeadSkin.length() <= 16) {
                     if (graveManager.getGraveHead() != null) {
                         skull.setOwningPlayer(graveManager.getGraveHead());
                     }
                 }
                 item.setItemMeta(skull);
             }
-            List<String> lores = new ArrayList<String>();
+            meta = item.getItemMeta();
+            List<String> lores = new ArrayList<>();
             List<String> loreLines = plugin.getConfig().getStringList("settings.guiLore");
             for (String lore : loreLines) {
                 String line = ChatColor.GRAY + lore.replace("$location", "LOC")
@@ -165,6 +178,7 @@ public class GUIManager {
             NamespacedKey key = new NamespacedKey(plugin, "graveLocation");
             String keyValue = grave.getLocation().getWorld().getName() + "#"
                     + grave.getLocation().getX() + "#" + grave.getLocation().getY() + "#" + grave.getLocation().getZ();
+            item.setItemMeta(meta);
             item.getItemMeta().getPersistentDataContainer().set(key, PersistentDataType.STRING, keyValue);
             if (item != null) {
                 items.add(item);

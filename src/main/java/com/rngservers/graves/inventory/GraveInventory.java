@@ -1,5 +1,6 @@
-package com.rngservers.graves.grave;
+package com.rngservers.graves.inventory;
 
+import com.rngservers.graves.manager.GraveManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,7 +13,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class Grave implements InventoryHolder {
+public class GraveInventory implements InventoryHolder {
     private Location location;
     private Inventory inventory;
     private Integer experience;
@@ -26,7 +27,7 @@ public class Grave implements InventoryHolder {
     private Integer protectTime;
     private ConcurrentMap<UUID, Integer> holograms = new ConcurrentHashMap<>();
 
-    public Grave(Location location, Inventory itemInventory, String title) {
+    public GraveInventory(Location location, Inventory itemInventory, String title) {
         this.location = location;
         this.createdTime = System.currentTimeMillis();
         inventory = Bukkit.getServer().createInventory(this, itemInventory.getSize(), title);
@@ -115,10 +116,6 @@ public class Grave implements InventoryHolder {
 
     public void setAliveTime(Integer aliveTime) {
         this.aliveTime = aliveTime;
-    }
-
-    public void setHolograms(ConcurrentMap<UUID, Integer> holograms) {
-        this.holograms = holograms;
     }
 
     public void addHologram(UUID uuid, Integer lineNumber) {

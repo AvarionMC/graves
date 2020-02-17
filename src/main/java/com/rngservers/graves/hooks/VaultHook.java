@@ -4,7 +4,7 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
-public class Vault {
+public class VaultHook {
     private Economy econ;
 
     public Economy getEconomy() {

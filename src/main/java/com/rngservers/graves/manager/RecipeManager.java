@@ -1,7 +1,7 @@
-package com.rngservers.graves.recipe;
+package com.rngservers.graves.manager;
 
-import com.rngservers.graves.Main;
-import com.rngservers.graves.grave.GraveManager;
+import com.rngservers.graves.Graves;
+import com.rngservers.graves.manager.GraveManager;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -13,10 +13,10 @@ import java.util.Iterator;
 import java.util.List;
 
 public class RecipeManager {
-    private Main plugin;
+    private Graves plugin;
     private GraveManager graveManager;
 
-    public RecipeManager(Main plugin, GraveManager graveManager) {
+    public RecipeManager(Graves plugin, GraveManager graveManager) {
         this.plugin = plugin;
         this.graveManager = graveManager;
     }

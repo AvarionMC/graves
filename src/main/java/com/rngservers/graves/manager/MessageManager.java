@@ -1,16 +1,16 @@
-package com.rngservers.graves.messages;
+package com.rngservers.graves.manager;
 
-import com.rngservers.graves.Main;
+import com.rngservers.graves.Graves;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class Messages {
-    private Main plugin;
+public class MessageManager {
+    private Graves plugin;
 
-    public Messages(Main plugin) {
+    public MessageManager(Graves plugin) {
         this.plugin = plugin;
     }
 

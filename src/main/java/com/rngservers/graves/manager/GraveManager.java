@@ -1,8 +1,7 @@
-package com.rngservers.graves.grave;
+package com.rngservers.graves.manager;
 
-import com.rngservers.graves.Main;
-import com.rngservers.graves.data.DataManager;
-import com.rngservers.graves.messages.Messages;
+import com.rngservers.graves.Graves;
+import com.rngservers.graves.inventory.GraveInventory;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.*;
@@ -30,19 +29,19 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 public class GraveManager {
-    private Main plugin;
-    private DataManager data;
-    private Messages messages;
-    private ConcurrentMap<Location, Grave> graves = new ConcurrentHashMap<>();
+    private Graves plugin;
+    private DataManager dataManager;
+    private MessageManager messageManager;
+    private ConcurrentMap<Location, GraveInventory> graves = new ConcurrentHashMap<>();
     private List<String> hologramLines = new ArrayList<>();
     private List<Material> graveItemIgnore = new ArrayList<>();
     private List<Material> graveIgnore = new ArrayList<>();
     private OfflinePlayer graveHead;
 
-    public GraveManager(Main plugin, DataManager data, Messages messages) {
+    public GraveManager(Graves plugin, DataManager dataManager, MessageManager messageManager) {
         this.plugin = plugin;
-        this.data = data;
-        this.messages = messages;
+        this.dataManager = dataManager;
+        this.messageManager = messageManager;
         getSavedGraves();
         graveHeadLoad();
         graveItemIgnoreLoad();
@@ -55,7 +54,7 @@ public class GraveManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                graves = data.getSavedGraves();
+                graves = dataManager.getSavedGraves();
                 createHolograms();
 
                 plugin.getServer().getLogger().info("[Graves] Loaded saved graves!");
@@ -69,8 +68,8 @@ public class GraveManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                for (ConcurrentMap.Entry<Location, Grave> entry : graves.entrySet()) {
-                    Grave grave = entry.getValue();
+                for (ConcurrentMap.Entry<Location, GraveInventory> entry : graves.entrySet()) {
+                    GraveInventory grave = entry.getValue();
                     if (plugin.getServer().getWorlds().contains(grave.getLocation().getWorld()) &&
                             grave.getLocation().getWorld().isChunkLoaded(grave.getLocation().getChunk())) {
                         updateHologram(grave);
@@ -95,8 +94,8 @@ public class GraveManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                for (ConcurrentMap.Entry<Location, Grave> entry : graves.entrySet()) {
-                    Grave grave = entry.getValue();
+                for (ConcurrentMap.Entry<Location, GraveInventory> entry : graves.entrySet()) {
+                    GraveInventory grave = entry.getValue();
                     if (plugin.getServer().getWorlds().contains(grave.getLocation().getWorld())) {
                         if (grave.getAliveTime() != null) {
                             long diff = System.currentTimeMillis() - grave.getCreatedTime();
@@ -123,7 +122,7 @@ public class GraveManager {
         return graveHead;
     }
 
-    public void graveParticle(Grave grave) {
+    public void graveParticle(GraveInventory grave) {
         Particle particle;
         try {
             particle = Particle.valueOf(plugin.getConfig().getString("settings.graveParticle"));
@@ -140,9 +139,9 @@ public class GraveManager {
         }
     }
 
-    public ConcurrentMap<Location, Grave> getGraves(OfflinePlayer player) {
-        ConcurrentMap<Location, Grave> playerGraves = new ConcurrentHashMap<>();
-        for (ConcurrentMap.Entry<Location, Grave> entry : graves.entrySet()) {
+    public ConcurrentMap<Location, GraveInventory> getGraves(OfflinePlayer player) {
+        ConcurrentMap<Location, GraveInventory> playerGraves = new ConcurrentHashMap<>();
+        for (ConcurrentMap.Entry<Location, GraveInventory> entry : graves.entrySet()) {
             if (entry.getValue().getPlayer().getUniqueId().equals(player.getUniqueId())) {
                 playerGraves.put(entry.getKey(), entry.getValue());
             }
@@ -150,13 +149,13 @@ public class GraveManager {
         return playerGraves;
     }
 
-    public Grave getGrave(Location location) {
+    public GraveInventory getGrave(Location location) {
         return graves.get(roundLocation(location));
     }
 
     public void saveGraves() {
-        for (ConcurrentMap.Entry<Location, Grave> entry : graves.entrySet()) {
-            data.saveGrave(entry.getValue());
+        for (ConcurrentMap.Entry<Location, GraveInventory> entry : graves.entrySet()) {
+            dataManager.saveGrave(entry.getValue());
         }
     }
 
@@ -231,12 +230,12 @@ public class GraveManager {
         return item.getItemMeta().getPersistentDataContainer().has(key, PersistentDataType.INTEGER);
     }
 
-    public void protectGrave(Grave grave, Boolean protect) {
+    public void protectGrave(GraveInventory grave, Boolean protect) {
         grave.setProtected(protect);
-        messages.graveChangeProtect(grave.getLocation());
+        messageManager.graveChangeProtect(grave.getLocation());
     }
 
-    public String parseProtect(Grave grave) {
+    public String parseProtect(GraveInventory grave) {
         String protect;
         if (grave.getProtected() != null && grave.getProtected()) {
             protect = plugin.getConfig().getString("settings.graveProtectedProtectedMessage");
@@ -315,7 +314,7 @@ public class GraveManager {
         return plugin.getConfig().getDouble("settings.graveTeleportCost");
     }
 
-    public Grave createGrave(Player player, List<ItemStack> items) {
+    public GraveInventory createGrave(Player player, List<ItemStack> items) {
         if (graveIgnore.contains(player.getLocation().getBlock().getType())) {
             String graveIgnoreMessage = plugin.getConfig().getString("settings.graveIgnoreMessage")
                     .replace("$block", formatString(player.getLocation().getBlock().getType().toString()))
@@ -329,7 +328,7 @@ public class GraveManager {
         Boolean graveOnlyCanBuild = plugin.getConfig().getBoolean("settings.graveOnlyCanBuild");
         if (graveOnlyCanBuild) {
             if (!canBuild(player, location)) {
-                messages.buildDenied(player);
+                messageManager.buildDenied(player);
                 return null;
             }
         }
@@ -348,7 +347,7 @@ public class GraveManager {
         if (graveTitle.equals("")) {
             graveTitle = player.getName() + "'s Grave";
         }
-        Grave grave = new Grave(roundLocation(location), inventory, graveTitle);
+        GraveInventory grave = new GraveInventory(roundLocation(location), inventory, graveTitle);
         grave.setAliveTime(getGraveTime(player));
         Boolean graveProtected = plugin.getConfig().getBoolean("settings.graveProtected");
         if (graveProtected && player.hasPermission("graves.protection")) {
@@ -376,7 +375,7 @@ public class GraveManager {
         return grave;
     }
 
-    public Grave createGrave(LivingEntity entity, List<ItemStack> items) {
+    public GraveInventory createGrave(LivingEntity entity, List<ItemStack> items) {
         if (graveIgnore.contains(entity.getLocation().getBlock().getType())) {
             return null;
         }
@@ -395,7 +394,7 @@ public class GraveManager {
         if (graveTitle.equals("")) {
             graveTitle = formatString(entity.getType().toString()) + "'s Grave";
         }
-        Grave grave = new Grave(roundLocation(location), inventory, graveTitle);
+        GraveInventory grave = new GraveInventory(roundLocation(location), inventory, graveTitle);
         grave.setAliveTime(getGraveTime());
         grave.setEntityType(entity.getType());
         grave.setReplace(location.getBlock().getType());
@@ -412,7 +411,7 @@ public class GraveManager {
         return newInventory;
     }
 
-    public void placeGrave(Grave grave) {
+    public void placeGrave(GraveInventory grave) {
         Material graveBlock = Material.matchMaterial(plugin.getConfig().getString("settings.graveBlock"));
         if (graveBlock == null) {
             graveBlock = Material.CHEST;
@@ -449,10 +448,17 @@ public class GraveManager {
                     } else if (grave.getEntityType() != null) {
                         // TODO Mob heads
                     }
-                } else {
+                } else if (graveHeadName.length() <= 16) {
                     if (graveHead != null) {
                         skull.setOwningPlayer(graveHead);
                     }
+                } else {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            addSkullBlockTexture(grave.getLocation().getBlock(), graveHeadName);
+                        }
+                    }.runTaskLater(plugin, 1L);
                 }
                 skull.update();
             }
@@ -493,7 +499,7 @@ public class GraveManager {
                 return ground;
             }
         }
-        if (data.graveReplace().contains(location.getBlock().getType()) || data.graveReplace().contains("ALL")) {
+        if (dataManager.graveReplace().contains(location.getBlock().getType()) || dataManager.graveReplace().contains("ALL")) {
             return location;
         }
         if (isAir(location.getBlock().getType())) {
@@ -576,7 +582,7 @@ public class GraveManager {
         Block block = location.getBlock();
         int max = 0;
         while (max <= 256) {
-            if (!data.graveReplace().contains(block.getType()) && !isAir(block.getType())) {
+            if (!dataManager.graveReplace().contains(block.getType()) && !isAir(block.getType())) {
                 return block.getLocation().add(0, 1, 0);
             }
             block = block.getLocation().subtract(0, 1, 0).getBlock();
@@ -590,7 +596,7 @@ public class GraveManager {
         Block block = location.getBlock();
         int max = 0;
         while (max <= 256) {
-            if (data.graveReplace().contains(block.getType()) || !isAir(block.getType())) {
+            if (dataManager.graveReplace().contains(block.getType()) || !isAir(block.getType())) {
                 return block.getLocation().add(0, 1, 0);
             }
             block = block.getLocation().subtract(0, 1, 0).getBlock();
@@ -605,7 +611,7 @@ public class GraveManager {
         Block block = location.getBlock();
         int max = 0;
         while (max <= 256) {
-            if ((data.graveReplace().contains(block.getType()) || isAir(block.getType())) && block.getType().equals(Material.LAVA)) {
+            if ((dataManager.graveReplace().contains(block.getType()) || isAir(block.getType())) && block.getType().equals(Material.LAVA)) {
                 return block.getLocation().add(0, 1, 0);
             }
             block = block.getLocation().subtract(0, 1, 0).getBlock();
@@ -619,7 +625,7 @@ public class GraveManager {
         Block block = location.getBlock();
         int max = 0;
         while (max <= 256) {
-            if (data.graveReplace().contains(block.getType())) {
+            if (dataManager.graveReplace().contains(block.getType())) {
                 return block.getLocation().add(0, 1, 0);
             }
             if (isAir(block.getType())) {
@@ -642,7 +648,7 @@ public class GraveManager {
         }
     }
 
-    public void replaceGrave(Grave grave) {
+    public void replaceGrave(GraveInventory grave) {
         Material replace = grave.getReplace();
         if (replace == null) {
             replace = Material.AIR;
@@ -651,11 +657,11 @@ public class GraveManager {
         closeGrave(grave);
     }
 
-    public void removeGrave(Grave grave) {
+    public void removeGrave(GraveInventory grave) {
         graves.remove(grave.getLocation());
     }
 
-    public void dropGrave(Grave grave) {
+    public void dropGrave(GraveInventory grave) {
         if (grave != null) {
             for (ItemStack item : grave.getInventory()) {
                 if (item != null) {
@@ -666,7 +672,7 @@ public class GraveManager {
         }
     }
 
-    public void closeGrave(Grave grave) {
+    public void closeGrave(GraveInventory grave) {
         List<HumanEntity> viewers = grave.getInventory().getViewers();
         for (HumanEntity viewer : new ArrayList<>(viewers)) {
             grave.getInventory().getViewers().remove(viewer);
@@ -678,8 +684,8 @@ public class GraveManager {
         if (!graves.isEmpty()) {
             Iterator iterator = graves.entrySet().iterator();
             while (iterator.hasNext()) {
-                ConcurrentMap.Entry<Location, Grave> entry = (Map.Entry<Location, Grave>) iterator.next();
-                Grave grave = entry.getValue();
+                ConcurrentMap.Entry<Location, GraveInventory> entry = (Map.Entry<Location, GraveInventory>) iterator.next();
+                GraveInventory grave = entry.getValue();
                 List<HumanEntity> viewers = grave.getInventory().getViewers();
                 for (HumanEntity viewer : new ArrayList<>(viewers)) {
                     grave.getInventory().getViewers().remove(viewer);
@@ -693,7 +699,7 @@ public class GraveManager {
         if (!graves.isEmpty()) {
             Iterator iterator = graves.entrySet().iterator();
             while (iterator.hasNext()) {
-                Map.Entry<Location, Grave> entry = (Map.Entry) iterator.next();
+                Map.Entry<Location, GraveInventory> entry = (Map.Entry) iterator.next();
                 removeHologram(entry.getValue());
             }
         }
@@ -703,8 +709,8 @@ public class GraveManager {
         if (!graves.isEmpty()) {
             Iterator iterator = graves.entrySet().iterator();
             while (iterator.hasNext()) {
-                Map.Entry<Location, Grave> entry = (Map.Entry) iterator.next();
-                Grave grave = entry.getValue();
+                Map.Entry<Location, GraveInventory> entry = (Map.Entry) iterator.next();
+                GraveInventory grave = entry.getValue();
                 if (grave.getHolograms().isEmpty()) {
                     createHologram(grave);
                 }
@@ -712,7 +718,7 @@ public class GraveManager {
         }
     }
 
-    public Boolean hasPermission(Grave grave, Player player) {
+    public Boolean hasPermission(GraveInventory grave, Player player) {
         Boolean owner = false;
         Boolean killer = false;
         Boolean bypass = false;
@@ -752,7 +758,7 @@ public class GraveManager {
         }
     }
 
-    public void giveExperience(Grave grave, Player player) {
+    public void giveExperience(GraveInventory grave, Player player) {
         String expMessage = plugin.getConfig().getString("settings.expMessage").replace("&", "§");
         if (grave.getExperience() != null && grave.getExperience() > 0) {
             expMessage = expMessage.replace("$level", getLevelFromExp(grave.getExperience()));
@@ -763,7 +769,7 @@ public class GraveManager {
         }
     }
 
-    public void dropExperience(Grave grave) {
+    public void dropExperience(GraveInventory grave) {
         if (grave.getExperience() != null && grave.getExperience() > 0) {
             ExperienceOrb orb = (ExperienceOrb) grave.getLocation().getWorld().spawnEntity(grave.getLocation(), EntityType.EXPERIENCE_ORB);
             orb.setExperience(grave.getExperience());
@@ -771,12 +777,12 @@ public class GraveManager {
         }
     }
 
-    public void destroyGrave(Grave grave) {
+    public void destroyGrave(GraveInventory grave) {
         grave.getInventory().clear();
         grave.setExperience(null);
     }
 
-    public void updateHologram(Grave grave) {
+    public void updateHologram(GraveInventory grave) {
         boolean hologram = plugin.getConfig().getBoolean("settings.hologram");
         if (hologram) {
             if (!grave.getHolograms().isEmpty()) {
@@ -794,11 +800,11 @@ public class GraveManager {
         }
     }
 
-    public void autoLoot(Grave grave, Player player) {
+    public void autoLoot(GraveInventory grave, Player player) {
         equipArmor(grave.getInventory(), player);
         equipItems(grave.getInventory(), player);
         if (checkEmpty(grave)) {
-            messages.graveLoot(grave.getLocation(), player);
+            messageManager.graveLoot(grave.getLocation(), player);
             giveExperience(grave, player);
             removeHologram(grave);
             replaceGrave(grave);
@@ -883,7 +889,7 @@ public class GraveManager {
         return false;
     }
 
-    public Boolean checkEmpty(Grave grave) {
+    public Boolean checkEmpty(GraveInventory grave) {
         if (grave.getItemAmount() == 0) {
             return true;
         } else {
@@ -919,7 +925,7 @@ public class GraveManager {
         return freeSlots;
     }
 
-    public String parseHologram(Integer lineNumber, Grave grave) {
+    public String parseHologram(Integer lineNumber, GraveInventory grave) {
         String line = hologramLines.get(lineNumber).replace("$itemCount", grave.getItemAmount().toString()).replace("&", "§");
         if (grave.getAliveTime() != null) {
             Long aliveTime = (grave.getAliveTime() - (System.currentTimeMillis() - grave.getCreatedTime())) / 1000;
@@ -982,11 +988,11 @@ public class GraveManager {
 
     public void cleanupBrokenHolograms() {
         for (World world : plugin.getServer().getWorlds()) {
-            if (!world.getEntities().isEmpty()) {
+            if (world.getEntities() != null && !world.getEntities().isEmpty()) {
                 for (Entity entity : world.getEntities()) {
                     if (entity instanceof ArmorStand) {
                         ArmorStand armorStand = (ArmorStand) entity;
-                        Grave grave = getGraveFromHologram(armorStand);
+                        GraveInventory grave = getGraveFromHologram(armorStand);
                         if (grave == null) {
                             for (String tag : armorStand.getScoreboardTags()) {
                                 if (tag.contains("graveHologram")) {
@@ -1000,7 +1006,7 @@ public class GraveManager {
         }
     }
 
-    public void createHologram(Grave grave) {
+    public void createHologram(GraveInventory grave) {
         Material graveBlock = Material.matchMaterial(plugin.getConfig().getString("settings.graveBlock"));
         if (graveBlock == null) {
             graveBlock = Material.CHEST;
@@ -1038,7 +1044,7 @@ public class GraveManager {
         }
     }
 
-    public void removeHologram(Grave grave) {
+    public void removeHologram(GraveInventory grave) {
         if (!grave.getHolograms().isEmpty()) {
             for (Iterator<Map.Entry<UUID, Integer>> iterator = grave.getHolograms().entrySet()
                     .iterator(); iterator.hasNext(); ) {
@@ -1054,7 +1060,7 @@ public class GraveManager {
         }
     }
 
-    public Grave getGraveFromHologram(ArmorStand armorStand) {
+    public GraveInventory getGraveFromHologram(ArmorStand armorStand) {
         for (String tag : armorStand.getScoreboardTags()) {
             if (tag.contains("graveHologramLocation:")) {
                 String[] cords = tag.replace("graveHologramLocation:", "").split("#");
@@ -1075,7 +1081,7 @@ public class GraveManager {
     @SuppressWarnings("deprecation")
     public void graveHeadLoad() {
         String graveHeadName = plugin.getConfig().getString("settings.graveHeadSkin");
-        if (!graveHeadName.equals("")) {
+        if (!graveHeadName.equals("") && graveHeadName.length() <= 16) {
             graveHead = plugin.getServer().getOfflinePlayer(graveHeadName);
         }
     }
@@ -1152,7 +1158,7 @@ public class GraveManager {
         }
     }
 
-    public void graveSpawnZombie(Grave grave, Player player) {
+    public void graveSpawnZombie(GraveInventory grave, Player player) {
         if (grave.getPlayer() != null && grave.getPlayer().getUniqueId().equals(player.getUniqueId())) {
             Boolean graveZombieOwner = plugin.getConfig().getBoolean("settings.graveZombieOwner");
             if (!graveZombieOwner) {
@@ -1167,7 +1173,7 @@ public class GraveManager {
         spawnZombie(grave, player);
     }
 
-    public void spawnZombie(Grave grave, LivingEntity target) {
+    public void spawnZombie(GraveInventory grave, LivingEntity target) {
         LivingEntity livingEntity = spawnZombie(grave);
         if (livingEntity != null && livingEntity instanceof Monster) {
             Monster monster = (Monster) livingEntity;
@@ -1175,7 +1181,7 @@ public class GraveManager {
         }
     }
 
-    public LivingEntity spawnZombie(Grave grave) {
+    public LivingEntity spawnZombie(GraveInventory grave) {
         if (grave.getPlayer() != null) {
             EntityType graveZombieType = EntityType.ZOMBIE;
             try {
@@ -1223,6 +1229,24 @@ public class GraveManager {
         return item;
     }
 
+    public void addSkullBlockTexture(Block block, String base64) {
+        UUID hashAsId = new UUID(base64.hashCode(), base64.hashCode());
+        String args = String.format(
+                "%d %d %d %s",
+                block.getX(),
+                block.getY(),
+                block.getZ(),
+                "{Owner:{Id:\"" + hashAsId + "\",Properties:{textures:[{Value:\"" + base64 + "\"}]}}}"
+        );
+        if (block.getWorld().getGameRuleValue(GameRule.SEND_COMMAND_FEEDBACK)) {
+            block.getWorld().setGameRule(GameRule.SEND_COMMAND_FEEDBACK, false);
+            plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "data merge block " + args);
+            block.getWorld().setGameRule(GameRule.SEND_COMMAND_FEEDBACK, true);
+        } else {
+            plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "data merge block " + args);
+        }
+    }
+
     public void hologramLinesLoad() {
         hologramLines.clear();
         for (String line : plugin.getConfig().getStringList("settings.hologramLines")) {
@@ -1231,7 +1255,7 @@ public class GraveManager {
         Collections.reverse(hologramLines);
     }
 
-    public void runCreateCommands(Grave grave, LivingEntity livingEntity) {
+    public void runCreateCommands(GraveInventory grave, LivingEntity livingEntity) {
         List<String> graveCreateCommands = plugin.getConfig().getStringList("settings.graveCreateCommands");
         Boolean graveCommandsOnlyPlayers = plugin.getConfig().getBoolean("settings.graveCommandsOnlyPlayers");
         for (String command : graveCreateCommands) {
@@ -1242,7 +1266,7 @@ public class GraveManager {
         }
     }
 
-    public void runLootCommands(Grave grave, Player player) {
+    public void runLootCommands(GraveInventory grave, Player player) {
         List<String> graveLootCommands = plugin.getConfig().getStringList("settings.graveLootCommands");
         Boolean graveCommandsOnlyPlayers = plugin.getConfig().getBoolean("settings.graveCommandsOnlyPlayers");
         for (String command : graveLootCommands) {
@@ -1253,7 +1277,7 @@ public class GraveManager {
         }
     }
 
-    public void runOpenCommands(Grave grave, Player player) {
+    public void runOpenCommands(GraveInventory grave, Player player) {
         List<String> graveOpenCommands = plugin.getConfig().getStringList("settings.graveOpenCommands");
         Boolean graveCommandsOnlyPlayers = plugin.getConfig().getBoolean("settings.graveCommandsOnlyPlayers");
         for (String command : graveOpenCommands) {
@@ -1264,7 +1288,7 @@ public class GraveManager {
         }
     }
 
-    public void runBreakCommands(Grave grave, Player player) {
+    public void runBreakCommands(GraveInventory grave, Player player) {
         List<String> graveBreakCommands = plugin.getConfig().getStringList("settings.graveBreakCommands");
         Boolean graveCommandsOnlyPlayers = plugin.getConfig().getBoolean("settings.graveCommandsOnlyPlayers");
         for (String command : graveBreakCommands) {
@@ -1275,7 +1299,7 @@ public class GraveManager {
         }
     }
 
-    public void runExplodeCommands(Grave grave, Entity entity) {
+    public void runExplodeCommands(GraveInventory grave, Entity entity) {
         List<String> graveExplodeCommands = plugin.getConfig().getStringList("settings.graveExplodeCommands");
         Boolean graveCommandsOnlyPlayers = plugin.getConfig().getBoolean("settings.graveCommandsOnlyPlayers");
         for (String command : graveExplodeCommands) {
@@ -1295,7 +1319,7 @@ public class GraveManager {
         }
     }
 
-    public String formatCommand(String command, Entity entity, Grave grave) {
+    public String formatCommand(String command, Entity entity, GraveInventory grave) {
         command = command.replace("$entity", getEntityName(entity))
                 .replace("$player", getEntityName(entity))
                 .replace("$owner", getOwnerName(grave))
@@ -1322,7 +1346,7 @@ public class GraveManager {
         return formatString(entity.getType().toString());
     }
 
-    public static String getOwnerName(Grave grave) {
+    public static String getOwnerName(GraveInventory grave) {
         String owner = "";
         if (grave.getPlayer() != null) {
             owner = grave.getPlayer().getName();

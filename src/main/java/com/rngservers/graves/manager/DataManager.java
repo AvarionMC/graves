@@ -1,8 +1,8 @@
-package com.rngservers.graves.data;
+package com.rngservers.graves.manager;
 
-import com.rngservers.graves.Main;
-import com.rngservers.graves.grave.Grave;
-import com.rngservers.graves.grave.GraveManager;
+import com.rngservers.graves.Graves;
+import com.rngservers.graves.inventory.GraveInventory;
+import com.rngservers.graves.manager.GraveManager;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -23,19 +23,19 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class DataManager {
-    private Main plugin;
+    private Graves plugin;
     private FileConfiguration data;
     private File dataFile;
     private List<Material> graveReplace = new ArrayList<>();
 
-    public DataManager(Main plugin) {
+    public DataManager(Graves plugin) {
         this.plugin = plugin;
         createDataFile();
         graveReplaceLoad();
     }
 
-    public ConcurrentMap<Location, Grave> getSavedGraves() {
-        ConcurrentMap<Location, Grave> graves = new ConcurrentHashMap<>();
+    public ConcurrentMap<Location, GraveInventory> getSavedGraves() {
+        ConcurrentMap<Location, GraveInventory> graves = new ConcurrentHashMap<>();
         for (String worlds : data.getKeys(false)) {
             for (String cords : data.getConfigurationSection(worlds).getKeys(false)) {
                 String[] cord = cords.split("_");
@@ -69,7 +69,7 @@ public class DataManager {
                     entityType = EntityType.valueOf(data.getString(worlds + "." + cords + ".entity"));
                     graveTitle = graveTitle(entityType);
                 }
-                Grave grave = createGrave(location, items, graveTitle);
+                GraveInventory grave = createGrave(location, items, graveTitle);
                 if (player != null) {
                     grave.setPlayer(player);
                 }
@@ -127,18 +127,18 @@ public class DataManager {
         return graveTitle;
     }
 
-    private Grave createGrave(Location location, List<ItemStack> items, String graveTitle) {
+    private GraveInventory createGrave(Location location, List<ItemStack> items, String graveTitle) {
         Inventory inventory = plugin.getServer().createInventory(null, GraveManager.getInventorySize(items.size()));
         for (ItemStack item : items) {
             if (item != null) {
                 inventory.addItem(item);
             }
         }
-        Grave grave = new Grave(location, inventory, graveTitle);
+        GraveInventory grave = new GraveInventory(location, inventory, graveTitle);
         return grave;
     }
 
-    public void saveGrave(Grave grave) {
+    public void saveGrave(GraveInventory grave) {
         if (grave.getItemAmount() == 0) {
             return;
         }

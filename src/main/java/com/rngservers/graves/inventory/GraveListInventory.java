@@ -1,4 +1,4 @@
-package com.rngservers.graves.gui;
+package com.rngservers.graves.inventory;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -8,11 +8,11 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public class GravesGUI implements InventoryHolder {
+public class GraveListInventory implements InventoryHolder {
     private final Inventory inv;
     private List<ItemStack> items;
 
-    public GravesGUI(String name, List<ItemStack> items, Integer size) {
+    public GraveListInventory(String name, List<ItemStack> items, Integer size) {
         this.items = items;
         inv = Bukkit.createInventory(this, size, name);
         initializeItems();
