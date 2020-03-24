@@ -1,17 +1,15 @@
 package com.rngservers.graves.manager;
 
 import com.rngservers.graves.Graves;
+import com.rngservers.graves.hooks.VaultHook;
 import com.rngservers.graves.inventory.GraveInventory;
 import com.rngservers.graves.inventory.GraveListInventory;
-import com.rngservers.graves.hooks.VaultHook;
 import org.bukkit.*;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +29,8 @@ public class GUIManager {
 
     public void teleportGrave(Player player, ItemStack item) {
         Double graveTeleportCost = graveManager.getTeleportCost(player);
-        if (vaultHook != null) {
+        UUID graveOwnerUUID = UUID.fromString(item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin, "graveOwner"), PersistentDataType.STRING));
+        if (vaultHook != null && player.getUniqueId().equals(graveOwnerUUID)) {
             Double balance = vaultHook.getEconomy().getBalance(player);
             if (balance < graveTeleportCost) {
                 String notEnoughMoneyMessage = plugin.getConfig().getString("settings.notEnoughMoneyMessage")
@@ -136,8 +135,6 @@ public class GUIManager {
                 if (graveHeadSkin.equals("$entity") || graveHeadSkin.equals("")) {
                     if (grave.getPlayer() != null) {
                         skull.setOwningPlayer(grave.getPlayer());
-                    } else if (grave.getEntityType() != null) {
-                        // TODO Mob heads
                     }
                 } else if (graveHeadSkin.length() <= 16) {
                     if (graveManager.getGraveHead() != null) {
@@ -174,12 +171,11 @@ public class GUIManager {
                     .replace("&", "§");
             meta.setDisplayName(guiGrave);
             meta.setLore(lores);
-            item.setItemMeta(meta);
-            NamespacedKey key = new NamespacedKey(plugin, "graveLocation");
-            String keyValue = grave.getLocation().getWorld().getName() + "#"
+            String locationValue = grave.getLocation().getWorld().getName() + "#"
                     + grave.getLocation().getX() + "#" + grave.getLocation().getY() + "#" + grave.getLocation().getZ();
+            meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "graveLocation"), PersistentDataType.STRING, locationValue);
+            meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "graveOwner"), PersistentDataType.STRING, grave.getPlayer().getUniqueId().toString());
             item.setItemMeta(meta);
-            item.getItemMeta().getPersistentDataContainer().set(key, PersistentDataType.STRING, keyValue);
             if (item != null) {
                 items.add(item);
             }

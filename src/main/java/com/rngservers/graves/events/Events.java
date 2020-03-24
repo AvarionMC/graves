@@ -18,6 +18,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -58,7 +59,25 @@ public class Events implements Listener {
                 return;
             }
         }
-        Integer graveMax = plugin.getConfig().getInt("settings.graveMax");
+        if (event.getEntity().getLastDamageCause().getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) {
+            if (event.getEntity() != null && event.getEntity().getKiller() instanceof Player) {
+                Boolean graveCreatePvP = plugin.getConfig().getBoolean("settings.graveCreatePvP");
+                if (!graveCreatePvP) {
+                    return;
+                }
+            } else {
+                Boolean graveCreatePvE = plugin.getConfig().getBoolean("settings.graveCreatePvE");
+                if (!graveCreatePvE) {
+                    return;
+                }
+            }
+        } else {
+            Boolean graveCreateEnvironmental = plugin.getConfig().getBoolean("settings.graveCreateEnvironmental");
+            if (!graveCreateEnvironmental) {
+                return;
+            }
+        }
+        Integer graveMax = graveManager.getMaxGraves(event.getEntity());
         if (graveMax > 0) {
             if (graveManager.getGraves(event.getEntity()).size() >= graveMax) {
                 messageManager.graveMax(event.getEntity());
@@ -201,9 +220,11 @@ public class Events implements Listener {
                 graveManager.autoLoot(grave, event.getPlayer());
                 messageManager.graveOpen(grave.getLocation());
                 graveManager.runLootCommands(grave, event.getPlayer());
-                Boolean graveZombieOnlyBreak = plugin.getConfig().getBoolean("settings.graveZombieOnlyBreak");
-                if (!graveZombieOnlyBreak) {
-                    graveManager.graveSpawnZombie(grave, event.getPlayer());
+                if (grave.getItemAmount() <= 0) {
+                    Boolean graveZombieOnlyBreak = plugin.getConfig().getBoolean("settings.graveZombieOnlyBreak");
+                    if (!graveZombieOnlyBreak) {
+                        graveManager.graveSpawnZombie(grave, event.getPlayer());
+                    }
                 }
             } else {
                 messageManager.graveProtected(event.getPlayer(), grave.getLocation());
@@ -261,9 +282,11 @@ public class Events implements Listener {
                         graveManager.autoLoot(grave, event.getPlayer());
                         messageManager.graveOpen(grave.getLocation());
                         graveManager.runLootCommands(grave, event.getPlayer());
-                        Boolean graveZombieOnlyBreak = plugin.getConfig().getBoolean("settings.graveZombieOnlyBreak");
-                        if (!graveZombieOnlyBreak) {
-                            graveManager.graveSpawnZombie(grave, event.getPlayer());
+                        if (grave.getItemAmount() <= 0) {
+                            Boolean graveZombieOnlyBreak = plugin.getConfig().getBoolean("settings.graveZombieOnlyBreak");
+                            if (!graveZombieOnlyBreak) {
+                                graveManager.graveSpawnZombie(grave, event.getPlayer());
+                            }
                         }
                     } else {
                         messageManager.graveProtected(event.getPlayer(), grave.getLocation());

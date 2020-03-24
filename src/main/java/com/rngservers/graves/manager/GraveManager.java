@@ -8,6 +8,8 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Skull;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Levelled;
 import org.bukkit.block.data.Rotatable;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.command.ConsoleCommandSender;
@@ -270,6 +272,15 @@ public class GraveManager {
         }
     }
 
+    public Integer getMaxGraves(Player player) {
+        Integer graveMax = getPermissionHighestInt(player, "graves.amount.");
+        if (graveMax != null) {
+            return graveMax;
+        } else {
+            return getMaxGraves();
+        }
+    }
+
     public Integer getPermissionHighestInt(Player player, String permission) {
         List<Integer> gravePermissions = new ArrayList<>();
         for (PermissionAttachmentInfo perm : player.getEffectivePermissions()) {
@@ -306,6 +317,14 @@ public class GraveManager {
         Integer graveTime = plugin.getConfig().getInt("settings.graveProtectedTime") * 1000;
         if (graveTime > 0) {
             return graveTime;
+        }
+        return null;
+    }
+
+    public Integer getMaxGraves() {
+        Integer graveMax = plugin.getConfig().getInt("settings.graveMax");
+        if (graveMax > 0) {
+            return graveMax;
         }
         return null;
     }
@@ -412,26 +431,29 @@ public class GraveManager {
     }
 
     public void placeGrave(GraveInventory grave) {
-        Material graveBlock = Material.matchMaterial(plugin.getConfig().getString("settings.graveBlock"));
-        if (graveBlock == null) {
-            graveBlock = Material.CHEST;
+        Material graveMaterial = Material.matchMaterial(plugin.getConfig().getString("settings.graveBlock"));
+        if (graveMaterial == null) {
+            graveMaterial = Material.CHEST;
         }
-        Boolean water = false;
-        if (grave.getLocation().getBlock().getType().equals(Material.WATER) ||
-                grave.getLocation().getBlock().getBlockData() instanceof Waterlogged) {
-            water = true;
-        }
-        grave.getLocation().getBlock().setType(graveBlock);
-        if (!water && grave.getLocation().getBlock().getBlockData() instanceof Waterlogged) {
+        Block graveBlock = grave.getLocation().getBlock();
+        BlockData graveData = graveBlock.getBlockData();
+        graveBlock.setType(graveMaterial);
+        if (graveData instanceof Waterlogged) {
             Waterlogged waterlogged = (Waterlogged) grave.getLocation().getBlock().getBlockData();
             waterlogged.setWaterlogged(false);
             grave.getLocation().getBlock().setBlockData(waterlogged);
         }
+        if (graveData instanceof Levelled) {
+            Levelled leveled = (Levelled) graveData;
+            if (leveled.getLevel() != 0) {
+                grave.setReplace(Material.AIR);
+            }
+        }
         String graveHeadName = plugin.getConfig().getString("settings.graveHeadSkin");
-        if (graveBlock.equals(Material.PLAYER_HEAD)) {
-            if (grave.getLocation().getBlock().getState() instanceof Skull) {
-                Skull skull = (Skull) grave.getLocation().getBlock().getState();
-                Rotatable skullRotate = (Rotatable) grave.getLocation().getBlock().getBlockData();
+        if (graveMaterial.equals(Material.PLAYER_HEAD)) {
+            if (graveBlock.getState() instanceof Skull) {
+                Skull skull = (Skull) graveBlock.getState();
+                Rotatable skullRotate = (Rotatable) graveBlock.getBlockData();
                 BlockFace skullBlockFace;
                 if (grave.getPlayer() != null) {
                     skullBlockFace = getSkullBlockFace(grave.getPlayer().getPlayer());
@@ -1465,9 +1487,9 @@ public class GraveManager {
     }
 
     public Boolean canBuild(Player player, Location location) {
-        BlockPlaceEvent placeEvent = new BlockPlaceEvent(location.getBlock(), location.getBlock().getState(), location.getBlock(), null, player, true, EquipmentSlot.HAND);
+        BlockPlaceEvent placeEvent = new BlockPlaceEvent(location.getBlock(), location.getBlock().getState(), location.getBlock(), new ItemStack(Material.AIR), player, true, EquipmentSlot.HAND);
         plugin.getServer().getPluginManager().callEvent(placeEvent);
-        if (placeEvent.canBuild()) {
+        if (!placeEvent.isCancelled() && placeEvent.canBuild()) {
             return true;
         }
         return false;
