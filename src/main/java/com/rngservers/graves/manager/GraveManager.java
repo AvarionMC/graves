@@ -436,12 +436,12 @@ public class GraveManager {
             graveMaterial = Material.CHEST;
         }
         Block graveBlock = grave.getLocation().getBlock();
-        BlockData graveData = graveBlock.getBlockData();
         graveBlock.setType(graveMaterial);
+        BlockData graveData = graveBlock.getBlockData();
         if (graveData instanceof Waterlogged) {
-            Waterlogged waterlogged = (Waterlogged) grave.getLocation().getBlock().getBlockData();
+            Waterlogged waterlogged = (Waterlogged) graveData;
             waterlogged.setWaterlogged(false);
-            grave.getLocation().getBlock().setBlockData(waterlogged);
+            graveBlock.setBlockData(waterlogged);
         }
         if (graveData instanceof Levelled) {
             Levelled leveled = (Levelled) graveData;
