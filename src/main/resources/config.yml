@@ -179,7 +179,7 @@ settings:
 
   # If a player dies in these blocks a grave will not be created.
   graveIgnoreMessage: "&8[&7Graves&8] &fA grave was not created because you died in &7$block&f!"
-  graveIgnore: # Uncomment com.random.discordmpdbot.lava if you don't want graves being created in com.random.discordmpdbot.lava. You can add more to the list if you want.
+  graveIgnore: # Uncomment LAVA if you don't want graves being created in LAVA You can add more to the list if you want.
     #- LAVA
 
   # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html

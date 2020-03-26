@@ -95,8 +95,8 @@ public class GUIManager {
                     player.sendMessage(guiEmpty);
                 }
             } else {
-                player.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.GOLD + "Graves" + ChatColor.DARK_GRAY + "] "
-                        + ChatColor.GOLD + otherPlayer.getName() + ChatColor.RESET + " does not have any graves!");
+                player.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.GRAY + "Graves" + ChatColor.GRAY + "] "
+                        + ChatColor.GRAY + otherPlayer.getName() + ChatColor.RESET + " does not have any graves!");
             }
             return;
         }

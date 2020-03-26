@@ -436,18 +436,19 @@ public class GraveManager {
             graveMaterial = Material.CHEST;
         }
         Block graveBlock = grave.getLocation().getBlock();
-        graveBlock.setType(graveMaterial);
         BlockData graveData = graveBlock.getBlockData();
-        if (graveData instanceof Waterlogged) {
-            Waterlogged waterlogged = (Waterlogged) graveData;
-            waterlogged.setWaterlogged(false);
-            graveBlock.setBlockData(waterlogged);
-        }
         if (graveData instanceof Levelled) {
             Levelled leveled = (Levelled) graveData;
             if (leveled.getLevel() != 0) {
                 grave.setReplace(Material.AIR);
             }
+        }
+        graveBlock.setType(graveMaterial);
+        graveBlock.getBlockData();
+        if (graveData instanceof Waterlogged) {
+            Waterlogged waterlogged = (Waterlogged) graveData;
+            waterlogged.setWaterlogged(false);
+            graveBlock.setBlockData(waterlogged);
         }
         String graveHeadName = plugin.getConfig().getString("settings.graveHeadSkin");
         if (graveMaterial.equals(Material.PLAYER_HEAD)) {
