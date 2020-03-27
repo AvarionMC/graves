@@ -6,14 +6,14 @@
 
     <groupId>com.rngservers</groupId>
     <artifactId>Graves</artifactId>
-    <version>3.4</version>
+    <version>3.5</version>
     <name>Graves</name>
-    <description>Graves.</description>
+    <description>Full featured lightweight death chest plugin.​</description>
 
     <developers>
         <developer>
             <name>RandomUnknown</name>
-            <url>https://gitlab.com/RandomUnknown</url>
+            <url>https://gitlab.com/8494742733/graves/</url>
         </developer>
     </developers>
 

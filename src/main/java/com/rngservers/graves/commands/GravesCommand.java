@@ -160,7 +160,7 @@ public class GravesCommand implements CommandExecutor {
     }
 
     public void help(CommandSender sender) {
-        String version = "3.4";
+        String version = "3.5";
         String author = "RandomUnknown";
 
         sender.sendMessage(
