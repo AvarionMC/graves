@@ -1,7 +1,6 @@
 package com.rngservers.graves.manager;
 
 import com.rngservers.graves.Graves;
-import com.rngservers.graves.manager.GraveManager;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -11,6 +10,7 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 public class RecipeManager {
     private Graves plugin;
@@ -22,23 +22,22 @@ public class RecipeManager {
     }
 
     public void loadRecipes() {
-        Boolean graveToken = plugin.getConfig().getBoolean("settings.graveToken");
-        Boolean graveTokenRecipeEnabled = plugin.getConfig().getBoolean("settings.graveTokenRecipeEnabled");
-        if (graveToken && graveTokenRecipeEnabled) {
+        if (plugin.getConfig().getBoolean("settings.token") &&
+                plugin.getConfig().getBoolean("settings.tokenRecipeEnabled")) {
             graveTokenRecipe();
         }
     }
 
     public void unloadRecipes() {
-        Material tokenMaterial = Material.matchMaterial(plugin.getConfig().getString("settings.graveTokenItem"));
-        if (tokenMaterial != null) {
+        Material graveTokenMaterial = Material.matchMaterial(Objects.requireNonNull(plugin.getConfig().getString("settings.tokenItem")));
+        if (graveTokenMaterial != null) {
             Iterator<Recipe> recipes = plugin.getServer().recipeIterator();
             while (recipes.hasNext()) {
                 Recipe recipe = recipes.next();
                 if (recipe != null) {
-                    ItemStack item = recipe.getResult();
-                    if (item.hasItemMeta()) {
-                        if (hasRecipeData(item)) {
+                    ItemStack itemStack = recipe.getResult();
+                    if (itemStack.hasItemMeta()) {
+                        if (hasRecipeData(itemStack)) {
                             recipes.remove();
                         }
                     }
@@ -48,8 +47,9 @@ public class RecipeManager {
     }
 
     public void graveTokenRecipe() {
-        Material tokenMaterial = Material.matchMaterial(plugin.getConfig().getString("settings.graveTokenItem"));
-        if (tokenMaterial != null) {
+        Material graveTokenMaterial = Material.matchMaterial(Objects.requireNonNull(plugin.getConfig().getString("settings.tokenItem")));
+
+        if (graveTokenMaterial != null) {
             ItemStack item = graveManager.getGraveToken();
 
             NamespacedKey key = new NamespacedKey(plugin, "grave_token");
@@ -57,8 +57,9 @@ public class RecipeManager {
 
             recipe.shape("ABC", "DEF", "GHI");
 
-            List<String> lines = plugin.getConfig().getStringList("settings.graveTokenRecipe");
+            List<String> lines = plugin.getConfig().getStringList("settings.tokenRecipe");
             Integer recipeKey = 1;
+
             for (String string : lines.get(0).split(" ")) {
                 Material material = Material.matchMaterial(string);
                 if (material != null) {
@@ -66,6 +67,7 @@ public class RecipeManager {
                 }
                 recipeKey++;
             }
+
             for (String string : lines.get(1).split(" ")) {
                 Material material = Material.matchMaterial(string);
                 if (material != null) {
@@ -73,6 +75,7 @@ public class RecipeManager {
                 }
                 recipeKey++;
             }
+
             for (String string : lines.get(2).split(" ")) {
                 Material material = Material.matchMaterial(string);
                 if (material != null) {
@@ -80,13 +83,14 @@ public class RecipeManager {
                 }
                 recipeKey++;
             }
+
             plugin.getServer().addRecipe(recipe);
         }
     }
 
-    public Boolean hasRecipeData(ItemStack item) {
-        NamespacedKey key = new NamespacedKey(plugin, "gravesRecipe");
-        return item.getItemMeta().getPersistentDataContainer().has(key, PersistentDataType.INTEGER);
+    public boolean hasRecipeData(ItemStack item) {
+        return Objects.requireNonNull(item.getItemMeta()).getPersistentDataContainer()
+                .has(new NamespacedKey(plugin, "gravesRecipe"), PersistentDataType.INTEGER);
     }
 
     public char getChar(Integer count) {

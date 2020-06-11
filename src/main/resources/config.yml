@@ -10,107 +10,101 @@ settings:
   # If you uncomment something make sure it is not repeated twice! You can remove or comment out the old option.
   # To disable messages set them to ""
 
+  ##########
+  # Worlds #
+  ##########
   worlds: # What worlds will graves spawn in.
     - world
     - world_nether
     - world_the_end
     - ALL # Enable in all worlds
 
-  #graveTime will be used for players who do not have the permission "graves.time.", It will also be used for entity graves.
-  graveTime: 10800 # (Second) How long death chests should stay alive for, 10800 = 3 hours, 0 lasts forever.
-  #graveBlock: CHEST # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
-  graveBlock: PLAYER_HEAD # If player head.
-  #graveBlock: AIR # Disable the graveBlock feature, if this is disabled you will want holograms or particles enabled so people can still open graves.
-  #graveHeadSkin: "$entity" # If graveHeadSkin is set to "$entity", it will get the skin of the player or entity.
-  graveHeadSkin: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjdjYWI1NmM4MmNiODFiZGI5OTc5YTQ2NGJjOWQzYmEzZTY3MjJiYTEyMmNmNmM1Mjg3MzAxMGEyYjU5YWVmZSJ9fX0="
-  #graveHeadSkin: MHF_Chest # MHF_Chest is a mini chest. You can use $entity, a player username or a texture.
-  graveAirHeight: 1 # If the graveBlock is set to air how high will the hologram be off the ground, 0 is touching the ground.
-  graveTitle: "$entity's Grave" # Grave chest title.
+  ##########
+  # Graves #
+  ##########
+  block: PLAYER_HEAD # Material: PLAYER_HEAD, CHEST, BEACON (AIR to disable)
+  time: 10800 # (Second) How long graves should stay alive for, 10800 = 3 hours, 0 lasts forever.
 
-  graveMax: 18 # The max amount of graves a player can have.
-  graveMaxMessage: "&8[&7Graves&8] &fA grave was not created, you have too many graves!"
+  headSkinType: 1 # 0 = Player/Entity head, 1 = Custom texture, 2 = Player username.
+  headSkin: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjdjYWI1NmM4MmNiODFiZGI5OTc5YTQ2NGJjOWQzYmEzZTY3MjJiYTEyMmNmNmM1Mjg3MzAxMGEyYjU5YWVmZSJ9fX0="
+  #headSkin: "MHF_Chest" # If headSkinType is set to 2.
 
-  graveCreatePvP: true # Create a grave if a player dies to another player.
-  graveCreatePvE: true # Create a grave if a player dies to a mob.
-  graveCreateEnvironmental: true # Create a grave if a player dies to things such as fall damage, lava and suffocation.
+  title: "$entity's Grave"
+  maxGraves: 18 # The max amount of graves a player can have.
+  maxSearch: 15 # The max distance a grave should search for a place to be created.
+  airHeight: 1 # If the block is set to air how high will the hologram be off the ground, 0 is touching the ground.
+  onlyCanBuild: false # Only create graves where the player can build, should work with all protection plugins.
+  timeoutDrop: true # When a grave times out drop everything in it. If false it gets destroyed.
+  ignoreKeepInventory: false # Should the plugin ignore the keep inventory gamerule.
 
-  graveBreak: true # Can graves be broken.
-  graveExplode: true # Can graves be blown up.
+  break: true # Can graves be broken.
+  explode: true # Can graves be blown up.
 
-  # If you want to show the locked state of a grave you can add $protect to the hologram and lore.
-  graveProtected: false # Enable the grave protection feature.
-  graveProtectedMessage: "&8[&7Graves&8] &fThis grave is protected!"
-  graveProtectedSound: BLOCK_CHEST_LOCKED # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
-  graveProtectedKillerOpen: true # Can the killer open the killed players grave, this will bypass graveProtected.
-  graveProtectedProtectedMessage: "&c&lProtected"
-  graveProtectedUnprotectedMessage: "&a&lUnprotected"
-  graveProtectedChange: true # Can the player change if their grave is protected by right clicking it in the graves GUI.
-  graveProtectedChangeSound: ENTITY_DONKEY_CHEST # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
-  graveProtectedTime: 300 # Seconds, 300 = 5 minutes. Set to 0 to always stay locked.
+  createPvP: true # Create a grave if a player dies to another player.
+  createPvE: true # Create a grave if a player dies to a mob.
+  createEnvironmental: true # Create a grave if a player dies to things such as fall damage, lava and suffocation.
 
-  graveOnlyCanBuild: false # Only create graves where the player can build, should work with all protection plugins.
-  buildDeniedMessage: "&8[&7Graves&8] &fA grave was not created because you can't build there!"
-
-  # Grave particle system.
-  graveParticle: false # Disabled by default.
-  #graveParticle: REDSTONE # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
-  graveParticleColor: ORANGE # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Color.html
-  graveParticleCount: 4 # Amount of particles.
-  graveParticleSize: 4 # Size of particles.
-  graveParticleHeight: 0 # Height of the particles.
-
-  graveAutoCleanup: true # Should the server auto clean up graves if they are broken.
-
-  graveFailure: "&8[&7Graves&8] &fA grave was unable to be placed! Item's dropped on ground." # Can't place grave message.
-
-  graveOpenSound: BLOCK_CHEST_OPEN # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
-  graveCloseSound: BLOCK_CHEST_CLOSE # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
-
-  deathMessage: "&8[&7Graves&8] &fYou have a death chest at &7$x&fx, &7$y&fy, &7$z&fz that lasts for &7$time&f!" # Death message.
-
-  graveTimeoutDrop: true # When a grave times out drop everything in it. If false it gets destroyed.
   placeGround: true # If the player dies in the air should the grave find the ground under the player to place it on.
-  placeLavaTop: true # If the player dies in com.random.discordmpdbot.lava should it be placed at the top, this will override placeGround if it can.
+  placeLavaTop: true # If the player dies in lava should it be placed at the top, this will override placeGround if it can.
   placeVoid: true # If the player died in the void, should it place a grave in the air.
 
-  lootMessage: "&8[&7Graves&8] &fGrave looted!"
-  lootSound: ENTITY_DONKEY_CHEST # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
-  lootEffect: MOBSPAWNER_FLAMES # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Effect.html
+  walkOver: false # Should graves be looted if walked over.
 
-  # If expStore is false it will store what Minecraft would normally drop, if you want to fully disable it, set expStore to true and expStorePercent to 0.
-  expStore: true # Should all the players EXP be stored in the grave. If false only the vanilla drop amount will be stored.
-  expStorePercent: 0.8 # How much of the EXP should be stored, 0.8 = 80%, 1 = 100%, 0 = 0%.
-  expLevelRound: true # If using $level should it be rounded to a whole number.
-  expMessage: "&8[&7Graves&8] &fLooted &7$level &flevels from grave!"
-
-  permissionDenied: "&8[&7Graves&8] &fPermission Denied!"
-
-  graveEntities: # Entities that can have graves.
+  entities: # Entities that can have graves.
     - PLAYER
     #- ZOMBIE
     #- ALL
 
-  graveZombieOwner: false # Should a grave spawn a zombie when it is looted by its owner.
-  graveZombieOther: true # Should a grave spawn a zombie if it is looted by another player.
-  graveZombieOnlyBreak: false # Should a zombie only spawn if the player broke the grave not open it.
-  graveZombieExplode: false # Should a grave spawn a zombie if it is blown up, this only works if the grave can be blown up.
-  graveZombieType: ZOMBIE # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/LivingEntity.html
-  graveZombieOwnerHead: true # Will the zombie have the owners head on.
-  graveZombieHealth: 20 # How much health the zombie has.
-  graveZombiePickup: false # Can the zombie pickup dropped items.
-  graveZombieDrops: false # Do grave zombies drop items, this may include the head it is wearing.
-  graveZombieName: "$owner's Zombie"
+  ############
+  # Messages #
+  ############
+  lootMessage: "&8[&7Graves&8] &fGrave looted!"
+  maxGravesMessage: "&8[&7Graves&8] &fA grave was not created, you have too many graves!"
+  buildDeniedMessage: "&8[&7Graves&8] &fA grave was not created because you can't build there!"
+  failureMessage: "&8[&7Graves&8] &fA grave was unable to be placed! Item's dropped on ground."
+  protectMessage: "&8[&7Graves&8] &fThis grave is protected!"
+  deathMessage: "&8[&7Graves&8] &fYou have a death chest at &7$x&fx, &7$y&fy, &7$z&fz that lasts for &7$time&f!"
+  tokenNoTokenMessage: "&8[&7Graves&8] &fA grave was not created because you didn't have a &7$name&f!"
+  teleportMessage: "&8[&7Graves&8] &fYou teleported to your grave for &7$money&f!"
+  teleportTopMessage: "&8[&7Graves&8] &fGrave was in an unsafe location, you have been teleported nearby."
+  teleportFailedMessage: "&8[&7Graves&8] &fTeleport failed! Teleport location is unsafe!"
+  teleportDisabledMessage: "&8[&7Graves&8] &fGrave teleportation is disabled!"
+  expMessage: "&8[&7Graves&8] &fLooted &7$level &flevels from grave!"
+  notEnoughMoneyMessage: "&8[&7Graves&8] &fYou don't have enough money! You need &7$money&f!"
+  ignoreMessage: "&8[&7Graves&8] &fA grave was not created because you died in &7$block&f!"
+  permissionDeniedMessage: "&8[&7Graves&8] &fPermission Denied!"
+  protectProtectedMessage: "&c&lProtected"
+  protectUnprotectedMessage: "&a&lUnprotected"
 
-  hologram: true
-  hologramOpen: true # Will right clicking a hologram open the grave.
-  hologramLines:
-    #- "&7$protect" # Show if a grave protected.
-    - "&7$entity's &fGrave"
-    - "&7$itemCount &fItems &f/ &7$level &fLevels"
-    - "&7$time &fleft"
+  ########
+  # Time #
+  ########
+  timeSecond: "&7$s&fs "
+  timeMinute: "&7$m&fm "
+  timeHour: "&7$h&fh "
+  timeDay: "&7$d&fd "
+  timeInfinite: "&7Infinite"
 
+  ##########
+  # Sounds #
+  ##########
+  openSound: BLOCK_CHEST_OPEN
+  closeSound: BLOCK_CHEST_CLOSE
+  lootSound: ENTITY_DONKEY_CHEST
+  teleportSound: ENTITY_ENDERMAN_TELEPORT
+  protectSound: BLOCK_CHEST_LOCKED
+  protectChangeSound: ENTITY_DONKEY_CHEST
+
+  ###########
+  # Effects #
+  ###########
+  lootEffect: MOBSPAWNER_FLAMES
+
+  #######
+  # GUI #
+  #######
   guiTitle: "$entity's Graves"
-  guiGrave: "&fGrave: &7$x&fx, &7$y&fy, &7$z&fz"
+  guiGrave: "&fGrave: &7$x&fx, &7$y&fy, &7$z&fz, &7$world"
   guiEmpty: "&8[&7Graves&8] &fYou don't have any graves!"
   guiLore:
     #- "&7$protect" # If you are using grave protection you might want to allow the player to see if their grave is protected. And tell them how to change the protection.
@@ -118,72 +112,127 @@ settings:
     - "&7Items: &f$item"
     - "&7Levels: &f$level"
 
-  graveTeleport: false # Can the player teleport to their grave from the Graves GUI.
-  graveTeleportCost: 5 # How much it costs to teleport to a grave, you need Vault for this.
-  graveTeleportMessage: "&8[&7Graves&8] &fYou teleported to your grave for &7$money&f!"
-  graveTeleportUnsafe: false # Should players be allowed to always teleport to a grave even if unsafe.
-  graveTeleportTop: true # If the grave is in a unsafe location, should the player be teleported to the top. If this fails then the fail message will show.
-  graveTeleportTopMessage: "&8[&7Graves&8] &fGrave was in an unsafe location, you have been teleported nearby."
-  graveTeleportFailedMessage: "&8[&7Graves&8] &fTeleport failed! Teleport location is unsafe!"
-  graveTeleportSound: ENTITY_ENDERMAN_TELEPORT # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
-  graveTeleportDisabled: "&8[&7Graves&8] &fGrave teleportation is disabled!"
+  #############
+  # Holograms #
+  #############
+  hologram: true
+  hologramOpen: true # Will right clicking a hologram open the grave.
+  hologramAutoCleanup: true # Should the server auto clean up graves if they are broken.
+  hologramLines:
+    #- "&7$protect" # Show if a grave protected.
+    - "&7$entity's &fGrave"
+    - "&7$itemCount &fItems &f/ &7$level &fLevels"
+    - "&7$time &fleft"
 
-  graveToken: false # Do players need to have grave tokens in their inventory when they die to create a grave.
-  graveTokenItem: SUNFLOWER # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
-  graveTokenName: "&7Grave Token" # Grave token name.
-  graveTokenLore: # Grave token lore.
+  ##############
+  # Protection #
+  ##############
+  protect: false # Enable the grave protection feature.
+  protectTime: 300 # Seconds, 300 = 5 minutes. Set to 0 to always stay locked.
+  protectKillerOpen: true # Can the killer open the killed players grave, this will bypass protect.
+  protectChange: true # Can the player change if their grave is protected by right clicking it in the graves GUI.
+
+  ##############
+  # Experience #
+  ##############
+  # If expStore is false it will store what Minecraft would normally drop, if you want to fully disable it, set expStore to true and expStorePercent to 0.
+  expStore: true # Should all the players EXP be stored in the grave. If false only the vanilla drop amount will be stored.
+  expStorePercent: 0.8 # How much of the EXP should be stored, 0.8 = 80%, 1 = 100%, 0 = 0%.
+  expLevelRound: true # If using $level should it be rounded to a whole number.
+
+  ###########
+  # Zombies #
+  ###########
+  zombieType: ZOMBIE # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/LivingEntity.html
+  zombieName: "$owner's Zombie"
+  zombieOwner: false # Should a grave spawn a zombie when it is looted by its owner.
+  zombieOther: true # Should a grave spawn a zombie if it is looted by another player.
+  zombieOnlyBreak: false # Should a zombie only spawn if the player broke the grave not open it.
+  zombieExplode: false # Should a grave spawn a zombie if it is blown up, this only works if the grave can be blown up.
+  zombieOwnerHead: true # Will the zombie have the owners head on.
+  zombieHealth: 20 # How much health the zombie has.
+  zombiePickup: false # Can the zombie pickup dropped items.
+  zombieDrops: false # Do grave zombies drop items, this may include the head it is wearing.
+
+  #############
+  # Particles #
+  #############
+  particle: false # Enable the particles feature.
+  particleType: REDSTONE # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
+  particleColor: GRAY # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Color.html
+  particleCount: 4 # Amount of particles.
+  particleSize: 4 # Size of particles.
+  particleHeight: 0 # Height of the particles.
+
+  #################
+  # Teleportation #
+  #################
+  teleport: false # Can the player teleport to their grave from the Graves GUI.
+  teleportCost: 500 # How much it costs to teleport to a grave, you need Vault for this.
+  teleportUnsafe: false # Should players be allowed to always teleport to a grave even if unsafe.
+  teleportTop: true # If the grave is in a unsafe location, should the player be teleported to the top. If this fails then the fail message will show.
+  teleportTopNether: false # Should players be teleported to the top of the nether.
+
+  ##########
+  # Tokens #
+  ##########
+  token: false # Do players need to have grave tokens in their inventory when they die to create a grave.
+  tokenItem: SUNFLOWER # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+  tokenName: "&7Grave Token" # Grave token name.
+  tokenRecipeEnabled: true # Can players craft grave tokens.
+  tokenLore: # Grave token lore.
     - "&7Keep this in your inventory and"
     - "&7when you die a grave will be"
     - "&7created!"
-  graveTokenRecipeEnabled: true # Can players craft grave tokens.
-  graveTokenNoTokenMessage: "&8[&7Graves&8] &fA grave was not created because you didn't have a &7$name&f!"
-  graveTokenRecipe: # Grave token recipe, use AIR for an empty square.
+  tokenRecipe: # Grave token recipe, use AIR for an empty square.
     - "GOLD_INGOT GOLD_INGOT GOLD_INGOT"
     - "GOLD_INGOT EMERALD GOLD_INGOT"
     - "GOLD_INGOT GOLD_INGOT GOLD_INGOT"
 
-  notEnoughMoneyMessage: "&8[&7Graves&8] &fYou don't have enough money! You need &7$money&f!"
-
-  timeSecond: "&7$s&fs "
-  timeMinute: "&7$m&fm "
-  timeHour: "&7$h&fh "
-  timeDay: "&7$d&fd "
-  timeInfinite: "&7Infinite"
-
-  ignoreKeepInventory: false # Should the plugin ignore the keep inventory gamerule.
-
-  graveCommandsOnlyPlayers: true # Should grave commands only execute on player graves. If false entity graves will execute commands.
+  ##################
+  # Event Commands #
+  ##################
   # Run commands on grave actions, you can use the following placeholders.
   # $entity, $owner, $x, $y, $z, $time.
-  graveLootCommands:
-    #- "say $entity looted $owner's grave"
-  graveCreateCommands:
-    #- "say $entity died at $xx $yy $zz, grave lasts for $time!"
-  graveOpenCommands:
-    #- "say $entity is looting $owner's grave!"
-  graveBreakCommands:
-    #- "say $entity broke $owner's grave!"
-  graveExplodeCommands:
-    #- "say $entity exploded $owner's grave!"
+  commandsOnlyPlayers: true # Should grave commands only execute on player graves. If false entity graves will execute commands.
+  lootCommands:
+  #- "say $entity looted $owner's grave"
+  createCommands:
+  #- "say $entity died at $xx $yy $zz, grave lasts for $time!"
+  openCommands:
+  #- "say $entity is looting $owner's grave!"
+  breakCommands:
+  #- "say $entity broke $owner's grave!"
+  explodeCommands:
+  #- "say $entity exploded $owner's grave!"
+  teleportCommands:
+  #- "say $entity teleported to $owner's grave!"
 
-  graveItemIgnore: # Items that graves will ignore, these items will be handled normally.
-    #- BEDROCK  # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
-  graveItemIgnoreName: # If an item has this exact name it will be handled normally.
-    #- "&4Admin Sword"
-  graveItemIgnoreLore: # If an item has this exact line of lore it will be handled normally.
-    #- "Soulbound"
-  graveItemIgnoreNameContains: # If an item contains this string in the name it will be handled normally.
-    #- "Super Pickaxe"
-  graveItemIgnoreLoreContains: # If an item contains this string in the lore it will be handled normally.
-    #- "Ignore Lore"
+  #################
+  # Item Ignoring #
+  #################
+  itemIgnore: # Items that graves will ignore, these items will be handled normally.
+  #- BEDROCK  # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+  itemIgnoreName: # If an item has this exact name it will be handled normally.
+  #- "&4Admin Sword"
+  itemIgnoreLore: # If an item has this exact line of lore it will be handled normally.
+  #- "Soulbound"
+  itemIgnoreNameContains: # If an item contains this string in the name it will be handled normally.
+  #- "Super Pickaxe"
+  itemIgnoreLoreContains: # If an item contains this string in the lore it will be handled normally.
+  #- "Ignore Lore"
 
+  ##################
+  # Block Ignoring #
+  ##################
   # If a player dies in these blocks a grave will not be created.
-  graveIgnoreMessage: "&8[&7Graves&8] &fA grave was not created because you died in &7$block&f!"
-  graveIgnore: # Uncomment LAVA if you don't want graves being created in LAVA You can add more to the list if you want.
-    #- LAVA
+  ignore: # Uncomment LAVA if you don't want graves being created in LAVA You can add more to the list if you want.
+  #- LAVA
 
-  # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
-  graveReplace: # What blocks can graves replace.
+  ########################
+  # Grave Replace Blocks #
+  ########################
+  replace: # What blocks can graves replace.
     - TORCH
     - REDSTONE_TORCH
     - WATER
@@ -271,3 +320,4 @@ settings:
     - ANDESITE_SLAB
     - RED_NETHER_BRICK_SLAB
     - POLISHED_ANDESITE_SLAB
+    - NETHER_PORTAL

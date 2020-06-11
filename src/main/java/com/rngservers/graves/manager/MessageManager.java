@@ -7,6 +7,8 @@ import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Objects;
+
 public class MessageManager {
     private Graves plugin;
 
@@ -15,68 +17,76 @@ public class MessageManager {
     }
 
     public void graveLoot(Location location, Player player) {
-        String lootMessage = plugin.getConfig().getString("settings.lootMessage")
+        String lootMessage = Objects.requireNonNull(plugin.getConfig().getString("settings.lootMessage"))
                 .replace("&", "§");
         if (!lootMessage.equals("")) {
             player.sendMessage(lootMessage);
         }
-        String lootSound = plugin.getConfig().getString("settings.lootSound");
+
+        String lootSound = Objects.requireNonNull(plugin.getConfig().getString("settings.lootSound"));
         if (!lootSound.equals("")) {
-            location.getWorld().playSound(location, Sound.valueOf(lootSound.toUpperCase()), 1, 1);
+            Objects.requireNonNull(location.getWorld()).playSound(location, Sound.valueOf(lootSound.toUpperCase()), 1, 1);
         }
-        String lootEffect = plugin.getConfig().getString("settings.lootEffect");
+
+        String lootEffect = Objects.requireNonNull(plugin.getConfig().getString("settings.lootEffect"));
         if (!lootEffect.equals("")) {
-            location.getWorld().playEffect(location, Effect.valueOf(lootEffect), 0);
+            Objects.requireNonNull(location.getWorld()).playEffect(location, Effect.valueOf(lootEffect), 0);
         }
     }
 
     public void graveOpen(Location location) {
-        String graveOpenSound = plugin.getConfig().getString("settings.graveOpenSound");
-        if (!graveOpenSound.equals("")) {
-            location.getWorld().playSound(location,
-                    Sound.valueOf(graveOpenSound.toUpperCase()), 1, 1);
+        String openSound = Objects.requireNonNull(plugin.getConfig().getString("settings.openSound"));
+        if (!openSound.equals("")) {
+            Objects.requireNonNull(location.getWorld()).playSound(location,
+                    Sound.valueOf(openSound.toUpperCase()), 1, 1);
         }
     }
 
     public void graveClose(Location location) {
-        String graveCloseSound = plugin.getConfig().getString("settings.graveCloseSound");
-        if (!graveCloseSound.equals("")) {
-            location.getWorld().playSound(location,
-                    Sound.valueOf(graveCloseSound.toUpperCase()), 1, 1);
+        String closeSound = Objects.requireNonNull(plugin.getConfig().getString("settings.closeSound"));
+        if (!closeSound.equals("")) {
+            Objects.requireNonNull(location.getWorld()).playSound(location,
+                    Sound.valueOf(closeSound.toUpperCase()), 1, 1);
         }
     }
 
-    public void graveMax(Player player) {
-        String graveMaxMessage = plugin.getConfig().getString("settings.graveMaxMessage")
+    public void maxGraves(Player player) {
+        String maxGravesMessage = Objects.requireNonNull(plugin.getConfig()
+                .getString("settings.maxGravesMessage"))
                 .replace("&", "§");
-        if (!graveMaxMessage.equals("")) {
-            player.sendMessage(graveMaxMessage);
+        if (!maxGravesMessage.equals("")) {
+            player.sendMessage(maxGravesMessage);
         }
     }
 
     public void buildDenied(Player player) {
-        String buildDeniedMessage = plugin.getConfig().getString("settings.buildDeniedMessage")
+        String buildDeniedMessage = Objects.requireNonNull(plugin.getConfig()
+                .getString("settings.buildDeniedMessage"))
                 .replace("&", "§");
         if (!buildDeniedMessage.equals("")) {
             player.sendMessage(buildDeniedMessage);
         }
     }
 
-    public void graveProtected(Player player, Location location) {
-        String graveProtectedMessage = plugin.getConfig().getString("settings.graveProtectedMessage")
+    public void graveProtect(Player player, Location location) {
+        String protectMessage = Objects.requireNonNull(plugin.getConfig().getString("settings.protectMessage"))
                 .replace("&", "§");
-        if (!graveProtectedMessage.equals("")) {
-            player.sendMessage(graveProtectedMessage);
+        if (!protectMessage.equals("")) {
+            player.sendMessage(protectMessage);
         }
-        String graveProtectedSound = plugin.getConfig().getString("settings.graveProtectedSound");
-        if (!graveProtectedSound.equals("")) {
-            location.getWorld().playSound(location, Sound.valueOf(graveProtectedSound.toUpperCase()), 1, 1);
+
+        String protectSound = Objects.requireNonNull(plugin.getConfig().getString("settings.protectSound"));
+        if (!protectSound.equals("")) {
+            Objects.requireNonNull(location.getWorld())
+                    .playSound(location, Sound.valueOf(protectSound.toUpperCase()), 1, 1);
         }
     }
 
-    public void graveTokenNoTokenMessage(Player player) {
-        String graveTokenName = plugin.getConfig().getString("settings.graveTokenName").replace("&", "§");
-        String graveTokenNoTokenMessage = plugin.getConfig().getString("settings.graveTokenNoTokenMessage")
+    public void tokenNoTokenMessage(Player player) {
+        String graveTokenName = Objects.requireNonNull(plugin.getConfig().getString("settings.tokenName"))
+                .replace("&", "§");
+        String graveTokenNoTokenMessage = Objects.requireNonNull(plugin.getConfig()
+                .getString("settings.tokenNoTokenMessage"))
                 .replace("$name", graveTokenName).replace("&", "§");
         if (!graveTokenNoTokenMessage.equals("")) {
             player.sendMessage(graveTokenNoTokenMessage);
@@ -84,17 +94,18 @@ public class MessageManager {
     }
 
     public void graveChangeProtect(Location location) {
-        String graveProtectedChangeSound = plugin.getConfig().getString("settings.graveProtectedChangeSound");
-        if (!graveProtectedChangeSound.equals("")) {
-            location.getWorld().playSound(location, Sound.valueOf(graveProtectedChangeSound.toUpperCase()), 1.0F, 1.0F);
+        String protectChangeSound = Objects.requireNonNull(plugin.getConfig().getString("settings.protectChangeSound"));
+        if (!protectChangeSound.equals("")) {
+            Objects.requireNonNull(location.getWorld()).playSound(location,
+                    Sound.valueOf(protectChangeSound.toUpperCase()), 1.0F, 1.0F);
         }
     }
 
     public void permissionDenied(CommandSender sender) {
-        String permissionDenied = plugin.getConfig().getString("settings.permissionDenied")
+        String permissionDeniedMessage = Objects.requireNonNull(plugin.getConfig().getString("settings.permissionDeniedMessage"))
                 .replace("&", "§");
-        if (!permissionDenied.equals("")) {
-            sender.sendMessage(permissionDenied);
+        if (!permissionDeniedMessage.equals("")) {
+            sender.sendMessage(permissionDeniedMessage);
         }
     }
 }

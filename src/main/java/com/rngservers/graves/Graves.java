@@ -1,14 +1,12 @@
 package com.rngservers.graves;
 
 import com.rngservers.graves.commands.GravesCommand;
-import com.rngservers.graves.manager.DataManager;
 import com.rngservers.graves.events.Events;
-import com.rngservers.graves.manager.GraveManager;
-import com.rngservers.graves.manager.MessageManager;
-import com.rngservers.graves.manager.GUIManager;
 import com.rngservers.graves.hooks.VaultHook;
-import com.rngservers.graves.manager.RecipeManager;
+import com.rngservers.graves.manager.*;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Objects;
 
 public final class Graves extends JavaPlugin {
     GraveManager graveManager;
@@ -32,8 +30,10 @@ public final class Graves extends JavaPlugin {
 
         GUIManager guiManager = new GUIManager(this, graveManager, vaultHook);
 
-        this.getCommand("graves").setExecutor(new GravesCommand(this, data, graveManager, guiManager, recipeManager, messageManager));
-        this.getServer().getPluginManager().registerEvents(new Events(this, graveManager, guiManager, messageManager), this);
+        Objects.requireNonNull(getCommand("graves")).
+                setExecutor(new GravesCommand(this, data, graveManager, guiManager, recipeManager, messageManager));
+
+        getServer().getPluginManager().registerEvents(new Events(this, graveManager, guiManager, messageManager), this);
     }
 
     @Override
@@ -41,6 +41,7 @@ public final class Graves extends JavaPlugin {
         graveManager.removeHolograms();
         graveManager.closeGraves();
         graveManager.saveGraves();
+
         recipeManager.unloadRecipes();
     }
 }

@@ -2,7 +2,6 @@ package com.rngservers.graves.manager;
 
 import com.rngservers.graves.Graves;
 import com.rngservers.graves.inventory.GraveInventory;
-import com.rngservers.graves.manager.GraveManager;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -18,13 +17,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class DataManager {
     private Graves plugin;
-    private FileConfiguration data;
+    private FileConfiguration dataConfig;
     private File dataFile;
     private List<Material> graveReplace = new ArrayList<>();
 
@@ -35,155 +35,189 @@ public class DataManager {
     }
 
     public ConcurrentMap<Location, GraveInventory> getSavedGraves() {
-        ConcurrentMap<Location, GraveInventory> graves = new ConcurrentHashMap<>();
-        for (String worlds : data.getKeys(false)) {
-            for (String cords : data.getConfigurationSection(worlds).getKeys(false)) {
-                String[] cord = cords.split("_");
-                int x = Integer.valueOf(cord[0]);
-                int y = Integer.valueOf(cord[1]);
-                int z = Integer.valueOf(cord[2]);
-                World world = plugin.getServer().getWorld(worlds);
-                Location location = new Location(world, x, y, z);
-                List<ItemStack> items = new ArrayList<>();
-                for (String slot : data.getConfigurationSection(worlds + "." + cords + ".items").getKeys(false)) {
-                    ItemStack item = data.getItemStack(worlds + "." + cords + ".items." + slot);
-                    if (item != null) {
-                        items.add(item);
-                    }
-                }
+        ConcurrentMap<Location, GraveInventory> gravesList = new ConcurrentHashMap<>();
 
-                Material replace = Material.matchMaterial(data.getString(worlds + "." + cords + ".replace"));
-                Long time = data.getLong(worlds + "." + cords + ".time");
-                Integer aliveTime = null;
-                if (data.isSet(worlds + "." + cords + ".alive")) {
-                    aliveTime = data.getInt(worlds + "." + cords + ".alive");
+        for (String worlds : dataConfig.getKeys(false)) {
+            for (String cordsString : Objects.requireNonNull(dataConfig.getConfigurationSection(worlds)).getKeys(false)) {
+                World world = plugin.getServer().getWorld(worlds);
+
+                String[] cords = cordsString.split("_");
+
+                int x = Integer.parseInt(cords[0]);
+                int y = Integer.parseInt(cords[1]);
+                int z = Integer.parseInt(cords[2]);
+
+                Location location = new Location(world, x, y, z);
+
+                List<ItemStack> itemList = new ArrayList<>();
+                for (String slot : Objects.requireNonNull(dataConfig.getConfigurationSection(worlds + "." +
+                        cordsString + ".items")).getKeys(false)) {
+                    ItemStack itemStack = dataConfig.getItemStack(worlds + "." + cordsString + ".items." + slot);
+
+                    if (itemStack != null) {
+                        itemList.add(itemStack);
+                    }
                 }
 
                 OfflinePlayer player = null;
                 EntityType entityType = null;
-                String graveTitle = "Grave";
-                if (data.isSet(worlds + "." + cords + ".player")) {
-                    player = plugin.getServer().getOfflinePlayer(UUID.fromString(data.getString(worlds + "." + cords + ".player")));
-                    graveTitle = graveTitle(player);
-                } else if (data.isSet(worlds + "." + cords + ".entity")) {
-                    entityType = EntityType.valueOf(data.getString(worlds + "." + cords + ".entity"));
-                    graveTitle = graveTitle(entityType);
+
+                String title = "Grave";
+
+                if (dataConfig.isSet(worlds + "." + cordsString + ".player")) {
+                    player = plugin.getServer().getOfflinePlayer(UUID
+                            .fromString(Objects.requireNonNull(dataConfig
+                                    .getString(worlds + "." + cordsString + ".player"))));
+                    title = getGraveTitle(player);
+                } else if (dataConfig.isSet(worlds + "." + cordsString + ".entity")) {
+                    entityType = EntityType.valueOf(dataConfig.getString(worlds + "." + cordsString + ".entity"));
+                    title = getGraveTitle(entityType);
                 }
-                GraveInventory grave = createGrave(location, items, graveTitle);
+
+                GraveInventory graveInventory = createGrave(location, itemList, title);
+
                 if (player != null) {
-                    grave.setPlayer(player);
+                    graveInventory.setPlayer(player);
                 }
+
                 if (entityType != null) {
-                    grave.setEntityType(entityType);
+                    graveInventory.setEntityType(entityType);
                 }
-                if (data.isSet(worlds + "." + cords + ".killer")) {
-                    OfflinePlayer killer = plugin.getServer().getOfflinePlayer(UUID.fromString(data.getString(worlds + "." + cords + ".killer")));
-                    grave.setKiller(killer);
-                }
-                grave.setCreatedTime(time);
-                grave.setAliveTime(aliveTime);
 
-                Boolean protect = data.getBoolean(worlds + "." + cords + ".protect");
-                grave.setProtected(protect);
+                if (dataConfig.isSet(worlds + "." + cordsString + ".alive")) {
+                    graveInventory.setAliveTime(dataConfig.getInt(worlds + "." + cordsString + ".alive"));
+                }
 
-                Integer protectTime = data.getInt(worlds + "." + cords + ".protectTime");
-                if (protectTime == 0) {
-                    protectTime = null;
+                if (dataConfig.isSet(worlds + "." + cordsString + ".time")) {
+                    graveInventory.setCreatedTime(dataConfig.getLong(worlds + "." + cordsString + ".time"));
                 }
-                grave.setProtectTime(protectTime);
 
-                if (data.isSet(worlds + "." + cords + ".level")) {
-                    Integer level = data.getInt(worlds + "." + cords + ".level");
-                    grave.setExperience(level);
+                if (dataConfig.isSet(worlds + "." + cordsString + ".protect")) {
+                    graveInventory.setProtected(dataConfig.getBoolean(worlds + "." + cordsString + ".protect"));
                 }
-                grave.setReplace(replace);
-                grave.setPlayer(player);
-                if (location != null && grave != null) {
-                    graves.put(location, grave);
+
+                if (dataConfig.isSet(worlds + "." + cordsString + ".protectTime")) {
+                    graveInventory.setProtectTime(dataConfig.getInt(worlds + "." + cordsString + ".protectTime"));
                 }
-                data.set(worlds + "." + cords, null);
+
+                if (dataConfig.isSet(worlds + "." + cordsString + ".killer")) {
+                    OfflinePlayer killer = plugin.getServer().getOfflinePlayer(UUID.
+                            fromString(Objects.requireNonNull(dataConfig.getString(worlds + "." + cordsString + ".killer"))));
+
+                    graveInventory.setKiller(killer);
+                }
+
+                if (dataConfig.isSet(worlds + "." + cordsString + ".level")) {
+                    graveInventory.setExperience(dataConfig.getInt(worlds + "." + cordsString + ".level"));
+                }
+
+                if (dataConfig.isSet(worlds + "." + cordsString + ".replace")) {
+                    Material replaceMaterial = Material
+                            .matchMaterial(Objects.requireNonNull(dataConfig.getString(worlds + "." +
+                                    cordsString + ".replace")));
+
+                    graveInventory.setReplace(replaceMaterial);
+                }
+
+                gravesList.put(location, graveInventory);
+
+                dataConfig.set(worlds + "." + cordsString, null);
             }
         }
         saveData();
-        dataFile.delete();
-        return graves;
+
+        if (dataFile.delete()) {
+            plugin.getServer().getLogger().info("[Graves] Loaded saved graves!");
+        }
+
+        return gravesList;
     }
 
-    public String graveTitle(OfflinePlayer player) {
-        String graveTitle = plugin.getConfig().getString("settings.graveTitle")
-                .replace("$entity", player.getName()).replace("&", "§");
+    public String getGraveTitle(OfflinePlayer player) {
+        String graveTitle = Objects.requireNonNull(plugin.getConfig().getString("settings.title"))
+                .replace("$entity", Objects.requireNonNull(player.getName()))
+                .replace("&", "§");
         if (graveTitle.equals("")) {
             graveTitle = player.getName() + "'s Grave";
         }
+
         return graveTitle;
     }
 
-    public String graveTitle(EntityType entityType) {
-        String graveTitle = plugin.getConfig().getString("settings.graveTitle")
-                .replace("$entity", GraveManager.formatString(entityType.toString())).replace("&", "§");
+    public String getGraveTitle(EntityType entityType) {
+        String graveTitle = Objects.requireNonNull(plugin.getConfig().getString("settings.title"))
+                .replace("$entity", GraveManager.formatString(entityType.toString()))
+                .replace("&", "§");
         if (graveTitle.equals("")) {
             graveTitle = GraveManager.formatString(entityType.toString()) + "'s Grave";
         }
+
         return graveTitle;
     }
 
-    private GraveInventory createGrave(Location location, List<ItemStack> items, String graveTitle) {
-        Inventory inventory = plugin.getServer().createInventory(null, GraveManager.getInventorySize(items.size()));
-        for (ItemStack item : items) {
-            if (item != null) {
-                inventory.addItem(item);
+    private GraveInventory createGrave(Location location, List<ItemStack> itemList, String graveTitle) {
+        Inventory inventory = plugin.getServer().createInventory(null,
+                GraveManager.getInventorySize(itemList.size()));
+
+        for (ItemStack itemStack : itemList) {
+            if (itemStack != null) {
+                inventory.addItem(itemStack);
             }
         }
-        GraveInventory grave = new GraveInventory(location, inventory, graveTitle);
-        return grave;
+
+        return new GraveInventory(location, inventory, graveTitle);
     }
 
-    public void saveGrave(GraveInventory grave) {
-        if (grave.getItemAmount() == 0) {
+    public void saveGrave(GraveInventory graveInventory) {
+        if (graveInventory.getItemAmount() == 0) {
             return;
         }
-        if (grave != null && grave.getLocation().getWorld() != null && grave.getInventory() != null) {
-            String world = grave.getLocation().getWorld().getName();
-            int x = grave.getLocation().getBlockX();
-            int y = grave.getLocation().getBlockY();
-            int z = grave.getLocation().getBlockZ();
 
-            if (grave.getPlayer() != null) {
-                data.set(world + "." + x + "_" + y + "_" + z + ".player", grave.getPlayer().getUniqueId().toString());
-            } else if (grave.getEntityType() != null) {
-                data.set(world + "." + x + "_" + y + "_" + z + ".entity", grave.getEntityType().toString());
+        if (graveInventory.getLocation().getWorld() != null) {
+            String world = graveInventory.getLocation().getWorld().getName();
+            int x = graveInventory.getLocation().getBlockX();
+            int y = graveInventory.getLocation().getBlockY();
+            int z = graveInventory.getLocation().getBlockZ();
+
+            dataConfig.set(world + "." + x + "_" + y + "_" + z + ".time", graveInventory.getCreatedTime());
+            dataConfig.set(world + "." + x + "_" + y + "_" + z + ".replace", graveInventory.getReplaceMaterial().toString());
+            dataConfig.set(world + "." + x + "_" + y + "_" + z + ".protect", graveInventory.getProtected());
+
+            if (graveInventory.getPlayer() != null) {
+                dataConfig.set(world + "." + x + "_" + y + "_" + z + ".player", graveInventory.getPlayer().getUniqueId().toString());
+            } else if (graveInventory.getEntityType() != null) {
+                dataConfig.set(world + "." + x + "_" + y + "_" + z + ".entity", graveInventory.getEntityType().toString());
             }
-            data.set(world + "." + x + "_" + y + "_" + z + ".time", grave.getCreatedTime());
-            data.set(world + "." + x + "_" + y + "_" + z + ".alive", grave.getAliveTime());
-            data.set(world + "." + x + "_" + y + "_" + z + ".replace", grave.getReplace().toString());
-            if (grave.getKiller() != null) {
-                data.set(world + "." + x + "_" + y + "_" + z + ".killer", grave.getKiller().getUniqueId().toString());
+
+            if (graveInventory.getAliveTime() > 0) {
+                dataConfig.set(world + "." + x + "_" + y + "_" + z + ".alive", graveInventory.getAliveTime());
             }
-            if (grave.getExperience() != null) {
-                data.set(world + "." + x + "_" + y + "_" + z + ".level", grave.getExperience());
+
+            if (graveInventory.getKiller() != null) {
+                dataConfig.set(world + "." + x + "_" + y + "_" + z + ".killer", graveInventory.getKiller().getUniqueId().toString());
             }
-            if (grave.getProtected() != null) {
-                data.set(world + "." + x + "_" + y + "_" + z + ".protect", grave.getProtected());
+
+            if (graveInventory.getExperience() > 0) {
+                dataConfig.set(world + "." + x + "_" + y + "_" + z + ".level", graveInventory.getExperience());
             }
-            if (grave.getProtectTime() != null) {
-                data.set(world + "." + x + "_" + y + "_" + z + ".protectTime", grave.getProtectTime());
-            } else {
-                data.set(world + "." + x + "_" + y + "_" + z + ".protectTime", 0);
-            }
-            int counter = 0;
-            for (ItemStack item : grave.getInventory()) {
-                if (item != null) {
-                    data.set(world + "." + x + "_" + y + "_" + z + ".items." + counter, item);
-                    counter++;
+
+            dataConfig.set(world + "." + x + "_" + y + "_" + z + ".protectTime", Math.max(graveInventory.getProtectTime(), 0));
+
+            int count = 0;
+            for (ItemStack itemStack : graveInventory.getInventory()) {
+                if (itemStack != null) {
+                    dataConfig.set(world + "." + x + "_" + y + "_" + z + ".items." + count, itemStack);
+                    count++;
                 }
             }
+
             saveData();
         }
     }
 
     public void saveData() {
         try {
-            data.save(dataFile);
+            dataConfig.save(dataFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -192,17 +226,18 @@ public class DataManager {
     public void createDataFile() {
         dataFile = new File(plugin.getDataFolder(), "graves.yml");
         if (!dataFile.exists()) {
-            dataFile.getParentFile().mkdirs();
             try {
-                dataFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
+                if (dataFile.createNewFile()) {
+                    plugin.getLogger().info("Loaded data file!");
+                }
+            } catch (IOException exception) {
+                exception.printStackTrace();
             }
         }
 
-        data = new YamlConfiguration();
+        dataConfig = new YamlConfiguration();
         try {
-            data.load(dataFile);
+            dataConfig.load(dataFile);
         } catch (IOException | InvalidConfigurationException e) {
             e.printStackTrace();
         }
@@ -210,10 +245,12 @@ public class DataManager {
 
     public void graveReplaceLoad() {
         graveReplace.clear();
-        for (String line : plugin.getConfig().getStringList("settings.graveReplace")) {
-            Material material = Material.matchMaterial(line.toUpperCase());
-            if (material != null) {
-                graveReplace.add(material);
+
+        for (String line : plugin.getConfig().getStringList("settings.replace")) {
+            Material replaceMaterial = Material.matchMaterial(line.toUpperCase());
+
+            if (replaceMaterial != null) {
+                graveReplace.add(replaceMaterial);
             }
         }
     }
@@ -222,6 +259,7 @@ public class DataManager {
         if (graveReplace.isEmpty()) {
             graveReplaceLoad();
         }
+
         return graveReplace;
     }
 }

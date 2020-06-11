@@ -1,11 +1,7 @@
 package com.rngservers.graves.commands;
 
 import com.rngservers.graves.Graves;
-import com.rngservers.graves.manager.DataManager;
-import com.rngservers.graves.manager.GraveManager;
-import com.rngservers.graves.manager.MessageManager;
-import com.rngservers.graves.manager.GUIManager;
-import com.rngservers.graves.manager.RecipeManager;
+import com.rngservers.graves.manager.*;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -60,9 +56,8 @@ public class GravesCommand implements CommandExecutor {
                 if (args.length == 2) {
                     if (player.hasPermission("graves.gui.other")) {
                         OfflinePlayer otherPlayer = plugin.getServer().getOfflinePlayer(args[1]);
-                        if (otherPlayer != null) {
-                            guiManager.openGraveGUI(player, otherPlayer);
-                        }
+
+                        guiManager.openGraveGUI(player, otherPlayer);
                     } else {
                         messageManager.permissionDenied(sender);
                     }
@@ -81,13 +76,12 @@ public class GravesCommand implements CommandExecutor {
                 messageManager.permissionDenied(sender);
                 return true;
             }
-            Integer count = graveManager.cleanupHolograms();
             sender.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.GRAY + "Graves" + ChatColor.DARK_GRAY + "]"
-                    + ChatColor.RESET + " Removed " + ChatColor.GRAY + count.toString() + ChatColor.WHITE + " holograms!");
+                    + ChatColor.RESET + " Removed " + ChatColor.GRAY + graveManager.cleanupHolograms() +
+                    ChatColor.WHITE + " holograms!");
         }
         if (args[0].equals("givetoken")) {
-            Boolean graveToken = plugin.getConfig().getBoolean("settings.graveToken");
-            if (!graveToken) {
+            if (!plugin.getConfig().getBoolean("settings.token")) {
                 return true;
             }
             if (!sender.hasPermission("graves.givetoken")) {
@@ -121,14 +115,14 @@ public class GravesCommand implements CommandExecutor {
                 Player player = plugin.getServer().getPlayer(args[1]);
                 if (player != null) {
                     try {
-                        Integer amount = Integer.parseInt(args[2]);
-                        Integer count = 0;
+                        int amount = Integer.parseInt(args[2]);
+                        int count = 0;
                         while (count < amount) {
                             player.getInventory().addItem(item);
                             count++;
                         }
-                        sender.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.GRAY + "Graves" + ChatColor.DARK_GRAY + "]"
-                                + ChatColor.RESET + " Gave " + player.getName() + " token!");
+                        sender.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.GRAY + "Graves" +
+                                ChatColor.DARK_GRAY + "]" + ChatColor.RESET + " Gave " + player.getName() + " token!");
                     } catch (NumberFormatException ignored) {
                     }
                 } else {
@@ -160,7 +154,7 @@ public class GravesCommand implements CommandExecutor {
     }
 
     public void help(CommandSender sender) {
-        String version = "3.5";
+        String version = "3.6";
         String author = "RandomUnknown";
 
         sender.sendMessage(
@@ -172,17 +166,18 @@ public class GravesCommand implements CommandExecutor {
         if (sender.hasPermission("graves.gui")) {
             if (sender.hasPermission("graves.gui.other")) {
                 sender.sendMessage(
-                        ChatColor.GRAY + "/graves list {player} " + ChatColor.DARK_GRAY + "-" + ChatColor.RESET + " View player graves");
+                        ChatColor.GRAY + "/graves list {player} " + ChatColor.DARK_GRAY + "-" + ChatColor.RESET +
+                                " View player graves");
             } else {
                 sender.sendMessage(
-                        ChatColor.GRAY + "/graves list " + ChatColor.DARK_GRAY + "-" + ChatColor.RESET + " Player graves");
+                        ChatColor.GRAY + "/graves list " + ChatColor.DARK_GRAY + "-" + ChatColor.RESET +
+                                " Player graves");
             }
         }
         if (sender.hasPermission("graves.givetoken")) {
-            Boolean graveToken = plugin.getConfig().getBoolean("settings.graveToken");
-            if (graveToken) {
-                sender.sendMessage(ChatColor.GRAY + "/graves givetoken {player} {amount} " + ChatColor.DARK_GRAY + "-" + ChatColor.RESET
-                        + " Give grave token");
+            if (plugin.getConfig().getBoolean("settings.token")) {
+                sender.sendMessage(ChatColor.GRAY + "/graves givetoken {player} {amount} " + ChatColor.DARK_GRAY + "-"
+                        + ChatColor.RESET + " Give grave token");
             }
         }
         if (sender.hasPermission("graves.cleanup")) {

@@ -16,20 +16,21 @@ import java.util.concurrent.ConcurrentMap;
 public class GraveInventory implements InventoryHolder {
     private Location location;
     private Inventory inventory;
-    private Integer experience;
     private Material replace;
     private EntityType entity;
     private OfflinePlayer player;
     private OfflinePlayer killer;
-    private Long createdTime;
-    private Integer aliveTime;
-    private Boolean protect;
-    private Integer protectTime;
     private ConcurrentMap<UUID, Integer> holograms = new ConcurrentHashMap<>();
+    private long createdTime;
+    private int aliveTime;
+    private int protectTime;
+    private int experience;
+    private boolean protect;
 
     public GraveInventory(Location location, Inventory itemInventory, String title) {
         this.location = location;
         this.createdTime = System.currentTimeMillis();
+
         inventory = Bukkit.getServer().createInventory(this, itemInventory.getSize(), title);
         inventory.setContents(itemInventory.getContents());
     }
@@ -38,15 +39,12 @@ public class GraveInventory implements InventoryHolder {
         return this.location;
     }
 
+    @Override
     public Inventory getInventory() {
         return this.inventory;
     }
 
-    public Integer getExperience() {
-        return this.experience;
-    }
-
-    public Material getReplace() {
+    public Material getReplaceMaterial() {
         return this.replace;
     }
 
@@ -62,31 +60,39 @@ public class GraveInventory implements InventoryHolder {
         return this.killer;
     }
 
-    public Long getCreatedTime() {
+    public ConcurrentMap<UUID, Integer> getHolograms() {
+        return this.holograms;
+    }
+
+    public long getCreatedTime() {
         return this.createdTime;
     }
 
-    public Boolean getProtected() {
-        return this.protect;
+    public int getAliveTime() {
+        return this.aliveTime;
     }
 
-    public Integer getProtectTime() {
+    public int getProtectTime() {
         return this.protectTime;
     }
 
-    public void setProtected(Boolean protect) {
+    public int getExperience() {
+        return this.experience;
+    }
+
+    public boolean getProtected() {
+        return this.protect;
+    }
+
+    public void setProtected(boolean protect) {
         this.protect = protect;
     }
 
-    public void setCreatedTime(Long createdTime) {
+    public void setCreatedTime(long createdTime) {
         this.createdTime = createdTime;
     }
 
-    public Integer getItemAmount() {
-        return GraveManager.getItemAmount(this.inventory);
-    }
-
-    public void setExperience(Integer experience) {
+    public void setExperience(int experience) {
         this.experience = experience;
     }
 
@@ -106,23 +112,19 @@ public class GraveInventory implements InventoryHolder {
         this.killer = killer;
     }
 
-    public void setProtectTime(Integer protectTime) {
+    public void setProtectTime(int protectTime) {
         this.protectTime = protectTime;
     }
 
-    public Integer getAliveTime() {
-        return this.aliveTime;
-    }
-
-    public void setAliveTime(Integer aliveTime) {
+    public void setAliveTime(int aliveTime) {
         this.aliveTime = aliveTime;
     }
 
-    public void addHologram(UUID uuid, Integer lineNumber) {
+    public void addHologram(UUID uuid, int lineNumber) {
         this.holograms.put(uuid, lineNumber);
     }
 
-    public ConcurrentMap<UUID, Integer> getHolograms() {
-        return this.holograms;
+    public int getItemAmount() {
+        return GraveManager.getItemAmount(this.inventory);
     }
 }

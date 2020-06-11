@@ -11,7 +11,7 @@
 
 <ul>
 	<li>Extremely customizable</li>
-	<li>Open Source and Free</li>
+	<li>Free and Open-source</li>
 	<li>Change virtually everything</li>
 	<li>Holograms</li>
 	<li>Protection (Protect a Set Amount of Time)</li>

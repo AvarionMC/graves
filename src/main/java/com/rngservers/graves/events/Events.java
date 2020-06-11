@@ -2,14 +2,16 @@ package com.rngservers.graves.events;
 
 import com.rngservers.graves.Graves;
 import com.rngservers.graves.inventory.GraveInventory;
-import com.rngservers.graves.manager.GraveManager;
 import com.rngservers.graves.inventory.GraveListInventory;
-import com.rngservers.graves.manager.MessageManager;
 import com.rngservers.graves.manager.GUIManager;
+import com.rngservers.graves.manager.GraveManager;
+import com.rngservers.graves.manager.MessageManager;
 import org.bukkit.GameRule;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -19,16 +21,20 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.inventory.*;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 public class Events implements Listener {
     private Graves plugin;
@@ -45,86 +51,94 @@ public class Events implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerDeath(PlayerDeathEvent event) {
-        if (!event.getEntity().hasPermission("graves.place")) {
+        Player player = event.getEntity();
+
+        if (!player.hasPermission("graves.place")) {
             return;
         }
+
         List<String> worlds = plugin.getConfig().getStringList("settings.worlds");
-        if (!worlds.contains(event.getEntity().getLocation().getWorld().getName()) && !worlds.contains("ALL")) {
+        if (!worlds.contains(Objects.requireNonNull(player.getLocation().getWorld()).getName()) && !worlds.contains("ALL")) {
             return;
         }
-        if (!plugin.getConfig().getBoolean("settings.ignoreKeepInventory")) {
-            if (event.getEntity().getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY)) {
-                return;
-            }
+
+        if (!plugin.getConfig().getBoolean("settings.ignoreKeepInventory") &&
+                Objects.requireNonNull(player.getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY))) {
+            return;
         }
-        if (event.getEntity().getLastDamageCause() != null && event.getEntity().getLastDamageCause().getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) {
-            if (event.getEntity() != null && event.getEntity().getKiller() instanceof Player) {
-                Boolean graveCreatePvP = plugin.getConfig().getBoolean("settings.graveCreatePvP");
-                if (!graveCreatePvP) {
+
+        if (player.getLastDamageCause() != null && player.getLastDamageCause().getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) {
+            if (player.getKiller() != null) {
+                if (!plugin.getConfig().getBoolean("settings.createPvP")) {
                     return;
                 }
             } else {
-                Boolean graveCreatePvE = plugin.getConfig().getBoolean("settings.graveCreatePvE");
-                if (!graveCreatePvE) {
+                if (!plugin.getConfig().getBoolean("settings.createPvE")) {
                     return;
                 }
             }
         } else {
-            Boolean graveCreateEnvironmental = plugin.getConfig().getBoolean("settings.graveCreateEnvironmental");
-            if (!graveCreateEnvironmental) {
+            if (!plugin.getConfig().getBoolean("settings.createEnvironmental")) {
                 return;
             }
         }
-        Integer graveMax = graveManager.getMaxGraves(event.getEntity());
-        if (graveMax > 0) {
-            if (graveManager.getGraves(event.getEntity()).size() >= graveMax) {
-                messageManager.graveMax(event.getEntity());
-                return;
-            }
+
+        int maxGraves = graveManager.getMaxGraves(player);
+
+        if (maxGraves > 0 && graveManager.getPlayerGraves(player.getUniqueId()).size() >= maxGraves) {
+            messageManager.maxGraves(player);
+            return;
         }
-        List<ItemStack> resetDrops = new ArrayList<>(event.getDrops());
-        Boolean graveToken = plugin.getConfig().getBoolean("settings.graveToken");
-        if (graveToken) {
-            ItemStack token = graveManager.getGraveTokenFromPlayer(event.getEntity());
-            if (token != null) {
-                token.setAmount(token.getAmount() - 1);
+
+        List<ItemStack> eventDrops = new ArrayList<>(event.getDrops());
+
+        if (plugin.getConfig().getBoolean("settings.token")) {
+            ItemStack graveToken = graveManager.getGraveTokenFromPlayer(player);
+            if (graveToken != null) {
+                graveToken.setAmount(graveToken.getAmount() - 1);
             } else {
-                messageManager.graveTokenNoTokenMessage(event.getEntity());
+                messageManager.tokenNoTokenMessage(player);
                 return;
             }
         }
+
         List<ItemStack> newDrops = new ArrayList<>(event.getDrops());
-        event.getDrops().clear();
         Iterator<ItemStack> iterator = newDrops.iterator();
+
+        event.getDrops().clear();
+
         while (iterator.hasNext()) {
             ItemStack itemStack = iterator.next();
+
             if (graveManager.shouldIgnore(itemStack)) {
                 iterator.remove();
                 event.getDrops().add(itemStack);
             }
         }
-        List<String> graveEntities = plugin.getConfig().getStringList("settings.graveEntities");
-        if (graveEntities.contains(event.getEntity().getType().toString()) || graveEntities.contains("ALL")) {
+
+        List<String> entities = plugin.getConfig().getStringList("settings.entities");
+        if (entities.contains(event.getEntity().getType().toString()) || entities.contains("ALL")) {
             if (newDrops.size() > 0) {
-                GraveInventory grave = graveManager.createGrave(event.getEntity(), newDrops);
-                if (grave != null) {
+                GraveInventory graveInventory = graveManager.createGrave(event.getEntity(), newDrops);
+                if (graveInventory != null) {
                     if (event.getEntity().hasPermission("graves.experience")) {
-                        Boolean expStore = plugin.getConfig().getBoolean("settings.expStore");
-                        if (expStore) {
-                            Integer playerExp = graveManager.getPlayerDropExp(event.getEntity());
-                            if (playerExp != null) {
-                                grave.setExperience(playerExp);
+                        if (plugin.getConfig().getBoolean("settings.expStore")) {
+                            int playerExp = graveManager.getPlayerDropExp(event.getEntity());
+                            if (playerExp > 0) {
+                                graveInventory.setExperience(playerExp);
                             }
                         } else {
-                            grave.setExperience(event.getDroppedExp());
+                            graveInventory.setExperience(event.getDroppedExp());
                         }
+
                         event.setDroppedExp(0);
                         event.setKeepLevel(false);
                     }
-                    graveManager.runCreateCommands(grave, event.getEntity());
+
+                    graveManager.runCreateCommands(graveInventory, event.getEntity());
                 } else {
                     event.getDrops().clear();
-                    event.getDrops().addAll(resetDrops);
+                    event.getDrops().addAll(eventDrops);
                 }
             }
         }
@@ -132,25 +146,31 @@ public class Events implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onEntityDeath(EntityDeathEvent event) {
-        if (event.getEntity() instanceof Player) {
+        LivingEntity livingEntity = event.getEntity();
+
+        if (livingEntity instanceof Player) {
             return;
         }
-        Boolean graveZombieDrops = plugin.getConfig().getBoolean("settings.graveZombieDrops");
-        if (!graveZombieDrops) {
-            if (graveManager.isGraveZombie(event.getEntity())) {
-                event.getDrops().clear();
-                event.setDroppedExp(0);
-                return;
-            }
+
+        if (!plugin.getConfig().getBoolean("settings.zombieDrops") &&
+                graveManager.isGraveZombie(livingEntity)) {
+            event.getDrops().clear();
+            event.setDroppedExp(0);
+            return;
         }
-        List<ItemStack> resetDrops = new ArrayList<>(event.getDrops());
-        List<String> graveEntities = plugin.getConfig().getStringList("settings.graveEntities");
+
         List<String> worlds = plugin.getConfig().getStringList("settings.worlds");
-        if (worlds.contains(event.getEntity().getLocation().getWorld().getName()) || worlds.contains("ALL")) {
-            if (graveEntities.contains(event.getEntity().getType().toString()) || graveEntities.contains("ALL")) {
+        List<String> entities = plugin.getConfig().getStringList("settings.entities");
+
+        List<ItemStack> eventDrops = new ArrayList<>(event.getDrops());
+
+        if (worlds.contains(livingEntity.getWorld().getName()) || worlds.contains("ALL")) {
+            if (entities.contains(event.getEntity().getType().toString()) || entities.contains("ALL")) {
                 List<ItemStack> newDrops = new ArrayList<>(event.getDrops());
-                event.getDrops().clear();
                 Iterator<ItemStack> iterator = newDrops.iterator();
+
+                event.getDrops().clear();
+
                 while (iterator.hasNext()) {
                     ItemStack itemStack = iterator.next();
                     if (graveManager.shouldIgnore(itemStack)) {
@@ -158,16 +178,19 @@ public class Events implements Listener {
                         event.getDrops().add(itemStack);
                     }
                 }
+
                 if (newDrops.size() > 0) {
-                    GraveInventory grave = graveManager.createGrave(event.getEntity(), newDrops);
-                    if (grave != null) {
-                        grave.setExperience(event.getDroppedExp());
+                    GraveInventory graveInventory = graveManager.createGrave(event.getEntity(), newDrops);
+
+                    if (graveInventory != null) {
+                        graveInventory.setExperience(event.getDroppedExp());
                         event.setDroppedExp(0);
                     } else {
                         event.getDrops().clear();
-                        event.getDrops().addAll(resetDrops);
+                        event.getDrops().addAll(eventDrops);
                     }
-                    graveManager.runCreateCommands(grave, event.getEntity());
+
+                    graveManager.runCreateCommands(graveInventory, event.getEntity());
                 }
             }
         }
@@ -175,88 +198,102 @@ public class Events implements Listener {
 
     @EventHandler
     public void onGraveOpen(PlayerInteractEvent event) {
-        if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK) || !event.getHand().equals(EquipmentSlot.HAND)) {
+        Player player = event.getPlayer();
+
+        if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK) ||
+                (event.getHand() != null && !event.getHand().equals(EquipmentSlot.HAND))) {
             return;
         }
-        if (event.getPlayer().hasPermission("graves.autoloot")) {
+
+        if (player.hasPermission("graves.autoloot")) {
             if (event.getPlayer().isSneaking()) {
                 return;
             }
         }
-        GraveInventory grave = graveManager.getGrave(event.getClickedBlock().getLocation());
-        if (grave != null) {
-            if (!event.getPlayer().hasPermission("graves.open")) {
-                messageManager.permissionDenied(event.getPlayer());
-                event.setCancelled(true);
-                return;
-            }
-            if (graveManager.hasPermission(grave, event.getPlayer())) {
-                event.getPlayer().openInventory(grave.getInventory());
-                messageManager.graveOpen(grave.getLocation());
-                graveManager.runOpenCommands(grave, event.getPlayer());
-            } else {
-                messageManager.graveProtected(event.getPlayer(), event.getClickedBlock().getLocation());
-            }
+
+        GraveInventory graveInventory = graveManager.getGraveInventory(Objects.requireNonNull(event.getClickedBlock()).getLocation());
+
+        if (graveInventory != null) {
             event.setCancelled(true);
+
+            if (event.getPlayer().hasPermission("graves.open")) {
+                if (graveManager.hasPermission(graveInventory, event.getPlayer())) {
+                    player.openInventory(graveInventory.getInventory());
+
+                    graveManager.runOpenCommands(graveInventory, event.getPlayer());
+
+                    messageManager.graveOpen(graveInventory.getLocation());
+                } else {
+                    messageManager.graveProtect(event.getPlayer(), event.getClickedBlock().getLocation());
+                }
+            } else {
+                messageManager.permissionDenied(player);
+            }
         }
     }
 
     @EventHandler
     public void onGraveSneakOpen(PlayerInteractEvent event) {
-        if (!event.getPlayer().hasPermission("graves.autoloot")) {
+        Player player = event.getPlayer();
+
+        if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK) ||
+                !player.hasPermission("graves.autoloot") ||
+                !player.isSneaking()) {
             return;
         }
-        if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-            return;
-        }
-        if (!event.getPlayer().isSneaking()) {
-            return;
-        }
-        GraveInventory grave = graveManager.getGrave(event.getClickedBlock().getLocation());
-        if (grave != null) {
-            if (graveManager.hasPermission(grave, event.getPlayer())) {
-                graveManager.autoLoot(grave, event.getPlayer());
-                messageManager.graveOpen(grave.getLocation());
-                graveManager.runLootCommands(grave, event.getPlayer());
-                if (grave.getItemAmount() <= 0) {
-                    Boolean graveZombieOnlyBreak = plugin.getConfig().getBoolean("settings.graveZombieOnlyBreak");
-                    if (!graveZombieOnlyBreak) {
-                        graveManager.graveSpawnZombie(grave, event.getPlayer());
+
+        GraveInventory graveInventory = graveManager.getGraveInventory(Objects.requireNonNull(event.getClickedBlock()).getLocation());
+
+        if (graveInventory != null) {
+            event.setCancelled(true);
+
+            if (graveManager.hasPermission(graveInventory, player)) {
+                graveManager.autoLoot(graveInventory, player);
+                graveManager.runLootCommands(graveInventory, player);
+
+                messageManager.graveOpen(graveInventory.getLocation());
+
+                if (graveInventory.getItemAmount() <= 0) {
+                    if (!plugin.getConfig().getBoolean("settings.zombieOnlyBreak")) {
+                        graveManager.graveSpawnZombie(graveInventory, player);
                     }
                 }
             } else {
-                messageManager.graveProtected(event.getPlayer(), grave.getLocation());
+                messageManager.graveProtect(player, graveInventory.getLocation());
             }
-            event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onHologramOpen(PlayerInteractAtEntityEvent event) {
-        if (event.getPlayer().hasPermission("graves.autoloot")) {
-            if (event.getPlayer().isSneaking()) {
+        Player player = event.getPlayer();
+
+        if (player.hasPermission("graves.autoloot")) {
+            if (player.isSneaking()) {
                 return;
             }
         }
+
         if (event.getRightClicked().getType().equals(EntityType.ARMOR_STAND)) {
-            Boolean hologramOpen = plugin.getConfig().getBoolean("settings.hologramOpen");
-            if (hologramOpen) {
-                ArmorStand armorStand = (ArmorStand) event.getRightClicked();
-                GraveInventory grave = graveManager.getGraveFromHologram(armorStand);
-                if (grave != null) {
-                    if (!event.getPlayer().hasPermission("graves.open")) {
-                        messageManager.permissionDenied(event.getPlayer());
-                        event.setCancelled(true);
-                        return;
-                    }
-                    if (graveManager.hasPermission(grave, event.getPlayer())) {
-                        event.getPlayer().openInventory(grave.getInventory());
-                        messageManager.graveOpen(grave.getLocation());
-                        graveManager.runOpenCommands(grave, event.getPlayer());
-                    } else {
-                        messageManager.graveProtected(event.getPlayer(), grave.getLocation());
-                    }
+            if (plugin.getConfig().getBoolean("settings.hologramOpen")) {
+                GraveInventory graveInventory = graveManager.getGraveFromHologram((ArmorStand) event.getRightClicked());
+
+                if (graveInventory != null) {
                     event.setCancelled(true);
+
+                    if (player.hasPermission("graves.open")) {
+                        if (graveManager.hasPermission(graveInventory, player)) {
+                            player.openInventory(graveInventory.getInventory());
+
+                            graveManager.runOpenCommands(graveInventory, player);
+
+                            messageManager.graveOpen(graveInventory.getLocation());
+                        } else {
+                            messageManager.graveProtect(player, graveInventory.getLocation());
+                        }
+                    } else {
+                        messageManager.permissionDenied(player);
+                    }
                 }
             }
         }
@@ -264,32 +301,33 @@ public class Events implements Listener {
 
     @EventHandler
     public void onHologramSneakOpen(PlayerInteractAtEntityEvent event) {
-        if (!event.getPlayer().hasPermission("graves.autoloot")) {
+        Player player = event.getPlayer();
+
+        if (!player.hasPermission("graves.autoloot") || !player.isSneaking()) {
             return;
         }
-        if (!event.getPlayer().isSneaking()) {
-            return;
-        }
+
         if (event.getRightClicked().getType().equals(EntityType.ARMOR_STAND)) {
-            Boolean hologramOpen = plugin.getConfig().getBoolean("settings.hologramOpen");
-            if (hologramOpen) {
-                ArmorStand armorStand = (ArmorStand) event.getRightClicked();
-                GraveInventory grave = graveManager.getGraveFromHologram(armorStand);
-                if (grave != null) {
-                    if (graveManager.hasPermission(grave, event.getPlayer())) {
-                        graveManager.autoLoot(grave, event.getPlayer());
-                        messageManager.graveOpen(grave.getLocation());
-                        graveManager.runLootCommands(grave, event.getPlayer());
-                        if (grave.getItemAmount() <= 0) {
-                            Boolean graveZombieOnlyBreak = plugin.getConfig().getBoolean("settings.graveZombieOnlyBreak");
-                            if (!graveZombieOnlyBreak) {
-                                graveManager.graveSpawnZombie(grave, event.getPlayer());
+            if (plugin.getConfig().getBoolean("settings.hologramOpen")) {
+                event.setCancelled(true);
+
+                GraveInventory graveInventory = graveManager.getGraveFromHologram((ArmorStand) event.getRightClicked());
+
+                if (graveInventory != null) {
+                    if (graveManager.hasPermission(graveInventory, player)) {
+                        graveManager.autoLoot(graveInventory, player);
+                        graveManager.runLootCommands(graveInventory, player);
+
+                        messageManager.graveOpen(graveInventory.getLocation());
+
+                        if (graveInventory.getItemAmount() <= 0) {
+                            if (!plugin.getConfig().getBoolean("settings.zombieOnlyBreak")) {
+                                graveManager.graveSpawnZombie(graveInventory, player);
                             }
                         }
                     } else {
-                        messageManager.graveProtected(event.getPlayer(), grave.getLocation());
+                        messageManager.graveProtect(player, graveInventory.getLocation());
                     }
-                    event.setCancelled(true);
                 }
             }
         }
@@ -298,124 +336,32 @@ public class Events implements Listener {
     @EventHandler
     public void onGraveClose(InventoryCloseEvent event) {
         if (event.getInventory().getHolder() instanceof GraveInventory) {
-            GraveInventory grave = (GraveInventory) event.getInventory().getHolder();
-            messageManager.graveClose(grave.getLocation());
-            if (grave.getItemAmount() == 0) {
+            GraveInventory graveInventory = (GraveInventory) event.getInventory().getHolder();
+            messageManager.graveClose(graveInventory.getLocation());
+
+            if (graveInventory.getItemAmount() == 0) {
                 Player player = (Player) event.getPlayer();
-                grave.getInventory().getViewers().remove(player);
-                graveManager.giveExperience(grave, player);
-                graveManager.removeHologram(grave);
-                graveManager.replaceGrave(grave);
-                graveManager.removeGrave(grave);
-                messageManager.graveLoot(grave.getLocation(), player);
-                graveManager.runLootCommands(grave, player);
-                Boolean graveZombieOwner = plugin.getConfig().getBoolean("settings.graveZombieOwner");
-                if (graveZombieOwner) {
-                    if (grave.getPlayer() != null && grave.getPlayer().getUniqueId().equals(event.getPlayer().getUniqueId())) {
-                        graveManager.spawnZombie(grave, event.getPlayer());
+                graveInventory.getInventory().getViewers().remove(player);
+
+                graveManager.giveExperience(graveInventory, player);
+                graveManager.removeHologram(graveInventory);
+                graveManager.replaceGrave(graveInventory);
+                graveManager.removeGrave(graveInventory);
+                graveManager.runLootCommands(graveInventory, player);
+
+                messageManager.graveLoot(graveInventory.getLocation(), player);
+
+                if (plugin.getConfig().getBoolean("settings.zombieOwner")) {
+                    if (graveInventory.getPlayer() != null && graveInventory.getPlayer().getUniqueId().equals(player.getUniqueId())) {
+                        graveManager.spawnZombie(graveInventory, player);
                         return;
                     }
                 }
-                Boolean graveZombieOther = plugin.getConfig().getBoolean("settings.graveZombieOther");
-                if (graveZombieOther) {
-                    if (grave.getPlayer() != null && !grave.getPlayer().getUniqueId().equals(event.getPlayer().getUniqueId())) {
-                        graveManager.spawnZombie(grave, event.getPlayer());
+
+                if (plugin.getConfig().getBoolean("settings.zombieOther")) {
+                    if (graveInventory.getPlayer() != null && !graveInventory.getPlayer().getUniqueId().equals(player.getUniqueId())) {
+                        graveManager.spawnZombie(graveInventory, player);
                     }
-                }
-            }
-        }
-    }
-
-    @EventHandler
-    public void onGraveBreak(BlockBreakEvent event) {
-        GraveInventory grave = graveManager.getGrave(event.getBlock().getLocation());
-        if (grave != null) {
-            if (graveManager.hasPermission(grave, event.getPlayer())) {
-                graveManager.dropGrave(grave);
-                graveManager.dropExperience(grave);
-                graveManager.removeHologram(grave);
-                graveManager.replaceGrave(grave);
-                graveManager.removeGrave(grave);
-                graveManager.runBreakCommands(grave, event.getPlayer());
-                messageManager.graveClose(grave.getLocation());
-                Boolean graveZombieOwner = plugin.getConfig().getBoolean("settings.graveZombieOwner");
-                if (graveZombieOwner) {
-                    if (grave.getPlayer() != null && grave.getPlayer().getUniqueId().equals(event.getPlayer().getUniqueId())) {
-                        graveManager.spawnZombie(grave, event.getPlayer());
-                        return;
-                    }
-                }
-                Boolean graveZombieOther = plugin.getConfig().getBoolean("settings.graveZombieOther");
-                if (graveZombieOther) {
-                    if (grave.getPlayer() != null && !grave.getPlayer().getUniqueId().equals(event.getPlayer().getUniqueId())) {
-                        graveManager.spawnZombie(grave, event.getPlayer());
-                    }
-                }
-            } else {
-                messageManager.graveProtected(event.getPlayer(), event.getBlock().getLocation());
-                event.setCancelled(true);
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onBlockPlace(BlockPlaceEvent event) {
-        GraveInventory grave = graveManager.getGrave(event.getBlock().getLocation());
-        if (grave != null) {
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onBucketEmpty(PlayerBucketEmptyEvent event) {
-        GraveInventory grave = graveManager.getGrave(event.getBlock().getLocation());
-        if (grave != null) {
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onGraveBreakNaturally(BlockFromToEvent event) {
-        GraveInventory grave = graveManager.getGrave(event.getToBlock().getLocation());
-        if (grave != null) {
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPistonExtendGrave(BlockPistonExtendEvent event) {
-        GraveInventory grave = graveManager.getGrave(event.getBlock().getRelative(event.getDirection()).getLocation());
-        if (grave != null) {
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onGraveExplode(EntityExplodeEvent event) {
-        Iterator<Block> iterator = event.blockList().iterator();
-        while (iterator.hasNext()) {
-            Block block = iterator.next();
-            GraveInventory grave = graveManager.getGrave(block.getLocation());
-            if (grave != null) {
-                if ((System.currentTimeMillis() - grave.getCreatedTime()) < 1000) {
-                    iterator.remove();
-                    continue;
-                }
-                Boolean graveExplode = plugin.getConfig().getBoolean("settings.graveExplode");
-                if (graveExplode) {
-                    graveManager.dropGrave(grave);
-                    graveManager.dropExperience(grave);
-                    graveManager.removeHologram(grave);
-                    graveManager.replaceGrave(grave);
-                    graveManager.removeGrave(grave);
-                    graveManager.runExplodeCommands(grave, event.getEntity());
-                    messageManager.graveClose(grave.getLocation());
-                    Boolean graveZombieExplode = plugin.getConfig().getBoolean("settings.graveZombieExplode");
-                    if (graveZombieExplode) {
-                        graveManager.spawnZombie(grave);
-                    }
-                } else {
-                    iterator.remove();
                 }
             }
         }
@@ -423,37 +369,30 @@ public class Events implements Listener {
 
     @EventHandler
     public void onGraveListClick(InventoryClickEvent event) {
-        Player player = (Player) event.getView().getPlayer();
-        if (event.getInventory() != null && event.getInventory().getHolder() instanceof GraveListInventory) {
+        if (event.getInventory().getHolder() instanceof GraveListInventory) {
             event.setCancelled(true);
-        }
-        if (event.getClickedInventory() != null && event.getClickedInventory().getHolder() instanceof GraveListInventory) {
-            event.setCancelled(true);
-            Boolean graveTeleport = plugin.getConfig().getBoolean("settings.graveTeleport");
+
             if (event.getCurrentItem() != null) {
-                Boolean graveProtected = plugin.getConfig().getBoolean("settings.graveProtected");
-                if (graveProtected) {
-                    if (event.getClick().equals(ClickType.RIGHT)) {
-                        Boolean graveProtectedChange = plugin.getConfig().getBoolean("settings.graveProtectedChange");
-                        if (graveProtectedChange) {
-                            GraveInventory grave = graveManager.getGrave(guiManager.getGraveLocation(event.getCurrentItem()));
-                            Long diff = System.currentTimeMillis() - grave.getCreatedTime();
-                            if (grave != null) {
-                                if (grave.getProtected() != null && grave.getProtectTime() == null || diff < grave.getProtectTime()) {
-                                    if (grave.getProtected()) {
-                                        graveManager.protectGrave(grave, false);
-                                    } else {
-                                        graveManager.protectGrave(grave, true);
-                                    }
-                                    graveManager.updateHologram(grave);
-                                    guiManager.openGraveGUI(player, grave.getPlayer());
-                                    return;
-                                }
-                            }
+                Player player = (Player) event.getView().getPlayer();
+
+                if (plugin.getConfig().getBoolean("settings.protect") &&
+                        plugin.getConfig().getBoolean("settings.protectChange") &&
+                        event.getClick().equals(ClickType.RIGHT)) {
+                    GraveInventory graveInventory = graveManager.getGraveInventory(guiManager.getGraveLocation(event.getCurrentItem()));
+                    if (graveInventory != null) {
+                        long createdDiff = System.currentTimeMillis() - graveInventory.getCreatedTime();
+
+                        if ((graveInventory.getProtected() && graveInventory.getProtectTime() < 1) ||
+                                (createdDiff < graveInventory.getProtectTime())) {
+                            graveManager.setGraveProtection(graveInventory, !graveInventory.getProtected());
+                            graveManager.updateHologram(graveInventory);
+
+                            guiManager.openGraveGUI(player, graveInventory.getPlayer());
+                            return;
                         }
                     }
                 }
-                if (graveTeleport) {
+                if (plugin.getConfig().getBoolean("settings.teleport")) {
                     if (player.hasPermission("graves.teleport")) {
                         guiManager.teleportGrave(player, event.getCurrentItem());
                     } else {
@@ -463,14 +402,146 @@ public class Events implements Listener {
                     if (player.hasPermission("graves.bypass")) {
                         guiManager.teleportGrave(player, event.getCurrentItem());
                     } else {
-                        String graveTeleportDisabled = plugin.getConfig().getString("settings.graveTeleportDisabled")
+                        String teleportDisabledMessage = Objects.requireNonNull(plugin.getConfig().getString("settings.teleportDisabledMessage"))
                                 .replace("&", "§");
-                        if (!graveTeleportDisabled.equals("")) {
-                            player.sendMessage(graveTeleportDisabled);
+                        if (!teleportDisabledMessage.equals("")) {
+                            player.sendMessage(teleportDisabledMessage);
                         }
                     }
                 }
             }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onGraveBreak(BlockBreakEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
+        Player player = event.getPlayer();
+        Location location = event.getBlock().getLocation();
+        GraveInventory graveInventory = graveManager.getGraveInventory(location);
+
+        if (graveInventory != null) {
+            if (plugin.getConfig().getBoolean("settings.break")) {
+                if (graveManager.hasPermission(graveInventory, player)) {
+                    graveManager.dropGrave(graveInventory);
+                    graveManager.dropExperience(graveInventory);
+                    graveManager.removeHologram(graveInventory);
+                    graveManager.replaceGrave(graveInventory);
+                    graveManager.removeGrave(graveInventory);
+                    graveManager.runBreakCommands(graveInventory, player);
+
+                    messageManager.graveClose(graveInventory.getLocation());
+
+                    if (plugin.getConfig().getBoolean("settings.zombieOwner")) {
+                        if (graveInventory.getPlayer() != null && graveInventory.getPlayer().getUniqueId().equals(player.getUniqueId())) {
+                            graveManager.spawnZombie(graveInventory, player);
+                            return;
+                        }
+                    }
+
+                    if (plugin.getConfig().getBoolean("settings.zombieOther")) {
+                        if (graveInventory.getPlayer() != null && !graveInventory.getPlayer().getUniqueId().equals(player.getUniqueId())) {
+                            graveManager.spawnZombie(graveInventory, player);
+                        }
+                    }
+                } else {
+                    messageManager.graveProtect(player, location);
+                    event.setCancelled(true);
+                }
+            } else {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onGraveExplode(EntityExplodeEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
+        Iterator<Block> iterator = event.blockList().iterator();
+        while (iterator.hasNext()) {
+            Block block = iterator.next();
+
+            GraveInventory graveInventory = graveManager.getGraveInventory(block.getLocation());
+            if (graveInventory != null) {
+                if ((System.currentTimeMillis() - graveInventory.getCreatedTime()) < 1000) {
+                    iterator.remove();
+                    continue;
+                }
+
+                if (plugin.getConfig().getBoolean("settings.explode")) {
+                    graveManager.dropGrave(graveInventory);
+                    graveManager.dropExperience(graveInventory);
+                    graveManager.removeHologram(graveInventory);
+                    graveManager.replaceGrave(graveInventory);
+                    graveManager.removeGrave(graveInventory);
+                    graveManager.runExplodeCommands(graveInventory, event.getEntity());
+
+                    messageManager.graveClose(graveInventory.getLocation());
+
+                    if (plugin.getConfig().getBoolean("settings.zombieExplode")) {
+                        graveManager.spawnZombie(graveInventory);
+                    }
+                } else {
+                    iterator.remove();
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onBlockPlace(BlockPlaceEvent event) {
+        if (graveManager.getGraveInventory(event.getBlock().getLocation()) != null) {
+            event.setCancelled(true);
+        }
+
+        if (graveManager.hasRecipeData(event.getItemInHand())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerMove(PlayerMoveEvent event) {
+        if (plugin.getConfig().getBoolean("settings.walkOver")) {
+            Player player = event.getPlayer();
+
+            GraveInventory graveInventory = graveManager.getGraveInventory(player.getLocation());
+
+            if (graveInventory == null) {
+                graveInventory = graveManager.getGraveInventory(player.getLocation().clone().subtract(0, 1, 0));
+            }
+
+            if (graveInventory != null) {
+                if (graveManager.hasPermission(graveInventory, player)) {
+                    graveManager.autoLoot(graveInventory, player);
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onBucketEmpty(PlayerBucketEmptyEvent event) {
+        if (graveManager.getGraveInventory(event.getBlock().getLocation()) != null) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onGraveBreakOther(BlockFromToEvent event) {
+        if (graveManager.getGraveInventory(event.getToBlock().getLocation()) != null) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPistonExtend(BlockPistonExtendEvent event) {
+        if (graveManager.getGraveInventory(event.getBlock().getRelative(event.getDirection()).getLocation()) != null) {
+            event.setCancelled(true);
         }
     }
 }
