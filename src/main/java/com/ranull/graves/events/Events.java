@@ -1,11 +1,11 @@
-package com.rngservers.graves.events;
+package com.ranull.graves.events;
 
-import com.rngservers.graves.Graves;
-import com.rngservers.graves.inventory.GraveInventory;
-import com.rngservers.graves.inventory.GraveListInventory;
-import com.rngservers.graves.manager.GUIManager;
-import com.rngservers.graves.manager.GraveManager;
-import com.rngservers.graves.manager.MessageManager;
+import com.ranull.graves.Graves;
+import com.ranull.graves.inventory.GraveInventory;
+import com.ranull.graves.inventory.GraveListInventory;
+import com.ranull.graves.manager.GUIManager;
+import com.ranull.graves.manager.GraveManager;
+import com.ranull.graves.manager.MessageManager;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.block.Block;

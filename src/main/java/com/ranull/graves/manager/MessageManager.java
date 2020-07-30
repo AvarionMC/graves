@@ -1,6 +1,6 @@
-package com.rngservers.graves.manager;
+package com.ranull.graves.manager;
 
-import com.rngservers.graves.Graves;
+import com.ranull.graves.Graves;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Sound;

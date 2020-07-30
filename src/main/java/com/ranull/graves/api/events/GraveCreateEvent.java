@@ -1,6 +1,6 @@
-package com.rngservers.graves.api.events;
+package com.ranull.graves.api.events;
 
-import com.rngservers.graves.inventory.GraveInventory;
+import com.ranull.graves.inventory.GraveInventory;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 

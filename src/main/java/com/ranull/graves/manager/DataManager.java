@@ -1,7 +1,7 @@
-package com.rngservers.graves.manager;
+package com.ranull.graves.manager;
 
-import com.rngservers.graves.Graves;
-import com.rngservers.graves.inventory.GraveInventory;
+import com.ranull.graves.Graves;
+import com.ranull.graves.inventory.GraveInventory;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;

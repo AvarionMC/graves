@@ -1,4 +1,4 @@
-package com.rngservers.graves.hooks;
+package com.ranull.graves.hooks;
 
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -20,7 +20,9 @@ public class VaultHook {
         if (rsp == null) {
             return false;
         }
+
         econ = rsp.getProvider();
+
         return econ != null;
     }
 }

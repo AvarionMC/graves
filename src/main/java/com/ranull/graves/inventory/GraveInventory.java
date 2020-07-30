@@ -1,6 +1,6 @@
-package com.rngservers.graves.inventory;
+package com.ranull.graves.inventory;
 
-import com.rngservers.graves.manager.GraveManager;
+import com.ranull.graves.manager.GraveManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;

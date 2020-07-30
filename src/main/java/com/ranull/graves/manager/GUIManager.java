@@ -1,9 +1,11 @@
-package com.rngservers.graves.manager;
+package com.ranull.graves.manager;
 
-import com.rngservers.graves.Graves;
-import com.rngservers.graves.hooks.VaultHook;
-import com.rngservers.graves.inventory.GraveInventory;
-import com.rngservers.graves.inventory.GraveListInventory;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+import com.ranull.graves.Graves;
+import com.ranull.graves.hooks.VaultHook;
+import com.ranull.graves.inventory.GraveInventory;
+import com.ranull.graves.inventory.GraveListInventory;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -11,6 +13,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -247,10 +250,29 @@ public class GUIManager {
         return itemList;
     }
 
-    @SuppressWarnings("deprecation")
-    public void addSkullItemStackTexture(ItemStack itemStack, String base64) {
-        plugin.getServer().getUnsafe().modifyItemStack(itemStack, "{SkullOwner:{Id:\"" +
-                new UUID(base64.hashCode(), base64.hashCode()) +
-                "\",Properties:{textures:[{Value:\"" + base64 + "\"}]}}}");
+    public static ItemStack addSkullItemStackTexture(ItemStack itemStack, String base64) {
+        if (itemStack.getType() != Material.PLAYER_HEAD) {
+            return itemStack;
+        }
+        
+        SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
+
+        GameProfile profile = new GameProfile(UUID.randomUUID(), null);
+
+        profile.getProperties().put("textures", new Property("textures", base64));
+
+        try {
+            Field profileField = skullMeta.getClass().getDeclaredField("profile");
+
+            profileField.setAccessible(true);
+
+            profileField.set(skullMeta, profile);
+        } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException exception) {
+            exception.printStackTrace();
+        }
+
+        itemStack.setItemMeta(skullMeta);
+
+        return itemStack;
     }
 }

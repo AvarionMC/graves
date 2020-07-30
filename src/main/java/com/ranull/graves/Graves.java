@@ -1,9 +1,9 @@
-package com.rngservers.graves;
+package com.ranull.graves;
 
-import com.rngservers.graves.commands.GravesCommand;
-import com.rngservers.graves.events.Events;
-import com.rngservers.graves.hooks.VaultHook;
-import com.rngservers.graves.manager.*;
+import com.ranull.graves.commands.GravesCommand;
+import com.ranull.graves.events.Events;
+import com.ranull.graves.hooks.VaultHook;
+import com.ranull.graves.manager.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;

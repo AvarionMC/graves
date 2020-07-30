@@ -12,8 +12,8 @@
 
     <developers>
         <developer>
-            <name>RandomUnknown</name>
-            <url>https://gitlab.com/8494742733/graves/</url>
+            <name>Ranull</name>
+            <url>https://gitlab.com/ranull/minecraft/graves</url>
         </developer>
     </developers>
 
@@ -74,7 +74,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.15.2-R0.1-SNAPSHOT</version>
+            <version>1.16.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

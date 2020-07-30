@@ -1,4 +1,4 @@
-package com.rngservers.graves.inventory;
+package com.ranull.graves.inventory;
 
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;

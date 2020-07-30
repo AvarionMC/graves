@@ -1,8 +1,10 @@
-package com.rngservers.graves.manager;
+package com.ranull.graves.manager;
 
-import com.rngservers.graves.Graves;
-import com.rngservers.graves.api.events.GraveCreateEvent;
-import com.rngservers.graves.inventory.GraveInventory;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+import com.ranull.graves.Graves;
+import com.ranull.graves.api.events.GraveCreateEvent;
+import com.ranull.graves.inventory.GraveInventory;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.*;
@@ -25,6 +27,7 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -551,8 +554,9 @@ public class GraveManager {
                 if (headSkinType == 0) {
                     if (graveInventory.getPlayer() != null) {
                         skull.setOwningPlayer(graveInventory.getPlayer());
+                    } else if (graveInventory.getEntityType() != null) {
+                        // TODO Mob Heads
                     }
-                    // TODO Mob Heads
                 } else if (headSkinType == 1) {
                     new BukkitRunnable() {
                         @Override
@@ -1219,6 +1223,7 @@ public class GraveManager {
                 }
             }
         }
+
         return null;
     }
 
@@ -1384,25 +1389,27 @@ public class GraveManager {
     }
 
     public void addSkullBlockTexture(Block block, String base64) {
-        UUID hashAsId = new UUID(base64.hashCode(), base64.hashCode());
-
-        String args = String.format(
-                "%d %d %d %s",
-                block.getX(),
-                block.getY(),
-                block.getZ(),
-                "{Owner:{Id:\"" + hashAsId + "\",Properties:{textures:[{Value:\"" + base64 + "\"}]}}}"
-        );
-
-        if (Objects.requireNonNull(block.getWorld().getGameRuleValue(GameRule.SEND_COMMAND_FEEDBACK))) {
-            block.getWorld().setGameRule(GameRule.SEND_COMMAND_FEEDBACK, false);
-            plugin.getServer().dispatchCommand(plugin.getServer()
-                    .getConsoleSender(), "data merge block " + args);
-            block.getWorld().setGameRule(GameRule.SEND_COMMAND_FEEDBACK, true);
-        } else {
-            plugin.getServer().dispatchCommand(plugin.getServer()
-                    .getConsoleSender(), "data merge block " + args);
+        if (block.getType() != Material.PLAYER_HEAD) {
+            return;
         }
+
+        Skull skull = (Skull) block.getState();
+
+        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
+
+        gameProfile.getProperties().put("textures", new Property("textures",base64));
+
+        try {
+            Field profileField = skull.getClass().getDeclaredField("profile");
+
+            profileField.setAccessible(true);
+
+            profileField.set(skull, gameProfile);
+        } catch (NoSuchFieldException | IllegalAccessException exception) {
+            exception.printStackTrace();
+        }
+
+        skull.update();
     }
 
     public void hologramLinesLoad() {
@@ -1485,7 +1492,7 @@ public class GraveManager {
         command = command.replace("$entity", getEntityName(entity))
                 .replace("$player", getEntityName(entity))
                 .replace("$owner", getOwnerName(graveInventory))
-                .replace("$world", graveInventory.getLocation().getWorld().getName())
+                .replace("$world", Objects.requireNonNull(graveInventory.getLocation().getWorld()).getName())
                 .replace("$x", String.valueOf(graveInventory.getLocation().getBlockX()))
                 .replace("$y", String.valueOf(graveInventory.getLocation().getBlockY()))
                 .replace("$z", String.valueOf(graveInventory.getLocation().getBlockZ()))

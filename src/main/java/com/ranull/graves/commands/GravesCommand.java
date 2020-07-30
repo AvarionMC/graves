@@ -1,7 +1,7 @@
-package com.rngservers.graves.commands;
+package com.ranull.graves.commands;
 
-import com.rngservers.graves.Graves;
-import com.rngservers.graves.manager.*;
+import com.ranull.graves.manager.*;
+import com.ranull.graves.Graves;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -155,7 +155,7 @@ public class GravesCommand implements CommandExecutor {
 
     public void help(CommandSender sender) {
         String version = "3.6";
-        String author = "RandomUnknown";
+        String author = "Ranull";
 
         sender.sendMessage(
                 ChatColor.DARK_GRAY + "» " + ChatColor.GRAY + "Graves " + ChatColor.DARK_GRAY + "v" + version);

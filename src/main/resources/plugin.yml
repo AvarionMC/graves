@@ -1,9 +1,9 @@
 name: ${project.name}
 description: ${project.description}
 version: ${project.version}
-main: com.rngservers.graves.Graves
+main: com.ranull.graves.Graves
 api-version: 1.13
-author: RandomUnknown
+author: Ranull
 softdepend: [Vault]
 
 commands:
