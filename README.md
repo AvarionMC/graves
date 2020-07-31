@@ -1,7 +1,7 @@
 <div align="center">
-	<img src="/images/graves_icon_right.jpg">
+	<img width="80" height="80" src="/images/graves_icon_right.png">
 	<img src="/images/graves_logo.png">
-	<img src="/images/graves_icon_left.jpg">
+	<img width="80" height="80" src="/images/graves_icon_left.png">
 	<br>
 </div>
 
