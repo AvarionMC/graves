@@ -6,6 +6,7 @@ import com.ranull.graves.inventory.GraveListInventory;
 import com.ranull.graves.manager.GUIManager;
 import com.ranull.graves.manager.GraveManager;
 import com.ranull.graves.manager.MessageManager;
+import org.bukkit.GameMode;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -509,6 +510,12 @@ public class Events implements Listener {
     public void onPlayerMove(PlayerMoveEvent event) {
         if (plugin.getConfig().getBoolean("settings.walkOver")) {
             Player player = event.getPlayer();
+
+            // Players in spectator mode should not loot graves
+            // since they are not supposed to interact with the world
+            if(player.getGameMode() == GameMode.SPECTATOR) {
+                return;
+            }
 
             GraveInventory graveInventory = graveManager.getGraveInventory(player.getLocation());
 
