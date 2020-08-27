@@ -99,10 +99,10 @@ public class GUIManager {
         }
     }
 
-    public Location getGraveLocation(ItemStack item) {
+    public Location getGraveLocation(ItemStack itemStack) {
         NamespacedKey key = new NamespacedKey(plugin, "graveLocation");
 
-        String[] cords = Objects.requireNonNull(Objects.requireNonNull(item.getItemMeta()).getPersistentDataContainer()
+        String[] cords = Objects.requireNonNull(Objects.requireNonNull(itemStack.getItemMeta()).getPersistentDataContainer()
                 .get(key, PersistentDataType.STRING)).split("#");
 
         try {

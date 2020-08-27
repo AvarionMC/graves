@@ -19,32 +19,37 @@ public class MessageManager {
     public void graveLoot(Location location, Player player) {
         String lootMessage = Objects.requireNonNull(plugin.getConfig().getString("settings.lootMessage"))
                 .replace("&", "§");
+
         if (!lootMessage.equals("")) {
             player.sendMessage(lootMessage);
         }
 
-        String lootSound = Objects.requireNonNull(plugin.getConfig().getString("settings.lootSound"));
-        if (!lootSound.equals("")) {
+        String lootSound = plugin.getConfig().getString("settings.lootSound");
+
+        if (lootSound != null && !lootSound.equals("")) {
             Objects.requireNonNull(location.getWorld()).playSound(location, Sound.valueOf(lootSound.toUpperCase()), 1, 1);
         }
 
         String lootEffect = Objects.requireNonNull(plugin.getConfig().getString("settings.lootEffect"));
+
         if (!lootEffect.equals("")) {
             Objects.requireNonNull(location.getWorld()).playEffect(location, Effect.valueOf(lootEffect), 0);
         }
     }
 
     public void graveOpen(Location location) {
-        String openSound = Objects.requireNonNull(plugin.getConfig().getString("settings.openSound"));
-        if (!openSound.equals("")) {
+        String openSound = plugin.getConfig().getString("settings.openSound");
+
+        if (openSound != null && !openSound.equals("")) {
             Objects.requireNonNull(location.getWorld()).playSound(location,
                     Sound.valueOf(openSound.toUpperCase()), 1, 1);
         }
     }
 
     public void graveClose(Location location) {
-        String closeSound = Objects.requireNonNull(plugin.getConfig().getString("settings.closeSound"));
-        if (!closeSound.equals("")) {
+        String closeSound = plugin.getConfig().getString("settings.closeSound");
+
+        if (closeSound != null && !closeSound.equals("")) {
             Objects.requireNonNull(location.getWorld()).playSound(location,
                     Sound.valueOf(closeSound.toUpperCase()), 1, 1);
         }
@@ -75,8 +80,8 @@ public class MessageManager {
             player.sendMessage(protectMessage);
         }
 
-        String protectSound = Objects.requireNonNull(plugin.getConfig().getString("settings.protectSound"));
-        if (!protectSound.equals("")) {
+        String protectSound = plugin.getConfig().getString("settings.protectSound");
+        if (protectSound != null && !protectSound.equals("")) {
             Objects.requireNonNull(location.getWorld())
                     .playSound(location, Sound.valueOf(protectSound.toUpperCase()), 1, 1);
         }
@@ -94,8 +99,8 @@ public class MessageManager {
     }
 
     public void graveChangeProtect(Location location) {
-        String protectChangeSound = Objects.requireNonNull(plugin.getConfig().getString("settings.protectChangeSound"));
-        if (!protectChangeSound.equals("")) {
+        String protectChangeSound = plugin.getConfig().getString("settings.protectChangeSound");
+        if (protectChangeSound != null && !protectChangeSound.equals("")) {
             Objects.requireNonNull(location.getWorld()).playSound(location,
                     Sound.valueOf(protectChangeSound.toUpperCase()), 1.0F, 1.0F);
         }

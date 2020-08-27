@@ -6,9 +6,9 @@
 
     <groupId>com.rngservers</groupId>
     <artifactId>Graves</artifactId>
-    <version>3.6</version>
+    <version>3.7</version>
     <name>Graves</name>
-    <description>Full featured lightweight death chest plugin.​</description>
+    <description>Full featured lightweight death chest plugin.</description>
 
     <developers>
         <developer>

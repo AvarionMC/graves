@@ -26,6 +26,7 @@ public class GraveInventory implements InventoryHolder {
     private int protectTime;
     private int experience;
     private boolean protect;
+    private boolean unlink;
 
     public GraveInventory(Location location, Inventory itemInventory, String title) {
         this.location = location;
@@ -126,5 +127,13 @@ public class GraveInventory implements InventoryHolder {
 
     public int getItemAmount() {
         return GraveManager.getItemAmount(this.inventory);
+    }
+
+    public boolean getUnlink() {
+        return unlink;
+    }
+
+    public void setUnlink(boolean unlink) {
+        this.unlink = unlink;
     }
 }

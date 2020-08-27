@@ -154,7 +154,7 @@ public class GravesCommand implements CommandExecutor {
     }
 
     public void help(CommandSender sender) {
-        String version = "3.6";
+        String version = "3.7";
         String author = "Ranull";
 
         sender.sendMessage(

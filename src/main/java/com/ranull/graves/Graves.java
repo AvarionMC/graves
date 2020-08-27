@@ -1,7 +1,7 @@
 package com.ranull.graves;
 
 import com.ranull.graves.commands.GravesCommand;
-import com.ranull.graves.events.Events;
+import com.ranull.graves.listeners.Events;
 import com.ranull.graves.hooks.VaultHook;
 import com.ranull.graves.manager.*;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -10,6 +10,7 @@ import java.util.Objects;
 
 public final class Graves extends JavaPlugin {
     GraveManager graveManager;
+    GUIManager guiManager;
     RecipeManager recipeManager;
 
     @Override
@@ -28,7 +29,7 @@ public final class Graves extends JavaPlugin {
         recipeManager = new RecipeManager(this, graveManager);
         recipeManager.loadRecipes();
 
-        GUIManager guiManager = new GUIManager(this, graveManager, vaultHook);
+        guiManager = new GUIManager(this, graveManager, vaultHook);
 
         Objects.requireNonNull(getCommand("graves")).
                 setExecutor(new GravesCommand(this, data, graveManager, guiManager, recipeManager, messageManager));
@@ -43,5 +44,9 @@ public final class Graves extends JavaPlugin {
         graveManager.saveGraves();
 
         recipeManager.unloadRecipes();
+    }
+
+    public GUIManager getGuiManager() {
+        return guiManager;
     }
 }

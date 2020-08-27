@@ -131,6 +131,7 @@ settings:
   protectTime: 300 # Seconds, 300 = 5 minutes. Set to 0 to always stay locked.
   protectKillerOpen: true # Can the killer open the killed players grave, this will bypass protect.
   protectChange: true # Can the player change if their grave is protected by right clicking it in the graves GUI.
+  protectUnlink: false # Soft unlink a player from their grave after the grave protection runs out. It won't show up in the GUI and they can't teleport to it.
 
   ##############
   # Experience #
@@ -196,38 +197,38 @@ settings:
   # $entity, $owner, $x, $y, $z, $time.
   commandsOnlyPlayers: true # Should grave commands only execute on player graves. If false entity graves will execute commands.
   lootCommands:
-  #- "say $entity looted $owner's grave"
+    #- "say $entity looted $owner's grave"
   createCommands:
-  #- "say $entity died at $xx $yy $zz, grave lasts for $time!"
+    #- "say $entity died at $xx $yy $zz, grave lasts for $time!"
   openCommands:
-  #- "say $entity is looting $owner's grave!"
+    #- "say $entity is looting $owner's grave!"
   breakCommands:
-  #- "say $entity broke $owner's grave!"
+    #- "say $entity broke $owner's grave!"
   explodeCommands:
-  #- "say $entity exploded $owner's grave!"
+    #- "say $entity exploded $owner's grave!"
   teleportCommands:
-  #- "say $entity teleported to $owner's grave!"
+    #- "say $entity teleported to $owner's grave!"
 
   #################
   # Item Ignoring #
   #################
   itemIgnore: # Items that graves will ignore, these items will be handled normally.
-  #- BEDROCK  # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+    #- BEDROCK  # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
   itemIgnoreName: # If an item has this exact name it will be handled normally.
-  #- "&4Admin Sword"
+    #- "&4Admin Sword"
   itemIgnoreLore: # If an item has this exact line of lore it will be handled normally.
-  #- "Soulbound"
+    #- "Soulbound"
   itemIgnoreNameContains: # If an item contains this string in the name it will be handled normally.
-  #- "Super Pickaxe"
+    #- "Super Pickaxe"
   itemIgnoreLoreContains: # If an item contains this string in the lore it will be handled normally.
-  #- "Ignore Lore"
+    #- "Ignore Lore"
 
   ##################
   # Block Ignoring #
   ##################
   # If a player dies in these blocks a grave will not be created.
   ignore: # Uncomment LAVA if you don't want graves being created in LAVA You can add more to the list if you want.
-  #- LAVA
+    #- LAVA
 
   ########################
   # Grave Replace Blocks #

@@ -5,16 +5,14 @@ import com.mojang.authlib.properties.Property;
 import com.ranull.graves.Graves;
 import com.ranull.graves.api.events.GraveCreateEvent;
 import com.ranull.graves.inventory.GraveInventory;
+import com.ranull.graves.inventory.GraveListInventory;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Skull;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.Levelled;
-import org.bukkit.block.data.Rotatable;
-import org.bukkit.block.data.Waterlogged;
+import org.bukkit.block.data.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.server.ServerCommandEvent;
@@ -92,6 +90,25 @@ public class GraveManager {
                         if (graveInventory.getProtectTime() > 0 && graveInventory.getProtected()) {
                             if (System.currentTimeMillis() - graveInventory.getCreatedTime() >= graveInventory.getProtectTime()) {
                                 setGraveProtection(graveInventory, false);
+
+                                if (graveInventory.getPlayer() != null &&
+                                        plugin.getConfig().getBoolean("settings.protectUnlink")) {
+                                    graveInventory.setUnlink(true);
+
+                                    new BukkitRunnable() {
+                                        @Override
+                                        public void run() {
+                                            if (graveInventory.getPlayer().isOnline() &&
+                                                    graveInventory.getPlayer().getPlayer().getOpenInventory().getTopInventory().getHolder() instanceof GraveListInventory) {
+                                                if (getPlayerGraves(graveInventory.getPlayer().getUniqueId()).size() >= 1) {
+                                                    plugin.getGuiManager().openGraveGUI(graveInventory.getPlayer().getPlayer(), graveInventory.getPlayer().getPlayer());
+                                                } else {
+                                                    graveInventory.getPlayer().getPlayer().closeInventory();
+                                                }
+                                            }
+                                        }
+                                    }.runTask(plugin);
+                                }
                             }
                         }
                     }
@@ -156,7 +173,7 @@ public class GraveManager {
         ConcurrentMap<Location, GraveInventory> playerGraves = new ConcurrentHashMap<>();
 
         for (ConcurrentMap.Entry<Location, GraveInventory> entry : gravesMap.entrySet()) {
-            if (entry.getValue().getPlayer().getUniqueId().equals(uuid)) {
+            if (entry.getValue().getPlayer().getUniqueId().equals(uuid) && !entry.getValue().getUnlink()) {
                 playerGraves.put(entry.getKey(), entry.getValue());
             }
         }
@@ -371,6 +388,10 @@ public class GraveManager {
 
         Location location = getPlaceLocation(player.getLocation());
 
+        if (location == null) {
+            return null;
+        }
+
         if (player.getLocation().distance(location) >= plugin.getConfig().getInt("settings.maxSearch")) {
             if (player.getLocation().getY() > 0 && player.getLocation().getY() < 256) {
                 location = player.getLocation();
@@ -522,6 +543,10 @@ public class GraveManager {
             graveInventory.setReplace(Material.AIR);
         }
 
+        if (block.getBlockData() instanceof Openable) {
+            graveInventory.setReplace(Material.AIR);
+        }
+
         block.setType(graveMaterial);
 
         if (blockData instanceof Waterlogged) {
@@ -582,14 +607,18 @@ public class GraveManager {
     public Location getPlaceLocation(Location location) {
         location = roundLocation(location);
 
-        if (plugin.getConfig().getBoolean("settings.placeVoid") &&
-                (location.getY() < 0 || location.getY() > 256)) {
-            Location topLocation = getTop(location);
+        if (location.getY() < 0 || location.getY() > 256) {
+            if (plugin.getConfig().getBoolean("settings.placeVoid")) {
+                Location topLocation = getTop(location);
 
-            if (topLocation != null) {
-                return topLocation;
+                if (topLocation != null) {
+                    return topLocation;
+                }
+
+                return getVoid(location);
+            } else {
+                return null;
             }
-            return getVoid(location);
         }
 
         if (plugin.getConfig().getBoolean("settings.placeLavaTop") &&
@@ -972,12 +1001,13 @@ public class GraveManager {
 
     public boolean isHelmet(ItemStack itemStack) {
         if (itemStack != null) {
-            return itemStack.getType() == Material.DIAMOND_HELMET ||
-                    itemStack.getType() == Material.GOLDEN_HELMET ||
-                    itemStack.getType() == Material.IRON_HELMET ||
-                    itemStack.getType() == Material.LEATHER_HELMET ||
-                    itemStack.getType() == Material.CHAINMAIL_HELMET ||
-                    itemStack.getType() == Material.TURTLE_HELMET;
+            return itemStack.getType().toString().equals("DIAMOND_HELMET") ||
+                    itemStack.getType().toString().equals("GOLDEN_HELMET") ||
+                    itemStack.getType().toString().equals("IRON_HELMET") ||
+                    itemStack.getType().toString().equals("LEATHER_HELMET") ||
+                    itemStack.getType().toString().equals("CHAINMAIL_HELMET") ||
+                    itemStack.getType().toString().equals("TURTLE_HELMET") ||
+                    itemStack.getType().toString().equals("NETHERITE_HELMET");
         }
 
         return false;
@@ -985,11 +1015,12 @@ public class GraveManager {
 
     public boolean isChestplate(ItemStack itemStack) {
         if (itemStack != null) {
-            return itemStack.getType() == Material.DIAMOND_CHESTPLATE ||
-                    itemStack.getType() == Material.GOLDEN_CHESTPLATE ||
-                    itemStack.getType() == Material.IRON_CHESTPLATE ||
-                    itemStack.getType() == Material.LEATHER_CHESTPLATE ||
-                    itemStack.getType() == Material.CHAINMAIL_CHESTPLATE;
+            return itemStack.getType().toString().equals("DIAMOND_CHESTPLATE") ||
+                    itemStack.getType().toString().equals("GOLDEN_CHESTPLATE") ||
+                    itemStack.getType().toString().equals("IRON_CHESTPLATE") ||
+                    itemStack.getType().toString().equals("LEATHER_CHESTPLATE") ||
+                    itemStack.getType().toString().equals("CHAINMAIL_CHESTPLATE") ||
+                    itemStack.getType().toString().equals("NETHERITE_CHESTPLATE");
         }
 
         return false;
@@ -997,11 +1028,12 @@ public class GraveManager {
 
     public boolean isLeggings(ItemStack itemStack) {
         if (itemStack != null) {
-            return itemStack.getType() == Material.DIAMOND_LEGGINGS ||
-                    itemStack.getType() == Material.GOLDEN_LEGGINGS ||
-                    itemStack.getType() == Material.IRON_LEGGINGS ||
-                    itemStack.getType() == Material.LEATHER_LEGGINGS ||
-                    itemStack.getType() == Material.CHAINMAIL_LEGGINGS;
+            return itemStack.getType().toString().equals("DIAMOND_LEGGINGS") ||
+                    itemStack.getType().toString().equals("GOLDEN_LEGGINGS") ||
+                    itemStack.getType().toString().equals("IRON_LEGGINGS") ||
+                    itemStack.getType().toString().equals("LEATHER_LEGGINGS") ||
+                    itemStack.getType().toString().equals("CHAINMAIL_LEGGINGS") ||
+                    itemStack.getType().toString().equals("NETHERITE_LEGGINGS");
         }
 
         return false;
@@ -1009,11 +1041,12 @@ public class GraveManager {
 
     public boolean isBoots(ItemStack itemStack) {
         if (itemStack != null) {
-            return itemStack.getType() == Material.DIAMOND_BOOTS ||
-                    itemStack.getType() == Material.GOLDEN_BOOTS ||
-                    itemStack.getType() == Material.IRON_BOOTS ||
-                    itemStack.getType() == Material.LEATHER_BOOTS ||
-                    itemStack.getType() == Material.CHAINMAIL_BOOTS;
+            return itemStack.getType().toString().equals("DIAMOND_BOOTS") ||
+                    itemStack.getType().toString().equals("GOLDEN_BOOTS") ||
+                    itemStack.getType().toString().equals("IRON_BOOTS") ||
+                    itemStack.getType().toString().equals("LEATHER_BOOTS") ||
+                    itemStack.getType().toString().equals("CHAINMAIL_BOOTS") ||
+                    itemStack.getType().toString().equals("NETHERITE_BOOTS");
         }
 
         return false;
@@ -1128,7 +1161,11 @@ public class GraveManager {
         if (!plugin.getServer().getWorlds().isEmpty()) {
             for (World world : plugin.getServer().getWorlds()) {
                 if (!world.getEntities().isEmpty()) {
-                    for (Entity entity : world.getEntities()) {
+                    Iterator<Entity> iterator = world.getEntities().iterator();
+
+                    while (iterator.hasNext()) {
+                        Entity entity = iterator.next();
+
                         if (entity instanceof ArmorStand) {
                             ArmorStand armorStand = (ArmorStand) entity;
                             GraveInventory graveInventory = getGraveFromHologram(armorStand);
@@ -1136,7 +1173,7 @@ public class GraveManager {
                             if (graveInventory == null) {
                                 for (String tag : armorStand.getScoreboardTags()) {
                                     if (tag.contains("graveHologram")) {
-                                        armorStand.remove();
+                                        iterator.remove();
                                     }
                                 }
                             }
@@ -1300,7 +1337,7 @@ public class GraveManager {
     public void graveIgnoreLoad() {
         graveIgnore.clear();
 
-        for (String line : plugin.getConfig().getStringList("settings.graveIgnore")) {
+        for (String line : plugin.getConfig().getStringList("settings.ignore")) {
             Material material = Material.matchMaterial(line.toUpperCase());
             if (material != null) {
                 graveIgnore.add(material);

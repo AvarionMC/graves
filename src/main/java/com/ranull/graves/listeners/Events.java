@@ -1,4 +1,4 @@
-package com.ranull.graves.events;
+package com.ranull.graves.listeners;
 
 import com.ranull.graves.Graves;
 import com.ranull.graves.inventory.GraveInventory;
@@ -202,6 +202,7 @@ public class Events implements Listener {
         Player player = event.getPlayer();
 
         if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK) ||
+                player.getGameMode() == GameMode.SPECTATOR ||
                 (event.getHand() != null && !event.getHand().equals(EquipmentSlot.HAND))) {
             return;
         }
@@ -238,6 +239,7 @@ public class Events implements Listener {
         Player player = event.getPlayer();
 
         if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK) ||
+                player.getGameMode() == GameMode.SPECTATOR ||
                 !player.hasPermission("graves.autoloot") ||
                 !player.isSneaking()) {
             return;
@@ -268,6 +270,10 @@ public class Events implements Listener {
     @EventHandler
     public void onHologramOpen(PlayerInteractAtEntityEvent event) {
         Player player = event.getPlayer();
+
+        if (player.getGameMode() == GameMode.SPECTATOR) {
+            return;
+        }
 
         if (player.hasPermission("graves.autoloot")) {
             if (player.isSneaking()) {
@@ -303,6 +309,10 @@ public class Events implements Listener {
     @EventHandler
     public void onHologramSneakOpen(PlayerInteractAtEntityEvent event) {
         Player player = event.getPlayer();
+
+        if (player.getGameMode() == GameMode.SPECTATOR) {
+            return;
+        }
 
         if (!player.hasPermission("graves.autoloot") || !player.isSneaking()) {
             return;
@@ -496,7 +506,6 @@ public class Events implements Listener {
         }
     }
 
-    // BlockExplodeEvent is called when beds explode in the nether/end
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onGraveExplodeByBlock(BlockExplodeEvent event) {
         if (event.isCancelled()) {
@@ -550,9 +559,7 @@ public class Events implements Listener {
         if (plugin.getConfig().getBoolean("settings.walkOver")) {
             Player player = event.getPlayer();
 
-            // Players in spectator mode should not loot graves
-            // since they are not supposed to interact with the world
-            if(player.getGameMode() == GameMode.SPECTATOR) {
+            if (!player.hasPermission("graves.autoloot") && player.getGameMode() == GameMode.SPECTATOR) {
                 return;
             }
 

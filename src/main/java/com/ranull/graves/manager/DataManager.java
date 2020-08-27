@@ -96,6 +96,10 @@ public class DataManager {
                     graveInventory.setProtected(dataConfig.getBoolean(worlds + "." + cordsString + ".protect"));
                 }
 
+                if (dataConfig.isSet(worlds + "." + cordsString + ".unlink")) {
+                    graveInventory.setUnlink(dataConfig.getBoolean(worlds + "." + cordsString + ".unlink"));
+                }
+
                 if (dataConfig.isSet(worlds + "." + cordsString + ".protectTime")) {
                     graveInventory.setProtectTime(dataConfig.getInt(worlds + "." + cordsString + ".protectTime"));
                 }
@@ -182,6 +186,7 @@ public class DataManager {
             dataConfig.set(world + "." + x + "_" + y + "_" + z + ".time", graveInventory.getCreatedTime());
             dataConfig.set(world + "." + x + "_" + y + "_" + z + ".replace", graveInventory.getReplaceMaterial().toString());
             dataConfig.set(world + "." + x + "_" + y + "_" + z + ".protect", graveInventory.getProtected());
+            dataConfig.set(world + "." + x + "_" + y + "_" + z + ".unlink", graveInventory.getUnlink());
 
             if (graveInventory.getPlayer() != null) {
                 dataConfig.set(world + "." + x + "_" + y + "_" + z + ".player", graveInventory.getPlayer().getUniqueId().toString());
