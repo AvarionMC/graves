@@ -1459,12 +1459,20 @@ public class GraveManager {
     }
 
     public void runExplodeCommands(GraveInventory graveInventory, Entity entity) {
+        runExplodeCommands(graveInventory, getEntityName(entity));
+    }
+
+    public void runExplodeCommands(GraveInventory graveInventory, Block block) {
+        runExplodeCommands(graveInventory, getBlockName(block));
+    }
+
+    public void runExplodeCommands(GraveInventory graveInventory, String entityOrBlockName) {
         for (String command : plugin.getConfig().getStringList("settings.explodeCommands")) {
             if (plugin.getConfig().getBoolean("settings.commandsOnlyPlayers") && graveInventory.getEntityType() != null) {
                 return;
             }
 
-            runConsoleCommand(parseCommand(command, entity, graveInventory));
+            runConsoleCommand(parseCommand(command, entityOrBlockName, graveInventory));
         }
     }
 
@@ -1489,8 +1497,13 @@ public class GraveManager {
     }
 
     public String parseCommand(String command, Entity entity, GraveInventory graveInventory) {
-        command = command.replace("$entity", getEntityName(entity))
-                .replace("$player", getEntityName(entity))
+        return parseCommand(command, getEntityName(entity), graveInventory);
+    }
+
+    public String parseCommand(String command, String entityOrBlockName, GraveInventory graveInventory) {
+        command = command.replace("$entity", entityOrBlockName)
+                .replace("$block", entityOrBlockName)
+                .replace("$player", entityOrBlockName)
                 .replace("$owner", getOwnerName(graveInventory))
                 .replace("$world", Objects.requireNonNull(graveInventory.getLocation().getWorld()).getName())
                 .replace("$x", String.valueOf(graveInventory.getLocation().getBlockX()))
@@ -1518,6 +1531,10 @@ public class GraveManager {
         }
 
         return formatString(entity.getType().toString());
+    }
+
+    public static String getBlockName(Block block) {
+        return formatString(block.getType().toString());
     }
 
     public static String getOwnerName(GraveInventory graveInventory) {

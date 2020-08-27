@@ -458,8 +458,9 @@ public class Events implements Listener {
         }
     }
 
+    // EntityExplodeEvent is called when TNT and other entities explode (but not beds in the nether/end)
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onGraveExplode(EntityExplodeEvent event) {
+    public void onGraveExplodeByEntity(EntityExplodeEvent event) {
         if (event.isCancelled()) {
             return;
         }
@@ -482,6 +483,44 @@ public class Events implements Listener {
                     graveManager.replaceGrave(graveInventory);
                     graveManager.removeGrave(graveInventory);
                     graveManager.runExplodeCommands(graveInventory, event.getEntity());
+
+                    messageManager.graveClose(graveInventory.getLocation());
+
+                    if (plugin.getConfig().getBoolean("settings.zombieExplode")) {
+                        graveManager.spawnZombie(graveInventory);
+                    }
+                } else {
+                    iterator.remove();
+                }
+            }
+        }
+    }
+
+    // BlockExplodeEvent is called when beds explode in the nether/end
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onGraveExplodeByBlock(BlockExplodeEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
+        Iterator<Block> iterator = event.blockList().iterator();
+        while (iterator.hasNext()) {
+            Block block = iterator.next();
+
+            GraveInventory graveInventory = graveManager.getGraveInventory(block.getLocation());
+            if (graveInventory != null) {
+                if ((System.currentTimeMillis() - graveInventory.getCreatedTime()) < 1000) {
+                    iterator.remove();
+                    continue;
+                }
+
+                if (plugin.getConfig().getBoolean("settings.explode")) {
+                    graveManager.dropGrave(graveInventory);
+                    graveManager.dropExperience(graveInventory);
+                    graveManager.removeHologram(graveInventory);
+                    graveManager.replaceGrave(graveInventory);
+                    graveManager.removeGrave(graveInventory);
+                    graveManager.runExplodeCommands(graveInventory, event.getBlock());
 
                     messageManager.graveClose(graveInventory.getLocation());
 
