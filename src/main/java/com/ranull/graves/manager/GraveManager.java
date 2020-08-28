@@ -205,7 +205,7 @@ public class GraveManager {
     }
 
     public ItemStack getGraveTokenFromPlayer(Player player) {
-        for (ItemStack itemStack : player.getInventory()) {
+        for (ItemStack itemStack : player.getInventory().getStorageContents()) {
             if (itemStack != null) {
                 if (hasRecipeData(itemStack)) {
                     return itemStack;
@@ -1020,7 +1020,8 @@ public class GraveManager {
                     itemStack.getType().toString().equals("IRON_CHESTPLATE") ||
                     itemStack.getType().toString().equals("LEATHER_CHESTPLATE") ||
                     itemStack.getType().toString().equals("CHAINMAIL_CHESTPLATE") ||
-                    itemStack.getType().toString().equals("NETHERITE_CHESTPLATE");
+                    itemStack.getType().toString().equals("NETHERITE_CHESTPLATE") ||
+                    itemStack.getType().toString().equals("ELYTRA");
         }
 
         return false;
@@ -1164,16 +1165,16 @@ public class GraveManager {
                     Iterator<Entity> iterator = world.getEntities().iterator();
 
                     while (iterator.hasNext()) {
-                        Entity entity = iterator.next();
+                        Object object = iterator.next();
 
-                        if (entity instanceof ArmorStand) {
-                            ArmorStand armorStand = (ArmorStand) entity;
+                        if (object != null && object instanceof ArmorStand) {
+                            ArmorStand armorStand = (ArmorStand) object;
                             GraveInventory graveInventory = getGraveFromHologram(armorStand);
 
                             if (graveInventory == null) {
                                 for (String tag : armorStand.getScoreboardTags()) {
                                     if (tag.contains("graveHologram")) {
-                                        iterator.remove();
+                                        armorStand.remove();
                                     }
                                 }
                             }

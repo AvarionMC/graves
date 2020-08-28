@@ -559,7 +559,7 @@ public class Events implements Listener {
         if (plugin.getConfig().getBoolean("settings.walkOver")) {
             Player player = event.getPlayer();
 
-            if (!player.hasPermission("graves.autoloot") && player.getGameMode() == GameMode.SPECTATOR) {
+            if (!player.hasPermission("graves.autoloot") || player.getGameMode() == GameMode.SPECTATOR) {
                 return;
             }
 
