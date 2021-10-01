@@ -4,14 +4,15 @@ version: ${project.version}
 main: com.ranull.graves.Graves
 api-version: 1.13
 author: Ranull
-softdepend: [Vault]
+load: POSTWORLD
+softdepend: [ Vault, WorldEdit, WorldGuard, PlaceholderAPI, ProtocolLib, SkullTextureAPI, MoreMobHeads ]
 
 commands:
   graves:
     description: Graves info
     default: true
     usage: /graves
-    aliases: [graves, grave, deathchests, deathchest, dc, death]
+    aliases: [ graves, grave, deathchests, deathchest, dc, death ]
 
 permissions:
   graves.place:
