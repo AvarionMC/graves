@@ -76,7 +76,12 @@ public class GraveManager {
                             Objects.requireNonNull(graveInventory.getLocation().getWorld())
                                     .isChunkLoaded(graveInventory.getLocation().getChunk())) {
                         if (plugin.getConfig().getBoolean("settings.hologram")) {
-                            updateHologram(graveInventory);
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    updateHologram(graveInventory);
+                                }
+                            }.runTask(plugin);
                         }
 
                         if (plugin.getConfig().getBoolean("settings.particle")) {
@@ -84,7 +89,12 @@ public class GraveManager {
                         }
 
                         if (plugin.getConfig().getBoolean("settings.hologramAutoCleanup")) {
-                            cleanupBrokenHolograms();
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    cleanupBrokenHolograms();
+                                }
+                            }.runTask(plugin);
                         }
 
                         if (graveInventory.getProtectTime() > 0 && graveInventory.getProtected()) {
