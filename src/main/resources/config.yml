@@ -44,6 +44,10 @@ settings:
   # %time_protection_remaining_formatted% - Remaining protection time formatted
   # %time_lived% - Lived time
   # %time_lived_formatted% - Lived time formatted
+  # %world% - World name
+  # %x% - X cord
+  # %y% - Y cord
+  # %z% - Z cord
 
   ###############################
   # PlaceholderAPI Placeholders #
@@ -76,12 +80,12 @@ settings:
     basic: # Token name, you can define multiple tokens.
       material: SUNFLOWER # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
       name: "Grave Token" # Grave token name.
-      craft: true # Can players craft grave tokens.
+      craft: true # Can players craft this grave token.
       lore: # Grave token lore.
         - "&7Keep this in your inventory and"
         - "&7when you die a grave will be"
         - "&7created."
-      recipe: # Grave token recipe, use AIR for an empty square.
+      recipe: # Grave token recipe, use AIR for an empty square, make sure it is uinque.
         - "GOLD_INGOT GOLD_INGOT GOLD_INGOT"
         - "GOLD_INGOT EMERALD GOLD_INGOT"
         - "GOLD_INGOT GOLD_INGOT GOLD_INGOT"
@@ -95,6 +99,7 @@ settings:
   # The admin permission will always override permissions below it, therefore you should put your highest permission groups at the top,
   # so they correctly override in a hierarchy, this prevents you having to define the same thing for each permission group.
   permission:
+    # admin, vip, schem and disabled are examples, you can modify them or make your own.
     admin: # graves.permission.admin
       grave:
         time: -1
@@ -125,22 +130,6 @@ settings:
         enabled: true
         name: "grave_default"
 
-    holo: # graves.permission.holo
-      block:
-        walk-over: true
-      hologram:
-        enabled: true
-        line:
-          - "&7%owner_name%'s &rGrave"
-          - "Killed by &7%killer_name%"
-          - "%time_alive_remaining_formatted%"
-
-    dirt: # graves.permission.dirt
-      grave:
-        time: 30
-      block:
-        material: DIRT
-
     disabled: # graves.permission.disabled
       grave:
         enabled: false
@@ -151,6 +140,7 @@ settings:
   # Override default config options for entities that match these types, entity type names must be uppercase.
   # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html
   entity:
+    # Here we override the options for PLAYER, ENDER_DRAGON and WITHER. ENDER_DRAGON and WITHER are disabled by default.
     PLAYER: # Override default options for Players.
       grave:
         enabled: true
@@ -223,6 +213,7 @@ settings:
   # Default Options #
   ###################
   # Below are the default options for graves that are not overridden above, any options not defined above will take from here.
+  # You can copy options below above into an entity section or a permission group, it has the same indentation.
   default:
     default:
       #########
@@ -285,8 +276,8 @@ settings:
         void-smart: true # If the player died in the void, try place the grave on the last solid block they stood on. (Only works for players)
         offset:
           x: 0 # Placement offset X, this will affect all other offsets.
-          y: 0 # Schematic offset Y, this will affect all other offsets.
-          z: 0 # Schematic offset Z, this will affect all other offsets.
+          y: 0 # Placement offset Y, this will affect all other offsets.
+          z: 0 # Placement offset Z, this will affect all other offsets.
 
       ###########
       # Respawn #
@@ -355,7 +346,7 @@ settings:
       ##############
       protection:
         enabled: false # Enable the grave protection feature.
-        time: 5 # Seconds, 300 = 5 minutes. Set to 0 to always stay locked.
+        time: 5 # Seconds, 300 = 5 minutes. Set to -1 to always stay locked.
         open:
           owner: true # Can the owner open the owners grave.
           killer: false # Can the killer open the owners grave.
@@ -379,13 +370,19 @@ settings:
       # Teleport #
       ############
       teleport:
-        enabled: false # Can the entity teleport to their grave from the Graves GUI.
+        enabled: true # Can the entity teleport to their grave from the Graves GUI.
         cost: 5 # How much it costs to teleport to a grave, you need Vault for this.
         cost-different-world: 20 # Extra cost added on top of cost if the grave is in a different world.
         cost-distance-increase: true # Increase the price the further away the grave is.
         unsafe: false # Should entities be allowed to always teleport to a grave even if unsafe.
         top: true # If the grave is in an unsafe location, should the entity be teleported to the top.
         top-nether: false # Should entities be teleported to the top of the nether.
+
+      ###########
+      # Virtual #
+      ###########
+      virtual:
+        distance: 15 # Minimum distance entities need to be from a grave to open it virtually. -1 for infinite distance.
 
       #######
       # GUI #
@@ -410,14 +407,7 @@ settings:
           grave:
             title: "Grave Menu"
             slot:
-              #3:
-              #  material: "TRIPWIRE_HOOK"
-              #  function: "protection"
-              #  name: "Toggle Protection %state_protection%"
-              #  lore:
-              #    - "Toggle grave protection"
-
-              4:
+              0:
                 material: "PAPER"
                 function: "distance"
                 name: "Information"
@@ -426,12 +416,19 @@ settings:
                   - "Levels: &f%level%"
                   - "Death Location: &f%world%, %x%x, %y%y, %z%z"
 
-              #5:
-              #  material: "ENDER_PEARL"
-              #  function: "teleportation"
-              #  name: "Teleport"
+              1:
+                material: "ENDER_PEARL"
+                function: "teleportation"
+                name: "Teleport"
+                lore:
+                  - "Teleport to your grave"
+
+              #2: # Toggle protection on and off, you can uncomment this if you want
+              #  material: "TRIPWIRE_HOOK"
+              #  function: "protection"
+              #  name: "Toggle Protection %state_protection%"
               #  lore:
-              #    - "Teleport to your grave"
+              #    - "Toggle grave protection"
 
       ##########
       # Zombie #
@@ -451,7 +448,7 @@ settings:
       #########
       # Token #
       #########
-      token:
+      token: # You have to define the token at the top of the config file.
         enabled: false # Should graves require tokens for their creation.
         name: "basic" # Name of the token defined in token setup.
 
@@ -477,6 +474,7 @@ settings:
         teleport-failure: "Teleport failed, teleport location is unsafe."
         teleport-disabled: "Grave teleportation is disabled."
         build-denied: "A grave was not created because you don't have permission to build where you died."
+        distance-virtual: "You are too far away to virtually open this grave."
         permission-denied: "Permission denied."
         protection: "This grave is protected for %time_protection_remaining_formatted%."
         worldguard-create-deny: "A grave was not created because grave creation is disabled in this region."

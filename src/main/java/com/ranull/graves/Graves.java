@@ -359,7 +359,9 @@ public class Graves extends JavaPlugin {
                 if (getConfig().isConfigurationSection(section)) {
                     ConfigurationSection configurationSection = getConfig().getConfigurationSection(section);
 
-                    if (configurationSection != null && configurationSection.contains(config)) {
+                    if (configurationSection != null && (versionManager.hasConfigContains()
+                            ? configurationSection.contains(config, true)
+                            : configurationSection.contains(config))) {
                         return configurationSection;
                     }
                 }
@@ -372,7 +374,9 @@ public class Graves extends JavaPlugin {
             if (getConfig().isConfigurationSection(section)) {
                 ConfigurationSection configurationSection = getConfig().getConfigurationSection(section);
 
-                if (configurationSection != null && configurationSection.contains(config)) {
+                if (configurationSection != null && (versionManager.hasConfigContains()
+                        ? configurationSection.contains(config, true)
+                        : configurationSection.contains(config))) {
                     return configurationSection;
                 }
             }

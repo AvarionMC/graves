@@ -146,7 +146,7 @@ public final class GravesCommand implements CommandExecutor {
     }
 
     public void sendHelpMenu(CommandSender sender) {
-        String version = "4.0";
+        String version = "4.1";
         String author = "Ranull";
 
         sender.sendMessage(ChatColor.GRAY + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.GRAY + "Graves "

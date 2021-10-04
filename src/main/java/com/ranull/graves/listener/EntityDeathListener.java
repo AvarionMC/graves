@@ -4,6 +4,7 @@ import com.ranull.graves.Graves;
 import com.ranull.graves.event.GraveCreateEvent;
 import com.ranull.graves.inventory.Grave;
 import com.ranull.graves.util.ExperienceUtil;
+import com.ranull.graves.util.LocationUtil;
 import com.ranull.graves.util.SkinUtil;
 import com.ranull.graves.util.StringUtil;
 import org.bukkit.Location;
@@ -35,7 +36,7 @@ public class EntityDeathListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEntityDeath(EntityDeathEvent event) {
         LivingEntity livingEntity = event.getEntity();
-        Location location = livingEntity.getLocation();
+        Location location = LocationUtil.roundLocation(livingEntity.getLocation());
         List<String> permissionList = livingEntity instanceof Player ? plugin.getPermissionList(livingEntity) : null;
         List<String> worldList = plugin.getConfig("world", livingEntity, permissionList)
                 .getStringList("world");
@@ -89,17 +90,38 @@ public class EntityDeathListener implements Listener {
 
         // WorldGuard
         if (plugin.hasWorldGuard()) {
-            if (livingEntity instanceof Player) {
-                if (!plugin.getFlagManager().canCreateGrave((Player) livingEntity, location)) {
-                    plugin.getPlayerManager().sendMessage("message.worldguard-create-deny",
-                            livingEntity, location, permissionList);
+            boolean hasCreateGrave = plugin.getFlagManager().hasCreateGrave(location);
 
+            if (hasCreateGrave) {
+                if (livingEntity instanceof Player) {
+                    boolean canCreateGrave = plugin.getFlagManager().canCreateGrave((Player) livingEntity, location);
+
+                    if (!canCreateGrave) {
+                        plugin.getPlayerManager().sendMessage("message.worldguard-create-deny",
+                                livingEntity, location, permissionList);
+
+                        return;
+                    }
+                } else if (!plugin.getFlagManager().canCreateGrave(location)) {
                     return;
                 }
-            } else {
-                if (!plugin.getFlagManager().canCreateGrave(location)) {
-                    return;
-                }
+            } else if (plugin.getLocationManager().canBuild(livingEntity, location, permissionList)) {
+                plugin.getPlayerManager().sendMessage("message.build-denied",
+                        livingEntity, location, permissionList);
+
+                return;
+            }
+        } else if (plugin.getLocationManager().canBuild(livingEntity, location, permissionList)) {
+            plugin.getPlayerManager().sendMessage("message.build-denied",
+                    livingEntity, location, permissionList);
+
+            return;
+        }
+
+        // Player
+        if (livingEntity instanceof Player) {
+            if (!((Player) livingEntity).hasPermission("graves.place")) {
+                return;
             }
         }
 
@@ -185,24 +207,13 @@ public class EntityDeathListener implements Listener {
         if (!graveItemStackList.isEmpty()) {
             Grave grave = plugin.getGraveManager().createGrave(livingEntity, graveItemStackList, permissionList);
 
-            // Player
-            if (livingEntity instanceof Player) {
-                Player player = (Player) livingEntity;
+            grave.setPermissionList(permissionList);
+            grave.setOwnerTexture(SkinUtil.getTextureBase64(livingEntity, plugin));
+            grave.setYaw(livingEntity.getLocation().getYaw());
+            grave.setPitch(livingEntity.getLocation().getPitch());
+            grave.setTimeAlive(plugin.getConfig("grave.time", grave).getInt("grave.time") * 1000L);
 
-                // Has permission
-                if (!player.hasPermission("graves.place")) {
-                    return;
-                }
-
-                // Can build
-                if (plugin.getConfig("placement.can-build", grave).getBoolean("placement.can-build")
-                        && !plugin.getCompatibility().canBuild(player, player.getLocation(), plugin)) {
-                    plugin.getPlayerManager().sendMessage("message.build-denied", player,
-                            player.getLocation(), grave);
-                    return;
-                }
-            }
-
+            // Experience
             if (plugin.getConfig("experience.store", grave).getBoolean("experience.store")) {
                 float percent = (float) plugin.getConfig("experience.store-percent", grave)
                         .getDouble("experience.store-percent");
@@ -216,28 +227,12 @@ public class EntityDeathListener implements Listener {
                     } else {
                         grave.setExperience(event.getDroppedExp());
                     }
+
+                    if (event instanceof PlayerDeathEvent) {
+                        ((PlayerDeathEvent) event).setKeepLevel(false);
+                    }
                 } else {
                     grave.setExperience(ExperienceUtil.getDropPercent(event.getDroppedExp(), percent));
-                }
-            } else {
-                grave.setExperience(event.getDroppedExp());
-            }
-
-            if (livingEntity instanceof Player) {
-                Player player = (Player) livingEntity;
-
-                // Experience
-                if (player.hasPermission("graves.experience") && plugin.getConfig("expStore", grave)
-                        .getBoolean("expStore")) {
-                    grave.setExperience(ExperienceUtil.getPlayerDropExperience(player,
-                            (float) plugin.getConfig("expStorePercent", grave)
-                                    .getDouble("expStorePercent")));
-                } else {
-                    grave.setExperience(event.getDroppedExp());
-                }
-
-                if (event instanceof PlayerDeathEvent) {
-                    ((PlayerDeathEvent) event).setKeepLevel(false);
                 }
             } else {
                 grave.setExperience(event.getDroppedExp());
@@ -271,14 +266,7 @@ public class EntityDeathListener implements Listener {
                         .getInt("protection.time") * 1000L);
             }
 
-            grave.setTimeAlive(plugin.getConfig("grave.time", grave).getInt("grave.time") * 1000L);
-            grave.setOwnerTexture(SkinUtil.getTextureBase64(livingEntity, plugin));
-            grave.setYaw(livingEntity.getLocation().getYaw());
-            grave.setPitch(livingEntity.getLocation().getPitch());
-            grave.setPermissionList(permissionList);
-
-            location = plugin.getLocationManager().getSafeGraveLocation(livingEntity,
-                    livingEntity.getLocation(), grave, plugin);
+            location = plugin.getLocationManager().getSafeGraveLocation(livingEntity, location, grave);
 
             // Location
             if (location != null) {
@@ -304,8 +292,7 @@ public class EntityDeathListener implements Listener {
                 }
             } else {
                 event.getDrops().addAll(graveItemStackList);
-                plugin.getPlayerManager().sendMessage("message.failure", livingEntity,
-                        livingEntity.getLocation(), grave);
+                plugin.getPlayerManager().sendMessage("message.failure", livingEntity, location, grave);
                 plugin.debugMessage("Safe location not found " + plugin.getGraveManager());
             }
         } else {

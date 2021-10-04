@@ -1,7 +1,5 @@
 package com.ranull.graves.compatibility;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import com.ranull.graves.Graves;
 import com.ranull.graves.data.BlockData;
 import com.ranull.graves.inventory.Grave;
@@ -11,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Skull;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -18,9 +17,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.material.Openable;
-
-import java.lang.reflect.Field;
-import java.util.UUID;
 
 public final class CompatibilityMaterialData implements Compatibility {
     @Override
@@ -60,6 +56,13 @@ public final class CompatibilityMaterialData implements Compatibility {
         return blockPlaceEvent.canBuild() && !blockPlaceEvent.isCancelled();
     }
 
+    @SuppressWarnings("ConstantConditions")
+    @Override
+    public boolean hasTitleData(Block block) {
+        return block.getState() instanceof BlockState;
+    }
+
+    @SuppressWarnings("deprecation")
     private void updateSkullBlock(Block block, Grave grave, Graves plugin) {
         int headType = plugin.getConfig("block.head.type", grave).getInt("block.head.type");
         String headBase64 = plugin.getConfig("block.head.base64", grave).getString("block.head.base64");
@@ -82,28 +85,6 @@ public final class CompatibilityMaterialData implements Compatibility {
         }
 
         skull.update();
-    }
-
-    public ItemStack setSkullItemStackTexture(ItemStack itemStack, String base64) {
-        if (itemStack.getType().name().equals("SKULL")) {
-            SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
-            GameProfile profile = new GameProfile(UUID.randomUUID(), null);
-
-            profile.getProperties().put("textures", new Property("textures", base64));
-
-            try {
-                Field profileField = skullMeta.getClass().getDeclaredField("profile");
-
-                profileField.setAccessible(true);
-                profileField.set(skullMeta, profile);
-            } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException exception) {
-                exception.printStackTrace();
-            }
-
-            itemStack.setItemMeta(skullMeta);
-        }
-
-        return itemStack;
     }
 
     @SuppressWarnings("deprecation")

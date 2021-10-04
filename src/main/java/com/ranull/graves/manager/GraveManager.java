@@ -77,10 +77,11 @@ public final class GraveManager {
                 for (Map.Entry<String, ChunkData> chunkDataEntry : plugin.getDataManager().getChunkDataMap()
                         .entrySet()) {
                     ChunkData chunkData = chunkDataEntry.getValue();
-                    Location location = new Location(chunkData.getWorld(), chunkData.getX() << 4, 0,
-                            chunkData.getZ() << 4);
 
                     if (chunkData.isLoaded()) {
+                        Location location = new Location(chunkData.getWorld(),
+                                chunkData.getX() << 4, 0, chunkData.getZ() << 4);
+
                         // Holograms
                         for (HologramData hologramData : new ArrayList<>(chunkData.getHologramDataMap().values())) {
                             if (plugin.getDataManager().getGraveMap().containsKey(hologramData.getUUIDGrave())) {
@@ -389,13 +390,12 @@ public final class GraveManager {
 
             return true;
         } else {
-            plugin.getPlayerManager().sendMessage("message.protection", player, player.getLocation(), grave);
+            plugin.getPlayerManager().sendMessage("message.protection", player, location, grave);
             plugin.getPlayerManager().playWorldSound("sound.protection", location, grave);
         }
 
         return false;
     }
-
 
     public List<Location> getGraveLocationList(Location baseLocation, Grave grave) {
         List<Location> locationList = new ArrayList<>(plugin.getBlockManager().getBlockList(grave));
@@ -421,6 +421,12 @@ public final class GraveManager {
         }
 
         return locationList;
+    }
+
+    public Location getGraveLocation(Location location, Grave grave) {
+        List<Location> locationList = plugin.getGraveManager().getGraveLocationList(location, grave);
+
+        return !locationList.isEmpty() ? locationList.get(0) : null;
     }
 
     public void autoLootGrave(Player player, Location location, Grave grave) {

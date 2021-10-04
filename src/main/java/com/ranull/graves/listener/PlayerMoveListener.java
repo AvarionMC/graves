@@ -29,7 +29,7 @@ public class PlayerMoveListener implements Listener {
             Location location = LocationUtil.roundLocation(player.getLocation());
 
             if (location.getBlock().getRelative(BlockFace.DOWN).getType().isSolid()
-                    && plugin.getLocationManager().isLocationSafe(location)) {
+                    && plugin.getLocationManager().isLocationSafePlayer(location)) {
                 plugin.getLocationManager().setLastSolidLocation(player, location.clone());
             }
 

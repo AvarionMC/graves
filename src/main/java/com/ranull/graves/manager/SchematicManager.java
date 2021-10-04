@@ -80,8 +80,7 @@ public final class SchematicManager {
         if (location.getWorld() != null && plugin.getConfig("schematic.enabled", grave).getBoolean("schematic.enabled")) {
             String schematicName = plugin.getConfig("schematic.name", grave).getString("schematic.name");
 
-            if (schematicName != null && !schematicName.equals("")
-                    && plugin.getSchematicManager().hasSchematic(schematicName)) {
+            if (schematicName != null && !schematicName.equals("") && hasSchematic(schematicName)) {
                 int offsetX = plugin.getConfig("schematic.offset.x", grave).getInt("schematic.offset.x");
                 int offsetY = plugin.getConfig("schematic.offset.y", grave).getInt("schematic.offset.y");
                 int offsetZ = plugin.getConfig("schematic.offset.z", grave).getInt("schematic.offset.z");
@@ -189,7 +188,7 @@ public final class SchematicManager {
         return affineTransform;
     }
 
-    private BlockVector3 locationToBlockVector3(Location location) {
+    public BlockVector3 locationToBlockVector3(Location location) {
         return BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 

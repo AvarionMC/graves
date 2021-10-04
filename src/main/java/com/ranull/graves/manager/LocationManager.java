@@ -38,15 +38,28 @@ public final class LocationManager {
         lastSolidLocationMap.remove(entity.getUniqueId());
     }
 
-    public boolean isLocationSafe(Location location) {
+    public boolean isLocationSafePlayer(Location location) {
         Block block = location.getBlock();
 
         if (!block.getType().isSolid() && !MaterialUtil.isLava(block.getType())) {
             Block blockAbove = block.getRelative(BlockFace.UP);
             Block blockBelow = block.getRelative(BlockFace.DOWN);
 
-            return !blockAbove.getType().isSolid() && !MaterialUtil.isLava(blockAbove.getType())
+            return !block.getType().isSolid() && !MaterialUtil.isLava(blockAbove.getType())
                     && !MaterialUtil.isAir(blockBelow.getType()) && !MaterialUtil.isLava(blockBelow.getType());
+        }
+
+        return false;
+    }
+
+    public boolean isLocationSafeGrave(Location location) {
+        location = LocationUtil.roundLocation(location);
+        Block block = location.getBlock();
+
+        if (!block.getType().isSolid() && !MaterialUtil.isLava(block.getType())) {
+            Block blockBelow = block.getRelative(BlockFace.DOWN);
+
+            return blockBelow.getType().isSolid() && !MaterialUtil.isLava(blockBelow.getType());
         }
 
         return false;
@@ -55,17 +68,17 @@ public final class LocationManager {
     public Location getSafeTeleportLocation(Player player, Location location, Grave grave, Graves plugin) {
         if (location.getWorld() != null) {
             if (plugin.getConfig("teleport.unsafe", grave).getBoolean("teleport.unsafe")
-                    || isLocationSafe(location)) {
+                    || isLocationSafePlayer(location)) {
                 return location;
             } else if (plugin.getConfig("teleport.top", grave).getBoolean("teleport.top")) {
-                Location groundLocation = getGround(location, grave);
+                Location topLocation = getTop(location, player, grave);
 
-                if (groundLocation != null && groundLocation.getWorld() != null) {
-                    if (groundLocation.getWorld().getEnvironment() != World.Environment.NETHER
+                if (topLocation != null && topLocation.getWorld() != null) {
+                    if (topLocation.getWorld().getEnvironment() != World.Environment.NETHER
                             || plugin.getConfig("teleport.top-nether", grave).getBoolean("teleport.top-nether")) {
-                        plugin.getPlayerManager().sendMessage("message.teleport-top", player, groundLocation, grave);
+                        plugin.getPlayerManager().sendMessage("message.teleport-top", player, topLocation, grave);
 
-                        return groundLocation;
+                        return topLocation;
                     }
                 }
             }
@@ -78,73 +91,47 @@ public final class LocationManager {
         return null;
     }
 
-    public Location getSafeGraveLocation(LivingEntity livingEntity, Location location, Grave grave, Graves plugin) {
+    public Location getSafeGraveLocation(LivingEntity livingEntity, Location location, Grave grave) {
         location = LocationUtil.roundLocation(location);
-        List<String> blockReplaceList = plugin.getConfig("replace.block.material", grave)
-                .getStringList("replace.block.material");
+        boolean hasGrave = plugin.getDataManager().hasChunkData(location)
+                && plugin.getDataManager().getChunkData(location).getBlockDataMap().containsKey(location);
 
-        if (location.getWorld() != null) {
+        if (!hasGrave && isLocationSafeGrave(location)) {
+            return location;
+        } else if (location.getWorld() != null) {
             Block block = location.getBlock();
             int minHeight = getMinHeight(location);
             int maxHeight = location.getWorld().getMaxHeight();
 
-            if (location.getY() < minHeight || location.getY() > maxHeight) {
-                // Died in void
-                if (plugin.getConfig("placement.void", grave).getBoolean("placement.void")) {
-                    if (livingEntity instanceof Player
-                            && plugin.getConfig("placement.void-smart", grave)
-                            .getBoolean("placement.void-smart")) {
-                        Location solidLocation = plugin.getLocationManager().getLastSolidLocation(livingEntity);
-
-                        if (solidLocation != null && solidLocation.getBlock().getRelative(BlockFace.DOWN)
-                                .getType().isSolid()) {
-                            return solidLocation;
-                        }
-                    }
-
-                    // Calculate block closest to the void
-                    return getVoid(location, grave);
-                } else {
-                    // Don't create in void
-                    return null;
-                }
+            if (location.getY() < minHeight || location.getY() > maxHeight) { // Void
+                return getVoid(location, livingEntity, grave);
             } else if (MaterialUtil.isLava(block.getType())) {
-                // Died in lava
-                if (livingEntity instanceof Player
-                        && plugin.getConfig("placement.lava-smart", grave)
-                        .getBoolean("placement.lava-smart")) {
-                    Location solidLocation = plugin.getLocationManager().getLastSolidLocation(livingEntity);
-
-                    if (solidLocation != null && solidLocation.getBlock()
-                            .getRelative(BlockFace.DOWN).getType().isSolid()) {
-                        return solidLocation;
-                    }
-                }
-
-                if (plugin.getConfig("placement.lava-top", grave).getBoolean("placement.lava-top")) {
-                    Location lavaLocation = getLava(location, grave);
-
-                    return lavaLocation != null ? lavaLocation : location;
-                }
-            } else if (MaterialUtil.isAir(block.getType()) || blockReplaceList.contains(block.getType().name())) {
-                // Died in air
-                if (plugin.getConfig("placement.ground", grave).getBoolean("placement.ground")) {
-                    Location groundLocation = getGround(location, grave);
-
-                    return groundLocation != null ? groundLocation : location;
-                } else {
-                    return location;
-                }
+                return getLavaTop(location, livingEntity, grave); // Lava
+            } else if (!hasGrave && MaterialUtil.isAir(block.getType())
+                    || plugin.getConfig("replace.block.material", grave)
+                    .getStringList("replace.block.material").contains(block.getType().name())) {
+                return getGround(location, livingEntity, grave); // Air
+            } else {
+                return getTop(location, livingEntity, grave); // Top
             }
         }
 
-        return location;
+        return null;
     }
 
-    public Location getGround(Location location, Grave grave) {
-        location = location.clone();
+    public Location getGround(Location location, LivingEntity livingEntity, Grave grave) {
+        return findLocationFromY(location, livingEntity, location.getBlockY(), grave);
+    }
 
-        if (location.getWorld() != null) {
+    public Location getTop(Location location, LivingEntity livingEntity, Grave grave) {
+        return findLocationFromY(location, livingEntity, location.getWorld() != null
+                ? location.getWorld().getMaxHeight() : location.getBlockY(), grave);
+    }
+
+    private Location findLocationFromY(Location location, LivingEntity livingEntity, int y, Grave grave) {
+        if (location.getWorld() != null && plugin.getConfig("placement.ground", grave)
+                .getBoolean("placement.ground")) {
+            location = location.clone();
             boolean notSolid = plugin.getConfig("replace.block.not-solid", grave)
                     .getBoolean("replace.block.not-solid");
             List<String> blockReplaceList = plugin.getConfig("replace.block.material", grave)
@@ -152,11 +139,19 @@ public final class LocationManager {
             int totalHeight = (getMinHeight(location) * -1) + location.getWorld().getMaxHeight();
             int counter = 0;
 
+            location.setY(y);
+
             while (counter <= totalHeight) {
-                if ((!notSolid || location.getBlock().getType().isSolid())
-                        && !blockReplaceList.contains(location.getBlock().getType().name())
-                        && !MaterialUtil.isAir(location.getBlock().getType())
-                        && isLocationSafe(location.clone().add(0, 1, 0))) {
+                Block block = location.getBlock();
+
+                if ((plugin.getDataManager().hasChunkData(location)
+                        && plugin.getDataManager().getChunkData(location).getBlockDataMap().containsKey(location))) {
+                    return location.add(0, 1, 0);
+                } else if (MaterialUtil.isLava(block.getType())) {
+                    return getLavaTop(location, livingEntity, grave);
+                } else if ((!notSolid || block.getType().isSolid()) && !blockReplaceList.contains(block.getType().name())
+                        && !MaterialUtil.isAir(block.getType())
+                        && isLocationSafeGrave(location.clone().add(0, 1, 0))) {
                     return location.add(0, 1, 0);
                 }
 
@@ -168,19 +163,31 @@ public final class LocationManager {
         return null;
     }
 
-    public Location getVoid(Location location, Grave grave) {
-        location = location.clone();
+    public Location getVoid(Location location, LivingEntity livingEntity, Grave grave) {
+        if (plugin.getConfig("placement.void", grave).getBoolean("placement.void")) {
+            if (livingEntity instanceof Player && plugin.getConfig("placement.void-smart", grave)
+                    .getBoolean("placement.void-smart")) {
+                Location solidLocation = plugin.getLocationManager().getLastSolidLocation(livingEntity);
 
-        if (location.getWorld() != null) {
-            Location bottomLocation = getBottom(location, grave);
-
-            if (bottomLocation != null) {
-                return bottomLocation;
+                if (solidLocation != null && solidLocation.getBlock().getRelative(BlockFace.DOWN).getType().isSolid()) {
+                    return solidLocation;
+                }
             }
 
-            location.setY(getMinHeight(location));
+            // Calculate block closest to the void
+            location = location.clone();
 
-            return MaterialUtil.isAir(location.getBlock().getType()) ? location : null;
+            if (location.getWorld() != null) {
+                Location bottomLocation = getBottom(location, grave);
+
+                if (bottomLocation != null) {
+                    return bottomLocation;
+                }
+
+                location.setY(getMinHeight(location));
+
+                return MaterialUtil.isAir(location.getBlock().getType()) ? location : null;
+            }
         }
 
         return null;
@@ -202,8 +209,9 @@ public final class LocationManager {
             while (counter <= totalHeight) {
                 Block relativeBlock = block.getRelative(BlockFace.UP);
 
-                if ((blockReplaceList.contains(block.getType().name())
+                if (((blockReplaceList.contains(block.getType().name())
                         || !MaterialUtil.isAir(block.getType()))
+                        && !plugin.getCompatibility().hasTitleData(relativeBlock))
                         && (blockReplaceList.contains(relativeBlock.getType().name())
                         || MaterialUtil.isAir(relativeBlock.getType()))) {
                     return block.getLocation().add(0, 1, 0);
@@ -217,27 +225,56 @@ public final class LocationManager {
         return null;
     }
 
-    public Location getLava(Location location, Grave grave) {
-        location = location.clone();
+    public Location getLavaTop(Location location, LivingEntity livingEntity, Grave grave) {
+        if (livingEntity instanceof Player
+                && plugin.getConfig("placement.lava-smart", grave)
+                .getBoolean("placement.lava-smart")) {
+            Location solidLocation = plugin.getLocationManager().getLastSolidLocation(livingEntity);
 
-        if (location.getWorld() != null) {
-            List<String> blockReplaceList = plugin.getConfig("replace.block.material", grave)
-                    .getStringList("replace.block.material");
-            int counter = 0;
+            if (solidLocation != null && solidLocation.getBlock().getRelative(BlockFace.DOWN).getType().isSolid()) {
+                return solidLocation;
+            }
+        }
 
-            while (counter <= location.getWorld().getMaxHeight()) {
-                if ((blockReplaceList.contains(location.getBlock().getType().name())
-                        || MaterialUtil.isAir(location.getBlock().getType()))
-                        && !MaterialUtil.isLava(location.getBlock().getType())) {
-                    return location;
+        if (plugin.getConfig("placement.lava-top", grave).getBoolean("placement.lava-top")) {
+            location = location.clone();
+
+            if (location.getWorld() != null) {
+                List<String> blockReplaceList = plugin.getConfig("replace.block.material", grave)
+                        .getStringList("replace.block.material");
+                int counter = 0;
+
+                while (counter <= location.getWorld().getMaxHeight()) {
+                    Block block = location.getBlock();
+
+                    if ((blockReplaceList.contains(block.getType().name())
+                            || MaterialUtil.isAir(block.getType()))
+                            && !plugin.getCompatibility().hasTitleData(block)
+                            && !MaterialUtil.isLava(block.getType())) {
+                        return location;
+                    }
+
+                    location.add(0, 1, 0);
+                    counter++;
                 }
-
-                location.add(0, 1, 0);
-                counter++;
             }
         }
 
         return null;
+    }
+
+    public boolean canBuild(LivingEntity livingEntity, Location location, List<String> permissionList) {
+        if (livingEntity instanceof Player) {
+            Player player = (Player) livingEntity;
+
+            return (!plugin.getDataManager().hasChunkData(location)
+                    || !plugin.getDataManager().getChunkData(location).getBlockDataMap().containsKey(location))
+                    && (!plugin.getConfig("placement.can-build", player, permissionList)
+                    .getBoolean("placement.can-build")
+                    && !plugin.getCompatibility().canBuild(player, location, plugin));
+        }
+
+        return true;
     }
 
     public int getMinHeight(Location location) {

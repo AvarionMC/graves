@@ -68,6 +68,10 @@ public final class HologramManager {
                         armorStand.setInvulnerable(true);
                     }
 
+                    if (plugin.getVersionManager().hasScoreboardTags()) {
+                        armorStand.getScoreboardTags().add("graveHologram");
+                    }
+
                     armorStand.setGravity(false);
                     armorStand.setVisible(false);
                     armorStand.setCustomNameVisible(true);
@@ -102,17 +106,19 @@ public final class HologramManager {
     }
 
     public void removeHologram(List<HologramData> hologramDataList) {
+        List<HologramData> removedHologramDataList = new ArrayList<>();
+
         if (!hologramDataList.isEmpty()) {
             for (HologramData hologramData : hologramDataList) {
                 for (Entity entity : hologramData.getLocation().getChunk().getEntities()) {
                     if (entity.getUniqueId().equals(hologramData.getUUIDEntity())) {
                         entity.remove();
+                        removedHologramDataList.add(hologramData);
                     }
                 }
-
             }
 
-            plugin.getDataManager().removeHologram(hologramDataList);
+            plugin.getDataManager().removeHologram(removedHologramDataList);
         }
     }
 }

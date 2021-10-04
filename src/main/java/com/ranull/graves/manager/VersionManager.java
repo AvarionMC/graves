@@ -6,11 +6,13 @@ public final class VersionManager {
     private final String version;
     private final boolean hasBlockData;
     private final boolean hasPersistentData;
+    private final boolean hasScoreboardTags;
     private final boolean hasHexColors;
     private final boolean hasLodestone;
     private final boolean hasSwingHand;
     private final boolean hasWorldHeight;
     private final boolean hasSecondHand;
+    private final boolean hasConfigContains;
     private boolean isBukkit;
 
     public VersionManager(Graves plugin) {
@@ -21,9 +23,11 @@ public final class VersionManager {
         }
 
         this.version = plugin.getServer().getClass().getPackage().getName().split("\\.")[3];
+        this.hasConfigContains = !is_v1_7() && !is_v1_8() && !is_v1_9();
         this.hasBlockData = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10() && !is_v1_11() && !is_v1_12();
         this.hasPersistentData = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10() && !is_v1_11() && !is_v1_12()
                 && !is_v1_13();
+        this.hasScoreboardTags = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10();
         this.hasHexColors = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10() && !is_v1_11() && !is_v1_12()
                 && !is_v1_13() && !is_v1_14() && !is_v1_15() && !isBukkit();
         this.hasLodestone = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10() && !is_v1_11()
@@ -40,12 +44,20 @@ public final class VersionManager {
         return isBukkit;
     }
 
+    public boolean hasConfigContains() {
+        return hasConfigContains;
+    }
+
     public boolean hasBlockData() {
         return hasBlockData;
     }
 
     public boolean hasPersistentData() {
         return hasPersistentData;
+    }
+
+    public boolean hasScoreboardTags() {
+        return hasScoreboardTags;
     }
 
     public boolean hasHexColors() {

@@ -1,7 +1,5 @@
 package com.ranull.graves.compatibility;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import com.ranull.graves.Graves;
 import com.ranull.graves.data.BlockData;
 import com.ranull.graves.inventory.Grave;
@@ -13,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
+import org.bukkit.block.TileState;
 import org.bukkit.block.data.Levelled;
 import org.bukkit.block.data.Openable;
 import org.bukkit.block.data.Rotatable;
@@ -24,9 +23,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.lang.reflect.Field;
-import java.util.UUID;
-
 public final class CompatibilityBlockData implements Compatibility {
     @Override
     public BlockData placeBlock(Location location, Material material, Grave grave, Graves plugin) {
@@ -34,7 +30,7 @@ public final class CompatibilityBlockData implements Compatibility {
             Block block = location.getBlock();
             String originalMaterial = block.getType().name();
             String replaceMaterial = location.getBlock().getType().name();
-            String replaceData = location.getBlock().getBlockData().clone().getAsString();
+            String replaceData = location.getBlock().getBlockData().clone().getAsString(true);
 
             // Levelled
             if (block.getBlockData() instanceof Levelled) {
@@ -85,6 +81,11 @@ public final class CompatibilityBlockData implements Compatibility {
         return blockPlaceEvent.canBuild() && !blockPlaceEvent.isCancelled();
     }
 
+    @Override
+    public boolean hasTitleData(Block block) {
+        return block.getState() instanceof TileState;
+    }
+
     private void updateSkullBlock(Block block, Grave grave, Graves plugin) {
         int headType = plugin.getConfig("block.head.type", grave).getInt("block.head.type");
         String headBase64 = plugin.getConfig("block.head.base64", grave).getString("block.head.base64");
@@ -110,28 +111,6 @@ public final class CompatibilityBlockData implements Compatibility {
         }
 
         skull.update();
-    }
-
-    public ItemStack setSkullItemStackTexture(ItemStack itemStack, String base64) {
-        if (itemStack.getType() == Material.PLAYER_HEAD) {
-            SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
-            GameProfile profile = new GameProfile(UUID.randomUUID(), null);
-
-            profile.getProperties().put("textures", new Property("textures", base64));
-
-            try {
-                Field profileField = skullMeta.getClass().getDeclaredField("profile");
-
-                profileField.setAccessible(true);
-                profileField.set(skullMeta, profile);
-            } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException exception) {
-                exception.printStackTrace();
-            }
-
-            itemStack.setItemMeta(skullMeta);
-        }
-
-        return itemStack;
     }
 
     @Override

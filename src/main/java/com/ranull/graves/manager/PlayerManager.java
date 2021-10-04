@@ -92,7 +92,7 @@ public final class PlayerManager {
             Location locationTeleport = location.clone().getBlock().getRelative(blockFace).getRelative(blockFace)
                     .getLocation().add(0.5, 0, 0.5);
 
-            if (plugin.getLocationManager().isLocationSafe(locationTeleport)) {
+            if (plugin.getLocationManager().isLocationSafePlayer(locationTeleport)) {
                 locationTeleport.setYaw(BlockFaceUtil.getBlockFaceYaw(blockFace.getOppositeFace()));
                 locationTeleport.setPitch(20);
             } else {
@@ -293,16 +293,18 @@ public final class PlayerManager {
 
     public void runFunction(Player player, String function, Grave grave) {
         switch (function.toLowerCase()) {
-            case "list":
+            case "list": {
                 plugin.getGUIManager().openGraveList(player);
 
                 break;
-            case "menu":
+            }
+            case "menu": {
                 plugin.getGUIManager().openGraveMenu(player, grave);
 
                 break;
+            }
             case "teleport":
-            case "teleportation":
+            case "teleportation": {
                 if (plugin.getConfig("teleport.enabled", grave).getBoolean("teleport.enabled")
                         || player.hasPermission("graves.bypass")) {
                     plugin.getPlayerManager().teleportPlayer(plugin.getGraveManager()
@@ -313,8 +315,9 @@ public final class PlayerManager {
                 }
 
                 break;
+            }
             case "protect":
-            case "protection":
+            case "protection": {
                 if (grave.getTimeProtectionRemaining() > 0 || grave.getTimeProtectionRemaining() < 0) {
                     plugin.getGraveManager().toggleGraveProtection(grave);
                     plugin.getPlayerManager().playPlayerSound("sound.protection-change", player, grave);
@@ -322,12 +325,11 @@ public final class PlayerManager {
                 }
 
                 break;
-            case "distance":
-                List<Location> locationList = plugin.getGraveManager().getGraveLocationList(player.getLocation(), grave);
+            }
+            case "distance": {
+                Location location = plugin.getGraveManager().getGraveLocation(player.getLocation(), grave);
 
-                if (!locationList.isEmpty()) {
-                    Location location = locationList.get(0);
-
+                if (location != null) {
                     if (player.getWorld().equals(location.getWorld())) {
                         plugin.getPlayerManager().sendMessage("message.distance", player, location, grave);
                     } else {
@@ -336,11 +338,27 @@ public final class PlayerManager {
                 }
 
                 break;
+            }
             case "open":
-            case "virtual":
-                plugin.getGraveManager().openGrave(player, player.getLocation(), grave);
+            case "virtual": {
+                double distance = plugin.getConfig("virtual.distance", grave).getDouble("virtual.distance");
+
+                if (distance < 0) {
+                    plugin.getGraveManager().openGrave(player, player.getLocation(), grave);
+                } else {
+                    Location location = plugin.getGraveManager().getGraveLocation(player.getLocation(), grave);
+
+                    if (location != null) {
+                        if (player.getLocation().distance(location) <= distance) {
+                            plugin.getGraveManager().openGrave(player, player.getLocation(), grave);
+                        } else {
+                            plugin.getPlayerManager().sendMessage("message.distance-virtual", player, location, grave);
+                        }
+                    }
+                }
 
                 break;
+            }
         }
     }
 

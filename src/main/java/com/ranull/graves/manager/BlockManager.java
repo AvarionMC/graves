@@ -105,6 +105,8 @@ public final class BlockManager {
                 if (material != null) {
                     blockData.getLocation().getBlock().setType(material);
                 }
+            } else {
+                blockData.getLocation().getBlock().setType(Material.AIR);
             }
 
             if (blockData.getReplaceData() != null) {
