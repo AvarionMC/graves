@@ -113,7 +113,7 @@ public final class GUIManager {
 
                     inventory.setItem(slot, createGraveMenuItemStack(slot, grave));
                 } catch (NumberFormatException exception) {
-                    plugin.debugMessage(string + " is not an int");
+                    plugin.debugMessage(string + " is not an int", 1);
                 }
             }
         }
@@ -173,7 +173,7 @@ public final class GUIManager {
         if (material == null) {
             material = Material.PAPER;
 
-            plugin.debugMessage(materialString.toUpperCase() + " is not a Material ENUM");
+            plugin.debugMessage(materialString.toUpperCase() + " is not a Material ENUM", 1);
         }
 
         ItemStack itemStack = new ItemStack(material);

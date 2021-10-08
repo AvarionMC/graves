@@ -63,7 +63,7 @@ public final class BlockManager {
                     .placeBlock(location.clone().add(offsetX, offsetY, offsetZ), material, grave, plugin));
             plugin.debugMessage("Placing grave block for " + grave.getUUID() + " at "
                     + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
-                    + (location.getBlockY() + 0.5) + "Y, " + (location.getBlockZ() + 0.5) + "z");
+                    + (location.getBlockY() + 0.5) + "Y, " + (location.getBlockZ() + 0.5) + "z", 1);
         }
     }
 
@@ -117,7 +117,7 @@ public final class BlockManager {
             plugin.getDataManager().removeBlock(location);
             plugin.debugMessage("Replacing grave block for " + blockData.getGraveUUID() + " at "
                     + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
-                    + (location.getBlockY() + 0.5) + "Y, " + (location.getBlockZ() + 0.5) + "z");
+                    + (location.getBlockY() + 0.5) + "Y, " + (location.getBlockZ() + 0.5) + "z", 1);
         }
     }
 }

@@ -11,7 +11,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class InventoryClickListener implements Listener {
     private final Graves plugin;
@@ -28,13 +27,10 @@ public class InventoryClickListener implements Listener {
             if (inventoryHolder instanceof Grave) {
                 Grave grave = (Grave) inventoryHolder;
 
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        plugin.getDataManager().updateGrave(grave, "inventory",
-                                InventoryUtil.inventoryToString(grave.getInventory()));
-                    }
-                }.runTaskLater(plugin, 1L);
+                plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+                    plugin.getDataManager().updateGrave(grave, "inventory",
+                            InventoryUtil.inventoryToString(grave.getInventory()));
+                }, 1L);
             } else if (event.getWhoClicked() instanceof Player) {
                 Player player = (Player) event.getWhoClicked();
 
@@ -45,6 +41,7 @@ public class InventoryClickListener implements Listener {
                     if (grave != null) {
                         plugin.getPlayerManager().runFunction(player, plugin.getConfig("gui.menu.list.function", grave)
                                 .getString("gui.menu.list.function", "menu"), grave);
+                        plugin.getGUIManager().setGraveListItems(graveList.getInventory(), graveList.getUUID());
                     }
 
                     event.setCancelled(true);
@@ -57,6 +54,7 @@ public class InventoryClickListener implements Listener {
                                 plugin.getConfig("gui.menu.grave.slot." + event.getSlot() + ".function", grave)
                                         .getString("gui.menu.grave.slot." + event.getSlot()
                                                 + ".function", "none"), grave);
+                        plugin.getGUIManager().setGraveMenuItems(graveMenu.getInventory(), grave);
                     }
 
                     event.setCancelled(true);

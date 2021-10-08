@@ -169,7 +169,7 @@ public final class PlayerManager {
                 try {
                     location.getWorld().playSound(location, Sound.valueOf(string.toUpperCase()), volume, pitch);
                 } catch (IllegalArgumentException exception) {
-                    plugin.debugMessage(string.toUpperCase() + " is not a Sound ENUM");
+                    plugin.debugMessage(string.toUpperCase() + " is not a Sound ENUM", 1);
                 }
             }
         }
@@ -200,7 +200,7 @@ public final class PlayerManager {
                 try {
                     player.playSound(location, Sound.valueOf(string.toUpperCase()), volume, pitch);
                 } catch (IllegalArgumentException exception) {
-                    plugin.debugMessage(string.toUpperCase() + " is not a Sound ENUM");
+                    plugin.debugMessage(string.toUpperCase() + " is not a Sound ENUM", 1);
                 }
             }
         }
@@ -286,7 +286,7 @@ public final class PlayerManager {
                     || !serverCommandEvent.isCancelled()) {
                 plugin.getServer().getScheduler().callSyncMethod(plugin, () -> plugin.getServer()
                         .dispatchCommand(serverCommandEvent.getSender(), serverCommandEvent.getCommand()));
-                plugin.debugMessage("Running console command " + string);
+                plugin.debugMessage("Running console command " + string, 1);
             }
         }
     }
@@ -340,6 +340,7 @@ public final class PlayerManager {
                 break;
             }
             case "open":
+            case "loot":
             case "virtual": {
                 double distance = plugin.getConfig("virtual.distance", grave).getDouble("virtual.distance");
 
@@ -356,6 +357,11 @@ public final class PlayerManager {
                         }
                     }
                 }
+
+                break;
+            }
+            case "autoloot": {
+                plugin.getGraveManager().autoLootGrave(player, player.getLocation(), grave);
 
                 break;
             }

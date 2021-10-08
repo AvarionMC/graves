@@ -15,7 +15,6 @@ import java.lang.reflect.Field;
 import java.util.UUID;
 
 public final class SkinUtil {
-
     public static void setSkullBlockTexture(Skull skull, String base64) {
         GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
 
@@ -44,7 +43,8 @@ public final class SkinUtil {
                         return base64;
                     }
                 } catch (NoSuchMethodError exception) {
-                    plugin.debugMessage("SkullTextureAPI detected but can't find method getTextureBase64, maybe you are running an outdated version");
+                    plugin.debugMessage("SkullTextureAPI detected but can't find method getTextureBase64, " +
+                            "maybe you are running an outdated version", 1);
                 }
             }
 
@@ -59,7 +59,8 @@ public final class SkinUtil {
                         return base64;
                     }
                 } catch (NoSuchMethodError exception) {
-                    plugin.debugMessage("MoreMobHeads detected but can't find method getTextureFromEntity, maybe you are running an outdated version");
+                    plugin.debugMessage("MoreMobHeads detected but can't find method getTextureFromEntity, " +
+                            "maybe you are running an outdated version", 1);
                 }
             }
         }

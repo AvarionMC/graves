@@ -44,7 +44,7 @@ public class BlockBreakListener implements Listener {
                         }
 
                         plugin.getGraveManager().closeGrave(grave);
-                        plugin.getGraveManager().playEffect("effect.loot", block.getLocation());
+                        plugin.getGraveManager().playEffect("effect.loot", block.getLocation(), grave);
                         plugin.getEntityManager().spawnZombie(block.getLocation(), player, player, grave);
                         plugin.getPlayerManager().runCommands("command.break", player, block.getLocation(), grave);
                     } else {

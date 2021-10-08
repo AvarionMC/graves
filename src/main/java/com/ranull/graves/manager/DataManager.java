@@ -12,7 +12,6 @@ import com.ranull.graves.util.StringUtil;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.sql.*;
@@ -43,15 +42,12 @@ public final class DataManager {
     }
 
     private void load() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                loadTables();
-                loadGraveMap();
-                loadBlockMap();
-                loadHologramMap();
-            }
-        }.runTaskAsynchronously(plugin);
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+            loadTables();
+            loadGraveMap();
+            loadBlockMap();
+            loadHologramMap();
+        });
     }
 
     public void reload() {
@@ -351,28 +347,23 @@ public final class DataManager {
 
         String uuidGrave = blockData.getGraveUUID() != null ? "'" + blockData.getGraveUUID() + "'" : "NULL";
         String location = "'" + LocationUtil.locationToString(blockData.getLocation()) + "'";
-        String replaceMaterial = blockData.getReplaceMaterial() != null ? "'" + blockData.getReplaceMaterial() + "'" : "NULL";
+        String replaceMaterial = blockData.getReplaceMaterial() != null ? "'"
+                + blockData.getReplaceMaterial() + "'" : "NULL";
         String replaceData = blockData.getReplaceData() != null ? "'" + blockData.getReplaceData() + "'" : "NULL";
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                executeUpdate("INSERT INTO " + blockTable + " (location, uuid_grave, replace_material, replace_data) VALUES ("
-                        + location + ", " + uuidGrave + ", " + replaceMaterial + ", " + replaceData + ");");
-            }
-        }.runTaskAsynchronously(plugin);
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+            executeUpdate("INSERT INTO " + blockTable + " (location, uuid_grave, replace_material, replace_data) " +
+                    "VALUES (" + location + ", " + uuidGrave + ", " + replaceMaterial + ", " + replaceData + ");");
+        });
     }
 
     public void removeBlock(Location location) {
         getChunkData(location).removeBlockData(location);
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                executeUpdate("DELETE FROM " + blockTable + " WHERE location = '"
-                        + LocationUtil.locationToString(location) + "';");
-            }
-        }.runTaskAsynchronously(plugin);
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+            executeUpdate("DELETE FROM " + blockTable + " WHERE location = '"
+                    + LocationUtil.locationToString(location) + "';");
+        });
     }
 
     public void addHologram(HologramData hologramData) {
@@ -383,13 +374,10 @@ public final class DataManager {
         String uuidGrave = "'" + hologramData.getUUIDGrave() + "'";
         int line = hologramData.getLine();
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                executeUpdate("INSERT INTO " + hologramTable + " (chunk, uuid_entity, uuid_grave, line) VALUES ("
-                        + chunk + ", " + uuidEntity + ", " + uuidGrave + ", " + line + ");");
-            }
-        }.runTaskAsynchronously(plugin);
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+            executeUpdate("INSERT INTO " + hologramTable + " (chunk, uuid_entity, uuid_grave, line) VALUES ("
+                    + chunk + ", " + uuidEntity + ", " + uuidGrave + ", " + line + ");");
+        });
     }
 
     public void removeHologram(List<HologramData> hologramDataList) {
@@ -402,12 +390,9 @@ public final class DataManager {
                         + hologramData.getUUIDEntity() + "';");
             }
 
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    executeBatch(statement);
-                }
-            }.runTaskAsynchronously(plugin);
+            plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+                executeBatch(statement);
+            });
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
@@ -440,37 +425,28 @@ public final class DataManager {
         long timeProtection = grave.getTimeProtection();
         long timeCreation = grave.getTimeCreation();
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                executeUpdate("INSERT INTO grave (uuid, owner_type, owner_name, owner_uuid, owner_texture, killer_type, killer_name,"
-                        + " killer_uuid, location_death, yaw, pitch, inventory, experience, protection, time_alive, time_protection,"
-                        + " time_creation, permissions) VALUES (" + uuid + ", " + ownerType + ", " + ownerName + ", " + ownerUUID
-                        + ", " + ownerTexture + ", " + killerType + ", " + killerName + ", " + killerUUID + ", " + locationDeath
-                        + ", " + yaw + ", " + pitch + ", " + inventory + ", " + experience + ", " + protection + ", " + timeAlive
-                        + ", " + timeProtection + ", " + timeCreation + ", " + permissions + ");");
-            }
-        }.runTaskAsynchronously(plugin);
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+            executeUpdate("INSERT INTO grave (uuid, owner_type, owner_name, owner_uuid, owner_texture, killer_type, killer_name,"
+                    + " killer_uuid, location_death, yaw, pitch, inventory, experience, protection, time_alive, time_protection,"
+                    + " time_creation, permissions) VALUES (" + uuid + ", " + ownerType + ", " + ownerName + ", " + ownerUUID
+                    + ", " + ownerTexture + ", " + killerType + ", " + killerName + ", " + killerUUID + ", " + locationDeath
+                    + ", " + yaw + ", " + pitch + ", " + inventory + ", " + experience + ", " + protection + ", " + timeAlive
+                    + ", " + timeProtection + ", " + timeCreation + ", " + permissions + ");");
+        });
     }
 
     public void removeGrave(Grave grave) {
         uuidGraveMap.remove(grave.getUUID());
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                executeUpdate("DELETE FROM grave WHERE uuid = '" + grave.getUUID() + "';");
-            }
-        }.runTaskAsynchronously(plugin);
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+            executeUpdate("DELETE FROM grave WHERE uuid = '" + grave.getUUID() + "';");
+        });
     }
 
     public void updateGrave(Grave grave, String column, String string) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                executeUpdate("UPDATE grave SET " + column + " = '" + string + "' WHERE uuid = '" + grave.getUUID() + "';");
-            }
-        }.runTaskAsynchronously(plugin);
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+            executeUpdate("UPDATE grave SET " + column + " = '" + string + "' WHERE uuid = '" + grave.getUUID() + "';");
+        });
     }
 
     private Grave resultSetToGrave(ResultSet resultSet) {

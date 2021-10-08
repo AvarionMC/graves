@@ -29,7 +29,7 @@ public final class ExperienceUtil {
         return 9 * level - 158;
     }
 
-    public static String getLevelFromExperience(long experience) {
+    public static long getLevelFromExperience(long experience) {
         double result = 0;
 
         if (experience > 1395) {
@@ -40,7 +40,7 @@ public final class ExperienceUtil {
             result = Math.sqrt(experience + 9) - 3;
         }
 
-        return String.valueOf(Math.round(result * 100.0) / 100.0);
+        return (long) (Math.round(result * 100.0) / 100.0);
     }
 
     public static int getDropPercent(int experience, float percent) {

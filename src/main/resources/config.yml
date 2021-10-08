@@ -19,7 +19,7 @@ settings:
   ##################
   # Global Options #
   ##################
-  debug: false # Show debug messages in console.
+  debug: 0 # 0 = Nothing, 1 = Information, 2 = Failures
 
   #################
   # Placeholders #
@@ -231,6 +231,7 @@ settings:
       ########
       # Should a grave drop it's contents when destroyed for the following reasons.
       drop:
+        block: true #
         timeout: true # When a grave times out drop everything in it. If false it gets destroyed.
         explode: true # When a grave explodes drop everything in it. If false it gets destroyed.
         break: true # When a grave is broken drop everything in it. If false it gets destroyed.

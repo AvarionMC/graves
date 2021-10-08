@@ -64,7 +64,7 @@ public final class SchematicManager {
                     if (clipboardFormat != null) {
                         try (ClipboardReader clipboardReader = clipboardFormat.getReader(new FileInputStream(file))) {
                             stringClipboardMap.put(name, clipboardReader.read());
-                            plugin.debugMessage("Loading schematic " + name);
+                            plugin.debugMessage("Loading schematic " + name, 1);
                         } catch (IOException exception) {
                             exception.printStackTrace();
                         }
@@ -88,10 +88,10 @@ public final class SchematicManager {
                 pasteSchematic(location.clone().add(offsetX, offsetY, offsetZ), grave.getYaw(), schematicName);
                 plugin.debugMessage("Placing schematic for " + grave.getUUID() + " at "
                         + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
-                        + (location.getBlockY() + 0.5) + "Y, " + (location.getBlockZ() + 0.5) + "z");
+                        + (location.getBlockY() + 0.5) + "Y, " + (location.getBlockZ() + 0.5) + "z", 1);
 
             } else {
-                plugin.debugMessage("Can't find schematic " + schematicName);
+                plugin.debugMessage("Can't find schematic " + schematicName, 1);
             }
         }
     }
@@ -126,7 +126,7 @@ public final class SchematicManager {
                 //plugin.getServer().broadcastMessage(location.toString());
                 //center.getBlock().setType(Material.BEDROCK);
             } else {
-                plugin.debugMessage("Can't find schematic " + name);
+                plugin.debugMessage("Can't find schematic " + name, 1);
             }
         }
 
@@ -166,7 +166,7 @@ public final class SchematicManager {
                     exception.printStackTrace();
                 }
             } else {
-                plugin.debugMessage("Can't find schematic " + name);
+                plugin.debugMessage("Can't find schematic " + name, 1);
             }
         }
 

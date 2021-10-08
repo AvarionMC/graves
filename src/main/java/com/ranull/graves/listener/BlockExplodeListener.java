@@ -45,7 +45,7 @@ public class BlockExplodeListener implements Listener {
                         }
 
                         plugin.getGraveManager().closeGrave(grave);
-                        plugin.getGraveManager().playEffect("effect.loot", location);
+                        plugin.getGraveManager().playEffect("effect.loot", location, grave);
                         plugin.getPlayerManager().runCommands("command.explode",
                                 event.getBlock().getType().name(), location, grave);
 

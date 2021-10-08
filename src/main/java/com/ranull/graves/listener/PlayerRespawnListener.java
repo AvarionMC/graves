@@ -9,7 +9,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
 
@@ -28,14 +27,12 @@ public class PlayerRespawnListener implements Listener {
 
         if (!graveList.isEmpty()) {
             Grave grave = graveList.get(graveList.size() - 1);
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    plugin.getPlayerManager().runFunction(player, plugin
-                            .getConfig("respawn.function", player, permissionList)
-                            .getString("respawn.function", "none"), grave);
-                }
-            }.runTaskLater(plugin, 1L);
+
+            plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+                plugin.getPlayerManager().runFunction(player, plugin
+                        .getConfig("respawn.function", player, permissionList)
+                        .getString("respawn.function", "none"), grave);
+            }, 1L);
 
             if (plugin.getConfig("respawn.compass", player, permissionList)
                     .getBoolean("respawn.compass")

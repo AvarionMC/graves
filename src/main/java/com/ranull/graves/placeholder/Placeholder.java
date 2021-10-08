@@ -150,13 +150,15 @@ public final class Placeholder extends PlaceholderExpansion implements Relationa
             UUID uuid = UUIDUtil.getUUID(identifier.replace("level_", ""));
 
             if (uuid != null && plugin.getDataManager().getGraveMap().containsKey(uuid)) {
-                return ExperienceUtil.getLevelFromExperience(plugin.getDataManager().getGraveMap().get(uuid).getExperience());
+                return String.valueOf(ExperienceUtil.getLevelFromExperience(plugin.getDataManager().getGraveMap()
+                        .get(uuid).getExperience()));
             }
 
             return "";
         } else if (identifier.startsWith("time_alive_remaining_")) {
             if (identifier.startsWith("time_alive_remaining_formatted_")) {
-                UUID uuid = UUIDUtil.getUUID(identifier.replace("time_alive_remaining_formatted_", ""));
+                UUID uuid = UUIDUtil.getUUID(identifier
+                        .replace("time_alive_remaining_formatted_", ""));
 
                 if (uuid != null && plugin.getDataManager().getGraveMap().containsKey(uuid)) {
                     Grave grave = plugin.getDataManager().getGraveMap().get(uuid);
@@ -166,24 +168,28 @@ public final class Placeholder extends PlaceholderExpansion implements Relationa
                 UUID uuid = UUIDUtil.getUUID(identifier.replace("time_alive_remaining_", ""));
 
                 if (uuid != null && plugin.getDataManager().getGraveMap().containsKey(uuid)) {
-                    return String.valueOf(plugin.getDataManager().getGraveMap().get(uuid).getTimeAliveRemaining() / 1000);
+                    return String.valueOf(plugin.getDataManager().getGraveMap().get(uuid)
+                            .getTimeAliveRemaining() / 1000);
                 }
             }
 
             return "";
         } else if (identifier.startsWith("time_protection_remaining_")) {
             if (identifier.startsWith("time_protection_remaining_formatted_")) {
-                UUID uuid = UUIDUtil.getUUID(identifier.replace("time_protection_remaining_formatted_", ""));
+                UUID uuid = UUIDUtil.getUUID(identifier
+                        .replace("time_protection_remaining_formatted_", ""));
 
                 if (uuid != null && plugin.getDataManager().getGraveMap().containsKey(uuid)) {
                     Grave grave = plugin.getDataManager().getGraveMap().get(uuid);
                     return StringUtil.getTimeString(grave, grave.getTimeProtectionRemaining(), plugin);
                 }
             } else {
-                UUID uuid = UUIDUtil.getUUID(identifier.replace("time_protection_remaining_", ""));
+                UUID uuid = UUIDUtil.getUUID(identifier
+                        .replace("time_protection_remaining_", ""));
 
                 if (uuid != null && plugin.getDataManager().getGraveMap().containsKey(uuid)) {
-                    return String.valueOf(plugin.getDataManager().getGraveMap().get(uuid).getTimeProtectionRemaining() / 1000);
+                    return String.valueOf(plugin.getDataManager().getGraveMap().get(uuid)
+                            .getTimeProtectionRemaining() / 1000);
                 }
             }
 
@@ -216,7 +222,8 @@ public final class Placeholder extends PlaceholderExpansion implements Relationa
                 UUID uuid = UUIDUtil.getUUID(identifier.replace("distance_", ""));
 
                 if (uuid != null && plugin.getDataManager().getGraveMap().containsKey(uuid)) {
-                    return String.valueOf(plugin.getDataManager().getGraveMap().get(uuid).getTimeAliveRemaining() / 1000);
+                    return String.valueOf(plugin.getDataManager().getGraveMap().get(uuid)
+                            .getTimeAliveRemaining() / 1000);
                 }
                 return String.valueOf(plugin.getGraveManager().getGraveCount(player));
             }

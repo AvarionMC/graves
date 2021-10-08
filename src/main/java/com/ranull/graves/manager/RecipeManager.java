@@ -36,7 +36,7 @@ public final class RecipeManager {
             for (String key : configurationSection.getKeys(false)) {
                 if (plugin.getConfig().getBoolean("settings.token." + key + ".craft")) {
                     addTokenRecipe(key, getToken(key));
-                    plugin.debugMessage("Added recipe " + key);
+                    plugin.debugMessage("Added recipe " + key, 1);
                 }
             }
         }

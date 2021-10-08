@@ -1,6 +1,7 @@
 package com.ranull.graves.command;
 
 import com.ranull.graves.Graves;
+import com.ranull.graves.inventory.Grave;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -9,6 +10,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class GravesCommand implements CommandExecutor {
     private final Graves plugin;
@@ -140,13 +144,26 @@ public final class GravesCommand implements CommandExecutor {
             } else if (commandSender instanceof Player) {
                 plugin.getPlayerManager().sendMessage("message.permission-denied", (Player) commandSender);
             }
+        } else if (args[0].equals("purge")) {
+            if (commandSender.hasPermission("graves.purge")) {
+                List<Grave> graveList = new ArrayList<>(plugin.getDataManager().getGraveMap().values());
+
+                for (Grave grave : graveList) {
+                    plugin.getGraveManager().removeGrave(grave);
+                }
+
+                commandSender.sendMessage(ChatColor.GRAY + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
+                        + graveList.size() + " Graves purged.");
+            } else if (commandSender instanceof Player) {
+                plugin.getPlayerManager().sendMessage("message.permission-denied", (Player) commandSender);
+            }
         }
 
         return true;
     }
 
     public void sendHelpMenu(CommandSender sender) {
-        String version = "4.1";
+        String version = "4.2";
         String author = "Ranull";
 
         sender.sendMessage(ChatColor.GRAY + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.GRAY + "Graves "

@@ -45,7 +45,7 @@ public final class EntityManager {
             try {
                 entityType = EntityType.valueOf(zombieType);
             } catch (IllegalArgumentException exception) {
-                plugin.debugMessage(zombieType + " is not a EntityType ENUM");
+                plugin.debugMessage(zombieType + " is not a EntityType ENUM", 1);
             }
 
             if (entityType.name().equals("ZOMBIE") && MaterialUtil.isWater(location.getBlock().getType())) {
@@ -106,7 +106,7 @@ public final class EntityManager {
                 }
             }
 
-            plugin.debugMessage("Zombie type " + getEntityName(entity) + " spawned for grave " + grave.getUUID());
+            plugin.debugMessage("Zombie type " + getEntityName(entity) + " spawned for grave " + grave.getUUID(), 1);
         }
     }
 

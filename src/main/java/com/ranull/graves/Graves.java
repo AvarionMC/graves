@@ -77,7 +77,6 @@ public class Graves extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerDropItemListener(this), this);
         getServer().getPluginManager().registerEvents(new EntityDeathListener(this), this);
         getServer().getPluginManager().registerEvents(new EntityExplodeListener(this), this);
-        getServer().getPluginManager().registerEvents(new EntityTeleportListener(this), this);
         getServer().getPluginManager().registerEvents(new BlockPlaceListener(this), this);
         getServer().getPluginManager().registerEvents(new BlockBreakListener(this), this);
         getServer().getPluginManager().registerEvents(new BlockFromToListener(this), this);
@@ -139,8 +138,10 @@ public class Graves extends JavaPlugin {
         }
     }
 
-    public void debugMessage(String string) {
-        if (getConfig().getBoolean("settings.debug")) {
+    public void debugMessage(String string, int level) {
+        int debug = getConfig().getInt("settings.debug", 0);
+
+        if (debug >= level) {
             getLogger().info("Debug: " + string);
         }
     }

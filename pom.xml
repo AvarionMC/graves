@@ -6,7 +6,7 @@
 
     <groupId>com.ranull</groupId>
     <artifactId>Graves</artifactId>
-    <version>4.1</version>
+    <version>4.2</version>
     <name>Graves</name>
     <description>Full featured lightweight death chest plugin.</description>
 
@@ -148,12 +148,6 @@
             <groupId>com.github.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.36.0.3</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.comphenix.protocol</groupId>
-            <artifactId>ProtocolLib</artifactId>
-            <version>4.7.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

@@ -16,7 +16,8 @@ import java.util.regex.Pattern;
 
 public final class StringUtil {
     public static String format(String string) {
-        return WordUtils.capitalizeFully(string.replace("_", " "));
+        return WordUtils.capitalizeFully(string
+                .replace("_", " "));
     }
 
     public static String parseString(String string, Graves plugin) {
@@ -43,9 +44,11 @@ public final class StringUtil {
         return parseString(string, entity, plugin.getEntityManager().getEntityName(entity), location, grave, plugin);
     }
 
-    public static String parseString(String string, Entity entity, String name, Location location, Grave grave, Graves plugin) {
+    public static String parseString(String string, Entity entity, String name, Location location, Grave grave,
+                                     Graves plugin) {
         if (location != null) {
-            string = string.replace("%world%", location.getWorld() != null ? location.getWorld().getName() : "")
+            string = string.replace("%world%",
+                            location.getWorld() != null ? location.getWorld().getName() : "")
                     .replace("%x%", String.valueOf(location.getBlockX() + 0.5))
                     .replace("%y%", String.valueOf(location.getBlockY() + 0.5))
                     .replace("%z%", String.valueOf(location.getBlockZ() + 0.5));
@@ -63,34 +66,50 @@ public final class StringUtil {
 
         if (grave != null) {
             string = string.replace("%uuid%", grave.getUUID().toString())
-                    .replace("%owner_name%", grave.getOwnerName() != null ? grave.getOwnerName() : "null")
-                    .replace("%owner_type%", grave.getOwnerType() != null ? grave.getOwnerType().name() : "null")
-                    .replace("%owner_uuid%", grave.getOwnerUUID() != null ? grave.getOwnerUUID().toString() : "null")
-                    .replace("%killer_name%", grave.getKillerName() != null ? grave.getKillerName() : "null")
-                    .replace("%killer_type%", grave.getKillerType() != null ? grave.getKillerType().name() : "null")
-                    .replace("%killer_uuid%", grave.getKillerUUID() != null ? grave.getKillerUUID().toString() : "null")
-                    .replace("%time_alive_remaining%", String.valueOf(grave.getTimeAliveRemaining()))
-                    .replace("%time_alive_remaining_formatted%", getTimeString(grave, grave.getTimeAliveRemaining(), plugin))
-                    .replace("%time_protection_remaining%", String.valueOf(grave.getTimeProtectionRemaining()))
-                    .replace("%time_protection_remaining_formatted%", getTimeString(grave, grave.getTimeProtectionRemaining(), plugin))
-                    .replace("%time_lived%", String.valueOf(grave.getLivedTime()))
-                    .replace("%time_lived_formatted%", getTimeString(grave, grave.getLivedTime(), plugin))
-                    .replace("%state_protection%", grave.getProtection() && (grave.getTimeProtectionRemaining() > 0
-                            || grave.getTimeProtectionRemaining() < 0) ? plugin
-                            .getConfig("protection.state.protected", grave)
-                            .getString("protection.state.protected", "Protected") : plugin
-                            .getConfig("protection.state.unprotected", grave)
-                            .getString("protection.state.unprotected", "Unprotected"))
+                    .replace("%owner_name%", grave.getOwnerName() != null
+                            ? grave.getOwnerName() : "null")
+                    .replace("%owner_type%", grave.getOwnerType() != null
+                            ? grave.getOwnerType().name() : "null")
+                    .replace("%owner_uuid%", grave.getOwnerUUID() != null
+                            ? grave.getOwnerUUID().toString() : "null")
+                    .replace("%killer_name%", grave.getKillerName() != null
+                            ? grave.getKillerName() : "null")
+                    .replace("%killer_type%", grave.getKillerType() != null
+                            ? grave.getKillerType().name() : "null")
+                    .replace("%killer_uuid%", grave.getKillerUUID() != null
+                            ? grave.getKillerUUID().toString() : "null")
+                    .replace("%time_alive_remaining%",
+                            String.valueOf(grave.getTimeAliveRemaining()))
+                    .replace("%time_alive_remaining_formatted%",
+                            getTimeString(grave, grave.getTimeAliveRemaining(), plugin))
+                    .replace("%time_protection_remaining%",
+                            String.valueOf(grave.getTimeProtectionRemaining()))
+                    .replace("%time_protection_remaining_formatted%",
+                            getTimeString(grave, grave.getTimeProtectionRemaining(), plugin))
+                    .replace("%time_lived%",
+                            String.valueOf(grave.getLivedTime()))
+                    .replace("%time_lived_formatted%",
+                            getTimeString(grave, grave.getLivedTime(), plugin))
+                    .replace("%state_protection%",
+                            grave.getProtection() && (grave.getTimeProtectionRemaining() > 0
+                                    || grave.getTimeProtectionRemaining() < 0) ? plugin
+                                    .getConfig("protection.state.protected", grave)
+                                    .getString("protection.state.protected", "Protected") : plugin
+                                    .getConfig("protection.state.unprotected", grave)
+                                    .getString("protection.state.unprotected", "Unprotected"))
                     .replace("%item%", String.valueOf(grave.getItemAmount()));
             if (grave.getExperience() > 0) {
-                string = string.replace("%level%", ExperienceUtil.getLevelFromExperience(grave.getExperience()))
+                string = string.replace("%level%", String.valueOf(ExperienceUtil
+                                .getLevelFromExperience(grave.getExperience())))
                         .replace("%experience%", String.valueOf(grave.getExperience()));
             } else {
-                string = string.replace("%level%", "0").replace("%experience%", "0");
+                string = string.replace("%level%", "0")
+                        .replace("%experience%", "0");
             }
 
             if (grave.getOwnerType() == EntityType.PLAYER && plugin.hasPlaceholderAPI()) {
-                string = PlaceholderAPI.setPlaceholders(plugin.getServer().getOfflinePlayer(grave.getOwnerUUID()), string);
+                string = PlaceholderAPI.setPlaceholders(plugin.getServer()
+                        .getOfflinePlayer(grave.getOwnerUUID()), string);
             }
         }
 
