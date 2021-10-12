@@ -4,12 +4,11 @@ import com.ranull.graves.command.GravesCommand;
 import com.ranull.graves.compatibility.Compatibility;
 import com.ranull.graves.compatibility.CompatibilityBlockData;
 import com.ranull.graves.compatibility.CompatibilityMaterialData;
+import com.ranull.graves.integration.*;
 import com.ranull.graves.inventory.Grave;
 import com.ranull.graves.listener.*;
 import com.ranull.graves.manager.*;
-import com.ranull.graves.placeholder.Placeholder;
 import com.ranull.graves.update.UpdateChecker;
-import net.milkbowl.vault.economy.Economy;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.ConfigurationSection;
@@ -17,8 +16,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -29,21 +26,18 @@ public class Graves extends JavaPlugin {
     private DataManager dataManager;
     private BlockManager blockManager;
     private HologramManager hologramManager;
-    private SchematicManager schematicManager;
-    private FlagManager flagManager;
     private GUIManager guiManager;
     private RecipeManager recipeManager;
     private PlayerManager playerManager;
     private LocationManager locationManager;
     private EntityManager entityManager;
-    private EconomyManager economyManager;
     private GraveManager graveManager;
+    private IntegrationManager integrationManager;
     private Compatibility compatibility;
-    private Placeholder placeholder;
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
+        integrationManager.reload();
 
         versionManager = new VersionManager(this);
         dataManager = new DataManager(this, DataManager.Type.SQLITE);
@@ -59,8 +53,8 @@ public class Graves extends JavaPlugin {
             recipeManager = new RecipeManager(this);
         }
 
-        runUpdateChecker();
-        loadSoftDependencies();
+        updateChecker();
+        configChecker();
 
         new Metrics(this, 12849);
         PluginCommand pluginCommand = getCommand("graves");
@@ -77,6 +71,7 @@ public class Graves extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerDropItemListener(this), this);
         getServer().getPluginManager().registerEvents(new EntityDeathListener(this), this);
         getServer().getPluginManager().registerEvents(new EntityExplodeListener(this), this);
+        getServer().getPluginManager().registerEvents(new EntityDamageByEntityListener(this), this);
         getServer().getPluginManager().registerEvents(new BlockPlaceListener(this), this);
         getServer().getPluginManager().registerEvents(new BlockBreakListener(this), this);
         getServer().getPluginManager().registerEvents(new BlockFromToListener(this), this);
@@ -102,40 +97,31 @@ public class Graves extends JavaPlugin {
     public void onDisable() {
         graveManager.onDisable();
         dataManager.onDisable();
+        integrationManager.onDisable();
 
         if (recipeManager != null) {
             recipeManager.onDisable();
-        }
-
-        if (placeholder != null) {
-            placeholder.unregister();
         }
     }
 
     @Override
     public void onLoad() {
-        Plugin worldGuardPlugin = getServer().getPluginManager().getPlugin("WorldGuard");
+        saveDefaultConfig();
 
-        if (worldGuardPlugin != null) {
-            try {
-                Class.forName("com.sk89q.worldguard.protection.flags.registry.FlagConflictException",
-                        false, getClass().getClassLoader());
+        integrationManager = new IntegrationManager(this);
 
-                flagManager = new FlagManager(this);
-            } catch (ClassNotFoundException ignored) {
-                infoMessage("Outdated WorldGuard detected, Only WorldEdit 6.2+ is supported. Disabling WorldGuard support.");
-            }
-        }
+        integrationManager.loadWorldGuard();
     }
 
     public void reload() {
         saveDefaultConfig();
+        reloadConfig();
+        configChecker();
+        updateChecker();
         dataManager.reload();
         recipeManager.reload();
-
-        if (schematicManager != null) {
-            schematicManager.reload();
-        }
+        integrationManager.reload();
+        infoMessage("Config reloaded.");
     }
 
     public void debugMessage(String string, int level) {
@@ -162,7 +148,11 @@ public class Graves extends JavaPlugin {
         getLogger().info("Update: " + string);
     }
 
-    private void runUpdateChecker() {
+    public void integrationMessage(String string) {
+        getLogger().info("Integration: " + string);
+    }
+
+    private void updateChecker() {
         String response = new UpdateChecker(this, 74208).getVersion();
 
         if (response != null) {
@@ -181,7 +171,9 @@ public class Graves extends JavaPlugin {
                 }
             }
         }
+    }
 
+    private void configChecker() {
         double currentConfigVersion = 2;
         double configVersion = getConfig().getDouble("config-version");
 
@@ -203,55 +195,6 @@ public class Graves extends JavaPlugin {
         }
     }
 
-    private void loadSoftDependencies() {
-        Plugin worldEditPlugin = getServer().getPluginManager().getPlugin("WorldEdit");
-
-        if (worldEditPlugin != null && worldEditPlugin.isEnabled()) {
-            try {
-                Class.forName("com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats", false, getClass()
-                        .getClassLoader());
-
-                schematicManager = new SchematicManager(this);
-            } catch (ClassNotFoundException ignored) {
-                infoMessage("Outdated WorldEdit detected, Only WorldEdit 7+ is supported. Disabling WorldEdit support.");
-            }
-        }
-
-        Plugin vaultPlugin = getServer().getPluginManager().getPlugin("Vault");
-
-        if (vaultPlugin != null && vaultPlugin.isEnabled()) {
-            RegisteredServiceProvider<Economy> registeredServiceProvider = getServer().getServicesManager().getRegistration(Economy.class);
-
-            if (registeredServiceProvider != null) {
-                economyManager = new EconomyManager(registeredServiceProvider.getProvider());
-            }
-        }
-
-        Plugin placeholderAPIPlugin = getServer().getPluginManager().getPlugin("PlaceholderAPI");
-
-        if (placeholderAPIPlugin != null && placeholderAPIPlugin.isEnabled()) {
-            placeholder = new Placeholder(this);
-
-            placeholder.register();
-        }
-    }
-
-    public boolean hasWorldEdit() {
-        return schematicManager != null;
-    }
-
-    public boolean hasWorldGuard() {
-        return flagManager != null;
-    }
-
-    public boolean hasVault() {
-        return economyManager != null;
-    }
-
-    public boolean hasPlaceholderAPI() {
-        return placeholder != null;
-    }
-
     public VersionManager getVersionManager() {
         return versionManager;
     }
@@ -266,14 +209,6 @@ public class Graves extends JavaPlugin {
 
     public BlockManager getBlockManager() {
         return blockManager;
-    }
-
-    public SchematicManager getSchematicManager() {
-        return schematicManager;
-    }
-
-    public FlagManager getFlagManager() {
-        return flagManager;
     }
 
     public DataManager getDataManager() {
@@ -300,12 +235,60 @@ public class Graves extends JavaPlugin {
         return entityManager;
     }
 
-    public EconomyManager getEconomyManager() {
-        return economyManager;
-    }
-
     public Compatibility getCompatibility() {
         return compatibility;
+    }
+
+    public boolean hasVault() {
+        return integrationManager.getVault() != null;
+    }
+
+    public boolean hasWorldEdit() {
+        return integrationManager.getWorldEdit() != null;
+    }
+
+    public boolean hasWorldGuard() {
+        return integrationManager.getWorldGuard() != null;
+    }
+
+    public boolean hasFurnitureLib() {
+        return integrationManager.getFurnitureLib() != null;
+    }
+
+    public boolean hasProtectionLib() {
+        return integrationManager.getProtectionLib() != null;
+    }
+
+    public boolean hasItemsAdder() {
+        return integrationManager.getItemsAdder() != null;
+    }
+
+    public boolean hasPlaceholderAPI() {
+        return integrationManager.getPlaceholder() != null;
+    }
+
+    public Vault getVault() {
+        return integrationManager.getVault();
+    }
+
+    public WorldEdit getWorldEdit() {
+        return integrationManager.getWorldEdit();
+    }
+
+    public WorldGuard getWorldGuard() {
+        return integrationManager.getWorldGuard();
+    }
+
+    public FurnitureLib getFurnitureLib() {
+        return integrationManager.getFurnitureLib();
+    }
+
+    public ItemsAdder getItemsAdder() {
+        return integrationManager.getItemsAdder();
+    }
+
+    public ProtectionLib getProtectionLib() {
+        return integrationManager.getProtectionLib();
     }
 
     public List<String> getPermissionList(Entity entity) {

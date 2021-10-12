@@ -15,8 +15,8 @@ import java.lang.reflect.Field;
 import java.util.UUID;
 
 public final class SkinUtil {
-    public static void setSkullBlockTexture(Skull skull, String base64) {
-        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
+    public static void setSkullBlockTexture(Skull skull, String name, String base64) {
+        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), name);
 
         gameProfile.getProperties().put("textures", new Property("textures", base64));
 

@@ -5,7 +5,7 @@ main: com.ranull.graves.Graves
 api-version: 1.13
 author: Ranull
 load: POSTWORLD
-softdepend: [ Vault, WorldEdit, WorldGuard, PlaceholderAPI, ProtocolLib, SkullTextureAPI, MoreMobHeads ]
+softdepend: [ Vault, WorldEdit, WorldGuard, GriefDefender, PlaceholderAPI, FurnitureLib, ProtectionLib, ItemsAdder, ProtocolLib, SkullTextureAPI, MoreMobHeads ]
 
 commands:
   graves:

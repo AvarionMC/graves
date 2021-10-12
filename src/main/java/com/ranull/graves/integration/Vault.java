@@ -1,12 +1,12 @@
-package com.ranull.graves.manager;
+package com.ranull.graves.integration;
 
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.OfflinePlayer;
 
-public final class EconomyManager {
+public final class Vault {
     private final Economy economy;
 
-    public EconomyManager(Economy economy) {
+    public Vault(Economy economy) {
         this.economy = economy;
     }
 

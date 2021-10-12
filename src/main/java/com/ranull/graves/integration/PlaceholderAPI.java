@@ -1,4 +1,4 @@
-package com.ranull.graves.placeholder;
+package com.ranull.graves.integration;
 
 import com.ranull.graves.Graves;
 import com.ranull.graves.inventory.Grave;
@@ -13,10 +13,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public final class Placeholder extends PlaceholderExpansion implements Relational {
+public final class PlaceholderAPI extends PlaceholderExpansion implements Relational {
     private final Graves plugin;
 
-    public Placeholder(Graves plugin) {
+    public PlaceholderAPI(Graves plugin) {
         this.plugin = plugin;
     }
 

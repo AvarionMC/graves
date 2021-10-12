@@ -214,4 +214,9 @@ public class Grave implements InventoryHolder {
 
         return counter;
     }
+
+    public enum StorageMode {
+        EXACT,
+        COMPACT
+    }
 }

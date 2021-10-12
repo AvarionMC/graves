@@ -1,10 +1,9 @@
-package com.ranull.graves.manager;
+package com.ranull.graves.integration;
 
 import com.ranull.graves.Graves;
 import com.ranull.graves.inventory.Grave;
 import com.ranull.graves.util.BlockFaceUtil;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -16,6 +15,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.session.PasteBuilder;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -27,12 +27,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class SchematicManager {
+public final class WorldEdit {
     private final Graves plugin;
+    private final com.sk89q.worldedit.WorldEdit worldEdit;
     private final Map<String, Clipboard> stringClipboardMap;
 
-    public SchematicManager(Graves plugin) {
+    public WorldEdit(Graves plugin) {
         this.plugin = plugin;
+        this.worldEdit = com.sk89q.worldedit.WorldEdit.getInstance();
         this.stringClipboardMap = new HashMap<>();
         File schematicsFile = new File(plugin.getDataFolder() + File.separator + "schematics");
         String defaultSchematic = "grave_default";
@@ -45,10 +47,10 @@ public final class SchematicManager {
             plugin.infoMessage("Saved schematic " + defaultSchematic);
         }
 
-        reload();
+        load();
     }
 
-    public void reload() {
+    public void load() {
         stringClipboardMap.clear();
 
         File schematicsFile = new File(plugin.getDataFolder() + File.separator + "schematics");
@@ -85,11 +87,13 @@ public final class SchematicManager {
                 int offsetY = plugin.getConfig("schematic.offset.y", grave).getInt("schematic.offset.y");
                 int offsetZ = plugin.getConfig("schematic.offset.z", grave).getInt("schematic.offset.z");
 
-                pasteSchematic(location.clone().add(offsetX, offsetY, offsetZ), grave.getYaw(), schematicName);
+
+                Clipboard test = pasteSchematic(location.clone().add(offsetX, offsetY, offsetZ), grave.getYaw(), schematicName);
+                //PasteBuilder test = getSchematic(location.clone().add(offsetX, offsetY, offsetZ), grave.getYaw(), schematicName);
+                //buildSchematic(test);
                 plugin.debugMessage("Placing schematic for " + grave.getUUID() + " at "
                         + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
                         + (location.getBlockY() + 0.5) + "Y, " + (location.getBlockZ() + 0.5) + "z", 1);
-
             } else {
                 plugin.debugMessage("Can't find schematic " + schematicName, 1);
             }
@@ -154,7 +158,8 @@ public final class SchematicManager {
             if (stringClipboardMap.containsKey(name)) {
                 Clipboard clipboard = stringClipboardMap.get(name);
 
-                try (EditSession editSession = getEditSession(location.getWorld())) {
+                try {
+                    final EditSession editSession = getEditSession(location.getWorld());
                     ClipboardHolder clipboardHolder = new ClipboardHolder(clipboard);
 
                     clipboardHolder.setTransform(clipboardHolder.getTransform().combine(getYawTransform(yaw)));
@@ -171,6 +176,35 @@ public final class SchematicManager {
         }
 
         return null;
+    }
+
+    private PasteBuilder getSchematic(Location location, float yaw, String name) {
+        return getSchematic(location, yaw, name, true);
+    }
+
+    private PasteBuilder getSchematic(Location location, float yaw, String name, boolean ignoreAirBlocks) {
+        if (location.getWorld() != null) {
+            if (stringClipboardMap.containsKey(name)) {
+                Clipboard clipboard = stringClipboardMap.get(name);
+                ClipboardHolder clipboardHolder = new ClipboardHolder(clipboard);
+
+                clipboardHolder.setTransform(clipboardHolder.getTransform().combine(getYawTransform(yaw)));
+                return clipboardHolder.createPaste(getEditSession(location.getWorld()))
+                        .to(locationToBlockVector3(location)).ignoreAirBlocks(ignoreAirBlocks);
+            } else {
+                plugin.debugMessage("Can't find schematic " + name, 1);
+            }
+        }
+
+        return null;
+    }
+
+    public void buildSchematic(PasteBuilder pasteBuilder) {
+        try {
+            Operations.complete(pasteBuilder.build());
+        } catch (WorldEditException exception) {
+            exception.printStackTrace();
+        }
     }
 
     private AffineTransform getYawTransform(float yaw) {
@@ -197,6 +231,6 @@ public final class SchematicManager {
     }
 
     private EditSession getEditSession(World world) {
-        return WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(world));
+        return worldEdit.newEditSession(BukkitAdapter.adapt(world));
     }
 }

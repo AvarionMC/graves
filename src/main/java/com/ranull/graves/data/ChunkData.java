@@ -1,5 +1,7 @@
 package com.ranull.graves.data;
 
+import com.ranull.graves.data.integration.FurnitureLibData;
+import com.ranull.graves.data.integration.ItemsAdderData;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -13,6 +15,8 @@ public class ChunkData {
     private final int z;
     private final Map<Location, BlockData> blockDataMap;
     private final Map<UUID, HologramData> hologramDataMap;
+    private final Map<UUID, FurnitureLibData> furnitureLibDataMap;
+    private final Map<UUID, ItemsAdderData> itemsAdderDataMap;
 
     public ChunkData(Location location) {
         this.world = location.getWorld();
@@ -20,6 +24,8 @@ public class ChunkData {
         this.z = location.getBlockZ() >> 4;
         this.blockDataMap = new HashMap<>();
         this.hologramDataMap = new HashMap<>();
+        this.furnitureLibDataMap = new HashMap<>();
+        this.itemsAdderDataMap = new HashMap<>();
     }
 
     public World getWorld() {
@@ -50,6 +56,14 @@ public class ChunkData {
         return hologramDataMap;
     }
 
+    public Map<UUID, FurnitureLibData> getFurnitureLibMap() {
+        return furnitureLibDataMap;
+    }
+
+    public Map<UUID, ItemsAdderData> getItemsAdderMap() {
+        return itemsAdderDataMap;
+    }
+
     public void addBlockData(BlockData blockData) {
         blockDataMap.put(blockData.getLocation(), blockData);
     }
@@ -62,7 +76,23 @@ public class ChunkData {
         hologramDataMap.put(hologramData.getUUIDEntity(), hologramData);
     }
 
-    public void removeBlockData(HologramData hologramData) {
+    public void removeHologramData(HologramData hologramData) {
         hologramDataMap.remove(hologramData.getUUIDEntity());
+    }
+
+    public void addFurnitureLibData(FurnitureLibData furnitureData) {
+        furnitureLibDataMap.put(furnitureData.getUUIDEntity(), furnitureData);
+    }
+
+    public void removeFurnitureLibData(FurnitureLibData furnitureLibData) {
+        furnitureLibDataMap.remove(furnitureLibData.getUUIDEntity());
+    }
+
+    public void addItemsAdderData(ItemsAdderData furnitureData) {
+        itemsAdderDataMap.put(furnitureData.getUUIDEntity(), furnitureData);
+    }
+
+    public void removeItemsAdderData(ItemsAdderData itemsAdderData) {
+        furnitureLibDataMap.remove(itemsAdderData.getUUIDEntity());
     }
 }

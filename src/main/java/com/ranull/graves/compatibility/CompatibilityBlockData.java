@@ -52,10 +52,10 @@ public final class CompatibilityBlockData implements Compatibility {
             location.getBlock().setType(material);
 
             // Waterlogged
-            if (MaterialUtil.isWater(originalMaterial) && block.getBlockData() instanceof Waterlogged) {
+            if (block.getBlockData() instanceof Waterlogged) {
                 Waterlogged waterlogged = (Waterlogged) block.getBlockData();
 
-                waterlogged.setWaterlogged(true);
+                waterlogged.setWaterlogged(MaterialUtil.isWater(originalMaterial));
                 block.setBlockData(waterlogged);
             }
 
@@ -100,12 +100,12 @@ public final class CompatibilityBlockData implements Compatibility {
             if (grave.getOwnerType() == EntityType.PLAYER) {
                 skull.setOwningPlayer(plugin.getServer().getOfflinePlayer(grave.getOwnerUUID()));
             } else if (grave.getOwnerTexture() != null) {
-                SkinUtil.setSkullBlockTexture(skull, grave.getOwnerTexture());
+                SkinUtil.setSkullBlockTexture(skull, grave.getOwnerName(), grave.getOwnerTexture());
             } else if (headBase64 != null && !headBase64.equals("")) {
-                SkinUtil.setSkullBlockTexture(skull, headBase64);
+                SkinUtil.setSkullBlockTexture(skull, grave.getOwnerName(), headBase64);
             }
         } else if (headType == 1 && headBase64 != null && !headBase64.equals("")) {
-            SkinUtil.setSkullBlockTexture(skull, headBase64);
+            SkinUtil.setSkullBlockTexture(skull, grave.getOwnerName(), headBase64);
         } else if (headType == 2 && headName != null && headName.length() <= 16) {
             skull.setOwningPlayer(plugin.getServer().getOfflinePlayer(headName));
         }

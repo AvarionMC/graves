@@ -86,7 +86,7 @@ public final class PlayerManager {
     }
 
     public void teleportPlayer(Location location, Player player, Grave grave) {
-        if (!plugin.hasWorldGuard() || plugin.getFlagManager().canTeleport(player, location)) {
+        if (!plugin.hasWorldGuard() || plugin.getWorldGuard().canTeleport(player, location)) {
             location = LocationUtil.roundLocation(location);
             BlockFace blockFace = BlockFaceUtil.getYawBlockFace(grave.getYaw());
             Location locationTeleport = location.clone().getBlock().getRelative(blockFace).getRelative(blockFace)
@@ -110,8 +110,8 @@ public final class PlayerManager {
                 if (plugin.hasVault()) {
                     double teleportCost = getTeleportCost(player.getLocation(), locationTeleport, grave);
 
-                    if (plugin.getEconomyManager().hasBalance(player, teleportCost)
-                            && plugin.getEconomyManager().withdrawBalance(player, teleportCost)) {
+                    if (plugin.getVault().hasBalance(player, teleportCost)
+                            && plugin.getVault().withdrawBalance(player, teleportCost)) {
                         player.teleport(locationTeleport);
                         plugin.getPlayerManager().sendMessage("message.teleport", player, locationTeleport, grave);
                         plugin.getPlayerManager().playPlayerSound("sound.teleport", player, locationTeleport, grave);

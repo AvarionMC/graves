@@ -21,7 +21,7 @@ public final class ReflectionUtil {
         }
     }
 
-    private static Class<?> getClass(String clazz) throws ClassNotFoundException {
+    public static Class<?> getClass(String clazz) throws ClassNotFoundException {
         return Class.forName("net.minecraft.server." + Bukkit.getServer().getClass().getPackage().getName()
                 .replace(".", ",").split(",")[3] + "." + clazz);
     }

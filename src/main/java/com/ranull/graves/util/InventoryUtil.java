@@ -2,6 +2,7 @@ package com.ranull.graves.util;
 
 import com.ranull.graves.Graves;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -104,6 +105,10 @@ public final class InventoryUtil {
         }
     }
 
+    public static boolean isArmor(ItemStack itemStack) {
+        return isHelmet(itemStack) || isChestplate(itemStack) || isLeggings(itemStack) || isBoots(itemStack);
+    }
+
     public static boolean isHelmet(ItemStack itemStack) {
         return itemStack != null && itemStack.getType().name()
                 .matches("(?i)NETHERITE_HELMET|DIAMOND_HELMET|GOLDEN_HELMET|GOLD_HELMET|IRON_HELMET|LEATHER_HELMET|" +
@@ -129,34 +134,14 @@ public final class InventoryUtil {
     }
 
     public static String inventoryToString(Inventory inventory) {
-        List<String> itemStackList = new ArrayList<>();
+        List<String> stringList = new ArrayList<>();
+        ItemStack itemStackAir = new ItemStack(Material.AIR);
 
         for (ItemStack itemStack : inventory.getContents()) {
-            if (itemStack != null) {
-                itemStackList.add(Base64Util.objectToBase64(itemStack));
-            }
+            stringList.add(Base64Util.objectToBase64(itemStack != null ? itemStack : itemStackAir));
         }
 
-        return StringUtils.join(itemStackList, '|');
-    }
-
-    public static String inventoryToStringe(Inventory inventory) {
-        StringBuilder stringBuilder = new StringBuilder();
-        boolean first = true;
-
-        for (ItemStack itemStack : inventory.getContents()) {
-            if (itemStack != null) {
-                if (first) {
-                    first = false;
-                } else {
-                    stringBuilder.append("|");
-                }
-
-                stringBuilder.append(Base64Util.objectToBase64(itemStack));
-            }
-        }
-
-        return stringBuilder.toString();
+        return StringUtils.join(stringList, '|');
     }
 
     public static Inventory stringToInventory(InventoryHolder inventoryHolder, String string, String title, Graves plugin) {
@@ -166,13 +151,16 @@ public final class InventoryUtil {
             Inventory inventory = plugin.getServer().createInventory(inventoryHolder,
                     InventoryUtil.getInventorySize(strings.length), title);
 
-            for (String item : strings) {
-                Object object = Base64Util.base64ToObject(item);
+            int counter = 0;
+            for (String itemString : strings) {
+                Object object = Base64Util.base64ToObject(itemString);
 
                 if (object instanceof ItemStack) {
-                    inventory.addItem((ItemStack) object);
+                    inventory.setItem(counter, (ItemStack) object);
+                    counter++;
                 }
             }
+
             return inventory;
         }
 

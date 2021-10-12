@@ -4,6 +4,7 @@ import com.ranull.graves.Graves;
 import com.ranull.graves.data.BlockData;
 import com.ranull.graves.data.ChunkData;
 import com.ranull.graves.inventory.Grave;
+import com.ranull.graves.util.LocationUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -39,6 +40,8 @@ public final class BlockManager {
     }
 
     public void createBlock(Location location, Grave grave) {
+        location = LocationUtil.roundLocation(location);
+
         if (location.getWorld() != null) {
             Material material;
 
@@ -59,11 +62,27 @@ public final class BlockManager {
             int offsetY = plugin.getConfig("block.offset.y", grave).getInt("block.offset.y");
             int offsetZ = plugin.getConfig("block.offset.z", grave).getInt("block.offset.z");
 
-            plugin.getDataManager().addBlock(plugin.getCompatibility()
-                    .placeBlock(location.clone().add(offsetX, offsetY, offsetZ), material, grave, plugin));
-            plugin.debugMessage("Placing grave block for " + grave.getUUID() + " at "
-                    + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
-                    + (location.getBlockY() + 0.5) + "Y, " + (location.getBlockZ() + 0.5) + "z", 1);
+            BlockData blockData = plugin.getCompatibility().placeBlock(location.add(offsetX, offsetY, offsetZ),
+                    material, grave, plugin);
+
+            // Not working currently
+            /*
+            if (plugin.hasItemsAdder()) {
+                plugin.getItemsAdder().createBlock(location, grave);
+            }
+             */
+
+            plugin.getDataManager().addBlockData(blockData);
+
+            if (material != null) {
+                plugin.debugMessage("Placing grave block for " + grave.getUUID() + " at "
+                        + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
+                        + (location.getBlockY() + 0.5) + "Y, " + (location.getBlockZ() + 0.5) + "z", 1);
+            } else {
+                plugin.debugMessage("Placing access location for " + grave.getUUID() + " at "
+                        + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
+                        + (location.getBlockY() + 0.5) + "Y, " + (location.getBlockZ() + 0.5) + "z", 1);
+            }
         }
     }
 
@@ -81,7 +100,7 @@ public final class BlockManager {
         return locationList;
     }
 
-    public void removeBlocks(Grave grave) {
+    public void removeBlock(Grave grave) {
         for (Map.Entry<String, ChunkData> chunkDataEntry : plugin.getDataManager().getChunkDataMap().entrySet()) {
             ChunkData chunkData = chunkDataEntry.getValue();
 
@@ -114,7 +133,7 @@ public final class BlockManager {
                         .createBlockData(blockData.getReplaceData()));
             }
 
-            plugin.getDataManager().removeBlock(location);
+            plugin.getDataManager().removeBlockData(location);
             plugin.debugMessage("Replacing grave block for " + blockData.getGraveUUID() + " at "
                     + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
                     + (location.getBlockY() + 0.5) + "Y, " + (location.getBlockZ() + 0.5) + "z", 1);

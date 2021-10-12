@@ -136,9 +136,7 @@ public final class GravesCommand implements CommandExecutor {
             }
         } else if (args[0].equals("reload")) {
             if (commandSender.hasPermission("graves.reload")) {
-                plugin.reloadConfig();
                 plugin.reload();
-
                 commandSender.sendMessage(ChatColor.GRAY + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
                         + "Reloaded config file.");
             } else if (commandSender instanceof Player) {
@@ -163,7 +161,7 @@ public final class GravesCommand implements CommandExecutor {
     }
 
     public void sendHelpMenu(CommandSender sender) {
-        String version = "4.2";
+        String version = "4.3";
         String author = "Ranull";
 
         sender.sendMessage(ChatColor.GRAY + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.GRAY + "Graves "

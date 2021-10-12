@@ -1,9 +1,7 @@
-package com.ranull.graves.manager;
+package com.ranull.graves.integration;
 
-import com.ranull.graves.Graves;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
@@ -14,26 +12,23 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
-public final class FlagManager {
-    private final Graves plugin;
-    private final WorldGuard worldGuard;
-    private final Plugin worldGuardPlugin;
+public final class WorldGuard {
+    private final JavaPlugin plugin;
+    private final com.sk89q.worldguard.WorldGuard worldGuard;
     private final StateFlag createFlag;
     private final StateFlag teleportFlag;
 
-    public FlagManager(Graves plugin) {
+    public WorldGuard(JavaPlugin plugin) {
         this.plugin = plugin;
-        this.worldGuard = WorldGuard.getInstance();
-        this.worldGuardPlugin = plugin.getServer().getPluginManager().getPlugin("WorldGuard");
-
-        createFlag = getFlag("graves-create");
-        teleportFlag = getFlag("graves-teleport");
+        this.worldGuard = com.sk89q.worldguard.WorldGuard.getInstance();
+        this.createFlag = getFlag("graves-create");
+        this.teleportFlag = getFlag("graves-teleport");
     }
 
     private StateFlag getFlag(String string) {
-        if (worldGuardPlugin != null && worldGuardPlugin.isEnabled()) {
+        if (plugin.getServer().getPluginManager().isPluginEnabled("WorldGuard")) {
             Flag<?> flag = worldGuard.getFlagRegistry().get(string);
 
             if (flag instanceof StateFlag) {

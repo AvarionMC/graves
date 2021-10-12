@@ -47,7 +47,9 @@ public final class HologramManager {
             double offsetX = plugin.getConfig("hologram.offset.x", grave).getDouble("hologram.offset.x");
             double offsetY = plugin.getConfig("hologram.offset.y", grave).getDouble("hologram.offset.y");
             double offsetZ = plugin.getConfig("hologram.offset.z", grave).getDouble("hologram.offset.z");
-            location = LocationUtil.roundLocation(location).add(offsetX + 0.5, offsetY - 1.5, offsetZ + 0.5);
+            boolean marker = plugin.getConfig("hologram.marker", grave).getBoolean("hologram.marker");
+            location = LocationUtil.roundLocation(location)
+                    .add(offsetX + 0.5, offsetY + (marker ? 0.49 : -0.49), offsetZ + 0.5);
             List<String> lineList = plugin.getConfig("hologram.line", grave)
                     .getStringList("hologram.line");
             double lineHeight = plugin.getConfig("hologram.height-line", grave)
@@ -61,8 +63,13 @@ public final class HologramManager {
 
                 if (location.getWorld() != null) {
                     ArmorStand armorStand = location.getWorld().spawn(location, ArmorStand.class);
-                    plugin.getDataManager().addHologram(new HologramData(location, armorStand.getUniqueId(),
-                            grave.getUUID(), lineNumber));
+
+                    armorStand.setVisible(false);
+                    armorStand.setGravity(false);
+                    armorStand.setCustomNameVisible(true);
+                    armorStand.setSmall(true);
+                    armorStand.setMarker(marker);
+                    armorStand.setCustomName(StringUtil.parseString(line, location, grave, plugin));
 
                     if (!plugin.getVersionManager().is_v1_7() && !plugin.getVersionManager().is_v1_8()) {
                         armorStand.setInvulnerable(true);
@@ -72,18 +79,15 @@ public final class HologramManager {
                         armorStand.getScoreboardTags().add("graveHologram");
                     }
 
-                    armorStand.setGravity(false);
-                    armorStand.setVisible(false);
-                    armorStand.setCustomNameVisible(true);
-                    armorStand.setCustomName(StringUtil.parseString(line, location, grave, plugin));
-
+                    plugin.getDataManager().addHologramData(new HologramData(location, armorStand.getUniqueId(),
+                            grave.getUUID(), lineNumber));
                     lineNumber++;
                 }
             }
         }
     }
 
-    public void removeHolograms(Grave grave) {
+    public void removeHologram(Grave grave) {
         List<HologramData> hologramDataList = new ArrayList<>();
 
         for (Map.Entry<String, ChunkData> chunkDataEntry : plugin.getDataManager().getChunkDataMap().entrySet()) {
@@ -118,7 +122,7 @@ public final class HologramManager {
                 }
             }
 
-            plugin.getDataManager().removeHologram(removedHologramDataList);
+            plugin.getDataManager().removeHologramData(removedHologramDataList);
         }
     }
 }

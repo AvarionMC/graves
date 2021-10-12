@@ -57,6 +57,21 @@ public class EntityDeathListener implements Listener {
             return;
         }
 
+        // Permissions
+        if (livingEntity instanceof Player) {
+            Player player = (Player) livingEntity;
+
+            if (!player.hasPermission("graves.place")) {
+                plugin.debugMessage("Grave not created for " + entityName
+                        + " because they don't have permission to place graves", 2);
+
+                return;
+            } else if (player.hasPermission("essentials.keepinv")) {
+                plugin.debugMessage(entityName
+                        + " has essentials.keepinv", 2);
+            }
+        }
+
         // Enabled
         if (!plugin.getConfig("grave.enabled", livingEntity, permissionList).getBoolean("grave.enabled")) {
             plugin.debugMessage("Grave not created for " + entityName
@@ -114,11 +129,11 @@ public class EntityDeathListener implements Listener {
 
         // WorldGuard
         if (plugin.hasWorldGuard()) {
-            boolean hasCreateGrave = plugin.getFlagManager().hasCreateGrave(location);
+            boolean hasCreateGrave = plugin.getWorldGuard().hasCreateGrave(location);
 
             if (hasCreateGrave) {
                 if (livingEntity instanceof Player) {
-                    boolean canCreateGrave = plugin.getFlagManager().canCreateGrave((Player) livingEntity, location);
+                    boolean canCreateGrave = plugin.getWorldGuard().canCreateGrave((Player) livingEntity, location);
 
                     if (!canCreateGrave) {
                         plugin.getPlayerManager().sendMessage("message.worldguard-create-deny",
@@ -128,7 +143,7 @@ public class EntityDeathListener implements Listener {
 
                         return;
                     }
-                } else if (!plugin.getFlagManager().canCreateGrave(location)) {
+                } else if (!plugin.getWorldGuard().canCreateGrave(location)) {
                     plugin.debugMessage("Grave not created for " + entityName
                             + " because they are in a region with graves-create set to deny", 2);
 
@@ -149,16 +164,6 @@ public class EntityDeathListener implements Listener {
                     + " because they don't have permission to build where they died", 2);
 
             return;
-        }
-
-        // Player
-        if (livingEntity instanceof Player) {
-            if (!((Player) livingEntity).hasPermission("graves.place")) {
-                plugin.debugMessage("Grave not created for " + entityName
-                        + " because they don't have permission to place graves", 2);
-
-                return;
-            }
         }
 
         // PvP, PvE, Environmental
@@ -248,7 +253,8 @@ public class EntityDeathListener implements Listener {
 
         // Grave
         if (!graveItemStackList.isEmpty()) {
-            Grave grave = plugin.getGraveManager().createGrave(livingEntity, graveItemStackList, permissionList);
+            Grave grave = plugin.getGraveManager().createGrave(livingEntity, plugin.getGraveManager()
+                    .getGraveItemStackList(graveItemStackList, livingEntity, permissionList), permissionList);
 
             grave.setPermissionList(permissionList);
             grave.setOwnerTexture(SkinUtil.getTextureBase64(livingEntity, plugin));
@@ -335,7 +341,8 @@ public class EntityDeathListener implements Listener {
                 }
             } else {
                 event.getDrops().addAll(graveItemStackList);
-                plugin.getPlayerManager().sendMessage("message.failure", livingEntity, location, grave);
+                plugin.getPlayerManager().sendMessage("message.failure", livingEntity,
+                        livingEntity.getLocation(), grave);
                 plugin.debugMessage("Grave not created for " + entityName
                         + " because a safe location could not be found", 2);
             }

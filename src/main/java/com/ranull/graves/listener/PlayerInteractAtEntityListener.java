@@ -3,8 +3,8 @@ package com.ranull.graves.listener;
 import com.ranull.graves.Graves;
 import com.ranull.graves.inventory.Grave;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -26,11 +26,15 @@ public class PlayerInteractAtEntityListener implements Listener {
         if ((!plugin.getVersionManager().hasSecondHand() || event.getHand() == EquipmentSlot.HAND)
                 && event.getRightClicked() instanceof ArmorStand
                 && (plugin.getVersionManager().is_v1_7() || player.getGameMode() != GameMode.SPECTATOR)) {
-            Location location = event.getRightClicked().getLocation();
-            Grave grave = plugin.getHologramManager().getGraveFromHologram(event.getRightClicked());
+            Entity entity = event.getRightClicked();
+            Grave grave = plugin.getHologramManager().getGraveFromHologram(entity);
+
+            if (grave == null && plugin.hasItemsAdder()) {
+                grave = plugin.getItemsAdder().getGraveFromItemsAdder(entity);
+            }
 
             if (grave != null) {
-                event.setCancelled(plugin.getGraveManager().openGrave(player, location, grave));
+                event.setCancelled(plugin.getGraveManager().openGrave(player, entity.getLocation(), grave));
             }
         }
     }

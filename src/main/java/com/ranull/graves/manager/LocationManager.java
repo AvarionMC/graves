@@ -268,11 +268,13 @@ public final class LocationManager {
         if (livingEntity instanceof Player) {
             Player player = (Player) livingEntity;
 
-            return (!plugin.getDataManager().hasChunkData(location)
-                    || !plugin.getDataManager().getChunkData(location).getBlockDataMap().containsKey(location))
-                    && (!plugin.getConfig("placement.can-build", player, permissionList)
+            return (!plugin.getConfig("placement.can-build", player, permissionList)
                     .getBoolean("placement.can-build")
-                    || plugin.getCompatibility().canBuild(player, location, plugin));
+                    || plugin.getCompatibility().canBuild(player, location, plugin))
+                    && (!plugin.hasProtectionLib()
+                    || (!plugin.getConfig("placement.can-build-protectionlib", player, permissionList)
+                    .getBoolean("placement.can-build-protectionlib")
+                    || plugin.getProtectionLib().canBuild(location, player)));
         }
 
         return true;

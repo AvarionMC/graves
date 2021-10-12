@@ -10,22 +10,74 @@ settings:
   # To disable messages, sounds and effects set them to ""
   # To find out what a config option does, scroll down to the default options section, options are there with text explaining what each one does.
 
+  ###########
+  # Storage #
+  ###########
+  # Data storage system.
   storage:
-    type: SQLITE
-    sqlite:
+    type: SQLITE # SQLITE, More storage types will be added in the future.
+    sqlite: # Unless you know what you're doing leave options under sqlite default.
       journal-mode: "WAL" # https://www.sqlite.org/pragma.html#pragma_journal_mode
       synchronous: "OFF" # https://www.sqlite.org/pragma.html#pragma_synchronous
 
-  ##################
-  # Global Options #
-  ##################
+  #########
+  # Debug #
+  #########
+  # Debug information, debug level 2 can be useful in finding out why a Grave does not spawn on your server.
   debug: 0 # 0 = Nothing, 1 = Information, 2 = Failures
+
+  ###############
+  # Integration #
+  ###############
+  # Enable/Disable integrations into other plugins.
+  integration:
+    vault: # https://www.spigotmc.org/resources/vault.34315/
+      enabled: true # Should Vault integration be enabled.
+
+    worldedit: # https://dev.bukkit.org/projects/worldedit/
+      enabled: true # Should WorldEdit integration be enabled.
+
+    worldguard: # https://dev.bukkit.org/projects/worldguard/
+      enabled: true # Should WorldGuard integration be enabled.
+
+    griefdefender: # https://www.spigotmc.org/resources/griefdefender.68900/
+      enabled: true # Should GriefDefender integration be enabled.
+
+    furniturelib: # https://www.spigotmc.org/resources/furniturelibary.9368/
+      enabled: true # Should FurnitureLib integration be enabled.
+
+    protectionlib: # https://www.spigotmc.org/resources/protectionlib.9368/
+      enabled: true # Should ProtectionLib integration be enabled.
+
+    itemsadder: # https://www.spigotmc.org/resources/itemsadder.73355/
+      enabled: true # Should ItemsAdder integration be enabled.
+
+    placeholderapi: # https://www.spigotmc.org/resources/placeholderapi.6245/
+      enabled: true # Should PlaceholderAPI integration be enabled.
+
+  ###############
+  # Token Setup #
+  ###############
+  # Here is where you define your tokens that you can use in graves. Supported only on 1.12+
+  token:
+    basic: # Token name, you can define multiple tokens.
+      material: SUNFLOWER # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+      name: "Grave Token" # Grave token name.
+      craft: true # Can players craft this grave token.
+      lore: # Grave token lore.
+        - "&7Keep this in your inventory and"
+        - "&7when you die a grave will be"
+        - "&7created."
+      recipe: # Grave token recipe, use AIR for an empty square, make sure it is unique.
+        - "GOLD_INGOT GOLD_INGOT GOLD_INGOT"
+        - "GOLD_INGOT EMERALD GOLD_INGOT"
+        - "GOLD_INGOT GOLD_INGOT GOLD_INGOT"
 
   #################
   # Placeholders #
   ################
   # These placeholders relate to the current grave in messages.
-  # %uuid% - UUID
+  # %uuid% - Grave UUID
   # %owner_name% - Owner name
   # %owner_type% - Owner type
   # %owner_uuid% - Owner UUID
@@ -72,28 +124,10 @@ settings:
   # %graves_time_lived_<UUID>% - Lived time
   # %graves_time_lived_formatted_<UUID>% - Lived time formatted
 
-  ###############
-  # Token Setup #
-  ###############
-  # Here is where you define your tokens that you can use in graves. Supported only on 1.12+
-  token:
-    basic: # Token name, you can define multiple tokens.
-      material: SUNFLOWER # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
-      name: "Grave Token" # Grave token name.
-      craft: true # Can players craft this grave token.
-      lore: # Grave token lore.
-        - "&7Keep this in your inventory and"
-        - "&7when you die a grave will be"
-        - "&7created."
-      recipe: # Grave token recipe, use AIR for an empty square, make sure it is uinque.
-        - "GOLD_INGOT GOLD_INGOT GOLD_INGOT"
-        - "GOLD_INGOT EMERALD GOLD_INGOT"
-        - "GOLD_INGOT GOLD_INGOT GOLD_INGOT"
-
   #######################
   # Permission Override #
   #######################
-  # Override default config options for players who have these permissions, "graves.permission.{name}".
+  # Override config options for players who have these permissions, "graves.permission.{name}".
   # If a player has multiple permissions, by group inheritance or manually given, options will be chosen from the top down.
   # Meaning for example, since admin is at the top and if the player has this permission among others.
   # The admin permission will always override permissions below it, therefore you should put your highest permission groups at the top,
@@ -118,7 +152,7 @@ settings:
         grave:
           title: "VIP %owner_name%'s Grave"
 
-    schem: # graves.permission.schem
+    schematic: # graves.permission.schematic
       placement:
         offset:
           y: 1
@@ -130,9 +164,23 @@ settings:
         enabled: true
         name: "grave_default"
 
-    disabled: # graves.permission.disabled
-      grave:
+    furniturelib: # graves.permission.furniture
+      block:
         enabled: false
+      hologram:
+        enabled: false
+      furniturelib:
+        enabled: true
+        name: "GraveStone"
+
+    itemsadder: # graves.permission.furniture
+      block:
+        enabled: false
+      hologram:
+        enabled: false
+      itemsadder:
+        enabled: true
+        name: "mysterious_stone"
 
   ###################
   # Entity Override #
@@ -142,68 +190,19 @@ settings:
   entity:
     # Here we override the options for PLAYER, ENDER_DRAGON and WITHER. ENDER_DRAGON and WITHER are disabled by default.
     PLAYER: # Override default options for Players.
+      block:
+        head:
+          type: 1
       grave:
         enabled: true
         time: 10800
-      protection:
-        enabled: false
-        time: 300
-        open:
-          owner: true
-          killer: true
-          other: false
-          missing:
-            owner: true
-            other: false
       hologram:
         enabled: true
         line:
-          - "&7%owner_name% &c☠"
-          - "&r%item% &7items &r/ &r%level% &7levels"
-          #- "&r%item% &7items &r/ &r%level% &7levels &r%state_protection%" # With Protection
-          - "&7Killed &fby &c%killer_name%"
-          - "%time_alive_remaining_formatted%"
+          - "&7%owner_name%'s &rGrave"
+          - "&c%killer_name% &c☠"
+          #- "%time_alive_remaining_formatted%"
       world:
-        - ALL
-      death:
-        reason:
-          - ALL
-
-    ENDER_DRAGON: # Override default options for Ender Dragons.
-      grave:
-        enabled: false
-        time: -1
-        explode: false
-      block:
-        material: DRAGON_HEAD
-      gui:
-        grave:
-          title: "%owner_name% Corpse"
-      command:
-        create:
-          - "say %killer_name% killed the %owner_name%."
-      world:
-        - world_the_end
-        - ALL
-      death:
-        reason:
-          - ALL
-
-    WITHER: # Override default options for Withers.
-      grave:
-        enabled: false
-        time: -1
-        explode: false
-      block:
-        enabled: false
-      gui:
-        grave:
-          title: "%owner_name% Corpse"
-      schematic:
-        enabled: true
-        name: "grave_wither"
-      world:
-        - world
         - ALL
       death:
         reason:
@@ -226,13 +225,19 @@ settings:
         break: true # Can graves be broken.
         explode: true # Can graves be blown up.
 
+      ###########
+      # Storage #
+      ###########
+      # How the items are saved in graves, compact mode stacks all items and puts them into a small as possible inventory. exact mode matches the players inventory exactly.
+      storage:
+        mode: COMPACT # Storage mode: COMPACT, EXACT
+
       ########
       # Drop #
       ########
       # Should a grave drop it's contents when destroyed for the following reasons.
       drop:
-        block: true #
-        timeout: true # When a grave times out drop everything in it. If false it gets destroyed.
+        timeout: false # When a grave times out drop everything in it. If false it gets destroyed.
         explode: true # When a grave explodes drop everything in it. If false it gets destroyed.
         break: true # When a grave is broken drop everything in it. If false it gets destroyed.
 
@@ -260,21 +265,22 @@ settings:
           z: 0 # Block offset Z.
         walk-over: false # Should graves be looted if the block is walked over.
         head:
-          type: 0 # 0 = Player/Entity head, (1 = Custom texture or 2 = Player username set under headSkin).
+          type: 0 # 0 = Player/Entity head, (1 = Custom texture or 2 = Player username set under name).
           base64: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjdjYWI1NmM4MmNiODFiZGI5OTc5YTQ2NGJjOWQzYmEzZTY3MjJiYTEyMmNmNmM1Mjg3MzAxMGEyYjU5YWVmZSJ9fX0="
-          name: "MHF_Chest" # If headSkinType is set to 2.
+          name: "MHF_Chest" # If type is set to 2.
 
       #############
       # Placement #
       #############
       # How grave blocks or holograms are placed.
       placement:
-        can-build: true # Only create graves where the entity can build, should work with all protection plugins.
+        can-build: false # Only create graves where the entity can build, should work with all protection plugins.
+        can-build-protectionlib: false # Only create graves where the entity can build, (According to ProtectionLib).
         ground: true # If the entity dies in the air should the grave fall to the ground.
+        void: true # If the entity dies in the void, should it place a grave in the air if it can't find anywhere else.
         lava-top: true # If the entity dies in lava should the grave it float to the top.
-        lava-smart: true # If the entity died in lava, try place the grave on the last solid block they stood on. (Only works for players)
-        void: true # If the entity died in the void, should it place a grave in the air if it can't find anywhere else.
-        void-smart: true # If the player died in the void, try place the grave on the last solid block they stood on. (Only works for players)
+        void-smart: true # If the entity dies in the void, try place the grave on the last solid block they stood on. (Only works for players)
+        lava-smart: true # If the entity dies in lava, try place the grave on the last solid block they stood on. (Only works for players)
         offset:
           x: 0 # Placement offset X, this will affect all other offsets.
           y: 0 # Placement offset Y, this will affect all other offsets.
@@ -284,16 +290,15 @@ settings:
       # Respawn #
       ###########
       respawn:
-        compass: true
+        enabled: true # Should entities be given a compass to their last grave when they respawn. (Only works for players)
         compass-time: 30 # How long should the entity be given a compass on respawn after the grave was first created.
         function: "none" # Should we run a function after respawning, you can use menu and list among the other functions.
 
       ###########
       # Compass #
       ###########
-      # Only supported on 1.16.2+.
+      # Compass that points towards the closest location belonging to a grave, only supported on 1.16.2+.
       compass:
-        enabled: true # Should entities be given a compass to their last grave when they respawn. (Only works for players)
         function: "distance" # The function that gets run on right click.
         ignore: true # Ignore the compass if an entity dies with it, drop it normally.
         destroy: true # Should a previous compass be destroyed when creating a new grave.
@@ -313,12 +318,32 @@ settings:
           y: 0 # Schematic offset Y.
           z: 0 # Schematic offset Z.
 
+      ################
+      # FurnitureLib #
+      ################
+      # This option requires FurnitureLib, you must have this installed to use models.
+      furniturelib:
+        enabled: false # Should FurnitureLib furniture be used.
+        name: "GraveStone" # Object ID, GraveStone requires the DiceFurniture plugin.
+        line: # If the model contains a sign, this is the text we will apply to it.
+          - "%owner_name% Died"
+          - "By %killer_name%"
+
+      ##############
+      # ItemsAdder #
+      ##############
+      # The option requires ItemsAdder, you must have this installed to use models.
+      itemsadder:
+        enabled: false # Should ItemsAdder furniture be used.
+        name: "mysterious_stone" # Furniture name.
+
       ############
       # Hologram #
       ############
-      # If you are running PaperMC you can set armor-stands-tick to false for improved performance without impacting any function.
+      # If you are running PaperMC you can set armor-stands-tick to false for improved performance without impacting any functionality.
       hologram:
         enabled: false # Should holograms be created.
+        marker: true # Should the hologram be a marker, you can't interact with markers.
         height: 0.28 # Height the hologram spawns.
         height-line: 0.28 # How far apart should holograms be from each-other.
         offset:
@@ -345,12 +370,13 @@ settings:
       ##############
       # Protection #
       ##############
+      # Grave protection, protect graves from players, this does not protect from explosions, look for grave: explode: to disable this.
       protection:
         enabled: false # Enable the grave protection feature.
-        time: 5 # Seconds, 300 = 5 minutes. Set to -1 to always stay locked.
+        time: 300 # Seconds, 300 = 5 minutes. Set to -1 to always stay locked.
         open:
           owner: true # Can the owner open the owners grave.
-          killer: false # Can the killer open the owners grave.
+          killer: true # Can the killer open the owners grave.
           other: false # Can other entities open the owners grave.
           missing:
             owner: true # If a killer can't be found should the owner be allowed to open the grave.
@@ -362,7 +388,7 @@ settings:
       ##############
       # Experience #
       ##############
-      # If expStore is false it will store what Minecraft would normally drop, if you want to fully disable it, set expStore to true and expStorePercent to 0.
+      # If store is false it will store what Minecraft would normally drop, if you want to fully disable it, set store to true and store-percent to 0.
       experience:
         store: true # Should all the entities EXP be stored in the grave. If false only the vanilla drop amount will be stored.
         store-percent: 0.8 # How much of the EXP should be stored, 0.8 = 80%, 1 = 100%, 0 = 0%.
@@ -370,6 +396,7 @@ settings:
       ############
       # Teleport #
       ############
+      # Teleportation options.
       teleport:
         enabled: true # Can the entity teleport to their grave from the Graves GUI.
         cost: 5 # How much it costs to teleport to a grave, you need Vault for this.
@@ -377,11 +404,11 @@ settings:
         cost-distance-increase: true # Increase the price the further away the grave is.
         unsafe: false # Should entities be allowed to always teleport to a grave even if unsafe.
         top: true # If the grave is in an unsafe location, should the entity be teleported to the top.
-        top-nether: false # Should entities be teleported to the top of the nether.
 
       ###########
       # Virtual #
       ###########
+      # Options for the virtual inventory.
       virtual:
         distance: 15 # Minimum distance entities need to be from a grave to open it virtually. -1 for infinite distance.
 
@@ -424,7 +451,7 @@ settings:
                 lore:
                   - "Teleport to your grave"
 
-              #2: # Toggle protection on and off, you can uncomment this if you want
+              #2: # Toggle protection on and off, you can uncomment this if you want.
               #  material: "TRIPWIRE_HOOK"
               #  function: "protection"
               #  name: "Toggle Protection %state_protection%"
@@ -563,7 +590,7 @@ settings:
       ###########
       replace:
         block: # What blocks can graves replace.
-          not-solid: true # Replace non-solid blocks
+          not-solid: true # Replace blocks that are not solid.
 
       #########
       # Death #
