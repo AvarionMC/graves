@@ -6,6 +6,7 @@ import com.ranull.graves.data.ChunkData;
 import com.ranull.graves.data.HologramData;
 import com.ranull.graves.data.integration.FurnitureLibData;
 import com.ranull.graves.data.integration.ItemsAdderData;
+import com.ranull.graves.data.integration.OraxenData;
 import com.ranull.graves.inventory.Grave;
 import com.ranull.graves.util.ClassUtil;
 import com.ranull.graves.util.InventoryUtil;
@@ -51,6 +52,10 @@ public final class DataManager {
             if (plugin.hasItemsAdder()) {
                 loadItemsAdderMap();
             }
+
+            if (plugin.hasOraxen()) {
+                loadOraxenMap();
+            }
         });
     }
 
@@ -65,6 +70,10 @@ public final class DataManager {
 
         if (plugin.hasItemsAdder()) {
             setupItemsAdderTable();
+        }
+
+        if (plugin.hasOraxen()) {
+            setupOraxenTable();
         }
     }
 
@@ -312,6 +321,10 @@ public final class DataManager {
         setupFurnitureIntegrationTable("itemsadder");
     }
 
+    public void setupOraxenTable() {
+        setupFurnitureIntegrationTable("oraxen");
+    }
+
     private void setupFurnitureIntegrationTable(String name) {
         executeUpdate("CREATE TABLE IF NOT EXISTS " + name + " (" +
                 "chunk VARCHAR(255),\n" +
@@ -428,6 +441,24 @@ public final class DataManager {
         }
     }
 
+    private void loadOraxenMap() {
+        ResultSet resultSet = executeQuery("SELECT * FROM oraxen;");
+
+        if (resultSet != null) {
+            try {
+                while (resultSet.next()) {
+                    Location location = LocationUtil.chunkStringToLocation(resultSet.getString("chunk"));
+                    UUID uuidEntity = UUID.fromString(resultSet.getString("uuid_entity"));
+                    UUID uuidGrave = UUID.fromString(resultSet.getString("uuid_grave"));
+
+                    getChunkData(location).addOraxenData(new OraxenData(location, uuidEntity, uuidGrave));
+                }
+            } catch (SQLException exception) {
+                exception.printStackTrace();
+            }
+        }
+    }
+
     public void addBlockData(BlockData blockData) {
         getChunkData(blockData.getLocation()).addBlockData(blockData);
 
@@ -536,6 +567,37 @@ public final class DataManager {
                 getChunkData(itemsAdderData.getLocation()).removeItemsAdderData(itemsAdderData);
                 statement.addBatch("DELETE FROM itemsadder WHERE uuid_entity = '"
                         + itemsAdderData.getUUIDEntity() + "';");
+            }
+
+            plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+                executeBatch(statement);
+            });
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    public void addOraxenData(OraxenData oraxenData) {
+        getChunkData(oraxenData.getLocation()).addOraxenData(oraxenData);
+
+        String chunk = "'" + LocationUtil.chunkToString(oraxenData.getLocation()) + "'";
+        String uuidEntity = "'" + oraxenData.getUUIDEntity() + "'";
+        String uuidGrave = "'" + oraxenData.getUUIDGrave() + "'";
+
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+            executeUpdate("INSERT INTO oraxen (chunk, uuid_entity, uuid_grave) VALUES ("
+                    + chunk + ", " + uuidEntity + ", " + uuidGrave + ");");
+        });
+    }
+
+    public void removeOraxenData(List<OraxenData> oraxenDataList) {
+        try {
+            Statement statement = connection.createStatement();
+
+            for (OraxenData oraxenData : oraxenDataList) {
+                getChunkData(oraxenData.getLocation()).removeOraxenData(oraxenData);
+                statement.addBatch("DELETE FROM oraxen WHERE uuid_entity = '"
+                        + oraxenData.getUUIDEntity() + "';");
             }
 
             plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {

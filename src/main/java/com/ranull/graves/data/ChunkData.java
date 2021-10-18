@@ -2,6 +2,7 @@ package com.ranull.graves.data;
 
 import com.ranull.graves.data.integration.FurnitureLibData;
 import com.ranull.graves.data.integration.ItemsAdderData;
+import com.ranull.graves.data.integration.OraxenData;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -17,6 +18,7 @@ public class ChunkData {
     private final Map<UUID, HologramData> hologramDataMap;
     private final Map<UUID, FurnitureLibData> furnitureLibDataMap;
     private final Map<UUID, ItemsAdderData> itemsAdderDataMap;
+    private final Map<UUID, OraxenData> oraxenDataMap;
 
     public ChunkData(Location location) {
         this.world = location.getWorld();
@@ -26,6 +28,7 @@ public class ChunkData {
         this.hologramDataMap = new HashMap<>();
         this.furnitureLibDataMap = new HashMap<>();
         this.itemsAdderDataMap = new HashMap<>();
+        this.oraxenDataMap = new HashMap<>();
     }
 
     public World getWorld() {
@@ -64,6 +67,10 @@ public class ChunkData {
         return itemsAdderDataMap;
     }
 
+    public Map<UUID, OraxenData> getOraxenDataMap() {
+        return oraxenDataMap;
+    }
+
     public void addBlockData(BlockData blockData) {
         blockDataMap.put(blockData.getLocation(), blockData);
     }
@@ -94,5 +101,13 @@ public class ChunkData {
 
     public void removeItemsAdderData(ItemsAdderData itemsAdderData) {
         furnitureLibDataMap.remove(itemsAdderData.getUUIDEntity());
+    }
+
+    public void addOraxenData(OraxenData oraxenData) {
+        oraxenDataMap.put(oraxenData.getUUIDEntity(), oraxenData);
+    }
+
+    public void removeOraxenData(OraxenData oraxenData) {
+        oraxenDataMap.remove(oraxenData.getUUIDEntity());
     }
 }

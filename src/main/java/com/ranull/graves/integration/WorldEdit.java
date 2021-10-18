@@ -3,9 +3,9 @@ package com.ranull.graves.integration;
 import com.ranull.graves.Graves;
 import com.ranull.graves.inventory.Grave;
 import com.ranull.graves.util.BlockFaceUtil;
+import com.ranull.graves.util.ResourceUtil;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
@@ -20,6 +20,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
+import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,28 +30,29 @@ import java.util.Map;
 
 public final class WorldEdit {
     private final Graves plugin;
+    private final Plugin worldEditPlugin;
     private final com.sk89q.worldedit.WorldEdit worldEdit;
     private final Map<String, Clipboard> stringClipboardMap;
 
-    public WorldEdit(Graves plugin) {
+    public WorldEdit(Graves plugin, Plugin worldEditPlugin) {
         this.plugin = plugin;
+        this.worldEditPlugin = worldEditPlugin;
         this.worldEdit = com.sk89q.worldedit.WorldEdit.getInstance();
         this.stringClipboardMap = new HashMap<>();
-        File schematicsFile = new File(plugin.getDataFolder() + File.separator + "schematics");
-        String defaultSchematic = "grave_default";
-        String defaultSchematicPath = schematicsFile + File.separator + defaultSchematic + ".schem";
 
-        if ((!schematicsFile.exists() && schematicsFile.mkdirs())
-                || (schematicsFile.exists() && !(new File(defaultSchematicPath).exists()))) {
-            plugin.saveResource("schematics" + File.separator + defaultSchematic + ".schem", false);
-            plugin.saveResource("schematics" + File.separator + "grave_wither.schem", false);
-            plugin.infoMessage("Saved schematic " + defaultSchematic);
-        }
-
-        load();
+        saveData();
+        loadData();
     }
 
-    public void load() {
+    public void saveData() {
+        if (plugin.getConfig().getBoolean("settings.integration.worldedit.write")) {
+            ResourceUtil.copyResources("data/plugin/" + worldEditPlugin.getName().toLowerCase() + "/schematics",
+                    plugin.getDataFolder() + "/schematics", plugin);
+            plugin.debugMessage("Saving " + worldEditPlugin.getName() + " schematics.", 1);
+        }
+    }
+
+    public void loadData() {
         stringClipboardMap.clear();
 
         File schematicsFile = new File(plugin.getDataFolder() + File.separator + "schematics");
@@ -88,7 +90,7 @@ public final class WorldEdit {
                 int offsetZ = plugin.getConfig("schematic.offset.z", grave).getInt("schematic.offset.z");
 
 
-                Clipboard test = pasteSchematic(location.clone().add(offsetX, offsetY, offsetZ), grave.getYaw(), schematicName);
+                pasteSchematic(location.clone().add(offsetX, offsetY, offsetZ), grave.getYaw(), schematicName);
                 //PasteBuilder test = getSchematic(location.clone().add(offsetX, offsetY, offsetZ), grave.getYaw(), schematicName);
                 //buildSchematic(test);
                 plugin.debugMessage("Placing schematic for " + grave.getUUID() + " at "
@@ -105,7 +107,6 @@ public final class WorldEdit {
             if (stringClipboardMap.containsKey(name)) {
                 Clipboard clipboard = stringClipboardMap.get(name);
                 BlockVector3 offset = clipboard.getOrigin();
-                ;
                 Region region = clipboard.getRegion();
                 int width = region.getWidth();
                 int height = region.getHeight();
@@ -158,8 +159,7 @@ public final class WorldEdit {
             if (stringClipboardMap.containsKey(name)) {
                 Clipboard clipboard = stringClipboardMap.get(name);
 
-                try {
-                    final EditSession editSession = getEditSession(location.getWorld());
+                try (EditSession editSession = getEditSession(location.getWorld())) {
                     ClipboardHolder clipboardHolder = new ClipboardHolder(clipboard);
 
                     clipboardHolder.setTransform(clipboardHolder.getTransform().combine(getYawTransform(yaw)));
@@ -231,6 +231,7 @@ public final class WorldEdit {
     }
 
     private EditSession getEditSession(World world) {
-        return worldEdit.newEditSession(BukkitAdapter.adapt(world));
+        //return worldEdit.newEditSession(BukkitAdapter.adapt(world));
+        return worldEdit.newEditSession((com.sk89q.worldedit.world.World) world);
     }
 }

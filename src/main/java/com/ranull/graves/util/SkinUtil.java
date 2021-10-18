@@ -1,13 +1,11 @@
 package com.ranull.graves.util;
 
-import com.github.joelgodofwar.mmh.MoreMobHeads;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.ranull.graves.Graves;
 import com.ranull.skulltextureapi.SkullTextureAPI;
 import org.bukkit.block.Skull;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -44,22 +42,6 @@ public final class SkinUtil {
                     }
                 } catch (NoSuchMethodError exception) {
                     plugin.debugMessage("SkullTextureAPI detected but can't find method getTextureBase64, " +
-                            "maybe you are running an outdated version", 1);
-                }
-            }
-
-            Plugin moreMobHeadsPlugin = plugin.getServer().getPluginManager().getPlugin("MoreMobHeads");
-
-            if (entity instanceof LivingEntity && moreMobHeadsPlugin != null && moreMobHeadsPlugin.isEnabled()
-                    && moreMobHeadsPlugin instanceof MoreMobHeads) {
-                try {
-                    String base64 = ((MoreMobHeads) moreMobHeadsPlugin).getTextureFromEntity((LivingEntity) entity);
-
-                    if (base64 != null && !base64.equals("")) {
-                        return base64;
-                    }
-                } catch (NoSuchMethodError exception) {
-                    plugin.debugMessage("MoreMobHeads detected but can't find method getTextureFromEntity, " +
                             "maybe you are running an outdated version", 1);
                 }
             }

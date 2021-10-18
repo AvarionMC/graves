@@ -1,62 +1,100 @@
 package com.ranull.graves.integration;
 
+import com.griefdefender.api.Core;
 import com.griefdefender.api.Registry;
 import com.griefdefender.api.Tristate;
-import com.griefdefender.api.claim.ClaimContexts;
+import com.griefdefender.api.claim.Claim;
+import com.griefdefender.api.data.PlayerData;
 import com.griefdefender.api.permission.Context;
-import com.griefdefender.api.permission.ContextKeys;
+import com.griefdefender.api.permission.PermissionManager;
 import com.griefdefender.api.permission.flag.Flag;
-import com.griefdefender.api.permission.flag.FlagData;
-import com.griefdefender.api.permission.flag.FlagDefinition;
 import com.griefdefender.api.registry.CatalogRegistryModule;
-import com.griefdefender.api.util.generator.DummyObjectProvider;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import java.util.HashSet;
-import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public final class GriefDefender {
-    private final FlagDefinition.Builder definitionBuilder;
-    private final FlagData.Builder flagDataBuilder;
-    private final CatalogRegistryModule<Flag> catalogRegistryModule;
+    private final Core core;
+    private final Registry registry;
+    private final PermissionManager permissionManager;
+    private final Flag createFlag;
+    private final Flag teleportFlag;
 
     public GriefDefender() {
-        Registry registry = com.griefdefender.api.GriefDefender.getRegistry();
+        core = com.griefdefender.api.GriefDefender.getCore();
+        registry = com.griefdefender.api.GriefDefender.getRegistry();
+        permissionManager = com.griefdefender.api.GriefDefender.getPermissionManager();
+        createFlag = buildCreateFlag();
+        teleportFlag = buildTeleportFlag();
+        Optional<CatalogRegistryModule<Flag>> catalogRegistryModule = registry.getRegistryModuleFor(Flag.class);
 
-        this.definitionBuilder = registry.createBuilder(FlagDefinition.Builder.class);
-        this.flagDataBuilder = registry.createBuilder(FlagData.Builder.class);
-        this.catalogRegistryModule = registry.getRegistryModuleFor(Flag.class).orElse(null);
+        if (catalogRegistryModule.isPresent()) {
+            catalogRegistryModule.get().registerCustomType(createFlag);
+            catalogRegistryModule.get().registerCustomType(teleportFlag);
+        }
     }
 
-    public void registerFlag() {
-        //registerCustomType(generateFlag("graves-create")); // TODO
+    private Flag buildCreateFlag() {
+        return Flag.builder()
+                .id("graves:graves-create")
+                .name("graves-create")
+                .permission("griefdefender.flag.graves.graves-create")
+                .build();
     }
 
-    private List<Flag> generateFlag(String name) {
-        Set<Context> flagContexts = new HashSet<>();
-        flagContexts.add(new Context(ContextKeys.SOURCE, "minecraft:player"));
-
-        return definitionBuilder
-                .reset()
-                .name(name)
-                .admin(true)
-                .context(ClaimContexts.USER_DEFAULT_CONTEXT)
-                .defaultValue(Tristate.TRUE)
-                //.description(Component.text("Create graves"))
-                .group("admin")
-                .flagData(flagDataBuilder
-                        .reset()
-                        .flag(createFor(name))
-                        .contexts(flagContexts)
-                        .build())
-                .build().getFlags();
+    private Flag buildTeleportFlag() {
+        return Flag.builder()
+                .id("graves:graves-teleport")
+                .name("graves-teleport")
+                .permission("griefdefender.flag.graves.graves-teleport")
+                .build();
     }
 
-    private Flag createFor(String name) {
-        return DummyObjectProvider.createFor(Flag.class, name);
+    public boolean canCreateGrave(Player player, Location location) {
+        if (location.getWorld() != null) {
+            PlayerData playerData = core.getPlayerData(location.getWorld().getUID(), player.getUniqueId());
+
+            if (playerData != null) {
+                Claim claim = core.getClaimAt(location);
+                Set<Context> contextSet = new HashSet<>();
+
+                contextSet.add(new Context("graves:graves_create", player.getName()));
+
+                Tristate tristate = permissionManager.getActiveFlagPermissionValue(null, location, claim,
+                        playerData.getUser(), createFlag, player, player, contextSet, null, true);
+
+                return tristate == Tristate.TRUE;
+            }
+        }
+
+        return false;
     }
 
-    private void registerCustomType(List<Flag> flagList) {
-        flagList.forEach((catalogRegistryModule::registerCustomType));
+    /*
+
+    public boolean canCreateGrave(Location location) {
+        return createFlag != null
+                && worldGuard.getPlatform().getRegionContainer().createQuery().testState(BukkitAdapter.adapt(location),
+                (RegionAssociable) null, createFlag);
+    }
+
+    public boolean canTeleport(Player player, Location location) {
+        return createFlag != null
+                && worldGuard.getPlatform().getRegionContainer().createQuery().testState(BukkitAdapter.adapt(location),
+                WorldGuardPlugin.inst().wrapPlayer(player), teleportFlag);
+    }
+
+    public boolean canTeleport(Location location) {
+        return createFlag != null
+                && worldGuard.getPlatform().getRegionContainer().createQuery().testState(BukkitAdapter.adapt(location),
+                (RegionAssociable) null, teleportFlag);
+    }
+     */
+
+    public boolean canTeleport(Player player, Location location) {
+        return true; // TODO
     }
 }

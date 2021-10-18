@@ -1,0 +1,12 @@
+grave:
+  displayname: "<white>Grave"
+  material: PAPER
+  Mechanics:
+    furniture:
+      enabled: true
+      drop:
+        loots:
+          - { oraxen_item: grave, probability: 1.0 }
+  Pack:
+    generate_model: false
+    model: graves/grave

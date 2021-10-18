@@ -64,24 +64,26 @@ public final class HologramManager {
                 if (location.getWorld() != null) {
                     ArmorStand armorStand = location.getWorld().spawn(location, ArmorStand.class);
 
-                    armorStand.setVisible(false);
-                    armorStand.setGravity(false);
-                    armorStand.setCustomNameVisible(true);
-                    armorStand.setSmall(true);
-                    armorStand.setMarker(marker);
-                    armorStand.setCustomName(StringUtil.parseString(line, location, grave, plugin));
+                    if (location.getWorld().getEntities().contains(armorStand)) {
+                        armorStand.setVisible(false);
+                        armorStand.setGravity(false);
+                        armorStand.setCustomNameVisible(true);
+                        armorStand.setSmall(true);
+                        armorStand.setMarker(marker);
+                        armorStand.setCustomName(StringUtil.parseString(line, location, grave, plugin));
 
-                    if (!plugin.getVersionManager().is_v1_7() && !plugin.getVersionManager().is_v1_8()) {
-                        armorStand.setInvulnerable(true);
+                        if (!plugin.getVersionManager().is_v1_7() && !plugin.getVersionManager().is_v1_8()) {
+                            armorStand.setInvulnerable(true);
+                        }
+
+                        if (plugin.getVersionManager().hasScoreboardTags()) {
+                            armorStand.getScoreboardTags().add("graveHologram");
+                        }
+
+                        plugin.getDataManager().addHologramData(new HologramData(location, armorStand.getUniqueId(),
+                                grave.getUUID(), lineNumber));
+                        lineNumber++;
                     }
-
-                    if (plugin.getVersionManager().hasScoreboardTags()) {
-                        armorStand.getScoreboardTags().add("graveHologram");
-                    }
-
-                    plugin.getDataManager().addHologramData(new HologramData(location, armorStand.getUniqueId(),
-                            grave.getUUID(), lineNumber));
-                    lineNumber++;
                 }
             }
         }

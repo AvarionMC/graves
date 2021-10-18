@@ -6,7 +6,7 @@
 
     <groupId>com.ranull</groupId>
     <artifactId>Graves</artifactId>
-    <version>4.3</version>
+    <version>4.4</version>
     <name>Graves</name>
     <description>Full featured lightweight death chest plugin.</description>
 
@@ -92,6 +92,10 @@
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
         <repository>
+            <id>ranull-repo</id>
+            <url>https://repo.ranull.com/maven/releases/</url>
+        </repository>
+        <repository>
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
@@ -101,11 +105,19 @@
         </repository>
         <repository>
             <id>placeholderapi</id>
-            <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+        </repository>
+        <repository>
+            <id>dmulloy2-repo</id>
+            <url>https://repo.dmulloy2.net/repository/public/</url>
         </repository>
         <repository>
             <id>glaremasters</id>
             <url>https://repo.glaremasters.me/repository/bloodshot</url>
+        </repository>
+        <repository>
+            <id>jeff-media-repo</id>
+            <url>https://repo.jeff-media.de/maven2/</url>
         </repository>
         <repository>
             <id>enginehub</id>
@@ -128,6 +140,12 @@
             <groupId>com.mojang</groupId>
             <artifactId>authlib</artifactId>
             <version>1.5.21</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.ranull</groupId>
+            <artifactId>SkullTextureAPI</artifactId>
+            <version>1.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -167,9 +185,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.LoneDev6</groupId>
-            <artifactId>api-itemsadder</artifactId>
-            <version>2.4.7</version>
+            <groupId>com.comphenix.protocol</groupId>
+            <artifactId>ProtocolLib</artifactId>
+            <version>4.7.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -179,24 +197,34 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.github.LoneDev6</groupId>
+            <artifactId>api-itemsadder</artifactId>
+            <version>2.4.8</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.oraxen</groupId>
+            <artifactId>oraxen</artifactId>
+            <version>-bd81ace154-1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.jeff_media</groupId>
+            <artifactId>ChestSortAPI</artifactId>
+            <version>11.0.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jojodmo</groupId>
+            <artifactId>ItemBridge</artifactId>
+            <version>b0054538c1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
             <version>2.2.1</version>
             <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.ranull.skulltextureapi</groupId>
-            <artifactId>SkullTextureAPI</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>/home/user/code/jar/SkullTextureAPI.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>com.github.joelgodofwar.mmh</groupId>
-            <artifactId>MoreMobHeads</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>/home/user/code/jar/MoreMobHeads.jar</systemPath>
         </dependency>
     </dependencies>
 </project>

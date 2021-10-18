@@ -30,8 +30,8 @@ public final class FurnitureLib extends FurniturePlugin {
 
         this.plugin = plugin;
         this.furnitureLib = de.Ste3et_C0st.FurnitureLib.main.FurnitureLib.getInstance();
-        this.projectClickListener = new ProjectClickListener(plugin);
-        this.projectBreakListener = new ProjectBreakListener(plugin);
+        this.projectClickListener = new ProjectClickListener(plugin, this);
+        this.projectBreakListener = new ProjectBreakListener(this);
 
         plugin.getServer().getPluginManager().registerEvents(projectClickListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(projectBreakListener, plugin);
@@ -57,7 +57,8 @@ public final class FurnitureLib extends FurniturePlugin {
     public Grave getGraveFromFurnitureLib(Location location, UUID uuid) {
         FurnitureLibData furnitureLibData = getFurnitureLibData(location, uuid);
 
-        return furnitureLibData != null && plugin.getDataManager().getGraveMap().containsKey(furnitureLibData.getUUIDGrave())
+        return furnitureLibData != null && plugin.getDataManager().getGraveMap()
+                .containsKey(furnitureLibData.getUUIDGrave())
                 ? plugin.getDataManager().getGraveMap().get(furnitureLibData.getUUIDGrave()) : null;
     }
 

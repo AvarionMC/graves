@@ -18,9 +18,11 @@ import java.util.List;
 
 public final class RecipeManager {
     private final Graves plugin;
+    private final List<NamespacedKey> namespacedKeyList;
 
     public RecipeManager(Graves plugin) {
         this.plugin = plugin;
+        this.namespacedKeyList = new ArrayList<>();
         reload();
     }
 
@@ -92,44 +94,49 @@ public final class RecipeManager {
     }
 
     public void addTokenRecipe(String token, ItemStack itemStack) {
-        ShapedRecipe shapedRecipe = new ShapedRecipe(new NamespacedKey(plugin, token + "GraveToken"), itemStack);
+        NamespacedKey namespacedKey = new NamespacedKey(plugin, token + "GraveToken");
 
-        shapedRecipe.shape("ABC", "DEF", "GHI");
+        if (!namespacedKeyList.contains(namespacedKey)) {
+            ShapedRecipe shapedRecipe = new ShapedRecipe(namespacedKey, itemStack);
 
-        List<String> lineList = plugin.getConfig().getStringList("settings.token." + token + ".recipe");
-        int recipeKey = 1;
+            shapedRecipe.shape("ABC", "DEF", "GHI");
 
-        for (String string : lineList.get(0).split(" ")) {
-            Material material = Material.matchMaterial(string);
+            List<String> lineList = plugin.getConfig().getStringList("settings.token." + token + ".recipe");
+            int recipeKey = 1;
 
-            if (material != null) {
-                shapedRecipe.setIngredient(getChar(recipeKey), material);
+            for (String string : lineList.get(0).split(" ")) {
+                Material material = Material.matchMaterial(string);
+
+                if (material != null) {
+                    shapedRecipe.setIngredient(getChar(recipeKey), material);
+                }
+
+                recipeKey++;
             }
 
-            recipeKey++;
-        }
+            for (String string : lineList.get(1).split(" ")) {
+                Material material = Material.matchMaterial(string);
 
-        for (String string : lineList.get(1).split(" ")) {
-            Material material = Material.matchMaterial(string);
+                if (material != null) {
+                    shapedRecipe.setIngredient(getChar(recipeKey), material);
+                }
 
-            if (material != null) {
-                shapedRecipe.setIngredient(getChar(recipeKey), material);
+                recipeKey++;
             }
 
-            recipeKey++;
-        }
+            for (String string : lineList.get(2).split(" ")) {
+                Material material = Material.matchMaterial(string);
 
-        for (String string : lineList.get(2).split(" ")) {
-            Material material = Material.matchMaterial(string);
+                if (material != null) {
+                    shapedRecipe.setIngredient(getChar(recipeKey), material);
+                }
 
-            if (material != null) {
-                shapedRecipe.setIngredient(getChar(recipeKey), material);
+                recipeKey++;
             }
 
-            recipeKey++;
+            plugin.getServer().addRecipe(shapedRecipe);
+            namespacedKeyList.add(namespacedKey);
         }
-
-        plugin.getServer().addRecipe(shapedRecipe);
     }
 
     public ItemStack getGraveTokenFromPlayer(String token, List<ItemStack> itemStackList) {
@@ -169,6 +176,18 @@ public final class RecipeManager {
         }
 
         return false;
+    }
+
+    public String getTokenName(ItemStack itemStack) {
+        if (plugin.getVersionManager().hasPersistentData()) {
+            if (itemStack.getItemMeta() != null && itemStack.getItemMeta().getPersistentDataContainer()
+                    .has(new NamespacedKey(plugin, "token"), PersistentDataType.STRING)) {
+                return itemStack.getItemMeta().getPersistentDataContainer()
+                        .get(new NamespacedKey(plugin, "token"), PersistentDataType.STRING);
+            }
+        }
+
+        return null;
     }
 
     public boolean isToken(ItemStack itemStack) {

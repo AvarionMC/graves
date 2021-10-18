@@ -5,11 +5,14 @@ import com.ranull.graves.data.ChunkData;
 import com.ranull.graves.data.integration.ItemsAdderData;
 import com.ranull.graves.inventory.Grave;
 import com.ranull.graves.util.BlockFaceUtil;
+import com.ranull.graves.util.LocationUtil;
+import com.ranull.graves.util.ResourceUtil;
 import dev.lone.itemsadder.api.CustomBlock;
 import dev.lone.itemsadder.api.CustomFurniture;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
+import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,9 +21,23 @@ import java.util.Map;
 
 public final class ItemsAdder {
     private final Graves plugin;
+    private final Plugin itemsAdderPlugin;
 
-    public ItemsAdder(Graves plugin) {
+    public ItemsAdder(Graves plugin, Plugin itemsAdderPlugin) {
         this.plugin = plugin;
+        this.itemsAdderPlugin = itemsAdderPlugin;
+
+        saveData();
+    }
+
+    public void saveData() {
+        if (plugin.getConfig().getBoolean("settings.integration.itemsadder.write")) {
+            ResourceUtil.copyResources("data/plugin/" + itemsAdderPlugin.getName().toLowerCase() + "/data",
+                    plugin.getPluginsFolder() + "/" + itemsAdderPlugin.getName() + "/data", plugin);
+            ResourceUtil.copyResources("data/model/grave.json", plugin.getPluginsFolder() + "/"
+                    + itemsAdderPlugin.getName() + "/data/resource_pack/assets/graves/models/graves/grave.json", plugin);
+            plugin.debugMessage("Saving " + itemsAdderPlugin.getName() + " data.", 1);
+        }
     }
 
     public ItemsAdderData getItemsAdderData(Entity entity) {
@@ -44,24 +61,26 @@ public final class ItemsAdder {
     }
 
     public void createFurniture(Location location, Grave grave) {
-        location.setYaw(BlockFaceUtil.getBlockFaceYaw(BlockFaceUtil.getYawBlockFace(location.getYaw())));
+        location = LocationUtil.roundLocation(location).add(0.5, 0, 0.5);
 
-        if (plugin.getConfig("itemsadder.enabled", grave)
-                .getBoolean("itemsadder.enabled")) {
-            String type = plugin.getConfig("itemsadder.name", grave)
-                    .getString("itemsadder.type", "furniture");
+        location.setYaw(BlockFaceUtil.getBlockFaceYaw(BlockFaceUtil.getYawBlockFace(grave.getYaw()).getOppositeFace()));
+        location.setPitch(grave.getPitch());
 
-            if (type.equalsIgnoreCase("furniture")) {
-                String name = plugin.getConfig("itemsadder.name", grave)
-                        .getString("itemsadder.name", "");
-                CustomFurniture customFurniture = createCustomFurniture(name, location);
+        if (plugin.getConfig("itemsadder.furniture.enabled", grave)
+                .getBoolean("itemsadder.furniture.enabled")) {
+            String name = plugin.getConfig("itemsadder.furniture.name", grave)
+                    .getString("itemsadder.furniture.name", "");
+            CustomFurniture customFurniture = createCustomFurniture(name, location);
 
-                if (customFurniture != null && customFurniture.getArmorstand() != null) {
-                    plugin.getDataManager().addItemsAdderData(new ItemsAdderData(customFurniture.getArmorstand()
-                            .getLocation(), customFurniture.getArmorstand().getUniqueId(), grave.getUUID()));
-                } else {
-                    plugin.debugMessage("Can't find ItemsAdder furniture " + name, 1);
-                }
+            if (customFurniture != null && customFurniture.getArmorstand() != null) {
+                customFurniture.teleport(location);
+                plugin.getDataManager().addItemsAdderData(new ItemsAdderData(customFurniture.getArmorstand()
+                        .getLocation(), customFurniture.getArmorstand().getUniqueId(), grave.getUUID()));
+                plugin.debugMessage("Placing ItemsAdder furniture for " + grave.getUUID() + " at "
+                        + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
+                        + (location.getBlockY() + 0.5) + "Y, " + (location.getBlockZ() + 0.5) + "z", 1);
+            } else {
+                plugin.debugMessage("Can't find ItemsAdder furniture " + name, 1);
             }
         }
     }
@@ -95,8 +114,8 @@ public final class ItemsAdder {
             for (ItemsAdderData itemsAdderData : furnitureLibDataList) {
                 for (Entity entity : itemsAdderData.getLocation().getChunk().getEntities()) {
                     if (entity instanceof ArmorStand && entity.getUniqueId().equals(itemsAdderData.getUUIDEntity())) {
-                        //CustomFurniture.remove((ArmorStand) entity, false); // Does not seem to work.
-                        entity.remove(); // Use this because CustomFurniture.remove() does not work.
+                        CustomFurniture.remove(entity, false);
+                        entity.remove();
                         removedItemsAdderDataList.add(itemsAdderData);
                     }
                 }
@@ -107,21 +126,28 @@ public final class ItemsAdder {
     }
 
     public void createBlock(Location location, Grave grave) {
-        if (plugin.getConfig("itemsadder.enabled", grave)
-                .getBoolean("itemsadder.enabled")) {
-            String type = plugin.getConfig("itemsadder.name", grave)
-                    .getString("itemsadder.type", "block");
+        if (plugin.getConfig("itemsadder.block.enabled", grave)
+                .getBoolean("itemsadder.block.enabled")) {
+            String name = plugin.getConfig("itemsadder.block.name", grave)
+                    .getString("itemsadder.block.name", "");
+            CustomBlock customBlock = createCustomBlock(name, location);
 
-            if (type.equalsIgnoreCase("block")) {
-                String name = plugin.getConfig("itemsadder.name", grave)
-                        .getString("itemsadder.name", "");
-                CustomBlock customBlock = createCustomBlock(name, location);
-
-                if (customBlock == null) {
-                    plugin.debugMessage("Can't find ItemsAdder block " + name, 1);
-                }
+            if (customBlock != null) {
+                plugin.debugMessage("Placing ItemsAdder block for " + grave.getUUID() + " at "
+                        + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
+                        + (location.getBlockY() + 0.5) + "Y, " + (location.getBlockZ() + 0.5) + "z", 1);
+            } else {
+                plugin.debugMessage("Can't find ItemsAdder block " + name, 1);
             }
         }
+    }
+
+    public boolean isCustomBlock(Location location) {
+        return CustomBlock.byAlreadyPlaced(location.getBlock()) != null;
+    }
+
+    public void removeBlock(Location location) {
+        CustomBlock.remove(location);
     }
 
     private CustomFurniture createCustomFurniture(String name, Location location) {

@@ -1,5 +1,6 @@
 package com.ranull.graves.util;
 
+import org.bukkit.Rotation;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 
@@ -22,6 +23,27 @@ public final class BlockFaceUtil {
 
     public static BlockFace getEntityYawBlockFace(LivingEntity livingEntity) {
         return getYawBlockFace(livingEntity.getLocation().getYaw());
+    }
+
+    public static Rotation getBlockFaceRotation(BlockFace blockFace) {
+        switch (blockFace) {
+            case SOUTH:
+                return Rotation.NONE;
+            case SOUTH_WEST:
+                return Rotation.CLOCKWISE;
+            case WEST:
+                return Rotation.CLOCKWISE_45;
+            case NORTH_WEST:
+                return Rotation.CLOCKWISE_135;
+            case EAST:
+                return Rotation.COUNTER_CLOCKWISE;
+            case NORTH_EAST:
+                return Rotation.FLIPPED_45;
+            case SOUTH_EAST:
+                return Rotation.COUNTER_CLOCKWISE_45;
+            default:
+                return Rotation.FLIPPED;
+        }
     }
 
     public static BlockFace getYawBlockFace(float yaw) {

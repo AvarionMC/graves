@@ -62,15 +62,18 @@ public final class BlockManager {
             int offsetY = plugin.getConfig("block.offset.y", grave).getInt("block.offset.y");
             int offsetZ = plugin.getConfig("block.offset.z", grave).getInt("block.offset.z");
 
-            BlockData blockData = plugin.getCompatibility().placeBlock(location.add(offsetX, offsetY, offsetZ),
+            location.add(offsetX, offsetY, offsetZ);
+
+            BlockData blockData = plugin.getCompatibility().placeBlock(location,
                     material, grave, plugin);
 
-            // Not working currently
-            /*
             if (plugin.hasItemsAdder()) {
                 plugin.getItemsAdder().createBlock(location, grave);
             }
-             */
+
+            if (plugin.hasOraxen()) {
+                plugin.getOraxen().createBlock(location, grave);
+            }
 
             plugin.getDataManager().addBlockData(blockData);
 
@@ -116,6 +119,14 @@ public final class BlockManager {
 
     public void removeBlock(BlockData blockData) {
         Location location = blockData.getLocation();
+
+        if (plugin.hasItemsAdder() && plugin.getItemsAdder().isCustomBlock(location)) {
+            plugin.getItemsAdder().removeBlock(location);
+        }
+
+        if (plugin.hasOraxen() && plugin.getOraxen().isCustomBlock(location)) {
+            plugin.getOraxen().removeBlock(location);
+        }
 
         if (location.getWorld() != null) {
             if (blockData.getReplaceMaterial() != null) {

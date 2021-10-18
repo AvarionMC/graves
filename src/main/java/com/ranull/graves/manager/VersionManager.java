@@ -14,12 +14,20 @@ public final class VersionManager {
     private final boolean hasSecondHand;
     private final boolean hasConfigContains;
     private boolean isBukkit;
+    private boolean isMohist;
 
     public VersionManager(Graves plugin) {
         try {
-            Class.forName("org.spigotmc.SpigotConfig");
+            Class.forName("org.spigotmc.SpigotConfig", false, getClass().getClassLoader());
         } catch (ClassNotFoundException ignored) {
-            isBukkit = true;
+            this.isBukkit = true;
+        }
+
+        try {
+            Class.forName("com.mohistmc.config.MohistConfigUtil", false, getClass().getClassLoader());
+
+            this.isMohist = true;
+        } catch (ClassNotFoundException ignored) {
         }
 
         this.version = plugin.getServer().getClass().getPackage().getName().split("\\.")[3];
@@ -42,6 +50,10 @@ public final class VersionManager {
 
     public boolean isBukkit() {
         return isBukkit;
+    }
+
+    public boolean isMohist() {
+        return isMohist;
     }
 
     public boolean hasConfigContains() {

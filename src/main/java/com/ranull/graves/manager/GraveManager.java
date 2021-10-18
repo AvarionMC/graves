@@ -6,6 +6,7 @@ import com.ranull.graves.data.ChunkData;
 import com.ranull.graves.data.HologramData;
 import com.ranull.graves.data.integration.FurnitureLibData;
 import com.ranull.graves.data.integration.ItemsAdderData;
+import com.ranull.graves.data.integration.OraxenData;
 import com.ranull.graves.event.GraveTimeoutEvent;
 import com.ranull.graves.inventory.Grave;
 import com.ranull.graves.inventory.GraveList;
@@ -17,6 +18,7 @@ import com.ranull.graves.util.StringUtil;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -33,6 +35,7 @@ public final class GraveManager {
         graveTimer();
     }
 
+    @SuppressWarnings("ConstantConditions")
     public void graveTimer() {
         plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             List<Grave> graveRemoveList = new ArrayList<>();
@@ -40,6 +43,7 @@ public final class GraveManager {
             List<HologramData> hologramDataRemoveList = new ArrayList<>();
             List<FurnitureLibData> furnitureLibDataRemoveList = new ArrayList<>();
             List<ItemsAdderData> itemsAdderDataRemoveList = new ArrayList<>();
+            List<OraxenData> oraxenDataList = new ArrayList<>();
 
             // Graves
             for (Map.Entry<UUID, Grave> entry : plugin.getDataManager().getGraveMap().entrySet()) {
@@ -155,29 +159,42 @@ public final class GraveManager {
                         .removeFurniture(furnitureLibData));
                 itemsAdderDataRemoveList.forEach(itemsAdderData -> plugin.getItemsAdder()
                         .removeFurniture(itemsAdderData));
+                oraxenDataList.forEach(oraxenData -> plugin.getOraxen()
+                        .removeFurniture(oraxenData));
+                graveRemoveList.clear();
+                blockDataRemoveList.clear();
+                hologramDataRemoveList.clear();
+                furnitureLibDataRemoveList.clear();
+                itemsAdderDataRemoveList.clear();
+                oraxenDataList.clear();
 
                 for (Player player : plugin.getServer().getOnlinePlayers()) {
-                    Inventory inventory = player.getOpenInventory().getTopInventory();
+                    if (player.getOpenInventory() != null) { // Mohist, might return null even when Bukkit shouldn't.
+                        Inventory inventory = player.getOpenInventory().getTopInventory();
 
-                    if (inventory.getHolder() instanceof GraveList) {
-                        plugin.getGUIManager().setGraveListItems(inventory,
-                                ((GraveList) inventory.getHolder()).getUUID());
-                    } else if (inventory.getHolder() instanceof GraveMenu) {
-                        plugin.getGUIManager().setGraveMenuItems(inventory,
-                                ((GraveMenu) inventory.getHolder()).getGrave());
+                        if (inventory.getHolder() instanceof GraveList) {
+                            plugin.getGUIManager().setGraveListItems(inventory,
+                                    ((GraveList) inventory.getHolder()).getUUID());
+                        } else if (inventory.getHolder() instanceof GraveMenu) {
+                            plugin.getGUIManager().setGraveMenuItems(inventory,
+                                    ((GraveMenu) inventory.getHolder()).getGrave());
+                        }
                     }
                 }
             });
         }, 0L, 20L);
     }
 
+    @SuppressWarnings("ConstantConditions")
     public void onDisable() {
         for (Player player : plugin.getServer().getOnlinePlayers()) {
-            InventoryHolder inventoryHolder = player.getOpenInventory().getTopInventory().getHolder();
+            if (player.getOpenInventory() != null) { // Mohist, might return null even when Bukkit shouldn't.
+                InventoryHolder inventoryHolder = player.getOpenInventory().getTopInventory().getHolder();
 
-            if (inventoryHolder instanceof Grave || inventoryHolder instanceof GraveList
-                    || inventoryHolder instanceof GraveMenu) {
-                player.closeInventory();
+                if (inventoryHolder instanceof Grave || inventoryHolder instanceof GraveList
+                        || inventoryHolder instanceof GraveMenu) {
+                    player.closeInventory();
+                }
             }
         }
     }
@@ -231,17 +248,22 @@ public final class GraveManager {
         plugin.getHologramManager().removeHologram(grave);
         plugin.getDataManager().removeGrave(grave);
 
-        if (plugin.getFurnitureLib() != null) {
+        if (plugin.hasFurnitureLib()) {
             plugin.getFurnitureLib().removeFurniture(grave);
         }
 
-        if (plugin.getItemsAdder() != null) {
+        if (plugin.hasItemsAdder()) {
             plugin.getItemsAdder().removeFurniture(grave);
+        }
+
+        if (plugin.hasOraxen()) {
+            plugin.getOraxen().removeFurniture(grave);
         }
 
         plugin.debugMessage("Removing grave " + grave.getUUID(), 1);
     }
 
+    @SuppressWarnings("ConstantConditions")
     public void closeGrave(Grave grave) {
         List<HumanEntity> inventoryViewers = grave.getInventory().getViewers();
 
@@ -252,13 +274,15 @@ public final class GraveManager {
         }
 
         for (Player player : plugin.getServer().getOnlinePlayers()) {
-            InventoryHolder inventoryHolder = player.getOpenInventory().getTopInventory().getHolder();
+            if (player.getOpenInventory() != null) { // Mohist, might return null even when Bukkit shouldn't.
+                InventoryHolder inventoryHolder = player.getOpenInventory().getTopInventory().getHolder();
 
-            if (inventoryHolder instanceof GraveMenu) {
-                GraveMenu graveMenu = (GraveMenu) inventoryHolder;
+                if (inventoryHolder instanceof GraveMenu) {
+                    GraveMenu graveMenu = (GraveMenu) inventoryHolder;
 
-                if (graveMenu.getGrave().getUUID().equals(grave.getUUID())) {
-                    player.closeInventory();
+                    if (graveMenu.getGrave().getUUID().equals(grave.getUUID())) {
+                        player.closeInventory();
+                    }
                 }
             }
         }
@@ -286,7 +310,13 @@ public final class GraveManager {
 
     public Grave.StorageMode getStorageMode(String string) {
         try {
-            return Grave.StorageMode.valueOf(string.toUpperCase());
+            Grave.StorageMode storageMode = Grave.StorageMode.valueOf(string.toUpperCase());
+
+            if (storageMode == Grave.StorageMode.CHESTSORT && !plugin.hasChestSort()) {
+                return Grave.StorageMode.COMPACT;
+            }
+
+            return storageMode;
         } catch (NullPointerException | IllegalArgumentException ignored) {
         }
 
@@ -311,12 +341,16 @@ public final class GraveManager {
         if (plugin.hasItemsAdder()) {
             plugin.getItemsAdder().createFurniture(location, grave);
         }
+
+        if (plugin.hasOraxen()) {
+            plugin.getOraxen().createFurniture(location, grave);
+        }
     }
 
     public Inventory createGraveInventory(InventoryHolder inventoryHolder, Location location,
                                           List<ItemStack> itemStackList, String title, Grave.StorageMode storageMode) {
         if (location.getWorld() != null) {
-            if (storageMode == Grave.StorageMode.COMPACT) {
+            if (storageMode == Grave.StorageMode.COMPACT || storageMode == Grave.StorageMode.CHESTSORT) {
                 Inventory tempInventory = plugin.getServer().createInventory(null, 54);
                 int counter = 0;
 
@@ -346,6 +380,10 @@ public final class GraveManager {
                     if (itemStack != null) {
                         inventory.addItem(itemStack).forEach((key, value) -> location.getWorld().dropItem(location, value));
                     }
+                }
+
+                if (storageMode == Grave.StorageMode.CHESTSORT && plugin.hasChestSort()) {
+                    plugin.getChestSort().sortInventory(inventory);
                 }
 
                 return inventory;
@@ -386,12 +424,21 @@ public final class GraveManager {
     }
 
     public List<ItemStack> getGraveItemStackList(List<ItemStack> itemStackList, LivingEntity livingEntity, List<String> permissionList) {
-        if (livingEntity instanceof Player && plugin.getConfig("storage.mode", livingEntity, permissionList)
-                .getInt("storage.mode") == 0) {
+        return getGraveItemStackList(itemStackList, new ArrayList<>(), livingEntity, permissionList);
+    }
+
+    public List<ItemStack> getGraveItemStackList(List<ItemStack> itemStackList, List<ItemStack> removedItemStackList,
+                                                 LivingEntity livingEntity, List<String> permissionList) {
+        if (livingEntity instanceof Player && getStorageMode(plugin.getConfig("storage.mode",
+                livingEntity, permissionList).getString("storage.mode")) == Grave.StorageMode.EXACT) {
             Player player = (Player) livingEntity;
             List<ItemStack> playerInventoryContentList = Arrays.asList(player.getInventory().getContents());
 
             List<ItemStack> itemStackListNew = new ArrayList<>(playerInventoryContentList);
+            List<ItemStack> differenceList = new ArrayList<>(removedItemStackList);
+
+            differenceList.removeIf(itemStackList::contains);
+            itemStackListNew.removeAll(differenceList);
             itemStackList.removeAll(playerInventoryContentList);
 
             if (!itemStackList.isEmpty()) {
@@ -555,10 +602,7 @@ public final class GraveManager {
         Grave.StorageMode storageMode = getStorageMode(plugin.getConfig("storage.mode", grave)
                 .getString("storage.mode"));
 
-        if (storageMode == Grave.StorageMode.COMPACT) {
-            InventoryUtil.equipArmor(grave.getInventory(), player);
-            InventoryUtil.equipItems(grave.getInventory(), player);
-        } else if (storageMode == Grave.StorageMode.EXACT) {
+        if (storageMode == Grave.StorageMode.EXACT) {
             List<ItemStack> itemStackListLeftOver = new ArrayList<>();
             int counter = 0;
             int inventorySize = player.getInventory().getSize();
@@ -595,6 +639,9 @@ public final class GraveManager {
                             .forEach((key, value) -> player.getWorld().dropItem(player.getLocation(), value));
                 }
             }
+        } else {
+            InventoryUtil.equipArmor(grave.getInventory(), player);
+            InventoryUtil.equipItems(grave.getInventory(), player);
         }
 
         player.updateInventory();
@@ -615,6 +662,11 @@ public final class GraveManager {
         } else {
             plugin.getPlayerManager().playWorldSound("sound.open", location, grave);
         }
+    }
+
+    public String getDamageCause(EntityDamageEvent.DamageCause damageCause, Grave grave) {
+        return plugin.getConfig("message.death-reason." + damageCause.name(), grave)
+                .getString("message.death-reason." + damageCause.name(), StringUtil.format(damageCause.name()));
     }
 
     public void playEffect(String string, Location location) {

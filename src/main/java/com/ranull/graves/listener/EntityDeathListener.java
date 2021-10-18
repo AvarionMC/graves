@@ -22,15 +22,22 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class EntityDeathListener implements Listener {
     private final Graves plugin;
+    private final Map<UUID, List<ItemStack>> removedItemStackMap;
 
     public EntityDeathListener(Graves plugin) {
         this.plugin = plugin;
+        this.removedItemStackMap = new HashMap<>();
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onEntityDeathLowest(EntityDeathEvent event) {
+        if (event.getEntityType() == EntityType.PLAYER) {
+            removedItemStackMap.put(event.getEntity().getUniqueId(), new ArrayList<>(event.getDrops()));
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -136,7 +143,7 @@ public class EntityDeathListener implements Listener {
                     boolean canCreateGrave = plugin.getWorldGuard().canCreateGrave((Player) livingEntity, location);
 
                     if (!canCreateGrave) {
-                        plugin.getPlayerManager().sendMessage("message.worldguard-create-deny",
+                        plugin.getPlayerManager().sendMessage("message.region-create-deny",
                                 livingEntity, location, permissionList);
                         plugin.debugMessage("Grave not created for " + entityName
                                 + " because they are in a region with graves-create set to deny", 2);
@@ -253,8 +260,16 @@ public class EntityDeathListener implements Listener {
 
         // Grave
         if (!graveItemStackList.isEmpty()) {
-            Grave grave = plugin.getGraveManager().createGrave(livingEntity, plugin.getGraveManager()
-                    .getGraveItemStackList(graveItemStackList, livingEntity, permissionList), permissionList);
+            List<ItemStack> removedItemStackList = new ArrayList<>();
+
+            if (removedItemStackMap.containsKey(livingEntity.getUniqueId())) {
+                removedItemStackList.addAll(removedItemStackMap.get(livingEntity.getUniqueId()));
+                removedItemStackMap.remove(livingEntity.getUniqueId());
+            }
+
+            Grave grave = plugin.getGraveManager().createGrave(livingEntity,
+                    plugin.getGraveManager().getGraveItemStackList(graveItemStackList, removedItemStackList,
+                            livingEntity, permissionList), permissionList);
 
             grave.setPermissionList(permissionList);
             grave.setOwnerTexture(SkinUtil.getTextureBase64(livingEntity, plugin));
@@ -305,7 +320,7 @@ public class EntityDeathListener implements Listener {
                 } else {
                     grave.setKillerUUID(null);
                     grave.setKillerType(null);
-                    grave.setKillerName(StringUtil.format(entityDamageEvent.getCause().name()));
+                    grave.setKillerName(plugin.getGraveManager().getDamageCause(entityDamageEvent.getCause(), grave));
                 }
             }
 
@@ -331,11 +346,18 @@ public class EntityDeathListener implements Listener {
                 plugin.getServer().getPluginManager().callEvent(graveCreateEvent);
 
                 if (!graveCreateEvent.isCancelled()) {
-                    event.setDroppedExp(0);
-                    plugin.getGraveManager().placeGrave(location, grave);
-                    plugin.getPlayerManager().runCommands("command.create", livingEntity, location, grave);
-                    plugin.getPlayerManager().sendMessage("message.death", livingEntity, location, grave);
-                    plugin.getDataManager().addGrave(grave);
+                    if (!plugin.getVersionManager().isMohist()
+                            || (event.getEntityType() == EntityType.PLAYER && event instanceof PlayerDeathEvent)) {
+                        event.setDroppedExp(0);
+                        plugin.getGraveManager().placeGrave(location, grave);
+                        plugin.getPlayerManager().runCommands("command.create", livingEntity, location, grave);
+                        plugin.getPlayerManager().sendMessage("message.death", livingEntity, location, grave);
+                        plugin.getDataManager().addGrave(grave);
+                    } else {
+                        // Mohist Support, for some reason without this it dupes the items.
+                        event.getDrops().clear();
+                        event.setDroppedExp(0);
+                    }
                 } else {
                     event.getDrops().addAll(graveItemStackList);
                 }

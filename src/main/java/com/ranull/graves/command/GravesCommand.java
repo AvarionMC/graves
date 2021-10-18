@@ -161,11 +161,8 @@ public final class GravesCommand implements CommandExecutor {
     }
 
     public void sendHelpMenu(CommandSender sender) {
-        String version = "4.3";
-        String author = "Ranull";
-
         sender.sendMessage(ChatColor.GRAY + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.GRAY + "Graves "
-                + ChatColor.DARK_GRAY + "v" + version);
+                + ChatColor.DARK_GRAY + "v" + plugin.getDescription().getVersion());
 
         if (sender.hasPermission("graves.gui")) {
             sender.sendMessage(
@@ -196,6 +193,6 @@ public final class GravesCommand implements CommandExecutor {
                     + " Reload plugin");
         }
 
-        sender.sendMessage(ChatColor.DARK_GRAY + "Author: " + ChatColor.GRAY + author);
+        sender.sendMessage(ChatColor.DARK_GRAY + "Author: " + ChatColor.GRAY + "Ranull");
     }
 }

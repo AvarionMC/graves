@@ -86,7 +86,7 @@ public final class PlayerManager {
     }
 
     public void teleportPlayer(Location location, Player player, Grave grave) {
-        if (!plugin.hasWorldGuard() || plugin.getWorldGuard().canTeleport(player, location)) {
+        if (canTeleport(player, location)) {
             location = LocationUtil.roundLocation(location);
             BlockFace blockFace = BlockFaceUtil.getYawBlockFace(grave.getYaw());
             Location locationTeleport = location.clone().getBlock().getRelative(blockFace).getRelative(blockFace)
@@ -123,7 +123,7 @@ public final class PlayerManager {
                 }
             }
         } else {
-            plugin.getPlayerManager().sendMessage("message.worldguard-teleport-deny", player, location, grave);
+            plugin.getPlayerManager().sendMessage("message.region-teleport-deny", player, location, grave);
         }
     }
 
@@ -145,6 +145,11 @@ public final class PlayerManager {
         }
 
         return cost;
+    }
+
+    public boolean canTeleport(Player player, Location location) {
+        return (!plugin.hasWorldGuard() || plugin.getWorldGuard().canTeleport(player, location))
+                && (!plugin.hasGriefDefender() || plugin.getGriefDefender().canTeleport(player, location));
     }
 
     public void playWorldSound(String string, Player player) {

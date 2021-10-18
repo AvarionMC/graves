@@ -10,6 +10,13 @@ settings:
   # To disable messages, sounds and effects set them to ""
   # To find out what a config option does, scroll down to the default options section, options are there with text explaining what each one does.
 
+  ################
+  # Help/Support #
+  ################
+  # If you are having an issue with the plugin, and need help because something is not working as expected, you can't understand
+  # something in the config file, or you are getting unexpected results. You can join our Discord for help.
+  # Discord: https://discord.ranull.com/
+
   ###########
   # Storage #
   ###########
@@ -29,31 +36,41 @@ settings:
   ###############
   # Integration #
   ###############
-  # Enable/Disable integrations into other plugins.
+  # Enable/Disable integrations into other plugins, if you are having errors relating to another plugin try disabling it here.
   integration:
     vault: # https://www.spigotmc.org/resources/vault.34315/
       enabled: true # Should Vault integration be enabled.
-
     worldedit: # https://dev.bukkit.org/projects/worldedit/
       enabled: true # Should WorldEdit integration be enabled.
-
+      write: true # Should Graves write its schematics into its own folder.
     worldguard: # https://dev.bukkit.org/projects/worldguard/
       enabled: true # Should WorldGuard integration be enabled.
-
     griefdefender: # https://www.spigotmc.org/resources/griefdefender.68900/
       enabled: true # Should GriefDefender integration be enabled.
-
     furniturelib: # https://www.spigotmc.org/resources/furniturelibary.9368/
       enabled: true # Should FurnitureLib integration be enabled.
-
     protectionlib: # https://www.spigotmc.org/resources/protectionlib.9368/
       enabled: true # Should ProtectionLib integration be enabled.
-
     itemsadder: # https://www.spigotmc.org/resources/itemsadder.73355/
       enabled: true # Should ItemsAdder integration be enabled.
-
+      write: true # Should Graves write its data into the ItemsAdder data folder.
+    oraxen: # https://www.spigotmc.org/resources/oraxen.72448/
+      enabled: true # Should Oraxen integration be enabled.
+      write: true # Should Graves write its pack into the Oraxen pack folder.
     placeholderapi: # https://www.spigotmc.org/resources/placeholderapi.6245/
       enabled: true # Should PlaceholderAPI integration be enabled.
+    chestsort: # https://www.spigotmc.org/resources/chestsort.59773/
+      enabled: true # Should ChestSort integration be enabled.
+    itembridge: # https://www.spigotmc.org/resources/itembridge.77080/
+      enabled: true # Should ItemBridge integration be enabled.
+    deluxecombat: # https://www.spigotmc.org/resources/itembridge.77080/
+      enabled: true # Should ItemBridge integration be enabled.
+
+  #################
+  # Compatibility #
+  #################
+  compatibility:
+    warning: true # Warn when a plugin to have known incompatibilities is detected.
 
   ###############
   # Token Setup #
@@ -73,57 +90,6 @@ settings:
         - "GOLD_INGOT EMERALD GOLD_INGOT"
         - "GOLD_INGOT GOLD_INGOT GOLD_INGOT"
 
-  #################
-  # Placeholders #
-  ################
-  # These placeholders relate to the current grave in messages.
-  # %uuid% - Grave UUID
-  # %owner_name% - Owner name
-  # %owner_type% - Owner type
-  # %owner_uuid% - Owner UUID
-  # %killer_name% - Killer name
-  # %killer_type% - Killer type
-  # %killer_uuid% - Killer UUID
-  # %interact_name% - Interact name
-  # %interact_type% - Interact type
-  # %interact_uuid% - Interact UUID
-  # %item% - Item amount
-  # %experience% - Experience amount
-  # %level% - Level amount
-  # %time_alive_remaining% - Remaining alive time
-  # %time_alive_remaining_formatted% - Remaining alive time formatted
-  # %time_protection_remaining% - Remaining protection time
-  # %time_protection_remaining_formatted% - Remaining protection time formatted
-  # %time_lived% - Lived time
-  # %time_lived_formatted% - Lived time formatted
-  # %world% - World name
-  # %x% - X cord
-  # %y% - Y cord
-  # %z% - Z cord
-
-  ###############################
-  # PlaceholderAPI Placeholders #
-  ###############################
-  # These placeholders can be used in any plugin that supports PlaceholderAPI. <UUID> is the graves UUID
-  # %graves_author% - Plugin author
-  # %graves_version% - Plugin version
-  # %graves_count% - Grave count for player
-  # %graves_owner_name_<UUID>% - Grave owner name
-  # %graves_owner_type_<UUID>% - Grave owner type
-  # %graves_owner_uuid_<UUID>% - Grave owner UUID
-  # %graves_killer_name_<UUID>% - Grave killer name
-  # %graves_killer_type_<UUID>% - Grave killer type
-  # %graves_killer_uuid_<UUID>% - Grave killer UUID
-  # %graves_item_<UUID>% - Item amount
-  # %graves_experience_<UUID>% - Experience amount
-  # %graves_level_<UUID>% - Level amount
-  # %graves_time_alive_remaining_<UUID>% - Remaining alive time
-  # %graves_time_alive_remaining_formatted_<UUID>% - Remaining alive time formatted
-  # %graves_time_protection_remaining_<UUID>% - Remaining protection time
-  # %graves_time_protection_remaining_formatted_<UUID>% - Remaining protection time formatted
-  # %graves_time_lived_<UUID>% - Lived time
-  # %graves_time_lived_formatted_<UUID>% - Lived time formatted
-
   #######################
   # Permission Override #
   #######################
@@ -132,8 +98,8 @@ settings:
   # Meaning for example, since admin is at the top and if the player has this permission among others.
   # The admin permission will always override permissions below it, therefore you should put your highest permission groups at the top,
   # so they correctly override in a hierarchy, this prevents you having to define the same thing for each permission group.
+  # Remember you can copy options from the default section.
   permission:
-    # admin, vip, schem and disabled are examples, you can modify them or make your own.
     admin: # graves.permission.admin
       grave:
         time: -1
@@ -142,66 +108,20 @@ settings:
       world:
         - ALL
 
-    vip: # graves.permission.vip
-      grave:
-        time: 21600
-        explode: false
-      block:
-        material: BEACON
-      gui:
-        grave:
-          title: "VIP %owner_name%'s Grave"
-
-    schematic: # graves.permission.schematic
-      placement:
-        offset:
-          y: 1
-      hologram:
-        line:
-          - "&c☠ &rHere Lies &2%owner_name% &c☠"
-          - "&rKilled by &c%killer_name%"
-      schematic:
-        enabled: true
-        name: "grave_default"
-
-    furniturelib: # graves.permission.furniture
-      block:
-        enabled: false
-      hologram:
-        enabled: false
-      furniturelib:
-        enabled: true
-        name: "GraveStone"
-
-    itemsadder: # graves.permission.furniture
-      block:
-        enabled: false
-      hologram:
-        enabled: false
-      itemsadder:
-        enabled: true
-        name: "mysterious_stone"
-
   ###################
   # Entity Override #
   ###################
   # Override default config options for entities that match these types, entity type names must be uppercase.
   # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html
   entity:
-    # Here we override the options for PLAYER, ENDER_DRAGON and WITHER. ENDER_DRAGON and WITHER are disabled by default.
-    PLAYER: # Override default options for Players.
-      block:
-        head:
-          type: 1
+    # Here we override the options for entities, remember you can copy options from the default section.
+    PLAYER: # Override default options for players.
       grave:
         enabled: true
         time: 10800
-      hologram:
-        enabled: true
-        line:
-          - "&7%owner_name%'s &rGrave"
-          - "&c%killer_name% &c☠"
-          #- "%time_alive_remaining_formatted%"
+      block:
+        head:
+          type: 1
       world:
         - ALL
       death:
@@ -225,50 +145,6 @@ settings:
         break: true # Can graves be broken.
         explode: true # Can graves be blown up.
 
-      ###########
-      # Storage #
-      ###########
-      # How the items are saved in graves, compact mode stacks all items and puts them into a small as possible inventory. exact mode matches the players inventory exactly.
-      storage:
-        mode: COMPACT # Storage mode: COMPACT, EXACT
-
-      ########
-      # Drop #
-      ########
-      # Should a grave drop it's contents when destroyed for the following reasons.
-      drop:
-        timeout: false # When a grave times out drop everything in it. If false it gets destroyed.
-        explode: true # When a grave explodes drop everything in it. If false it gets destroyed.
-        break: true # When a grave is broken drop everything in it. If false it gets destroyed.
-
-      #########
-      # World #
-      #########
-      # What worlds will a grave will spawn in.
-      world:
-        - world
-        - world_nether
-        - world_the_end
-        #- ALL
-
-      #########
-      # Block #
-      #########
-      # Grave block options, this can be disabled if you only want holograms.
-      block:
-        enabled: true # Should grave blocks be enabled.
-        material: PLAYER_HEAD # Material: PLAYER_HEAD, CHEST, BEACON (AIR to disable)
-        rotation: 1 # If skulls are used, when calculating the direction the entity was looking, should it be 4 directions, or 8.
-        offset:
-          x: 0 # Block offset X.
-          y: 0 # Block offset Y.
-          z: 0 # Block offset Z.
-        walk-over: false # Should graves be looted if the block is walked over.
-        head:
-          type: 0 # 0 = Player/Entity head, (1 = Custom texture or 2 = Player username set under name).
-          base64: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjdjYWI1NmM4MmNiODFiZGI5OTc5YTQ2NGJjOWQzYmEzZTY3MjJiYTEyMmNmNmM1Mjg3MzAxMGEyYjU5YWVmZSJ9fX0="
-          name: "MHF_Chest" # If type is set to 2.
-
       #############
       # Placement #
       #############
@@ -286,13 +162,119 @@ settings:
           y: 0 # Placement offset Y, this will affect all other offsets.
           z: 0 # Placement offset Z, this will affect all other offsets.
 
+      #########
+      # World #
+      #########
+      # What worlds will a grave will spawn in.
+      world:
+        - world
+        - world_nether
+        - world_the_end
+        #- ALL
+
+      ########
+      # Drop #
+      ########
+      # Should a grave drop it's contents when destroyed for the following reasons.
+      drop:
+        timeout: false # When a grave times out drop everything in it. If false it gets destroyed.
+        explode: true # When a grave explodes drop everything in it. If false it gets destroyed.
+        break: true # When a grave is broken drop everything in it. If false it gets destroyed.
+
+      #########
+      # Block #
+      #########
+      # Block options, this can be disabled if you only want holograms.
+      block:
+        enabled: true # Should grave blocks be enabled.
+        material: PLAYER_HEAD # Material: PLAYER_HEAD, CHEST, BEACON.
+        walk-over: false # Should graves be looted if the block is walked over.
+        offset:
+          x: 0 # Block offset X.
+          y: 0 # Block offset Y.
+          z: 0 # Block offset Z.
+        head:
+          type: 0 # 0 = Player/Entity head, (1 = Custom texture or 2 = Player username set under name).
+          base64: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjdjYWI1NmM4MmNiODFiZGI5OTc5YTQ2NGJjOWQzYmEzZTY3MjJiYTEyMmNmNmM1Mjg3MzAxMGEyYjU5YWVmZSJ9fX0="
+          name: "MHF_Chest" # If type is set to 2.
+
+      ############
+      # Hologram #
+      ############
+      # If you are running PaperMC you can set armor-stands-tick to false for improved performance without impacting any functionality.
+      hologram:
+        enabled: true # Should holograms be created.
+        marker: true # Should the hologram be a marker, you can't interact with markers.
+        height-line: 0.28 # How far apart should holograms be from each-other.
+        offset:
+          x: 0 # Hologram offset X.
+          y: -0.28 # Hologram offset Y.
+          z: 0 # Hologram offset Z.
+        line:
+          - "&7%owner_name%'s &rGrave"
+          - "&c%killer_name% &c☠"
+
+      ##############
+      # Protection #
+      ##############
+      # Protection options, protect graves from players, this does not protect from explosions, look for grave: explode: to disable this.
+      protection:
+        enabled: false # Enable the grave protection feature.
+        time: 300 # Seconds, 300 = 5 minutes. Set to -1 to always stay locked.
+        open:
+          owner: true # Can the owner open the owners grave.
+          killer: true # Can the killer open the owners grave.
+          other: false # Can other entities open the owners grave.
+          missing:
+            owner: true # If a killer can't be found should the owner be allowed to open the grave.
+            other: false # If a killer can't be found should everyone be allowed to open the grave.
+        state:
+          protected: "&c✘"
+          unprotected: "&a✔"
+
+      #########
+      # Token #
+      #########
+      token: # You have to define the token at the top of the config file.
+        enabled: false # Should graves require tokens for their creation.
+        name: "basic" # Name of the token defined in token setup.
+
+      ###########
+      # Storage #
+      ###########
+      # How the items are saved in graves, compact mode stacks all items and puts them into a small as possible inventory. exact mode matches the players inventory exactly.
+      storage:
+        mode: COMPACT # Storage mode: COMPACT, EXACT, CHESTSORT (Requires ChestSort).
+
+      ##############
+      # Experience #
+      ##############
+      # If store is false it will store what Minecraft would normally drop, if you want to fully disable it, set store to true and store-percent to 0.
+      experience:
+        store: true # Should all the entities EXP be stored in the grave. If false only the vanilla drop amount will be stored.
+        store-percent: 0.8 # How much of the EXP should be stored, 0.8 = 80%, 1 = 100%, 0 = 0%.
+
       ###########
       # Respawn #
       ###########
       respawn:
-        enabled: true # Should entities be given a compass to their last grave when they respawn. (Only works for players)
+        compass: true # Should entities be given a compass to their last grave when they respawn. (Only works for players)
         compass-time: 30 # How long should the entity be given a compass on respawn after the grave was first created.
         function: "none" # Should we run a function after respawning, you can use menu and list among the other functions.
+
+      ############
+      # Particle #
+      ############
+      particle:
+        enabled: false # Enable the particles feature.
+        type: "REDSTONE" # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
+        count: 4 # Amount of particles.
+        dust-size: 4 # Only applies to REDSTONE.
+        dust-color: "RED" # only applies to REDSTONE, https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Color.html
+        offset:
+          x: 0 # Particle offset X.
+          y: 0 # Particle offset Y.
+          z: 0 # Particle offset Z.
 
       ###########
       # Compass #
@@ -305,6 +287,47 @@ settings:
         name: "%owner_name%'s Grave"
         lore:
           - "%world%, %x%x, %y%y, %z%z"
+
+      ############
+      # Teleport #
+      ############
+      # Teleportation options.
+      teleport:
+        enabled: true # Can the entity teleport to their grave from the Graves GUI.
+        cost: 5 # How much it costs to teleport to a grave, you need Vault for this.
+        cost-different-world: 20 # Extra cost added on top of cost if the grave is in a different world.
+        cost-distance-increase: true # Increase the price the further away the grave is.
+        unsafe: false # Should entities be allowed to always teleport to a grave even if unsafe.
+        top: true # If the grave is in an unsafe location, should the entity be teleported to the top.
+
+      ##########
+      # Zombie #
+      ##########
+      zombie:
+        type: ZOMBIE # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/LivingEntity.html
+        name: "%owner_name%'s Zombie"
+        spawn-owner: false # Should a grave spawn a zombie when it is looted by its owner.
+        spawn-other: true # Should a grave spawn a zombie if it is looted by another player.
+        only-break: false # Should a zombie only spawn if the player broke the grave not open it.
+        explode: false # Should a grave spawn a zombie if it is blown up, this only works if the grave can be blown up.
+        owner-head: true # Will the zombie have the owners head on.
+        health: 20 # How much health the zombie has.
+        pickup: false # Can the zombie pickup dropped items.
+        drop: false # Do grave zombies drop items, this may include the head it is wearing.
+
+      ###########
+      # Replace #
+      ###########
+      replace:
+        block: # What blocks can graves replace.
+          not-solid: true # Replace blocks that are not solid.
+
+      ###########
+      # Virtual #
+      ###########
+      # Options for the virtual inventory.
+      virtual:
+        distance: 15 # Minimum distance entities need to be from a grave to open it virtually. -1 for infinite distance.
 
       #############
       # Schematic #
@@ -333,84 +356,27 @@ settings:
       # ItemsAdder #
       ##############
       # The option requires ItemsAdder, you must have this installed to use models.
+      # Graves automatically adds models into ItemsAdder, if you want to use it you will need to re-generate your pack and use "graves:grave" as the furniture name.
       itemsadder:
-        enabled: false # Should ItemsAdder furniture be used.
-        name: "mysterious_stone" # Furniture name.
+        furniture:
+          enabled: false # Should we use ItemsAdder furniture?
+          name: "itemsadder:mysterious_stone" # Furniture name.
+        block:
+          enabled: false # Should we use ItemsAdder blocks?
+          name: "itemsadder:nice_stone" # Block name.
 
-      ############
-      # Hologram #
-      ############
-      # If you are running PaperMC you can set armor-stands-tick to false for improved performance without impacting any functionality.
-      hologram:
-        enabled: false # Should holograms be created.
-        marker: true # Should the hologram be a marker, you can't interact with markers.
-        height: 0.28 # Height the hologram spawns.
-        height-line: 0.28 # How far apart should holograms be from each-other.
-        offset:
-          x: 0 # Block offset X.
-          y: -0.28 # Block offset Y.
-          z: 0 # Block offset Z.
-        line:
-          - "%owner_name% &c☠"
-
-      ############
-      # Particle #
-      ############
-      particle:
-        enabled: false # Enable the particles feature.
-        type: "REDSTONE" # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
-        count: 4 # Amount of particles.
-        dust-size: 4 # Only applies to REDSTONE.
-        dust-color: "RED" # only applies to REDSTONE, https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Color.html
-        offset:
-          x: 0 # Particle offset X.
-          y: 0 # Particle offset Y.
-          z: 0 # Particle offset Z.
-
-      ##############
-      # Protection #
-      ##############
-      # Grave protection, protect graves from players, this does not protect from explosions, look for grave: explode: to disable this.
-      protection:
-        enabled: false # Enable the grave protection feature.
-        time: 300 # Seconds, 300 = 5 minutes. Set to -1 to always stay locked.
-        open:
-          owner: true # Can the owner open the owners grave.
-          killer: true # Can the killer open the owners grave.
-          other: false # Can other entities open the owners grave.
-          missing:
-            owner: true # If a killer can't be found should the owner be allowed to open the grave.
-            other: false # If a killer can't be found should everyone be allowed to open the grave.
-        state:
-          protected: "&c✘"
-          unprotected: "&a✔"
-
-      ##############
-      # Experience #
-      ##############
-      # If store is false it will store what Minecraft would normally drop, if you want to fully disable it, set store to true and store-percent to 0.
-      experience:
-        store: true # Should all the entities EXP be stored in the grave. If false only the vanilla drop amount will be stored.
-        store-percent: 0.8 # How much of the EXP should be stored, 0.8 = 80%, 1 = 100%, 0 = 0%.
-
-      ############
-      # Teleport #
-      ############
-      # Teleportation options.
-      teleport:
-        enabled: true # Can the entity teleport to their grave from the Graves GUI.
-        cost: 5 # How much it costs to teleport to a grave, you need Vault for this.
-        cost-different-world: 20 # Extra cost added on top of cost if the grave is in a different world.
-        cost-distance-increase: true # Increase the price the further away the grave is.
-        unsafe: false # Should entities be allowed to always teleport to a grave even if unsafe.
-        top: true # If the grave is in an unsafe location, should the entity be teleported to the top.
-
-      ###########
-      # Virtual #
-      ###########
-      # Options for the virtual inventory.
-      virtual:
-        distance: 15 # Minimum distance entities need to be from a grave to open it virtually. -1 for infinite distance.
+      ##########
+      # Oraxen #
+      ##########
+      # The option requires Oraxen, you must have this installed to use models.
+      # Graves automatically adds models into Oraxen, if you want to use it you will need to re-generate your pack and use "grave" as the furniture name.
+      oraxen:
+        furinture:
+          enabled: false # Should we use Oraxen furniture?
+          name: "grave" # Block name.
+        block:
+          enabled: false # Should we use Oraxen blocks?
+          name: "caveblock" # Block name.
 
       #######
       # GUI #
@@ -457,84 +423,6 @@ settings:
               #  name: "Toggle Protection %state_protection%"
               #  lore:
               #    - "Toggle grave protection"
-
-      ##########
-      # Zombie #
-      ##########
-      zombie:
-        type: ZOMBIE # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/LivingEntity.html
-        name: "%owner_name%'s Zombie"
-        spawn-owner: false # Should a grave spawn a zombie when it is looted by its owner.
-        spawn-other: true # Should a grave spawn a zombie if it is looted by another player.
-        only-break: false # Should a zombie only spawn if the player broke the grave not open it.
-        explode: false # Should a grave spawn a zombie if it is blown up, this only works if the grave can be blown up.
-        owner-head: true # Will the zombie have the owners head on.
-        health: 20 # How much health the zombie has.
-        pickup: false # Can the zombie pickup dropped items.
-        drop: false # Do grave zombies drop items, this may include the head it is wearing.
-
-      #########
-      # Token #
-      #########
-      token: # You have to define the token at the top of the config file.
-        enabled: false # Should graves require tokens for their creation.
-        name: "basic" # Name of the token defined in token setup.
-
-      ###########
-      # Message #
-      ###########
-      message:
-        prefix: "&7☠ &8» &r"
-        loot: ""
-        experience: "Looted &7%level% &rlevels from grave."
-        empty: "You don't have any graves."
-        death: "You died in &7%world% &rat &7%x%&rx, &7%y%&ry, &7%z%&rz, a grave was created that lasts for &7%time_alive_remaining_formatted%&r."
-        ignore: "A grave was not created because you died in &7%name%&r."
-        max: "A grave was not created, you have reached the maximum."
-        failure: "A grave was unable to be placed, item's dropped on ground."
-        no-money: "You don't have enough money, you need &7%teleport_cost%&r."
-        no-token: "A grave was not created because you didn't have a grave token."
-        give-token: "You were given a Grave Token."
-        distance: "You are &7%distance% &rblocks away."
-        distance-world: "Can't measure distance, wrong world."
-        teleport: "You teleported to your grave."
-        teleport-top: "Grave is in an unsafe location, you have been teleported nearby."
-        teleport-failure: "Teleport failed, teleport location is unsafe."
-        teleport-disabled: "Grave teleportation is disabled."
-        build-denied: "A grave was not created because you don't have permission to build where you died."
-        distance-virtual: "You are too far away to virtually open this grave."
-        permission-denied: "Permission denied."
-        protection: "This grave is protected for %time_protection_remaining_formatted%."
-        worldguard-create-deny: "A grave was not created because grave creation is disabled in this region."
-        worldguard-teleport-deny: "Grave teleportation is disabled in this region."
-
-      ########
-      # Time #
-      ########
-      time:
-        second: "&7%second%&fs "
-        minute: "&7%minute%&fm "
-        hour: "&7%hour%&fh "
-        day: "&7%day%&fd "
-        infinite: "&7Forever"
-
-      #########
-      # Sound #
-      #########
-      sound:
-        open: BLOCK_CHEST_OPEN
-        close: BLOCK_CHEST_CLOSE
-        loot: ENTITY_DONKEY_CHEST
-        teleport: ENTITY_ENDERMAN_TELEPORT
-        menu-open: ENTITY_CHICKEN_EGG
-        protection: BLOCK_CHEST_LOCKED
-        protection-change: ENTITY_DONKEY_CHEST
-
-      ##########
-      # Effect #
-      ##########
-      effect:
-        loot: MOBSPAWNER_FLAMES
 
       ###########
       # Command #
@@ -585,21 +473,15 @@ settings:
             - ""
             #- LAVA
 
-      ###########
-      # Replace #
-      ###########
-      replace:
-        block: # What blocks can graves replace.
-          not-solid: true # Replace blocks that are not solid.
-
       #########
       # Death #
       #########
+      # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html
       death:
         player: true # Create a grave if an entity dies to a player.
         entity: false # Create a grave if an entity dies to an entity.
         environmental: false # Create a grave if an entity dies to things such as fall damage, lava and suffocation.
-        reason: # Only create graves for entities that were killed for these reasons. https://hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html
+        reason: # Only create graves for entities that were killed for these reasons.
           #- CONTACT
           - ENTITY_ATTACK
           - ENTITY_SWEEP_ATTACK
@@ -673,3 +555,88 @@ settings:
           - CUSTOM
           #- SPAWNER
           #- ALL
+
+      ###########
+      # Message #
+      ###########
+      message:
+        prefix: "&7☠ &8» &r"
+        loot: ""
+        experience: "Looted &7%level% &rlevels from grave."
+        empty: "You don't have any graves."
+        death: "You died in &7%world% &rat &7%x%&rx, &7%y%&ry, &7%z%&rz, a grave was created that lasts for &7%time_alive_remaining_formatted%&r."
+        ignore: "A grave was not created because you died in &7%name%&r."
+        max: "A grave was not created, you have reached the maximum."
+        failure: "A grave was unable to be placed, item's dropped on ground."
+        no-money: "You don't have enough money, you need &7%teleport_cost%&r."
+        no-token: "A grave was not created because you didn't have a grave token."
+        give-token: "You were given a Grave Token."
+        distance: "You are &7%distance% &rblocks away."
+        distance-world: "Can't measure distance, wrong world."
+        teleport: "You teleported to your grave."
+        teleport-top: "Grave is in an unsafe location, you have been teleported nearby."
+        teleport-failure: "Teleport failed, teleport location is unsafe."
+        teleport-disabled: "Grave teleportation is disabled."
+        build-denied: "A grave was not created because you don't have permission to build where you died."
+        distance-virtual: "You are too far away to virtually open this grave."
+        permission-denied: "Permission denied."
+        protection: "This grave is protected for %time_protection_remaining_formatted%."
+        region-create-deny: "A grave was not created because grave creation is disabled in this region."
+        region-teleport-deny: "Grave teleportation is disabled in this region."
+        death-reason: # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html
+          ENTITY_ATTACK: "Attacked"
+          ENTITY_SWEEP_ATTACK: "Sweep Attacked"
+          PROJECTILE: "Projectile Struck"
+          SUFFOCATION: "Suffocated"
+          FALL: "Fell"
+          FIRE: "Burned"
+          FIRE_TICK: "Burned"
+          MELTING: "Melted"
+          LAVA: "Burned"
+          DROWNING: "Drowned"
+          BLOCK_EXPLOSION: "Exploded"
+          ENTITY_EXPLOSION: "Exploded"
+          VOID: "Voided"
+          LIGHTNING: "Zeus"
+          SUICIDE: "Suicide"
+          STARVATION: "Starved"
+          POISON: "Poisoned"
+          MAGIC: "Magic Missile"
+          WITHER: "Withered Away"
+          FALLING_BLOCK: "Crushed"
+          THORNS: "Thorned"
+          DRAGON_BREATH: "Dragon Breath"
+          CUSTOM: "Dark Magic"
+          FLY_INTO_WALL: "Highspeed Splat"
+          HOT_FLOOR: "Burned Feet"
+          CRAMMING: "Crushed"
+          DRYOUT: "Suffocated"
+          FREEZE: "Froze"
+
+      ########
+      # Time #
+      ########
+      time:
+        second: "&7%second%&fs "
+        minute: "&7%minute%&fm "
+        hour: "&7%hour%&fh "
+        day: "&7%day%&fd "
+        infinite: "&7Forever"
+
+      #########
+      # Sound #
+      #########
+      sound:
+        open: BLOCK_CHEST_OPEN
+        close: BLOCK_CHEST_CLOSE
+        loot: ENTITY_DONKEY_CHEST
+        teleport: ENTITY_ENDERMAN_TELEPORT
+        menu-open: ENTITY_CHICKEN_EGG
+        protection: BLOCK_CHEST_LOCKED
+        protection-change: ENTITY_DONKEY_CHEST
+
+      ##########
+      # Effect #
+      ##########
+      effect:
+        loot: MOBSPAWNER_FLAMES

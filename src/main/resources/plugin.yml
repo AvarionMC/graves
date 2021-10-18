@@ -5,7 +5,7 @@ main: com.ranull.graves.Graves
 api-version: 1.13
 author: Ranull
 load: POSTWORLD
-softdepend: [ Vault, WorldEdit, WorldGuard, GriefDefender, PlaceholderAPI, FurnitureLib, ProtectionLib, ItemsAdder, ProtocolLib, SkullTextureAPI, MoreMobHeads ]
+softdepend: [ Vault, WorldEdit, WorldGuard, GriefDefender, PlaceholderAPI, FurnitureLib, ProtectionLib, ChestSort, ItemsAdder, Oraxen, ItemBridge, ProtocolLib, SkullTextureAPI ]
 
 commands:
   graves:
@@ -51,6 +51,3 @@ permissions:
   graves.reload:
     default: op
     description: Reload Graves
-  graves.cleanup:
-    default: op
-    description: Cleanup holograms

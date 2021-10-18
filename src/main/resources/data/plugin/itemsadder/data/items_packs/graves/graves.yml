@@ -1,0 +1,22 @@
+info:
+  namespace: graves
+categories:
+  graves:
+    enabled: true
+    icon: "graves:grave"
+    name: "Graves"
+    items:
+      - "graves:grave"
+items:
+  grave:
+    display_name: Grave
+    permission: grave
+    resource:
+      material: STONE
+      generate: false
+      model_path: graves/grave
+    behaviours:
+      furniture:
+        small_hitbox: false
+        solid: false
+        fixed_rotation: false

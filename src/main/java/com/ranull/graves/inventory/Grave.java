@@ -217,6 +217,7 @@ public class Grave implements InventoryHolder {
 
     public enum StorageMode {
         EXACT,
-        COMPACT
+        COMPACT,
+        CHESTSORT
     }
 }

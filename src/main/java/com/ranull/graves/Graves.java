@@ -15,9 +15,11 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,8 +39,6 @@ public class Graves extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        integrationManager.reload();
-
         versionManager = new VersionManager(this);
         dataManager = new DataManager(this, DataManager.Type.SQLITE);
         blockManager = new BlockManager(this);
@@ -49,12 +49,25 @@ public class Graves extends JavaPlugin {
         entityManager = new EntityManager(this);
         graveManager = new GraveManager(this);
 
-        if (versionManager.hasPersistentData()) {
+        if (versionManager.hasPersistentData() && !versionManager.isMohist()) {
             recipeManager = new RecipeManager(this);
         }
 
+        if (versionManager.hasBlockData()) {
+            compatibility = new CompatibilityBlockData();
+        } else {
+            compatibility = new CompatibilityMaterialData();
+
+            infoMessage("Legacy version detected, Graves will run but may have problems with material names, " +
+                    "the default config is setup for the latest version of the game, you can alter the config manually to fix " +
+                    "any issues you encounter, you will need to find the names of materials and sounds for your version.");
+        }
+
+        integrationManager.reload();
         updateChecker();
+        compatibilityChecker();
         configChecker();
+        registerListeners();
 
         new Metrics(this, 12849);
         PluginCommand pluginCommand = getCommand("graves");
@@ -62,7 +75,47 @@ public class Graves extends JavaPlugin {
         if (pluginCommand != null) {
             pluginCommand.setExecutor(new GravesCommand(this));
         }
+    }
 
+    @Override
+    public void onDisable() {
+        graveManager.onDisable();
+        dataManager.onDisable();
+        integrationManager.onDisable();
+
+        if (recipeManager != null) {
+            recipeManager.onDisable();
+        }
+    }
+
+    @Override
+    public void onLoad() {
+        saveDefaultConfig();
+
+        integrationManager = new IntegrationManager(this);
+
+        integrationManager.loadWorldGuard();
+    }
+
+    public void reload() {
+        saveDefaultConfig();
+        reloadConfig();
+        configChecker();
+        updateChecker();
+        dataManager.reload();
+        integrationManager.reload();
+
+        if (recipeManager != null) {
+            recipeManager.reload();
+        }
+
+        unregisterListeners();
+        registerListeners();
+
+        infoMessage(getName() + " reloaded.");
+    }
+
+    public void registerListeners() {
         getServer().getPluginManager().registerEvents(new PlayerInteractListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerMoveListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerBucketEmptyListener(this), this);
@@ -93,35 +146,8 @@ public class Graves extends JavaPlugin {
         //getServer().getPluginManager().registerEvents(new GraveTestListener(this), this); // Test Listener
     }
 
-    @Override
-    public void onDisable() {
-        graveManager.onDisable();
-        dataManager.onDisable();
-        integrationManager.onDisable();
-
-        if (recipeManager != null) {
-            recipeManager.onDisable();
-        }
-    }
-
-    @Override
-    public void onLoad() {
-        saveDefaultConfig();
-
-        integrationManager = new IntegrationManager(this);
-
-        integrationManager.loadWorldGuard();
-    }
-
-    public void reload() {
-        saveDefaultConfig();
-        reloadConfig();
-        configChecker();
-        updateChecker();
-        dataManager.reload();
-        recipeManager.reload();
-        integrationManager.reload();
-        infoMessage("Config reloaded.");
+    public void unregisterListeners() {
+        HandlerList.unregisterAll(this);
     }
 
     public void debugMessage(String string, int level) {
@@ -134,6 +160,10 @@ public class Graves extends JavaPlugin {
 
     public void warningMessage(String string) {
         getLogger().info("Warning: " + string);
+    }
+
+    public void compatibilityMessage(String string) {
+        getLogger().info("Compatibility: " + string);
     }
 
     public void infoMessage(String string) {
@@ -183,15 +213,16 @@ public class Graves extends JavaPlugin {
                     "regenerate it, if you choose not to default options may be applied and current confirmation changes " +
                     "might not work.");
         }
+    }
 
-        if (versionManager.hasBlockData()) {
-            compatibility = new CompatibilityBlockData();
-        } else {
-            compatibility = new CompatibilityMaterialData();
+    private void compatibilityChecker() {
+        if (versionManager.isBukkit()) {
+            infoMessage("Bukkit detected, Some functions won't work on Bukkit, like hex codes.");
+        }
 
-            infoMessage("Legacy version detected, Graves will run but may have problems with material names, " +
-                    "the default config is setup for the latest version of the game, you can alter the config manually to fix " +
-                    "any issues you encounter, you will need to find the names of materials and sounds for your version.");
+        if (versionManager.isMohist()) {
+            infoMessage("Mohist detected, Graves will try and work around some of the issues introduced " +
+                    "by Mohist.");
         }
     }
 
@@ -251,6 +282,10 @@ public class Graves extends JavaPlugin {
         return integrationManager.getWorldGuard() != null;
     }
 
+    public boolean hasGriefDefender() {
+        return integrationManager.getGriefDefender() != null;
+    }
+
     public boolean hasFurnitureLib() {
         return integrationManager.getFurnitureLib() != null;
     }
@@ -263,8 +298,16 @@ public class Graves extends JavaPlugin {
         return integrationManager.getItemsAdder() != null;
     }
 
+    public boolean hasOraxen() {
+        return integrationManager.getOraxen() != null;
+    }
+
+    public boolean hasChestSort() {
+        return integrationManager.getChestSort() != null;
+    }
+
     public boolean hasPlaceholderAPI() {
-        return integrationManager.getPlaceholder() != null;
+        return integrationManager.getPlaceholderAPI() != null;
     }
 
     public Vault getVault() {
@@ -279,12 +322,24 @@ public class Graves extends JavaPlugin {
         return integrationManager.getWorldGuard();
     }
 
+    public GriefDefender getGriefDefender() {
+        return integrationManager.getGriefDefender();
+    }
+
     public FurnitureLib getFurnitureLib() {
         return integrationManager.getFurnitureLib();
     }
 
     public ItemsAdder getItemsAdder() {
         return integrationManager.getItemsAdder();
+    }
+
+    public Oraxen getOraxen() {
+        return integrationManager.getOraxen();
+    }
+
+    public ChestSort getChestSort() {
+        return integrationManager.getChestSort();
     }
 
     public ProtectionLib getProtectionLib() {
@@ -367,5 +422,9 @@ public class Graves extends JavaPlugin {
         }
 
         return getConfig().getConfigurationSection("settings.default.default");
+    }
+
+    public final File getPluginsFolder() {
+        return getDataFolder().getParentFile();
     }
 }
