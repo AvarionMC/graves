@@ -129,6 +129,18 @@ public final class PlayerManager {
 
     public double getTeleportCost(Location location1, Location location2, Grave grave) {
         double cost = plugin.getConfig("teleport.cost", grave).getDouble("teleport.cost");
+
+        if (plugin.getConfig("teleport.cost", grave).isString("teleport.cost")) {
+            String costString = StringUtil.parseString(plugin.getConfig("teleport.cost", grave)
+                    .getString("teleport.cost"), location2, grave, plugin);
+
+            try {
+                cost = Double.parseDouble(costString);
+            } catch (NumberFormatException ignored) {
+                plugin.debugMessage(costString + " cost is not a double", 1);
+            }
+        }
+
         double costDifferentWorld = plugin.getConfig("teleport.cost-different-world", grave)
                 .getDouble("teleport.cost-different-world");
 

@@ -16,6 +16,6 @@ public class ProjectBreakListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onProjectBreak(ProjectBreakEvent event) {
         event.setCancelled(event.getID().getUUID() != null
-                && furnitureLib.getGraveFromFurnitureLib(event.getLocation(), event.getID().getUUID()) != null);
+                && furnitureLib.getGrave(event.getLocation(), event.getID().getUUID()) != null);
     }
 }

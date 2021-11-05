@@ -24,7 +24,7 @@ public class FurnitureInteractListener implements Listener {
         Entity entity = event.getRightClicked();
 
         if (entity instanceof ItemFrame) {
-            Grave grave = oraxen.getGraveFromOraxen(entity);
+            Grave grave = oraxen.getGrave(entity);
 
             if (grave != null) {
                 event.setCancelled(plugin.getGraveManager().openGrave(event.getPlayer(), entity.getLocation(), grave));

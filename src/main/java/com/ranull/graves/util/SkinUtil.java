@@ -35,12 +35,12 @@ public final class SkinUtil {
             if (skullTextureAPIPlugin != null && skullTextureAPIPlugin.isEnabled()
                     && skullTextureAPIPlugin instanceof SkullTextureAPI) {
                 try {
-                    String base64 = ((SkullTextureAPI) skullTextureAPIPlugin).getTextureBase64(entity);
+                    String base64 = SkullTextureAPI.getTexture(entity);
 
                     if (base64 != null && !base64.equals("")) {
                         return base64;
                     }
-                } catch (NoSuchMethodError exception) {
+                } catch (NoSuchMethodError ignored) {
                     plugin.debugMessage("SkullTextureAPI detected but can't find method getTextureBase64, " +
                             "maybe you are running an outdated version", 1);
                 }

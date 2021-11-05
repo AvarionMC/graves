@@ -33,21 +33,28 @@ public class EntityDeathListener implements Listener {
         this.removedItemStackMap = new HashMap<>();
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onEntityDeathLowest(EntityDeathEvent event) {
         if (event.getEntityType() == EntityType.PLAYER) {
             removedItemStackMap.put(event.getEntity().getUniqueId(), new ArrayList<>(event.getDrops()));
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onEntityDeath(EntityDeathEvent event) {
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onEntityDeathMonitor(EntityDeathEvent event) {
         LivingEntity livingEntity = event.getEntity();
         String entityName = plugin.getEntityManager().getEntityName(livingEntity);
         Location location = LocationUtil.roundLocation(livingEntity.getLocation());
         List<String> permissionList = livingEntity instanceof Player ? plugin.getPermissionList(livingEntity) : null;
         List<String> worldList = plugin.getConfig("world", livingEntity, permissionList)
                 .getStringList("world");
+        List<ItemStack> removedItemStackList = new ArrayList<>();
+
+        // Removed items
+        if (removedItemStackMap.containsKey(livingEntity.getUniqueId())) {
+            removedItemStackList.addAll(removedItemStackMap.get(livingEntity.getUniqueId()));
+            removedItemStackMap.remove(livingEntity.getUniqueId());
+        }
 
         // Grave zombie
         if (plugin.getEntityManager().hasDataByte(livingEntity, "graveZombie")) {
@@ -237,36 +244,31 @@ public class EntityDeathListener implements Listener {
         while (iterator.hasNext()) {
             ItemStack itemStack = iterator.next();
 
-            // Ignore compass
-            if (itemStack.getType() == Material.COMPASS && plugin.getPlayerManager()
-                    .getUUIDFromItemStack(itemStack) != null) {
-                if (plugin.getConfig("compass.destroy", livingEntity, permissionList)
-                        .getBoolean("compass.destroy")) {
-                    iterator.remove();
+            if (itemStack != null) {
+                // Ignore compass
+                if (itemStack.getType() == Material.COMPASS && plugin.getPlayerManager()
+                        .getUUIDFromItemStack(itemStack) != null) {
+                    if (plugin.getConfig("compass.destroy", livingEntity, permissionList)
+                            .getBoolean("compass.destroy")) {
+                        iterator.remove();
 
-                    continue;
-                } else if (plugin.getConfig("compass.ignore", livingEntity, permissionList)
-                        .getBoolean("compass.ignore")) {
-                    continue;
+                        continue;
+                    } else if (plugin.getConfig("compass.ignore", livingEntity, permissionList)
+                            .getBoolean("compass.ignore")) {
+                        continue;
+                    }
                 }
-            }
 
-            // Ignored drops
-            if (!plugin.getGraveManager().shouldIgnoreItemStack(itemStack, livingEntity, permissionList)) {
-                graveItemStackList.add(itemStack);
-                iterator.remove();
+                // Ignored drops
+                if (!plugin.getGraveManager().shouldIgnoreItemStack(itemStack, livingEntity, permissionList)) {
+                    graveItemStackList.add(itemStack);
+                    iterator.remove();
+                }
             }
         }
 
         // Grave
         if (!graveItemStackList.isEmpty()) {
-            List<ItemStack> removedItemStackList = new ArrayList<>();
-
-            if (removedItemStackMap.containsKey(livingEntity.getUniqueId())) {
-                removedItemStackList.addAll(removedItemStackMap.get(livingEntity.getUniqueId()));
-                removedItemStackMap.remove(livingEntity.getUniqueId());
-            }
-
             Grave grave = plugin.getGraveManager().createGrave(livingEntity,
                     plugin.getGraveManager().getGraveItemStackList(graveItemStackList, removedItemStackList,
                             livingEntity, permissionList), permissionList);
@@ -306,6 +308,7 @@ public class EntityDeathListener implements Listener {
             if (livingEntity.getKiller() != null) {
                 grave.setKillerType(EntityType.PLAYER);
                 grave.setKillerName(livingEntity.getKiller().getName());
+                grave.setKillerNameDisplay(livingEntity.getKiller().getDisplayName());
                 grave.setKillerUUID(livingEntity.getKiller().getUniqueId());
             } else if (livingEntity.getLastDamageCause() != null) {
                 EntityDamageEvent entityDamageEvent = livingEntity.getLastDamageCause();
@@ -316,12 +319,15 @@ public class EntityDeathListener implements Listener {
 
                     grave.setKillerUUID(entityDamageByEntityEvent.getDamager().getUniqueId());
                     grave.setKillerType(entityDamageByEntityEvent.getDamager().getType());
-                    grave.setKillerName(plugin.getEntityManager().getEntityName(entityDamageByEntityEvent.getDamager()));
+                    grave.setKillerName(plugin.getEntityManager().getEntityName(entityDamageByEntityEvent
+                            .getDamager()));
                 } else {
                     grave.setKillerUUID(null);
                     grave.setKillerType(null);
-                    grave.setKillerName(plugin.getGraveManager().getDamageCause(entityDamageEvent.getCause(), grave));
+                    grave.setKillerName(plugin.getGraveManager().getDamageReason(entityDamageEvent.getCause(), grave));
                 }
+
+                grave.setKillerNameDisplay(grave.getKillerName());
             }
 
             if (plugin.getConfig("protection.enabled", grave).getBoolean("protection.enabled")) {

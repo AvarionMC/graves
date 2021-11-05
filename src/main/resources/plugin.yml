@@ -5,14 +5,36 @@ main: com.ranull.graves.Graves
 api-version: 1.13
 author: Ranull
 load: POSTWORLD
-softdepend: [ Vault, WorldEdit, WorldGuard, GriefDefender, PlaceholderAPI, FurnitureLib, ProtectionLib, ChestSort, ItemsAdder, Oraxen, ItemBridge, ProtocolLib, SkullTextureAPI ]
+loadbefore:
+  - GriefPrevention
+  - XItemsRemover
+softdepend:
+  - Vault
+  - WorldEdit
+  - WorldGuard
+  - GriefDefender
+  - PlaceholderAPI
+  - FurnitureLib
+  - FurnitureEngine
+  - ProtectionLib
+  - ChestSort
+  - ItemsAdder
+  - Oraxen
+  - ItemBridge
+  - ProtocolLib
+  - SkullTextureAPI
 
 commands:
   graves:
     description: Graves info
     default: true
     usage: /graves
-    aliases: [ graves, grave, deathchests, deathchest, dc, death ]
+    aliases:
+      - grave
+      - deathchests
+      - deathchest
+      - dc
+      - death
 
 permissions:
   graves.place:

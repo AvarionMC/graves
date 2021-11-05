@@ -49,6 +49,8 @@ settings:
       enabled: true # Should GriefDefender integration be enabled.
     furniturelib: # https://www.spigotmc.org/resources/furniturelibary.9368/
       enabled: true # Should FurnitureLib integration be enabled.
+    furnitureengine: # https://www.spigotmc.org/resources/furnitureengine.97134/
+      enabled: true # Should FurnitureEngine integration be enabled.
     protectionlib: # https://www.spigotmc.org/resources/protectionlib.9368/
       enabled: true # Should ProtectionLib integration be enabled.
     itemsadder: # https://www.spigotmc.org/resources/itemsadder.73355/
@@ -62,8 +64,6 @@ settings:
     chestsort: # https://www.spigotmc.org/resources/chestsort.59773/
       enabled: true # Should ChestSort integration be enabled.
     itembridge: # https://www.spigotmc.org/resources/itembridge.77080/
-      enabled: true # Should ItemBridge integration be enabled.
-    deluxecombat: # https://www.spigotmc.org/resources/itembridge.77080/
       enabled: true # Should ItemBridge integration be enabled.
 
   #################
@@ -148,7 +148,6 @@ settings:
       #############
       # Placement #
       #############
-      # How grave blocks or holograms are placed.
       placement:
         can-build: false # Only create graves where the entity can build, should work with all protection plugins.
         can-build-protectionlib: false # Only create graves where the entity can build, (According to ProtectionLib).
@@ -211,8 +210,8 @@ settings:
           y: -0.28 # Hologram offset Y.
           z: 0 # Hologram offset Z.
         line:
-          - "&7%owner_name%'s &rGrave"
-          - "&c%killer_name% &c☠"
+          - "&7%owner_name_display%'s &rGrave"
+          - "&c%killer_name_display% &c☠"
 
       ##############
       # Protection #
@@ -286,7 +285,7 @@ settings:
         destroy: true # Should a previous compass be destroyed when creating a new grave.
         name: "%owner_name%'s Grave"
         lore:
-          - "%world%, %x%x, %y%y, %z%z"
+          - "%world_formatted%, %x%x, %y%y, %z%z"
 
       ############
       # Teleport #
@@ -347,10 +346,18 @@ settings:
       # This option requires FurnitureLib, you must have this installed to use models.
       furniturelib:
         enabled: false # Should FurnitureLib furniture be used.
-        name: "GraveStone" # Object ID, GraveStone requires the DiceFurniture plugin.
+        name: "Grave1" # Object ID, GraveStone requires the DiceFurniture plugin.
         line: # If the model contains a sign, this is the text we will apply to it.
           - "%owner_name% Died"
           - "By %killer_name%"
+
+      ###################
+      # FurnitureEngine #
+      ###################
+      # This option requires FurnitureEngine, you must have this installed to use models.
+      furnitureengine:
+        enabled: false # Should FurnitureEngine furniture be used.
+        name: "grave" # Furniture name.
 
       ##############
       # ItemsAdder #
@@ -371,7 +378,7 @@ settings:
       # The option requires Oraxen, you must have this installed to use models.
       # Graves automatically adds models into Oraxen, if you want to use it you will need to re-generate your pack and use "grave" as the furniture name.
       oraxen:
-        furinture:
+        furniture:
           enabled: false # Should we use Oraxen furniture?
           name: "grave" # Block name.
         block:
@@ -408,7 +415,7 @@ settings:
                 lore:
                   - "Items: &f%item%"
                   - "Levels: &f%level%"
-                  - "Death Location: &f%world%, %x%x, %y%y, %z%z"
+                  - "Death Location: &f%world_formatted%, %x%x, %y%y, %z%z"
 
               1:
                 material: "ENDER_PEARL"
@@ -564,7 +571,7 @@ settings:
         loot: ""
         experience: "Looted &7%level% &rlevels from grave."
         empty: "You don't have any graves."
-        death: "You died in &7%world% &rat &7%x%&rx, &7%y%&ry, &7%z%&rz, a grave was created that lasts for &7%time_alive_remaining_formatted%&r."
+        death: "You died in &7%world_formatted% &rat &7%x%&rx, &7%y%&ry, &7%z%&rz, a grave was created that lasts for &7%time_alive_remaining_formatted%&r."
         ignore: "A grave was not created because you died in &7%name%&r."
         max: "A grave was not created, you have reached the maximum."
         failure: "A grave was unable to be placed, item's dropped on ground."
@@ -583,6 +590,10 @@ settings:
         protection: "This grave is protected for %time_protection_remaining_formatted%."
         region-create-deny: "A grave was not created because grave creation is disabled in this region."
         region-teleport-deny: "Grave teleportation is disabled in this region."
+        world: # Change the world name is %world_formatted%, if a world is not defined below it will try to format it itself.
+          world: "Overworld"
+          world_nether: "Nether"
+          world_the_end: "The End"
         death-reason: # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html
           ENTITY_ATTACK: "Attacked"
           ENTITY_SWEEP_ATTACK: "Sweep Attacked"

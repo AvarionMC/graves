@@ -3,10 +3,8 @@ package com.ranull.graves.manager;
 import com.ranull.graves.Graves;
 import com.ranull.graves.data.BlockData;
 import com.ranull.graves.data.ChunkData;
+import com.ranull.graves.data.EntityData;
 import com.ranull.graves.data.HologramData;
-import com.ranull.graves.data.integration.FurnitureLibData;
-import com.ranull.graves.data.integration.ItemsAdderData;
-import com.ranull.graves.data.integration.OraxenData;
 import com.ranull.graves.inventory.Grave;
 import com.ranull.graves.util.ClassUtil;
 import com.ranull.graves.util.InventoryUtil;
@@ -46,15 +44,19 @@ public final class DataManager {
             loadHologramMap();
 
             if (plugin.hasFurnitureLib()) {
-                loadFurnitureLibMap();
+                loadEntityDataMap("furniturelib", EntityData.Type.FURNITURELIB);
+            }
+
+            if (plugin.hasFurnitureEngine()) {
+                loadEntityDataMap("furnitureengine", EntityData.Type.FURNITUREENGINE);
             }
 
             if (plugin.hasItemsAdder()) {
-                loadItemsAdderMap();
+                loadEntityDataMap("itemsadder", EntityData.Type.ITEMSADDER);
             }
 
             if (plugin.hasOraxen()) {
-                loadOraxenMap();
+                loadEntityDataMap("oraxen", EntityData.Type.ORAXEN);
             }
         });
     }
@@ -65,15 +67,19 @@ public final class DataManager {
         setupHologramTable();
 
         if (plugin.hasFurnitureLib()) {
-            setupFurnitureLibTable();
+            setupFurnitureIntegrationTable("furniturelib");
+        }
+
+        if (plugin.hasFurnitureEngine()) {
+            setupFurnitureIntegrationTable("furnitureengine");
         }
 
         if (plugin.hasItemsAdder()) {
-            setupItemsAdderTable();
+            setupFurnitureIntegrationTable("itemsadder");
         }
 
         if (plugin.hasOraxen()) {
-            setupOraxenTable();
+            setupFurnitureIntegrationTable("oraxen");
         }
     }
 
@@ -166,10 +172,12 @@ public final class DataManager {
                 "uuid VARCHAR(255) UNIQUE,\n" +
                 "owner_type VARCHAR(255),\n" +
                 "owner_name VARCHAR(255),\n" +
+                "owner_name_display VARCHAR(255),\n" +
                 "owner_uuid VARCHAR(255),\n" +
                 "owner_texture VARCHAR(255),\n" +
                 "killer_type VARCHAR(255),\n" +
                 "killer_name VARCHAR(255),\n" +
+                "killer_name_display VARCHAR(255),\n" +
                 "killer_uuid VARCHAR(255),\n" +
                 "location_death VARCHAR(255),\n" +
                 "yaw FLOAT(16),\n" +
@@ -196,6 +204,10 @@ public final class DataManager {
             executeUpdate("ALTER TABLE " + name + " ADD COLUMN owner_name VARCHAR(255);");
         }
 
+        if (!columnList.contains("owner_name_display")) {
+            executeUpdate("ALTER TABLE " + name + " ADD COLUMN owner_name_display VARCHAR(255);");
+        }
+
         if (!columnList.contains("owner_uuid")) {
             executeUpdate("ALTER TABLE " + name + " ADD COLUMN owner_uuid VARCHAR(255);");
         }
@@ -210,6 +222,10 @@ public final class DataManager {
 
         if (!columnList.contains("killer_name")) {
             executeUpdate("ALTER TABLE " + name + " ADD COLUMN killer_name VARCHAR(255);");
+        }
+
+        if (!columnList.contains("killer_name_display")) {
+            executeUpdate("ALTER TABLE " + name + " ADD COLUMN killer_name_display VARCHAR(255);");
         }
 
         if (!columnList.contains("killer_uuid")) {
@@ -313,18 +329,6 @@ public final class DataManager {
         }
     }
 
-    public void setupFurnitureLibTable() {
-        setupFurnitureIntegrationTable("furniturelib");
-    }
-
-    public void setupItemsAdderTable() {
-        setupFurnitureIntegrationTable("itemsadder");
-    }
-
-    public void setupOraxenTable() {
-        setupFurnitureIntegrationTable("oraxen");
-    }
-
     private void setupFurnitureIntegrationTable(String name) {
         executeUpdate("CREATE TABLE IF NOT EXISTS " + name + " (" +
                 "chunk VARCHAR(255),\n" +
@@ -397,7 +401,7 @@ public final class DataManager {
                     UUID uuidGrave = UUID.fromString(resultSet.getString("uuid_grave"));
                     int line = resultSet.getInt("line");
 
-                    getChunkData(location).addHologramData(new HologramData(location, uuidEntity, uuidGrave, line));
+                    getChunkData(location).addEntityData(new HologramData(location, uuidEntity, uuidGrave, line));
                 }
             } catch (SQLException exception) {
                 exception.printStackTrace();
@@ -405,8 +409,8 @@ public final class DataManager {
         }
     }
 
-    private void loadFurnitureLibMap() {
-        ResultSet resultSet = executeQuery("SELECT * FROM furniturelib;");
+    private void loadEntityDataMap(String table, EntityData.Type type) {
+        ResultSet resultSet = executeQuery("SELECT * FROM " + table + ";");
 
         if (resultSet != null) {
             try {
@@ -415,43 +419,7 @@ public final class DataManager {
                     UUID uuidEntity = UUID.fromString(resultSet.getString("uuid_entity"));
                     UUID uuidGrave = UUID.fromString(resultSet.getString("uuid_grave"));
 
-                    getChunkData(location).addFurnitureLibData(new FurnitureLibData(location, uuidEntity, uuidGrave));
-                }
-            } catch (SQLException exception) {
-                exception.printStackTrace();
-            }
-        }
-    }
-
-    private void loadItemsAdderMap() {
-        ResultSet resultSet = executeQuery("SELECT * FROM itemsadder;");
-
-        if (resultSet != null) {
-            try {
-                while (resultSet.next()) {
-                    Location location = LocationUtil.chunkStringToLocation(resultSet.getString("chunk"));
-                    UUID uuidEntity = UUID.fromString(resultSet.getString("uuid_entity"));
-                    UUID uuidGrave = UUID.fromString(resultSet.getString("uuid_grave"));
-
-                    getChunkData(location).addItemsAdderData(new ItemsAdderData(location, uuidEntity, uuidGrave));
-                }
-            } catch (SQLException exception) {
-                exception.printStackTrace();
-            }
-        }
-    }
-
-    private void loadOraxenMap() {
-        ResultSet resultSet = executeQuery("SELECT * FROM oraxen;");
-
-        if (resultSet != null) {
-            try {
-                while (resultSet.next()) {
-                    Location location = LocationUtil.chunkStringToLocation(resultSet.getString("chunk"));
-                    UUID uuidEntity = UUID.fromString(resultSet.getString("uuid_entity"));
-                    UUID uuidGrave = UUID.fromString(resultSet.getString("uuid_grave"));
-
-                    getChunkData(location).addOraxenData(new OraxenData(location, uuidEntity, uuidGrave));
+                    getChunkData(location).addEntityData(new EntityData(location, uuidEntity, uuidGrave, type));
                 }
             } catch (SQLException exception) {
                 exception.printStackTrace();
@@ -484,7 +452,7 @@ public final class DataManager {
     }
 
     public void addHologramData(HologramData hologramData) {
-        getChunkData(hologramData.getLocation()).addHologramData(hologramData);
+        getChunkData(hologramData.getLocation()).addEntityData(hologramData);
 
         String chunk = "'" + LocationUtil.chunkToString(hologramData.getLocation()) + "'";
         String uuidEntity = "'" + hologramData.getUUIDEntity() + "'";
@@ -497,12 +465,12 @@ public final class DataManager {
         });
     }
 
-    public void removeHologramData(List<HologramData> hologramDataList) {
+    public void removeHologramData(List<EntityData> entityDataList) {
         try {
             Statement statement = connection.createStatement();
 
-            for (HologramData hologramData : hologramDataList) {
-                getChunkData(hologramData.getLocation()).removeHologramData(hologramData);
+            for (EntityData hologramData : entityDataList) {
+                getChunkData(hologramData.getLocation()).removeEntityData(hologramData);
                 statement.addBatch("DELETE FROM hologram WHERE uuid_entity = '"
                         + hologramData.getUUIDEntity() + "';");
             }
@@ -515,27 +483,36 @@ public final class DataManager {
         }
     }
 
-    public void addFurnitureLibData(FurnitureLibData furnitureLibData) {
-        getChunkData(furnitureLibData.getLocation()).addFurnitureLibData(furnitureLibData);
+    public void addEntityData(EntityData entityData) {
+        getChunkData(entityData.getLocation()).addEntityData(entityData);
 
-        String chunk = "'" + LocationUtil.chunkToString(furnitureLibData.getLocation()) + "'";
-        String uuidEntity = "'" + furnitureLibData.getUUIDEntity() + "'";
-        String uuidGrave = "'" + furnitureLibData.getUUIDGrave() + "'";
+        String table = entityDataTypeTable(entityData.getType());
 
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-            executeUpdate("INSERT INTO furniturelib (chunk, uuid_entity, uuid_grave) VALUES ("
-                    + chunk + ", " + uuidEntity + ", " + uuidGrave + ");");
-        });
+        if (table != null) {
+            String chunk = "'" + LocationUtil.chunkToString(entityData.getLocation()) + "'";
+            String uuidEntity = "'" + entityData.getUUIDEntity() + "'";
+            String uuidGrave = "'" + entityData.getUUIDGrave() + "'";
+
+            plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+                executeUpdate("INSERT INTO " + table + " (chunk, uuid_entity, uuid_grave) VALUES ("
+                        + chunk + ", " + uuidEntity + ", " + uuidGrave + ");");
+            });
+        }
     }
 
-    public void removeFurnitureLibData(List<FurnitureLibData> furnitureLibDataList) {
+    public void removeEntityData(List<EntityData> entityDataList) {
         try {
             Statement statement = connection.createStatement();
 
-            for (FurnitureLibData furnitureLibData : furnitureLibDataList) {
-                getChunkData(furnitureLibData.getLocation()).removeFurnitureLibData(furnitureLibData);
-                statement.addBatch("DELETE FROM furniturelib WHERE uuid_entity = '"
-                        + furnitureLibData.getUUIDEntity() + "';");
+            for (EntityData entityData : entityDataList) {
+                getChunkData(entityData.getLocation()).removeEntityData(entityData);
+
+                String table = entityDataTypeTable(entityData.getType());
+
+                if (table != null) {
+                    statement.addBatch("DELETE FROM " + table + " WHERE uuid_entity = '"
+                            + entityData.getUUIDEntity() + "';");
+                }
             }
 
             plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
@@ -546,65 +523,31 @@ public final class DataManager {
         }
     }
 
-    public void addItemsAdderData(ItemsAdderData itemsAdderData) {
-        getChunkData(itemsAdderData.getLocation()).addItemsAdderData(itemsAdderData);
-
-        String chunk = "'" + LocationUtil.chunkToString(itemsAdderData.getLocation()) + "'";
-        String uuidEntity = "'" + itemsAdderData.getUUIDEntity() + "'";
-        String uuidGrave = "'" + itemsAdderData.getUUIDGrave() + "'";
-
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-            executeUpdate("INSERT INTO itemsadder (chunk, uuid_entity, uuid_grave) VALUES ("
-                    + chunk + ", " + uuidEntity + ", " + uuidGrave + ");");
-        });
-    }
-
-    public void removeItemsAdderData(List<ItemsAdderData> itemsAdderDataList) {
-        try {
-            Statement statement = connection.createStatement();
-
-            for (ItemsAdderData itemsAdderData : itemsAdderDataList) {
-                getChunkData(itemsAdderData.getLocation()).removeItemsAdderData(itemsAdderData);
-                statement.addBatch("DELETE FROM itemsadder WHERE uuid_entity = '"
-                        + itemsAdderData.getUUIDEntity() + "';");
+    public String entityDataTypeTable(EntityData.Type type) {
+        switch (type) {
+            case HOLOGRAM: {
+                return "hologram";
             }
 
-            plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-                executeBatch(statement);
-            });
-        } catch (SQLException exception) {
-            exception.printStackTrace();
-        }
-    }
-
-    public void addOraxenData(OraxenData oraxenData) {
-        getChunkData(oraxenData.getLocation()).addOraxenData(oraxenData);
-
-        String chunk = "'" + LocationUtil.chunkToString(oraxenData.getLocation()) + "'";
-        String uuidEntity = "'" + oraxenData.getUUIDEntity() + "'";
-        String uuidGrave = "'" + oraxenData.getUUIDGrave() + "'";
-
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-            executeUpdate("INSERT INTO oraxen (chunk, uuid_entity, uuid_grave) VALUES ("
-                    + chunk + ", " + uuidEntity + ", " + uuidGrave + ");");
-        });
-    }
-
-    public void removeOraxenData(List<OraxenData> oraxenDataList) {
-        try {
-            Statement statement = connection.createStatement();
-
-            for (OraxenData oraxenData : oraxenDataList) {
-                getChunkData(oraxenData.getLocation()).removeOraxenData(oraxenData);
-                statement.addBatch("DELETE FROM oraxen WHERE uuid_entity = '"
-                        + oraxenData.getUUIDEntity() + "';");
+            case FURNITURELIB: {
+                return "furniturelib";
             }
 
-            plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-                executeBatch(statement);
-            });
-        } catch (SQLException exception) {
-            exception.printStackTrace();
+            case FURNITUREENGINE: {
+                return "furnitureengine";
+            }
+
+            case ITEMSADDER: {
+                return "itemsadder";
+            }
+
+            case ORAXEN: {
+                return "oraxen";
+            }
+
+            default: {
+                return null;
+            }
         }
     }
 
@@ -615,11 +558,15 @@ public final class DataManager {
         String ownerType = grave.getOwnerType() != null ? "'" + grave.getOwnerType() + "'" : "NULL";
         String ownerName = grave.getOwnerName() != null ? "'" + grave.getOwnerName()
                 .replace("'", "''") + "'" : "NULL";
+        String ownerNameDisplay = grave.getOwnerNameDisplay() != null ? "'" + grave.getOwnerNameDisplay()
+                .replace("'", "''") + "'" : "NULL";
         String ownerUUID = grave.getOwnerUUID() != null ? "'" + grave.getOwnerUUID() + "'" : "NULL";
         String ownerTexture = grave.getOwnerTexture() != null ? "'" + grave.getOwnerTexture()
                 .replace("'", "''") + "'" : "NULL";
         String killerType = grave.getKillerType() != null ? "'" + grave.getKillerType() + "'" : "NULL";
         String killerName = grave.getKillerName() != null ? "'" + grave.getKillerName()
+                .replace("'", "''") + "'" : "NULL";
+        String killerNameDisplay = grave.getKillerNameDisplay() != null ? "'" + grave.getKillerNameDisplay()
                 .replace("'", "''") + "'" : "NULL";
         String killerUUID = grave.getKillerUUID() != null ? "'" + grave.getKillerUUID() + "'" : "NULL";
         String locationDeath = grave.getLocationDeath() != null ? "'"
@@ -636,11 +583,13 @@ public final class DataManager {
         long timeCreation = grave.getTimeCreation();
 
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-            executeUpdate("INSERT INTO grave (uuid, owner_type, owner_name, owner_uuid, owner_texture, killer_type, killer_name,"
-                    + " killer_uuid, location_death, yaw, pitch, inventory, experience, protection, time_alive, time_protection,"
-                    + " time_creation, permissions) VALUES (" + uuid + ", " + ownerType + ", "
-                    + ownerName + ", " + ownerUUID + ", " + ownerTexture + ", " + killerType + ", " + killerName + ", " + killerUUID
-                    + ", " + locationDeath + ", " + yaw + ", " + pitch + ", " + inventory + ", " + experience + ", " + protection + ", "
+            executeUpdate("INSERT INTO grave (uuid, owner_type, owner_name, owner_name_display, owner_uuid,"
+                    + " owner_texture, killer_type, killer_name, killer_name_display, killer_uuid, location_death,"
+                    + " yaw, pitch, inventory, experience, protection, time_alive, time_protection,"
+                    + " time_creation, permissions) VALUES (" + uuid + ", " + ownerType + ", " + ownerName + ", "
+                    + ownerNameDisplay + ", " + ownerUUID + ", " + ownerTexture + ", " + killerType + ", "
+                    + killerName + ", " + killerNameDisplay + ", " + killerUUID + ", " + locationDeath + ", "
+                    + yaw + ", " + pitch + ", " + inventory + ", " + experience + ", " + protection + ", "
                     + timeAlive + ", " + timeProtection + ", " + timeCreation + ", " + permissions + ");");
         });
     }
@@ -668,6 +617,8 @@ public final class DataManager {
                     ? EntityType.valueOf(resultSet.getString("owner_type")) : null);
             grave.setOwnerName(resultSet.getString("owner_name") != null
                     ? resultSet.getString("owner_name") : null);
+            grave.setOwnerNameDisplay(resultSet.getString("owner_name_display") != null
+                    ? resultSet.getString("owner_name_display") : null);
             grave.setOwnerUUID(resultSet.getString("owner_uuid") != null
                     ? UUID.fromString(resultSet.getString("owner_uuid")) : null);
             grave.setOwnerTexture(resultSet.getString("owner_texture") != null
@@ -676,6 +627,8 @@ public final class DataManager {
                     ? EntityType.valueOf(resultSet.getString("killer_type")) : null);
             grave.setKillerName(resultSet.getString("killer_name") != null
                     ? resultSet.getString("killer_name") : null);
+            grave.setKillerNameDisplay(resultSet.getString("killer_name_display") != null
+                    ? resultSet.getString("killer_name_display") : null);
             grave.setKillerUUID(resultSet.getString("killer_uuid") != null
                     ? UUID.fromString(resultSet.getString("killer_uuid")) : null);
             grave.setLocationDeath(resultSet.getString("location_death") != null

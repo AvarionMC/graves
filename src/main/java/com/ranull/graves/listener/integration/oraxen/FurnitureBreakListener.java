@@ -17,6 +17,6 @@ public class FurnitureBreakListener implements Listener {
     @EventHandler(priority = EventPriority.LOW)
     public void onFurnitureBreak(EntityDamageEvent event) {
         event.setCancelled(event.getEntity() instanceof ItemFrame
-                && oraxen.getGraveFromOraxen(event.getEntity()) != null);
+                && oraxen.getGrave(event.getEntity()) != null);
     }
 }

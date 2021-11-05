@@ -4,29 +4,13 @@ import org.bukkit.Location;
 
 import java.util.UUID;
 
-public class HologramData {
-    private final Location location;
-    private final UUID uuidEntity;
-    private final UUID uuidGrave;
+public class HologramData extends EntityData {
     private final int line;
 
     public HologramData(Location location, UUID uuidEntity, UUID uuidGrave, int line) {
-        this.location = location;
-        this.uuidEntity = uuidEntity;
-        this.uuidGrave = uuidGrave;
+        super(location, uuidEntity, uuidGrave, Type.HOLOGRAM);
+
         this.line = line;
-    }
-
-    public Location getLocation() {
-        return location.clone();
-    }
-
-    public UUID getUUIDEntity() {
-        return uuidEntity;
-    }
-
-    public UUID getUUIDGrave() {
-        return uuidGrave;
     }
 
     public int getLine() {

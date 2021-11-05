@@ -6,6 +6,7 @@ import com.ranull.graves.util.BlockFaceUtil;
 import com.ranull.graves.util.ResourceUtil;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
@@ -95,7 +96,7 @@ public final class WorldEdit {
                 //buildSchematic(test);
                 plugin.debugMessage("Placing schematic for " + grave.getUUID() + " at "
                         + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
-                        + (location.getBlockY() + 0.5) + "Y, " + (location.getBlockZ() + 0.5) + "z", 1);
+                        + (location.getBlockY() + 0.5) + "y, " + (location.getBlockZ() + 0.5) + "z", 1);
             } else {
                 plugin.debugMessage("Can't find schematic " + schematicName, 1);
             }
@@ -231,7 +232,6 @@ public final class WorldEdit {
     }
 
     private EditSession getEditSession(World world) {
-        //return worldEdit.newEditSession(BukkitAdapter.adapt(world));
-        return worldEdit.newEditSession((com.sk89q.worldedit.world.World) world);
+        return worldEdit.newEditSession(BukkitAdapter.adapt(world));
     }
 }

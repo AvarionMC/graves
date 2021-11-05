@@ -1,11 +1,11 @@
 package com.ranull.graves.integration;
 
 import com.ranull.graves.Graves;
-import com.ranull.graves.data.ChunkData;
-import com.ranull.graves.data.integration.OraxenData;
+import com.ranull.graves.data.EntityData;
 import com.ranull.graves.inventory.Grave;
 import com.ranull.graves.listener.integration.oraxen.FurnitureBreakListener;
 import com.ranull.graves.listener.integration.oraxen.FurnitureInteractListener;
+import com.ranull.graves.manager.EntityDataManager;
 import com.ranull.graves.manager.VersionManager;
 import com.ranull.graves.util.BlockFaceUtil;
 import com.ranull.graves.util.ResourceUtil;
@@ -28,7 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public final class Oraxen {
+public final class Oraxen extends EntityDataManager {
     private final Graves plugin;
     private final Plugin oraxenPlugin;
     private final boolean hasFurniture;
@@ -36,9 +36,11 @@ public final class Oraxen {
     private final FurnitureBreakListener furnitureBreakListener;
 
     public Oraxen(Graves plugin, Plugin oraxenPlugin) {
+        super(plugin);
+
+        VersionManager versionManager = plugin.getVersionManager();
         this.plugin = plugin;
         this.oraxenPlugin = oraxenPlugin;
-        VersionManager versionManager = plugin.getVersionManager();
         this.hasFurniture = !versionManager.is_v1_7() && !versionManager.is_v1_8() && !versionManager.is_v1_9()
                 && !versionManager.is_v1_10() && !versionManager.is_v1_11() && !versionManager.is_v1_12()
                 && !versionManager.is_v1_13() && !versionManager.is_v1_14() && !versionManager.is_v1_15();
@@ -46,18 +48,7 @@ public final class Oraxen {
         this.furnitureBreakListener = new FurnitureBreakListener(this);
 
         saveData();
-        plugin.getServer().getPluginManager().registerEvents(furnitureInteractListener, plugin);
-        plugin.getServer().getPluginManager().registerEvents(furnitureBreakListener, plugin);
-    }
-
-    public void unregister() {
-        if (furnitureInteractListener != null) {
-            HandlerList.unregisterAll(furnitureInteractListener);
-        }
-
-        if (furnitureBreakListener != null) {
-            HandlerList.unregisterAll(furnitureBreakListener);
-        }
+        registerListeners();
     }
 
     public void saveData() {
@@ -71,24 +62,19 @@ public final class Oraxen {
         }
     }
 
-    public OraxenData getOraxenData(Entity entity) {
-        if (plugin.getDataManager().hasChunkData(entity.getLocation())) {
-            ChunkData chunkData = plugin.getDataManager().getChunkData(entity.getLocation());
-
-            if (chunkData.getOraxenDataMap().containsKey(entity.getUniqueId())) {
-                return chunkData.getOraxenDataMap().get(entity.getUniqueId());
-            }
-        }
-
-        return null;
+    public void registerListeners() {
+        plugin.getServer().getPluginManager().registerEvents(furnitureInteractListener, plugin);
+        plugin.getServer().getPluginManager().registerEvents(furnitureBreakListener, plugin);
     }
 
-    public Grave getGraveFromOraxen(Entity entity) {
-        OraxenData oraxenData = getOraxenData(entity);
+    public void unregisterListeners() {
+        if (furnitureInteractListener != null) {
+            HandlerList.unregisterAll(furnitureInteractListener);
+        }
 
-        return oraxenData != null && plugin.getDataManager().getGraveMap()
-                .containsKey(oraxenData.getUUIDGrave()) ? plugin.getDataManager().getGraveMap()
-                .get(oraxenData.getUUIDGrave()) : null;
+        if (furnitureBreakListener != null) {
+            HandlerList.unregisterAll(furnitureBreakListener);
+        }
     }
 
     public boolean hasFurniture() {
@@ -111,13 +97,11 @@ public final class Oraxen {
                     ItemFrame itemFrame = FurnitureMechanic.getItemFrame(location);
 
                     if (itemFrame != null) {
-                        plugin.getDataManager().addOraxenData(new OraxenData(location, itemFrame.getUniqueId(),
-                                grave.getUUID()));
+                        createEntityData(location, itemFrame.getUniqueId(), grave.getUUID(), EntityData.Type.ORAXEN);
+                        plugin.debugMessage("Placing Oraxen furniture for " + grave.getUUID() + " at "
+                                + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
+                                + (location.getBlockY() + 0.5) + "y, " + (location.getBlockZ() + 0.5) + "z", 1);
                     }
-
-                    plugin.debugMessage("Placing Oraxen furniture for " + grave.getUUID() + " at "
-                            + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
-                            + (location.getBlockY() + 0.5) + "Y, " + (location.getBlockZ() + 0.5) + "z", 1);
                 }
             } else {
                 plugin.warningMessage("This version of Minecraft does not support " + oraxenPlugin.getName()
@@ -127,42 +111,22 @@ public final class Oraxen {
     }
 
     public void removeFurniture(Grave grave) {
-        List<OraxenData> oraxenDataList = new ArrayList<>();
-
-        for (Map.Entry<String, ChunkData> chunkDataEntry : plugin.getDataManager().getChunkDataMap().entrySet()) {
-            ChunkData chunkData = chunkDataEntry.getValue();
-
-            if (chunkDataEntry.getValue().isLoaded()) {
-                for (OraxenData oraxenData : new ArrayList<>(chunkData.getOraxenDataMap().values())) {
-                    if (grave.getUUID().equals(oraxenData.getUUIDGrave())) {
-                        oraxenDataList.add(oraxenData);
-                    }
-                }
-            }
-        }
-
-        removeFurniture(oraxenDataList);
+        removeFurniture(getEntityDataMap(getLoadedEntityDataList(grave)));
     }
 
-    public void removeFurniture(OraxenData oraxenData) {
-        removeFurniture(Collections.singletonList(oraxenData));
+    public void removeFurniture(EntityData entityData) {
+        removeFurniture(getEntityDataMap(Collections.singletonList(entityData)));
     }
 
-    public void removeFurniture(List<OraxenData> oraxenDataList) {
-        List<OraxenData> removedOraxenDataList = new ArrayList<>();
+    public void removeFurniture(Map<EntityData, Entity> entityDataMap) {
+        List<EntityData> entityDataList = new ArrayList<>();
 
-        if (!oraxenDataList.isEmpty()) {
-            for (OraxenData oraxenData : oraxenDataList) {
-                for (Entity entity : oraxenData.getLocation().getChunk().getEntities()) {
-                    if (entity instanceof ItemFrame && entity.getUniqueId().equals(oraxenData.getUUIDEntity())) {
-                        entity.remove();
-                        removedOraxenDataList.add(oraxenData);
-                    }
-                }
-            }
-
-            plugin.getDataManager().removeOraxenData(removedOraxenDataList);
+        for (Map.Entry<EntityData, Entity> entry : entityDataMap.entrySet()) {
+            entry.getValue().remove();
+            entityDataList.add(entry.getKey());
         }
+
+        plugin.getDataManager().removeEntityData(entityDataList);
     }
 
     public void createBlock(Location location, Grave grave) {
@@ -177,7 +141,7 @@ public final class Oraxen {
                         .createNoteBlockData(noteBlockMechanic.getCustomVariation()), false);
                 plugin.debugMessage("Placing Oraxen block for " + grave.getUUID() + " at "
                         + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
-                        + (location.getBlockY() + 0.5) + "Y, " + (location.getBlockZ() + 0.5) + "z", 1);
+                        + (location.getBlockY() + 0.5) + "y, " + (location.getBlockZ() + 0.5) + "z", 1);
             }
         }
     }

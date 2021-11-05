@@ -77,6 +77,17 @@ public final class RecipeManager {
         return null;
     }
 
+    public List<String> getTokenList() {
+        List<String> stringList = new ArrayList<>();
+        ConfigurationSection configurationSection = plugin.getConfig().getConfigurationSection("settings.token");
+
+        if (configurationSection != null) {
+            stringList.addAll(configurationSection.getKeys(false));
+        }
+
+        return stringList;
+    }
+
     public void onDisable() {
         Iterator<Recipe> iterator = plugin.getServer().recipeIterator();
 

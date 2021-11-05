@@ -5,6 +5,7 @@ grave:
     furniture:
       enabled: true
       drop:
+        silktouch: false
         loots:
           - { oraxen_item: grave, probability: 1.0 }
   Pack:

@@ -14,6 +14,7 @@ public final class IntegrationManager {
     private WorldGuard worldGuard;
     private GriefDefender griefDefender;
     private FurnitureLib furnitureLib;
+    private FurnitureEngine furnitureEngine;
     private ProtectionLib protectionLib;
     private ItemsAdder itemsAdder;
     private Oraxen oraxen;
@@ -33,6 +34,7 @@ public final class IntegrationManager {
         //loadGriefDefender();
         loadPlaceholderAPI();
         loadFurnitureLib();
+        loadFurnitureEngine();
         loadProtectionLib();
         loadItemsAdder();
         loadOraxen();
@@ -43,11 +45,15 @@ public final class IntegrationManager {
 
     public void onDisable() {
         if (furnitureLib != null) {
-            furnitureLib.unregister();
+            furnitureLib.unregisterListeners();
+        }
+
+        if (furnitureEngine != null) {
+            furnitureEngine.unregisterListeners();
         }
 
         if (oraxen != null) {
-            oraxen.unregister();
+            oraxen.unregisterListeners();
         }
 
         if (placeholderAPI != null) {
@@ -73,6 +79,10 @@ public final class IntegrationManager {
 
     public FurnitureLib getFurnitureLib() {
         return furnitureLib;
+    }
+
+    public FurnitureEngine getFurnitureEngine() {
+        return furnitureEngine;
     }
 
     public ProtectionLib getProtectionLib() {
@@ -196,6 +206,29 @@ public final class IntegrationManager {
         }
     }
 
+    public void loadFurnitureEngine() {
+        if (plugin.getConfig().getBoolean("settings.integration.furnitureengine.enabled")) {
+            Plugin furnitureEnginePlugin = plugin.getServer().getPluginManager().getPlugin("FurnitureEngine");
+
+            if (furnitureEnginePlugin != null && furnitureEnginePlugin.isEnabled()) {
+                try {
+                    Class.forName("me.mira.furnitureengine.FurnitureAPI", false, getClass().getClassLoader());
+
+                    furnitureEngine = new FurnitureEngine(plugin);
+
+                    plugin.integrationMessage("Hooked into " + furnitureEnginePlugin.getName() + " "
+                            + furnitureEnginePlugin.getDescription().getVersion() + ".");
+                } catch (ClassNotFoundException ignored) {
+                    plugin.integrationMessage(furnitureEnginePlugin.getName() + " "
+                            + furnitureEnginePlugin.getDescription().getVersion() + " detected, but FurnitureAPI " +
+                            "class not found, disabling integration.");
+                }
+            }
+        } else {
+            furnitureEngine = null;
+        }
+    }
+
     public void loadProtectionLib() {
         if (plugin.getConfig().getBoolean("settings.integration.protectionlib.enabled")) {
             Plugin protectionLibPlugin = plugin.getServer().getPluginManager().getPlugin("ProtectionLib");
@@ -309,6 +342,14 @@ public final class IntegrationManager {
             if (essentialsPlugin != null && essentialsPlugin.isEnabled()) {
                 plugin.compatibilityMessage(essentialsPlugin.getName()
                         + " Detected, make sure you don't have the essentials.keepinv or essentials.keepxp permissions.");
+            }
+
+            Plugin deluxeCombatPlugin = plugin.getServer().getPluginManager().getPlugin("DeluxeCombat");
+
+            if (deluxeCombatPlugin != null && deluxeCombatPlugin.isEnabled()) {
+                plugin.compatibilityMessage(deluxeCombatPlugin.getName()
+                        + " Detected, in order to work with graves you need to set disable-drop-handling to true in " +
+                        deluxeCombatPlugin.getName() + "'s data.yml file.");
             }
 
             similarPluginWarning("DeadChest");

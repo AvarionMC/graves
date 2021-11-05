@@ -80,11 +80,11 @@ public final class BlockManager {
             if (material != null) {
                 plugin.debugMessage("Placing grave block for " + grave.getUUID() + " at "
                         + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
-                        + (location.getBlockY() + 0.5) + "Y, " + (location.getBlockZ() + 0.5) + "z", 1);
+                        + (location.getBlockY() + 0.5) + "y, " + (location.getBlockZ() + 0.5) + "z", 1);
             } else {
                 plugin.debugMessage("Placing access location for " + grave.getUUID() + " at "
                         + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
-                        + (location.getBlockY() + 0.5) + "Y, " + (location.getBlockZ() + 0.5) + "z", 1);
+                        + (location.getBlockY() + 0.5) + "y, " + (location.getBlockZ() + 0.5) + "z", 1);
             }
         }
     }
@@ -147,7 +147,7 @@ public final class BlockManager {
             plugin.getDataManager().removeBlockData(location);
             plugin.debugMessage("Replacing grave block for " + blockData.getGraveUUID() + " at "
                     + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
-                    + (location.getBlockY() + 0.5) + "Y, " + (location.getBlockZ() + 0.5) + "z", 1);
+                    + (location.getBlockY() + 0.5) + "y, " + (location.getBlockZ() + 0.5) + "z", 1);
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.ranull.graves.manager;
 
 import com.ranull.graves.Graves;
-import com.ranull.graves.data.ChunkData;
+import com.ranull.graves.data.EntityData;
 import com.ranull.graves.data.HologramData;
 import com.ranull.graves.inventory.Grave;
 import com.ranull.graves.util.LocationUtil;
@@ -15,30 +15,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public final class HologramManager {
+public final class HologramManager extends EntityDataManager {
     private final Graves plugin;
 
     public HologramManager(Graves plugin) {
+        super(plugin);
+
         this.plugin = plugin;
-    }
-
-    public HologramData getHologramData(Entity entity) {
-        if (plugin.getDataManager().hasChunkData(entity.getLocation())) {
-            ChunkData chunkData = plugin.getDataManager().getChunkData(entity.getLocation());
-
-            if (chunkData.getHologramDataMap().containsKey(entity.getUniqueId())) {
-                return chunkData.getHologramDataMap().get(entity.getUniqueId());
-            }
-        }
-
-        return null;
-    }
-
-    public Grave getGraveFromHologram(Entity entity) {
-        HologramData hologramData = getHologramData(entity);
-
-        return hologramData != null && plugin.getDataManager().getGraveMap().containsKey(hologramData.getUUIDGrave())
-                ? plugin.getDataManager().getGraveMap().get(hologramData.getUUIDGrave()) : null;
     }
 
     public void createHologram(Location location, Grave grave) {
@@ -69,8 +52,15 @@ public final class HologramManager {
                         armorStand.setGravity(false);
                         armorStand.setCustomNameVisible(true);
                         armorStand.setSmall(true);
-                        armorStand.setMarker(marker);
                         armorStand.setCustomName(StringUtil.parseString(line, location, grave, plugin));
+
+                        if (!plugin.getVersionManager().is_v1_7()) {
+                            try {
+                                armorStand.setMarker(marker);
+                            } catch (NoSuchMethodError ignored) {
+
+                            }
+                        }
 
                         if (!plugin.getVersionManager().is_v1_7() && !plugin.getVersionManager().is_v1_8()) {
                             armorStand.setInvulnerable(true);
@@ -90,41 +80,21 @@ public final class HologramManager {
     }
 
     public void removeHologram(Grave grave) {
-        List<HologramData> hologramDataList = new ArrayList<>();
-
-        for (Map.Entry<String, ChunkData> chunkDataEntry : plugin.getDataManager().getChunkDataMap().entrySet()) {
-            ChunkData chunkData = chunkDataEntry.getValue();
-
-            if (chunkDataEntry.getValue().isLoaded()) {
-                for (HologramData hologramData : new ArrayList<>(chunkData.getHologramDataMap().values())) {
-                    if (grave.getUUID().equals(hologramData.getUUIDGrave())) {
-                        hologramDataList.add(hologramData);
-                    }
-                }
-            }
-        }
-
-        removeHologram(hologramDataList);
+        removeHologram(getEntityDataMap(getLoadedEntityDataList(grave)));
     }
 
-    public void removeHologram(HologramData hologramData) {
-        removeHologram(Collections.singletonList(hologramData));
+    public void removeHologram(EntityData entityData) {
+        removeHologram(getEntityDataMap(Collections.singletonList(entityData)));
     }
 
-    public void removeHologram(List<HologramData> hologramDataList) {
-        List<HologramData> removedHologramDataList = new ArrayList<>();
+    public void removeHologram(Map<EntityData, Entity> entityDataMap) {
+        List<EntityData> entityDataList = new ArrayList<>();
 
-        if (!hologramDataList.isEmpty()) {
-            for (HologramData hologramData : hologramDataList) {
-                for (Entity entity : hologramData.getLocation().getChunk().getEntities()) {
-                    if (entity.getUniqueId().equals(hologramData.getUUIDEntity())) {
-                        entity.remove();
-                        removedHologramDataList.add(hologramData);
-                    }
-                }
-            }
-
-            plugin.getDataManager().removeHologramData(removedHologramDataList);
+        for (Map.Entry<EntityData, Entity> entry : entityDataMap.entrySet()) {
+            entry.getValue().remove();
+            entityDataList.add(entry.getKey());
         }
+
+        plugin.getDataManager().removeEntityData(entityDataList);
     }
 }

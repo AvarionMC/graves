@@ -67,17 +67,23 @@ public final class StringUtil {
         if (grave != null) {
             string = string.replace("%uuid%", grave.getUUID().toString())
                     .replace("%owner_name%", grave.getOwnerName() != null
-                            ? grave.getOwnerName() : "null")
+                            ? grave.getOwnerName() : "")
+                    .replace("%owner_name_display%", grave.getOwnerNameDisplay() != null
+                            ? grave.getOwnerNameDisplay() : (grave.getOwnerName() != null
+                            ? grave.getOwnerName() : ""))
                     .replace("%owner_type%", grave.getOwnerType() != null
-                            ? grave.getOwnerType().name() : "null")
+                            ? grave.getOwnerType().name() : "")
                     .replace("%owner_uuid%", grave.getOwnerUUID() != null
-                            ? grave.getOwnerUUID().toString() : "null")
+                            ? grave.getOwnerUUID().toString() : "")
                     .replace("%killer_name%", grave.getKillerName() != null
-                            ? grave.getKillerName() : "null")
+                            ? grave.getKillerName() : "")
+                    .replace("%killer_name_display%", grave.getKillerNameDisplay() != null
+                            ? grave.getKillerNameDisplay() : (grave.getKillerName() != null
+                            ? grave.getKillerName() : ""))
                     .replace("%killer_type%", grave.getKillerType() != null
-                            ? grave.getKillerType().name() : "null")
+                            ? grave.getKillerType().name() : "")
                     .replace("%killer_uuid%", grave.getKillerUUID() != null
-                            ? grave.getKillerUUID().toString() : "null")
+                            ? grave.getKillerUUID().toString() : "")
                     .replace("%time_alive_remaining%",
                             String.valueOf(grave.getTimeAliveRemaining()))
                     .replace("%time_alive_remaining_formatted%",
@@ -111,6 +117,15 @@ public final class StringUtil {
                 string = PlaceholderAPI.setPlaceholders(plugin.getServer()
                         .getOfflinePlayer(grave.getOwnerUUID()), string);
             }
+        }
+
+        if (location != null && location.getWorld() != null && grave != null) {
+            string = string.replace("%world_formatted%",
+                    location.getWorld() != null ? plugin.getConfig("message.world."
+                            + location.getWorld().getName(), grave).getString("message.world."
+                            + location.getWorld().getName(), StringUtil.format(location.getWorld().getName())) : "");
+        } else {
+            string = string.replace("%world_formatted%", "");
         }
 
         Pattern pattern = Pattern.compile("#[a-fA-f0-9]{6}");

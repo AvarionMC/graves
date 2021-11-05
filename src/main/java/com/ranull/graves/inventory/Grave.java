@@ -18,10 +18,12 @@ public class Grave implements InventoryHolder {
     private float pitch;
     private EntityType ownerType;
     private String ownerName;
+    private String ownerNameDisplay;
     private UUID ownerUUID;
     private String ownerTexture;
     private EntityType killerType;
     private String killerName;
+    private String killerNameDisplay;
     private UUID killerUUID;
     private Inventory inventory;
     private int experience;
@@ -97,6 +99,14 @@ public class Grave implements InventoryHolder {
         this.ownerName = ownerName;
     }
 
+    public String getOwnerNameDisplay() {
+        return ownerNameDisplay;
+    }
+
+    public void setOwnerNameDisplay(String ownerNameDisplay) {
+        this.ownerNameDisplay = ownerNameDisplay;
+    }
+
     public UUID getOwnerUUID() {
         return ownerUUID;
     }
@@ -127,6 +137,14 @@ public class Grave implements InventoryHolder {
 
     public void setKillerName(String killerName) {
         this.killerName = killerName;
+    }
+
+    public String getKillerNameDisplay() {
+        return killerNameDisplay;
+    }
+
+    public void setKillerNameDisplay(String killerNameDisplay) {
+        this.killerNameDisplay = killerNameDisplay;
     }
 
     public UUID getKillerUUID() {

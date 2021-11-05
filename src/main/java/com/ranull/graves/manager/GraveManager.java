@@ -3,10 +3,8 @@ package com.ranull.graves.manager;
 import com.ranull.graves.Graves;
 import com.ranull.graves.data.BlockData;
 import com.ranull.graves.data.ChunkData;
+import com.ranull.graves.data.EntityData;
 import com.ranull.graves.data.HologramData;
-import com.ranull.graves.data.integration.FurnitureLibData;
-import com.ranull.graves.data.integration.ItemsAdderData;
-import com.ranull.graves.data.integration.OraxenData;
 import com.ranull.graves.event.GraveTimeoutEvent;
 import com.ranull.graves.inventory.Grave;
 import com.ranull.graves.inventory.GraveList;
@@ -39,11 +37,8 @@ public final class GraveManager {
     public void graveTimer() {
         plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             List<Grave> graveRemoveList = new ArrayList<>();
+            List<EntityData> entityDataRemoveList = new ArrayList<>();
             List<BlockData> blockDataRemoveList = new ArrayList<>();
-            List<HologramData> hologramDataRemoveList = new ArrayList<>();
-            List<FurnitureLibData> furnitureLibDataRemoveList = new ArrayList<>();
-            List<ItemsAdderData> itemsAdderDataRemoveList = new ArrayList<>();
-            List<OraxenData> oraxenDataList = new ArrayList<>();
 
             // Graves
             for (Map.Entry<UUID, Grave> entry : plugin.getDataManager().getGraveMap().entrySet()) {
@@ -84,55 +79,40 @@ public final class GraveManager {
                     Location location = new Location(chunkData.getWorld(),
                             chunkData.getX() << 4, 0, chunkData.getZ() << 4);
 
-                    // Holograms
-                    for (HologramData hologramData : new ArrayList<>(chunkData.getHologramDataMap().values())) {
-                        if (plugin.getDataManager().getGraveMap().containsKey(hologramData.getUUIDGrave())) {
-                            Chunk chunk = chunkData.getWorld().getChunkAt(chunkData.getX(), chunkData.getZ());
-                            Grave grave = plugin.getDataManager().getGraveMap().get(hologramData.getUUIDGrave());
-                            List<String> lineList = plugin.getConfig("hologram.line", grave)
-                                    .getStringList("hologram.line");
+                    // Entity data
+                    for (EntityData entityData : new ArrayList<>(chunkData.getEntityDataMap().values())) {
+                        if (plugin.getDataManager().getGraveMap().containsKey(entityData.getUUIDGrave())) {
+                            if (entityData instanceof HologramData) {
+                                HologramData hologramData = (HologramData) entityData;
+                                Chunk chunk = chunkData.getWorld().getChunkAt(chunkData.getX(), chunkData.getZ());
+                                Grave grave = plugin.getDataManager().getGraveMap().get(entityData.getUUIDGrave());
+                                List<String> lineList = plugin.getConfig("hologram.line", grave)
+                                        .getStringList("hologram.line");
 
-                            Collections.reverse(lineList);
+                                Collections.reverse(lineList);
 
-                            plugin.getServer().getScheduler().runTask(plugin, () -> {
-                                int counter = 0;
-                                for (Entity entity : chunk.getEntities()) {
-                                    if (entity.getUniqueId().equals(hologramData.getUUIDEntity())) {
-                                        if (hologramData.getLine() < lineList.size()) {
-                                            entity.setCustomName(StringUtil.parseString(lineList
-                                                    .get(hologramData.getLine()), location, grave, plugin));
-                                        } else {
-                                            hologramDataRemoveList.add(hologramData);
+                                plugin.getServer().getScheduler().runTask(plugin, () -> {
+                                    int counter = 0;
+                                    for (Entity entity : chunk.getEntities()) {
+                                        if (entity.getUniqueId().equals(entityData.getUUIDEntity())) {
+                                            if (hologramData.getLine() < lineList.size()) {
+                                                entity.setCustomName(StringUtil.parseString(lineList
+                                                        .get(hologramData.getLine()), location, grave, plugin));
+                                            } else {
+                                                entityDataRemoveList.add(hologramData);
+                                            }
                                         }
+
+                                        counter++;
                                     }
 
-                                    counter++;
-                                }
-
-                                if (counter < chunk.getEntities().length) {
-                                    hologramDataRemoveList.add(hologramData);
-                                }
-                            });
+                                    if (counter < chunk.getEntities().length) {
+                                        entityDataRemoveList.add(hologramData);
+                                    }
+                                });
+                            }
                         } else {
-                            hologramDataRemoveList.add(hologramData);
-                        }
-                    }
-
-                    // FurnitureLib
-                    if (plugin.hasFurnitureLib()) {
-                        for (FurnitureLibData furnitureLibData : new ArrayList<>(chunkData.getFurnitureLibMap().values())) {
-                            if (!plugin.getDataManager().getGraveMap().containsKey(furnitureLibData.getUUIDGrave())) {
-                                furnitureLibDataRemoveList.add(furnitureLibData);
-                            }
-                        }
-                    }
-
-                    // ItemsAdder
-                    if (plugin.hasItemsAdder()) {
-                        for (ItemsAdderData itemsAdderData : new ArrayList<>(chunkData.getItemsAdderMap().values())) {
-                            if (!plugin.getDataManager().getGraveMap().containsKey(itemsAdderData.getUUIDGrave())) {
-                                itemsAdderDataRemoveList.add(itemsAdderData);
-                            }
+                            entityDataRemoveList.add(entityData);
                         }
                     }
 
@@ -152,21 +132,11 @@ public final class GraveManager {
 
             plugin.getServer().getScheduler().runTask(plugin, () -> {
                 graveRemoveList.forEach(GraveManager.this::removeGrave);
+                entityDataRemoveList.forEach(GraveManager.this::removeEntityData);
                 blockDataRemoveList.forEach(blockData -> plugin.getBlockManager().removeBlock(blockData));
-                hologramDataRemoveList.forEach(hologramData -> plugin.getHologramManager()
-                        .removeHologram(hologramData));
-                furnitureLibDataRemoveList.forEach(furnitureLibData -> plugin.getFurnitureLib()
-                        .removeFurniture(furnitureLibData));
-                itemsAdderDataRemoveList.forEach(itemsAdderData -> plugin.getItemsAdder()
-                        .removeFurniture(itemsAdderData));
-                oraxenDataList.forEach(oraxenData -> plugin.getOraxen()
-                        .removeFurniture(oraxenData));
                 graveRemoveList.clear();
                 blockDataRemoveList.clear();
-                hologramDataRemoveList.clear();
-                furnitureLibDataRemoveList.clear();
-                itemsAdderDataRemoveList.clear();
-                oraxenDataList.clear();
+                entityDataRemoveList.clear();
 
                 for (Player player : plugin.getServer().getOnlinePlayers()) {
                     if (player.getOpenInventory() != null) { // Mohist, might return null even when Bukkit shouldn't.
@@ -252,6 +222,10 @@ public final class GraveManager {
             plugin.getFurnitureLib().removeFurniture(grave);
         }
 
+        if (plugin.hasFurnitureEngine()) {
+            plugin.getFurnitureEngine().removeFurniture(grave);
+        }
+
         if (plugin.hasItemsAdder()) {
             plugin.getItemsAdder().removeFurniture(grave);
         }
@@ -261,6 +235,40 @@ public final class GraveManager {
         }
 
         plugin.debugMessage("Removing grave " + grave.getUUID(), 1);
+    }
+
+    public void removeEntityData(EntityData entityData) {
+        switch (entityData.getType()) {
+            case HOLOGRAM: {
+                plugin.getHologramManager().removeHologram(entityData);
+
+                break;
+            }
+
+            case FURNITURELIB: {
+                plugin.getFurnitureLib().removeEntityData(entityData);
+
+                break;
+            }
+
+            case FURNITUREENGINE: {
+                plugin.getFurnitureEngine().removeEntityData(entityData);
+
+                break;
+            }
+
+            case ITEMSADDER: {
+                plugin.getItemsAdder().removeEntityData(entityData);
+
+                break;
+            }
+
+            case ORAXEN: {
+                plugin.getOraxen().removeEntityData(entityData);
+
+                break;
+            }
+        }
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -298,6 +306,8 @@ public final class GraveManager {
 
         grave.setOwnerType(entity.getType());
         grave.setOwnerName(entityName);
+        grave.setOwnerNameDisplay(entity instanceof Player ? ((Player) entity).getDisplayName()
+                : entity.getCustomName());
         grave.setOwnerUUID(entity.getUniqueId());
         grave.setInventory(createGraveInventory(grave, entity.getLocation(), itemStackList,
                 StringUtil.parseString(plugin.getConfig("gui.grave.title", entity, permissionList)
@@ -336,6 +346,10 @@ public final class GraveManager {
 
         if (plugin.hasFurnitureLib()) {
             plugin.getFurnitureLib().createFurniture(location, grave);
+        }
+
+        if (plugin.hasFurnitureEngine()) {
+            plugin.getFurnitureEngine().createFurniture(location, grave);
         }
 
         if (plugin.hasItemsAdder()) {
@@ -664,7 +678,7 @@ public final class GraveManager {
         }
     }
 
-    public String getDamageCause(EntityDamageEvent.DamageCause damageCause, Grave grave) {
+    public String getDamageReason(EntityDamageEvent.DamageCause damageCause, Grave grave) {
         return plugin.getConfig("message.death-reason." + damageCause.name(), grave)
                 .getString("message.death-reason." + damageCause.name(), StringUtil.format(damageCause.name()));
     }

@@ -1,0 +1,32 @@
+# ------------------------------------  #
+#                                       #
+#       never touch the system-ID !     #
+#                                       #
+# ------------------------------------  #
+
+Grave3:
+  system-ID: Grave3
+  creator: 165af1f4-cefa-4af0-ae9f-8e758126dce3
+  displayName: '&fGrave 3'
+  spawnMaterial: COW_SPAWN_EGG
+  itemGlowEffect: false
+  itemLore: ''
+  placeAbleSide: TOP
+  crafting:
+    disable: true
+    recipe: xxx,xxx,xxx
+    index:
+      x: BEDROCK
+  projectData:
+    entities:
+      '0': H4sIAAAAAAAA/0WNQVLCQBBFO8bAMF7AcucBuIAbCIYSqkAsyIKwoSahQ03V0GNlGqmczgt4C4/hxsEE+avfr7v/lwAC5JhYc53W7wh38XK+WG5XafyahNAbKYdvRjGCVwjR6qCM8Tbwuyl9aKdzg83cfTH2pGl/vpQ+82iwimlvUMLtZBwnHQjWw97jT5r0773PoJX3G/iX/MtFYlvV7aOAG72Dh4MmLCpV8lNhc9/q2BJunVF5ANGzPRIH53cxs4VibakDYt1flKVDHnxdqsSmRZ9XlF3Qd4MiCDN1avwvmo05oiABAAA=
+      '1': H4sIAAAAAAAA/2VOQVLCQBCcGAnL+gHLmw/gA5yIhlKrRCzMgXChNnFCbbnOWruDVG7+zC9x98IGUnigT90909MjAQTICbHmJm++EK7S+XQ2X73l6UsWw+BOeXw1ihECgn6ib+11aVodxZBMlftAdxT9B2O3mtbtqgxHNwZdSmuDEi4fJ2mWQLQYD27/8mx4HXgBHQJfwgnyUILE1jVdUMCFfoebT01YOVXzqLJleMGzJVx5o8oIevd2Qxy1cfFsK8XaUgJiMZzVtUf+rxLLc6vorN/dz8HqQVyo7XG8BzCXJckhAQAA
+      '2': H4sIAAAAAAAA/2WNQVLCQBBFO8bAMF7AcucBuAAbiIYSq1QoyIKwoSahQ03V0ENlGqmcjgtwC4/hxsFEN/zV69/d/0sAAXJMrLlO6z3CXTx/n87XizT+SELoPSmHM6MYwSuEaLFTxngM/O6VPrXTucFm7r4Ye9S0vVxKn3kwWMW0NSjhdjKOkw4Ey1Hv8TtN+veeM2jleQX/kr+5SGyrun0UcKM38LDThEWlSh4UNvetji3h2hmVBxA92wNxcHkXb7ZQrC11QCz707J0yMPzX5VYXVtZa52+GiuCMFPHhn8Aa/P95CABAAA=
+      '3': H4sIAAAAAAAA/0VNS1LCQBDtGAPDeAHLnQfgAm4gGEqoArEgC8KGmoQONVVDj5VppHI6L+AtPIYbBxPkrV6/fh8JIECOiTXXaf2OcBcv54vldpXGr0kIvZFy+GYUI3iEEK0OyhhPA/+b0od2OjfY3N0XY0+a9men9J1Hg1VMe4MSbifjOOlAsB72Hn/SpH/veQYtPN/AP+RfLxLbqm6DAm70Dh4OmrCoVMlPhc39qmNLuHVG5QFEz/ZIHJzjYmYLxdpSB8S6vyhLh/z5dZkSm1YaXKXs4vpupAjCTJ0a/gtZmqjoIAEAAA==
+      '4': H4sIAAAAAAAA/2WNQW7CQAxFHdLAMFwAdccBuEBXpA0qSFAqyIKwQZPUQSMNnipjQDkdF+gteoxuOhDopn/1/G3/LwEEyDGx5jqtPxF68XK+WG5XafyWhNB9Vg7fjWIErxCi1V4Z4zHwuykdtdO5wWbuvBp70rS7XEqfeTBYxbQzKOFhMo6TNgTrUXfwkybDvucMbvK8gT/Jay4S26q+PQpo6Q943GvColIlPxU2962OLeHWGZUHEL3YA3FweRczWyjWltog1sNFWTrk89e9Smz+W9nd+m6sCMJMnRr+BajkbK4gAQAA
+    blockList:
+      '0':
+        blockData: minecraft:cobblestone_wall[east=none,north=none,south=none,up=true,waterlogged=false,west=none]
+        xOffset: 0.0
+        yOffset: 0.0
+        zOffset: 0.0

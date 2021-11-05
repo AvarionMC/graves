@@ -52,7 +52,8 @@ public class PlayerInteractListener implements Listener {
                 }
             }
 
-            if (event.getItem() != null && event.getItem().getType() == Material.COMPASS) {
+            if (event.getItem() != null && event.getItem().getType() == Material.COMPASS
+                    && plugin.getVersionManager().hasLodestone()) {
                 ItemStack itemStack = event.getItem();
 
                 if (itemStack.getItemMeta() != null && itemStack.getItemMeta() instanceof CompassMeta) {

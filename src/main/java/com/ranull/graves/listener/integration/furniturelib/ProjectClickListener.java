@@ -20,7 +20,7 @@ public class ProjectClickListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onProjectClick(ProjectClickEvent event) {
         if (event.getID().getUUID() != null) {
-            Grave grave = furnitureLib.getGraveFromFurnitureLib(event.getLocation(), event.getID().getUUID());
+            Grave grave = furnitureLib.getGrave(event.getLocation(), event.getID().getUUID());
 
             if (grave != null) {
                 event.setCancelled(plugin.getGraveManager().openGrave(event.getPlayer(), event.getLocation(), grave));

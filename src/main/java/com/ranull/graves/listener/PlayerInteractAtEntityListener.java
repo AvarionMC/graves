@@ -19,7 +19,7 @@ public class PlayerInteractAtEntityListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event) {
         Player player = event.getPlayer();
 
@@ -27,11 +27,7 @@ public class PlayerInteractAtEntityListener implements Listener {
                 && event.getRightClicked() instanceof ArmorStand
                 && (plugin.getVersionManager().is_v1_7() || player.getGameMode() != GameMode.SPECTATOR)) {
             Entity entity = event.getRightClicked();
-            Grave grave = plugin.getHologramManager().getGraveFromHologram(entity);
-
-            if (grave == null && plugin.hasItemsAdder()) {
-                grave = plugin.getItemsAdder().getGraveFromItemsAdder(entity);
-            }
+            Grave grave = plugin.getEntityDataManager().getGrave(entity);
 
             if (grave != null) {
                 event.setCancelled(plugin.getGraveManager().openGrave(player, entity.getLocation(), grave));

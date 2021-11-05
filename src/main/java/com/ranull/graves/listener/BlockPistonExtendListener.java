@@ -23,7 +23,7 @@ public class BlockPistonExtendListener implements Listener {
             event.setCancelled(true);
         } else {
             for (Entity entity : block.getWorld().getNearbyEntities(block.getLocation(), 0.5, 0.5, 0.5)) {
-                if (plugin.getHologramManager().getHologramData(entity) != null) {
+                if (plugin.getHologramManager().getGrave(entity) != null) {
                     event.setCancelled(true);
                 }
             }
