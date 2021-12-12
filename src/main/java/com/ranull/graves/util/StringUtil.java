@@ -128,19 +128,13 @@ public final class StringUtil {
             string = string.replace("%world_formatted%", "");
         }
 
-        Pattern pattern = Pattern.compile("#[a-fA-f0-9]{6}");
+        Pattern pattern = Pattern.compile("&#[a-fA-f0-9]{6}");
         Matcher matcher = pattern.matcher(string);
-        boolean canUseHex = plugin.getVersionManager().hasHexColors();
 
         while (matcher.find()) {
-            String colorHex = string.substring(matcher.start(), matcher.end());
-
-            if (canUseHex) {
-                string = string.replace(colorHex, ChatColor.of(colorHex).toString());
-            } else {
-                string = string.replace(colorHex, "");
-            }
-
+            String colorHex = string.substring(matcher.start() + 1, matcher.end());
+            string = plugin.getVersionManager().hasHexColors() ? string.replace("&" + colorHex,
+                    ChatColor.of(colorHex).toString()) : string.replace(colorHex, "");
             matcher = pattern.matcher(string);
         }
 

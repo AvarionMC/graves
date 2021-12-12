@@ -5,6 +5,7 @@ import com.ranull.graves.inventory.Grave;
 import com.ranull.graves.util.LocationUtil;
 import com.ranull.graves.util.MaterialUtil;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -107,7 +108,7 @@ public final class LocationManager {
                 return getVoid(location, livingEntity, grave);
             } else if (MaterialUtil.isLava(block.getType())) {
                 return getLavaTop(location, livingEntity, grave); // Lava
-            } else if (!hasGrave && MaterialUtil.isAir(block.getType())
+            } else if (!hasGrave && (MaterialUtil.isAir(block.getType()) || block.getType() == Material.WATER)
                     || plugin.getConfig("replace.block.material", grave)
                     .getStringList("replace.block.material").contains(block.getType().name())) {
                 return getGround(location, livingEntity, grave); // Air

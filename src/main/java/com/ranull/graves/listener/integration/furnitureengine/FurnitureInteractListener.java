@@ -1,9 +1,9 @@
 package com.ranull.graves.listener.integration.furnitureengine;
 
+import com.mira.furnitureengine.api.events.FurnitureInteractEvent;
 import com.ranull.graves.Graves;
 import com.ranull.graves.integration.FurnitureEngine;
 import com.ranull.graves.inventory.Grave;
-import me.mira.furnitureengine.events.FurnitureInteractEvent;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

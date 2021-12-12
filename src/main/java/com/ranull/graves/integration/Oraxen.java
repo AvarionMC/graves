@@ -31,7 +31,6 @@ import java.util.Map;
 public final class Oraxen extends EntityDataManager {
     private final Graves plugin;
     private final Plugin oraxenPlugin;
-    private final boolean hasFurniture;
     private final FurnitureInteractListener furnitureInteractListener;
     private final FurnitureBreakListener furnitureBreakListener;
 
@@ -41,9 +40,6 @@ public final class Oraxen extends EntityDataManager {
         VersionManager versionManager = plugin.getVersionManager();
         this.plugin = plugin;
         this.oraxenPlugin = oraxenPlugin;
-        this.hasFurniture = !versionManager.is_v1_7() && !versionManager.is_v1_8() && !versionManager.is_v1_9()
-                && !versionManager.is_v1_10() && !versionManager.is_v1_11() && !versionManager.is_v1_12()
-                && !versionManager.is_v1_13() && !versionManager.is_v1_14() && !versionManager.is_v1_15();
         this.furnitureInteractListener = new FurnitureInteractListener(plugin, this);
         this.furnitureBreakListener = new FurnitureBreakListener(this);
 
@@ -77,14 +73,10 @@ public final class Oraxen extends EntityDataManager {
         }
     }
 
-    public boolean hasFurniture() {
-        return hasFurniture;
-    }
-
     public void createFurniture(Location location, Grave grave) {
         if (plugin.getConfig("oraxen.furniture.enabled", grave)
                 .getBoolean("oraxen.furniture.enabled")) {
-            if (hasFurniture()) {
+            try {
                 String name = plugin.getConfig("oraxen.furniture.name", grave)
                         .getString("oraxen.furniture.name", "");
                 FurnitureMechanic furnitureMechanic = getFurnitureMechanic(name);
@@ -103,7 +95,7 @@ public final class Oraxen extends EntityDataManager {
                                 + (location.getBlockY() + 0.5) + "y, " + (location.getBlockZ() + 0.5) + "z", 1);
                     }
                 }
-            } else {
+            } catch (NoSuchMethodError ignored) {
                 plugin.warningMessage("This version of Minecraft does not support " + oraxenPlugin.getName()
                         + " furniture");
             }

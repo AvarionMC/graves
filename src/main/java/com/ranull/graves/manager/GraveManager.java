@@ -156,7 +156,7 @@ public final class GraveManager {
     }
 
     @SuppressWarnings("ConstantConditions")
-    public void onDisable() {
+    public void unload() {
         for (Player player : plugin.getServer().getOnlinePlayers()) {
             if (player.getOpenInventory() != null) { // Mohist, might return null even when Bukkit shouldn't.
                 InventoryHolder inventoryHolder = player.getOpenInventory().getTopInventory().getHolder();

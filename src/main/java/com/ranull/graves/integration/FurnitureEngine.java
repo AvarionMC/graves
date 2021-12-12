@@ -1,5 +1,6 @@
 package com.ranull.graves.integration;
 
+import com.mira.furnitureengine.api.FurnitureAPI;
 import com.ranull.graves.Graves;
 import com.ranull.graves.data.EntityData;
 import com.ranull.graves.inventory.Grave;
@@ -7,7 +8,6 @@ import com.ranull.graves.listener.integration.furnitureengine.FurnitureBreakList
 import com.ranull.graves.listener.integration.furnitureengine.FurnitureInteractListener;
 import com.ranull.graves.manager.EntityDataManager;
 import com.ranull.graves.util.BlockFaceUtil;
-import me.mira.furnitureengine.FurnitureAPI;
 import org.bukkit.Location;
 import org.bukkit.Rotation;
 import org.bukkit.entity.Entity;

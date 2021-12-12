@@ -27,7 +27,11 @@ public final class IntegrationManager {
     }
 
     public void reload() {
-        onDisable();
+        unload();
+        load();
+    }
+
+    public void load() {
         loadVault();
         loadWorldEdit();
         loadWorldGuard();
@@ -43,7 +47,7 @@ public final class IntegrationManager {
         loadCompatibilityWarnings();
     }
 
-    public void onDisable() {
+    public void unload() {
         if (furnitureLib != null) {
             furnitureLib.unregisterListeners();
         }

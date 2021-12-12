@@ -40,10 +40,10 @@ public class Graves extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        integrationManager.reload();
+        integrationManager.load();
 
         versionManager = new VersionManager(this);
-        dataManager = new DataManager(this, DataManager.Type.SQLITE);
+        dataManager = new DataManager(this);
         blockManager = new BlockManager(this);
         entityDataManager = new EntityDataManager(this);
         hologramManager = new HologramManager(this);
@@ -67,12 +67,12 @@ public class Graves extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        graveManager.onDisable();
-        dataManager.onDisable();
-        integrationManager.onDisable();
+        dataManager.closeConnection();
+        graveManager.unload();
+        integrationManager.unload();
 
         if (recipeManager != null) {
-            recipeManager.onDisable();
+            recipeManager.unload();
         }
     }
 
@@ -90,10 +90,10 @@ public class Graves extends JavaPlugin {
         reloadConfig();
         configChecker();
         updateChecker();
-        dataManager.reload();
-        integrationManager.reload();
         unregisterListeners();
         registerListeners();
+        dataManager.reload();
+        integrationManager.reload();
 
         if (recipeManager != null) {
             recipeManager.reload();

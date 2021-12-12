@@ -26,9 +26,9 @@ public final class DataManager {
     private String url;
     private Connection connection;
 
-    public DataManager(Graves plugin, Type type) {
+    public DataManager(Graves plugin) {
         this.plugin = plugin;
-        this.type = type;
+        this.type = DataManager.Type.SQLITE;
         this.uuidGraveMap = new HashMap<>();
         this.chunkDataMap = new HashMap<>();
 
@@ -109,10 +109,6 @@ public final class DataManager {
             executeUpdate("PRAGMA synchronous=" + plugin.getConfig()
                     .getString("settings.storage.sqlite.synchronous", "OFF").toUpperCase() + ";");
         }
-    }
-
-    public void onDisable() {
-        closeConnection();
     }
 
     public Map<UUID, Grave> getGraveMap() {
@@ -673,7 +669,7 @@ public final class DataManager {
         }
     }
 
-    private void closeConnection() {
+    public void closeConnection() {
         if (isConnected()) {
             try {
                 connection.close();

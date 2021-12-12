@@ -27,11 +27,11 @@ public final class RecipeManager {
     }
 
     public void reload() {
-        onDisable();
-        loadRecipes();
+        unload();
+        load();
     }
 
-    public void loadRecipes() {
+    public void load() {
         ConfigurationSection configurationSection = plugin.getConfig().getConfigurationSection("settings.token");
 
         if (configurationSection != null) {
@@ -39,6 +39,22 @@ public final class RecipeManager {
                 if (plugin.getConfig().getBoolean("settings.token." + key + ".craft")) {
                     addTokenRecipe(key, getToken(key));
                     plugin.debugMessage("Added recipe " + key, 1);
+                }
+            }
+        }
+    }
+
+    public void unload() {
+        Iterator<Recipe> iterator = plugin.getServer().recipeIterator();
+
+        while (iterator.hasNext()) {
+            Recipe recipe = iterator.next();
+
+            if (recipe != null) {
+                ItemStack itemStack = recipe.getResult();
+
+                if (itemStack.hasItemMeta() && isToken(itemStack)) {
+                    iterator.remove();
                 }
             }
         }
@@ -88,22 +104,6 @@ public final class RecipeManager {
         return stringList;
     }
 
-    public void onDisable() {
-        Iterator<Recipe> iterator = plugin.getServer().recipeIterator();
-
-        while (iterator.hasNext()) {
-            Recipe recipe = iterator.next();
-
-            if (recipe != null) {
-                ItemStack itemStack = recipe.getResult();
-
-                if (itemStack.hasItemMeta() && isToken(itemStack)) {
-                    iterator.remove();
-                }
-            }
-        }
-    }
-
     public void addTokenRecipe(String token, ItemStack itemStack) {
         NamespacedKey namespacedKey = new NamespacedKey(plugin, token + "GraveToken");
 
@@ -145,8 +145,13 @@ public final class RecipeManager {
                 recipeKey++;
             }
 
-            plugin.getServer().addRecipe(shapedRecipe);
-            namespacedKeyList.add(namespacedKey);
+
+            if (plugin.getServer().getRecipe(namespacedKey) == null) {
+                plugin.getServer().addRecipe(shapedRecipe);
+                namespacedKeyList.add(namespacedKey);
+            } else {
+                plugin.debugMessage("Unable to add recipe " + namespacedKey.getKey(), 1);
+            }
         }
     }
 
