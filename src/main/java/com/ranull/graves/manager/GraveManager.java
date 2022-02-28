@@ -84,32 +84,35 @@ public final class GraveManager {
                         if (plugin.getDataManager().getGraveMap().containsKey(entityData.getUUIDGrave())) {
                             if (entityData instanceof HologramData) {
                                 HologramData hologramData = (HologramData) entityData;
-                                Chunk chunk = chunkData.getWorld().getChunkAt(chunkData.getX(), chunkData.getZ());
-                                Grave grave = plugin.getDataManager().getGraveMap().get(entityData.getUUIDGrave());
-                                List<String> lineList = plugin.getConfig("hologram.line", grave)
-                                        .getStringList("hologram.line");
+                                Grave grave = plugin.getDataManager().getGraveMap().get(hologramData.getUUIDGrave());
 
-                                Collections.reverse(lineList);
+                                if (grave != null) {
+                                    Chunk chunk = chunkData.getWorld().getChunkAt(chunkData.getX(), chunkData.getZ());
+                                    List<String> lineList = plugin.getConfig("hologram.line", grave)
+                                            .getStringList("hologram.line");
 
-                                plugin.getServer().getScheduler().runTask(plugin, () -> {
-                                    int counter = 0;
-                                    for (Entity entity : chunk.getEntities()) {
-                                        if (entity.getUniqueId().equals(entityData.getUUIDEntity())) {
-                                            if (hologramData.getLine() < lineList.size()) {
-                                                entity.setCustomName(StringUtil.parseString(lineList
-                                                        .get(hologramData.getLine()), location, grave, plugin));
-                                            } else {
-                                                entityDataRemoveList.add(hologramData);
+                                    Collections.reverse(lineList);
+
+                                    plugin.getServer().getScheduler().runTask(plugin, () -> {
+                                        int counter = 0;
+                                        for (Entity entity : chunk.getEntities()) {
+                                            if (entity.getUniqueId().equals(entityData.getUUIDEntity())) {
+                                                if (hologramData.getLine() < lineList.size()) {
+                                                    entity.setCustomName(StringUtil.parseString(lineList
+                                                            .get(hologramData.getLine()), location, grave, plugin));
+                                                } else {
+                                                    entityDataRemoveList.add(hologramData);
+                                                }
                                             }
+
+                                            counter++;
                                         }
 
-                                        counter++;
-                                    }
-
-                                    if (counter < chunk.getEntities().length) {
-                                        entityDataRemoveList.add(hologramData);
-                                    }
-                                });
+                                        if (counter < chunk.getEntities().length) {
+                                            entityDataRemoveList.add(hologramData);
+                                        }
+                                    });
+                                }
                             }
                         } else {
                             entityDataRemoveList.add(entityData);
@@ -443,6 +446,8 @@ public final class GraveManager {
 
     public List<ItemStack> getGraveItemStackList(List<ItemStack> itemStackList, List<ItemStack> removedItemStackList,
                                                  LivingEntity livingEntity, List<String> permissionList) {
+        itemStackList = new ArrayList<>(itemStackList);
+
         if (livingEntity instanceof Player && getStorageMode(plugin.getConfig("storage.mode",
                 livingEntity, permissionList).getString("storage.mode")) == Grave.StorageMode.EXACT) {
             Player player = (Player) livingEntity;
@@ -725,7 +730,7 @@ public final class GraveManager {
                     for (String string : plugin.getConfig("ignore.item.name", entity, permissionList)
                             .getStringList("ignore.item.name")) {
                         if (!string.equals("")
-                                && itemMeta.getDisplayName().equals(string.replace("&", "§"))) {
+                                && itemMeta.getDisplayName().equals(StringUtil.parseString(string, plugin))) {
                             return true;
                         }
                     }
@@ -733,7 +738,7 @@ public final class GraveManager {
                     for (String string : plugin.getConfig("ignore.item.name-contains", entity, permissionList)
                             .getStringList("ignore.item.name-contains")) {
                         if (!string.equals("")
-                                && itemMeta.getDisplayName().contains(string.replace("&", "§"))) {
+                                && itemMeta.getDisplayName().contains(StringUtil.parseString(string, plugin))) {
                             return true;
                         }
                     }
@@ -744,7 +749,7 @@ public final class GraveManager {
                             .getStringList("ignore.item.lore")) {
                         if (!string.equals("")) {
                             for (String lore : itemMeta.getLore()) {
-                                if (lore.equals(string.replace("&", "§"))) {
+                                if (lore.equals(StringUtil.parseString(string, plugin))) {
                                     return true;
                                 }
                             }
@@ -755,7 +760,7 @@ public final class GraveManager {
                             .getStringList("ignore.item.lore-contains")) {
                         if (!string.equals("")) {
                             for (String lore : itemMeta.getLore()) {
-                                if (lore.contains(string.replace("&", "§"))) {
+                                if (lore.contains(StringUtil.parseString(string, plugin))) {
                                     return true;
                                 }
                             }

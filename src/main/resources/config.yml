@@ -81,6 +81,8 @@ settings:
       material: SUNFLOWER # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
       name: "Grave Token" # Grave token name.
       craft: true # Can players craft this grave token.
+      glow: true # Should the grave token glow.
+      model-data: -1 # Custom model data for the token item, -1 is none.
       lore: # Grave token lore.
         - "&7Keep this in your inventory and"
         - "&7when you die a grave will be"
@@ -315,13 +317,6 @@ settings:
         drop: false # Do grave zombies drop items, this may include the head it is wearing.
 
       ###########
-      # Replace #
-      ###########
-      replace:
-        block: # What blocks can graves replace.
-          not-solid: true # Replace blocks that are not solid.
-
-      ###########
       # Virtual #
       ###########
       # Options for the virtual inventory.
@@ -401,6 +396,8 @@ settings:
             title: "Grave List"
             function: "menu" # Open the menu by default, if you don't want to use the menu you can change this to none or any other valid function.
             name: "Grave"
+            glow: false
+            model-data: -1
             empty: "You don't have any graves."
             lore:
               - "Created &f%time_lived_formatted% &7ago"
@@ -412,6 +409,8 @@ settings:
                 material: "PAPER"
                 function: "distance"
                 name: "Information"
+                glow: false
+                model-data: -1
                 lore:
                   - "Items: &f%item%"
                   - "Levels: &f%level%"
@@ -421,6 +420,8 @@ settings:
                 material: "ENDER_PEARL"
                 function: "teleportation"
                 name: "Teleport"
+                glow: false
+                model-data: -1
                 lore:
                   - "Teleport to your grave"
 
@@ -428,6 +429,8 @@ settings:
               #  material: "TRIPWIRE_HOOK"
               #  function: "protection"
               #  name: "Toggle Protection %state_protection%"
+              #  glow: false
+              #  model-data: -1
               #  lore:
               #    - "Toggle grave protection"
 

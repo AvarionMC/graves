@@ -9,9 +9,11 @@ import com.ranull.graves.util.StringUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -152,9 +154,20 @@ public final class GUIManager {
                     .getString("gui.menu.list.name"), grave, plugin).replace("%number%",
                     String.valueOf(number));
             List<String> loreList = new ArrayList<>();
+            int customModelData = plugin.getConfig("gui.menu.list.model-data", grave)
+                    .getInt("gui.menu.list.model-data", -1);
 
             for (String string : plugin.getConfig("gui.menu.list.lore", grave).getStringList("gui.menu.list.lore")) {
                 loreList.add(ChatColor.GRAY + StringUtil.parseString(string, grave.getLocationDeath(), grave, plugin));
+            }
+
+            if (plugin.getConfig().getBoolean("gui.menu.list.glow")) {
+                itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
+                itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            }
+
+            if (customModelData > -1) {
+                itemMeta.setCustomModelData(customModelData);
             }
 
             itemMeta.setDisplayName(name);
@@ -182,16 +195,26 @@ public final class GUIManager {
             ItemMeta itemMeta = itemStack.getItemMeta();
             String name = ChatColor.WHITE + StringUtil.parseString(plugin.getConfig("gui.menu.grave.slot." + slot + ".name", grave)
                     .getString("gui.menu.grave.slot." + slot + ".name"), grave, plugin);
-
             List<String> loreList = new ArrayList<>();
+            int customModelData = plugin.getConfig("gui.menu.grave.slot." + slot + ".model-data", grave)
+                    .getInt("gui.menu.grave.slot." + slot + ".model-data", -1);
 
             for (String string : plugin.getConfig("gui.menu.grave.slot." + slot + ".lore", grave)
                     .getStringList("gui.menu.grave.slot." + slot + ".lore")) {
                 loreList.add(ChatColor.GRAY + StringUtil.parseString(string, grave.getLocationDeath(), grave, plugin));
             }
 
-            itemMeta.setLore(loreList);
+            if (plugin.getConfig().getBoolean("gui.menu.grave.slot." + slot + ".glow")) {
+                itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
+                itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            }
+
+            if (customModelData > -1) {
+                itemMeta.setCustomModelData(customModelData);
+            }
+
             itemMeta.setDisplayName(name);
+            itemMeta.setLore(loreList);
             itemStack.setItemMeta(itemMeta);
         }
 

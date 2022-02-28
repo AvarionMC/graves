@@ -32,6 +32,32 @@ public final class MaterialUtil {
         }
     }
 
+    public static boolean isSafeNotSolid(Material material) {
+        return !isSolid(material) && !isLava(material);
+    }
+
+    public static boolean isSafeSolid(Material material) {
+        return isSolid(material) && !isLava(material);
+    }
+
+    private static boolean isSolid(Material material) {
+        return material.isSolid() || isSafe(material);
+    }
+
+    private static boolean isSafe(Material material) {
+        return isSafe(material.name());
+    }
+
+    private static boolean isSafe(String string) {
+        switch (string) {
+            case "SCAFFOLDING":
+            case "POWDER_SNOW":
+                return true;
+            default:
+                return false;
+        }
+    }
+
     public static boolean isWater(Material material) {
         return isWater(material.name());
     }

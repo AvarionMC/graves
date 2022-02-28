@@ -47,33 +47,30 @@ public final class HologramManager extends EntityDataManager {
                 if (location.getWorld() != null) {
                     ArmorStand armorStand = location.getWorld().spawn(location, ArmorStand.class);
 
-                    if (location.getWorld().getEntities().contains(armorStand)) {
-                        armorStand.setVisible(false);
-                        armorStand.setGravity(false);
-                        armorStand.setCustomNameVisible(true);
-                        armorStand.setSmall(true);
-                        armorStand.setCustomName(StringUtil.parseString(line, location, grave, plugin));
+                    armorStand.setVisible(false);
+                    armorStand.setGravity(false);
+                    armorStand.setCustomNameVisible(true);
+                    armorStand.setSmall(true);
+                    armorStand.setCustomName(StringUtil.parseString(line, location, grave, plugin));
 
-                        if (!plugin.getVersionManager().is_v1_7()) {
-                            try {
-                                armorStand.setMarker(marker);
-                            } catch (NoSuchMethodError ignored) {
-
-                            }
+                    if (!plugin.getVersionManager().is_v1_7()) {
+                        try {
+                            armorStand.setMarker(marker);
+                        } catch (NoSuchMethodError ignored) {
                         }
-
-                        if (!plugin.getVersionManager().is_v1_7() && !plugin.getVersionManager().is_v1_8()) {
-                            armorStand.setInvulnerable(true);
-                        }
-
-                        if (plugin.getVersionManager().hasScoreboardTags()) {
-                            armorStand.getScoreboardTags().add("graveHologram");
-                        }
-
-                        plugin.getDataManager().addHologramData(new HologramData(location, armorStand.getUniqueId(),
-                                grave.getUUID(), lineNumber));
-                        lineNumber++;
                     }
+
+                    if (!plugin.getVersionManager().is_v1_7() && !plugin.getVersionManager().is_v1_8()) {
+                        armorStand.setInvulnerable(true);
+                    }
+
+                    if (plugin.getVersionManager().hasScoreboardTags()) {
+                        armorStand.getScoreboardTags().add("graveHologram");
+                    }
+
+                    plugin.getDataManager().addHologramData(new HologramData(location, armorStand.getUniqueId(),
+                            grave.getUUID(), lineNumber));
+                    lineNumber++;
                 }
             }
         }

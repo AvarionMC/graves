@@ -216,7 +216,7 @@ public final class IntegrationManager {
 
             if (furnitureEnginePlugin != null && furnitureEnginePlugin.isEnabled()) {
                 try {
-                    Class.forName("me.mira.furnitureengine.FurnitureAPI", false, getClass().getClassLoader());
+                    Class.forName("com.mira.furnitureengine.api.FurnitureAPI", false, getClass().getClassLoader());
 
                     furnitureEngine = new FurnitureEngine(plugin);
 

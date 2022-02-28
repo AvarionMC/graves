@@ -5,10 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.ranull</groupId>
-    <artifactId>Graves</artifactId>
-    <version>4.6</version>
+    <artifactId>graves</artifactId>
     <name>Graves</name>
     <description>Full featured lightweight death chest plugin.</description>
+    <version>4.7</version>
 
     <developers>
         <developer>
@@ -24,6 +24,7 @@
 
     <build>
         <defaultGoal>clean package</defaultGoal>
+        <finalName>${project.name}-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -42,7 +43,7 @@
                     <relocations>
                         <relocation>
                             <pattern>org.bstats</pattern>
-                            <shadedPattern>com.ranull.graves.bstats</shadedPattern>
+                            <shadedPattern>${groupId}.${artifactId}.bstats</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
@@ -89,7 +90,11 @@
     <repositories>
         <repository>
             <id>spigotmc-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>minecraft-repo</id>
+            <url>https://libraries.minecraft.net/</url>
         </repository>
         <repository>
             <id>ranull-repo</id>
@@ -100,27 +105,19 @@
             <url>https://repo.ranull.com/maven/external/</url>
         </repository>
         <repository>
-            <id>sonatype</id>
+            <id>sonatype-repo</id>
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
         <repository>
-            <id>minecraft-repo</id>
-            <url>https://libraries.minecraft.net/</url>
-        </repository>
-        <repository>
-            <id>placeholderapi</id>
+            <id>placeholderapi-repo</id>
             <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
         <repository>
-            <id>dmulloy2-repo</id>
-            <url>https://repo.dmulloy2.net/repository/public/</url>
-        </repository>
-        <repository>
-            <id>glaremasters</id>
+            <id>griefdefender-repo</id>
             <url>https://repo.glaremasters.me/repository/bloodshot/</url>
         </repository>
         <repository>
-            <id>jeff-media-public</id>
+            <id>jeff-media-repo</id>
             <url>https://hub.jeff-media.com/nexus/repository/jeff-media-public/</url>
         </repository>
         <repository>
@@ -141,6 +138,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bukkit</artifactId>
+            <version>3.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>com.mojang</groupId>
             <artifactId>authlib</artifactId>
             <version>1.5.21</version>
@@ -148,14 +151,26 @@
         </dependency>
         <dependency>
             <groupId>com.ranull</groupId>
-            <artifactId>SkullTextureAPI</artifactId>
+            <artifactId>skulltextureapi</artifactId>
             <version>1.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.MilkBowl</groupId>
-            <artifactId>VaultAPI</artifactId>
-            <version>1.7</version>
+            <groupId>com.mira</groupId>
+            <artifactId>furnitureengine</artifactId>
+            <version>1.6.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.milkbowl</groupId>
+            <artifactId>vault</artifactId>
+            <version>1.7.3</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>me.lokka30</groupId>
+            <artifactId>treasury</artifactId>
+            <version>1.1.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -171,6 +186,18 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>de.jeff_media</groupId>
+            <artifactId>ChestSortAPI</artifactId>
+            <version>13.0.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>me.clip</groupId>
+            <artifactId>placeholderapi</artifactId>
+            <version>2.11.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.griefdefender</groupId>
             <artifactId>api</artifactId>
             <version>2.0.0-20210822.184639-9</version>
@@ -180,18 +207,6 @@
             <groupId>com.github.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.36.0.3</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>me.clip</groupId>
-            <artifactId>placeholderapi</artifactId>
-            <version>2.10.10</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.comphenix.protocol</groupId>
-            <artifactId>ProtocolLib</artifactId>
-            <version>4.7.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -209,19 +224,7 @@
         <dependency>
             <groupId>com.github.oraxen</groupId>
             <artifactId>oraxen</artifactId>
-            <version>-bd81ace154-1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>me.mira</groupId>
-            <artifactId>FurnitureEngine</artifactId>
-            <version>1.5.1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>de.jeff_media</groupId>
-            <artifactId>ChestSortAPI</artifactId>
-            <version>12.0.0</version>
+            <version>-fe4ddcc632-1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -229,12 +232,6 @@
             <artifactId>ItemBridge</artifactId>
             <version>b0054538c1</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.bstats</groupId>
-            <artifactId>bstats-bukkit</artifactId>
-            <version>2.2.1</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

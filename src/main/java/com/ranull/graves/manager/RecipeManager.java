@@ -6,6 +6,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
@@ -75,14 +77,24 @@ public final class RecipeManager {
                     String name = ChatColor.WHITE + StringUtil.parseString(plugin.getConfig()
                             .getString("settings.token." + token + ".name"), plugin);
                     List<String> loreList = new ArrayList<>();
-
-                    itemMeta.setDisplayName(name);
+                    int customModelData = plugin.getConfig().getInt("settings.token." + token
+                            + ".model-data", -1);
 
                     for (String string : plugin.getConfig().getStringList("settings.token." + token + ".lore")) {
                         loreList.add(ChatColor.GRAY + StringUtil.parseString(string, plugin));
                     }
 
+                    if (plugin.getConfig().getBoolean("settings.token." + token + ".glow")) {
+                        itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
+                        itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                    }
+
+                    if (customModelData > -1) {
+                        itemMeta.setCustomModelData(customModelData);
+                    }
+
                     itemMeta.setLore(loreList);
+                    itemMeta.setDisplayName(name);
                     itemStack.setItemMeta(itemMeta);
                 }
             }
