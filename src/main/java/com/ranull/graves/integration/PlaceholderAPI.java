@@ -217,16 +217,6 @@ public final class PlaceholderAPI extends PlaceholderExpansion implements Relati
             if (identifier.equals("count")) {
                 return String.valueOf(plugin.getGraveManager().getGraveCount(player));
             }
-
-            if (identifier.equals("distance_")) {
-                UUID uuid = UUIDUtil.getUUID(identifier.replace("distance_", ""));
-
-                if (uuid != null && plugin.getDataManager().getGraveMap().containsKey(uuid)) {
-                    return String.valueOf(plugin.getDataManager().getGraveMap().get(uuid)
-                            .getTimeAliveRemaining() / 1000);
-                }
-                return String.valueOf(plugin.getGraveManager().getGraveCount(player));
-            }
         }
 
         return null;

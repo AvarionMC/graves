@@ -28,7 +28,8 @@ public class PlayerMoveListener implements Listener {
             Player player = event.getPlayer();
             Location location = LocationUtil.roundLocation(player.getLocation());
 
-            if (location.getBlock().getRelative(BlockFace.DOWN).getType().isSolid()
+            if (plugin.getLocationManager().isInsideBorder(location)
+                    && location.getBlock().getRelative(BlockFace.DOWN).getType().isSolid()
                     && plugin.getLocationManager().isLocationSafePlayer(location)) {
                 plugin.getLocationManager().setLastSolidLocation(player, location.clone());
             }
@@ -49,7 +50,7 @@ public class PlayerMoveListener implements Listener {
                     Grave grave = plugin.getDataManager().getGraveMap().get(blockData.getGraveUUID());
 
                     if (plugin.getConfig("block.walk-over", grave).getBoolean("block.walk-over")
-                            && plugin.getPlayerManager().canOpenGrave(player, grave)) {
+                            && plugin.getEntityManager().canOpenGrave(player, grave)) {
                         plugin.getGraveManager().autoLootGrave(event.getPlayer(), location, grave);
                     }
                 }

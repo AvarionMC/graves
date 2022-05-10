@@ -1,0 +1,59 @@
+#######################
+# Permission Override #
+#######################
+# Override config options for players who have these permissions, "graves.permission.{name}".
+# If a player has multiple permissions, by group inheritance or manually given, options will be chosen from the top down.
+# Meaning for example, since admin is at the top and if the player has this permission among others.
+# The admin permission will always override permissions below it, therefor you should put your highest permission groups at the top,
+# so they correctly override in a hierarchy, this prevents you having to define the same thing for each permission group.
+# Remember you can copy options from the default section.
+settings:
+  permission:
+    admin: # graves.permission.admin
+      grave:
+        time: -1
+      block:
+        material: BEDROCK
+
+    vip: # graves.permission.vip
+      grave:
+        time: 21600
+        explode: false
+      block:
+        material: BEACON
+      gui:
+        grave:
+          title: "VIP %owner_name%'s Grave"
+
+    schem: # graves.permission.schem
+      placement:
+        offset:
+          y: 1
+      hologram:
+        line:
+          - "&c☠ &rHere Lies &2%owner_name% &c☠"
+          - "&rKilled by &c%killer_name%"
+      schematic:
+        enabled: true
+        name: "grave_default"
+
+    holo: # graves.permission.holo
+      block:
+        enabled: false
+        walk-over: true
+      hologram:
+        enabled: true
+        line:
+          - "&7%owner_name%'s &rGrave"
+          - "Killed by &7%killer_name%"
+          - "%time_alive_remaining_formatted%"
+
+    dirt: # graves.permission.dirt
+      grave:
+        time: 30
+      block:
+        material: DIRT
+
+    disabled: # graves.permission.disabled
+      grave:
+        enabled: false

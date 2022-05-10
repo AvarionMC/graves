@@ -88,8 +88,10 @@ public class EntityDeathListener implements Listener {
 
         // Enabled
         if (!plugin.getConfig("grave.enabled", livingEntity, permissionList).getBoolean("grave.enabled")) {
-            plugin.debugMessage("Grave not created for " + entityName
-                    + " because they have graves disabled", 2);
+            if (livingEntity instanceof Player) {
+                plugin.debugMessage("Grave not created for " + entityName
+                        + " because they have graves disabled", 2);
+            }
 
             return;
         }
@@ -135,36 +137,34 @@ public class EntityDeathListener implements Listener {
 
         // Block Ignore
         if (plugin.getGraveManager().shouldIgnoreBlock(location.getBlock(), livingEntity, permissionList)) {
-            plugin.getPlayerManager().sendMessage("message.ignore", livingEntity,
+            plugin.getEntityManager().sendMessage("message.ignore", livingEntity,
                     StringUtil.format(location.getBlock().getType().name()), location, permissionList);
 
             return;
         }
 
         // WorldGuard
-        if (plugin.hasWorldGuard()) {
-            boolean hasCreateGrave = plugin.getWorldGuard().hasCreateGrave(location);
+        if (plugin.getIntegrationManager().hasWorldGuard()) {
+            boolean hasCreateGrave = plugin.getIntegrationManager().getWorldGuard().hasCreateGrave(location);
 
             if (hasCreateGrave) {
                 if (livingEntity instanceof Player) {
-                    boolean canCreateGrave = plugin.getWorldGuard().canCreateGrave((Player) livingEntity, location);
-
-                    if (!canCreateGrave) {
-                        plugin.getPlayerManager().sendMessage("message.region-create-deny",
+                    if (!plugin.getIntegrationManager().getWorldGuard().canCreateGrave(livingEntity, location)) {
+                        plugin.getEntityManager().sendMessage("message.region-create-deny",
                                 livingEntity, location, permissionList);
                         plugin.debugMessage("Grave not created for " + entityName
                                 + " because they are in a region with graves-create set to deny", 2);
 
                         return;
                     }
-                } else if (!plugin.getWorldGuard().canCreateGrave(location)) {
+                } else if (!plugin.getIntegrationManager().getWorldGuard().canCreateGrave(location)) {
                     plugin.debugMessage("Grave not created for " + entityName
                             + " because they are in a region with graves-create set to deny", 2);
 
                     return;
                 }
             } else if (!plugin.getLocationManager().canBuild(livingEntity, location, permissionList)) {
-                plugin.getPlayerManager().sendMessage("message.build-denied",
+                plugin.getEntityManager().sendMessage("message.build-denied",
                         livingEntity, location, permissionList);
                 plugin.debugMessage("Grave not created for " + entityName
                         + " because they don't have permission to build where they died", 2);
@@ -172,7 +172,7 @@ public class EntityDeathListener implements Listener {
                 return;
             }
         } else if (!plugin.getLocationManager().canBuild(livingEntity, location, permissionList)) {
-            plugin.getPlayerManager().sendMessage("message.build-denied",
+            plugin.getEntityManager().sendMessage("message.build-denied",
                     livingEntity, location, permissionList);
             plugin.debugMessage("Grave not created for " + entityName
                     + " because they don't have permission to build where they died", 2);
@@ -207,7 +207,7 @@ public class EntityDeathListener implements Listener {
         // Max
         if (plugin.getGraveManager().getGraveList(livingEntity).size()
                 >= plugin.getConfig("grave.max", livingEntity, permissionList).getInt("grave.max")) {
-            plugin.getPlayerManager().sendMessage("message.max", livingEntity,
+            plugin.getEntityManager().sendMessage("message.max", livingEntity,
                     livingEntity.getLocation(), permissionList);
             plugin.debugMessage("Grave not created for " + entityName
                     + " because they reached maximum graves", 2);
@@ -227,7 +227,7 @@ public class EntityDeathListener implements Listener {
                 if (itemStack != null) {
                     itemStack.setAmount(itemStack.getAmount() - 1);
                 } else {
-                    plugin.getPlayerManager().sendMessage("message.no-token", livingEntity,
+                    plugin.getEntityManager().sendMessage("message.no-token", livingEntity,
                             livingEntity.getLocation(), permissionList);
                     plugin.debugMessage("Grave not created for " + entityName
                             + " because they did not have a grave token", 2);
@@ -246,7 +246,7 @@ public class EntityDeathListener implements Listener {
 
             if (itemStack != null) {
                 // Ignore compass
-                if (itemStack.getType() == Material.COMPASS && plugin.getPlayerManager()
+                if (itemStack.getType() == Material.COMPASS && plugin.getEntityManager()
                         .getUUIDFromItemStack(itemStack) != null) {
                     if (plugin.getConfig("compass.destroy", livingEntity, permissionList)
                             .getBoolean("compass.destroy")) {
@@ -269,20 +269,25 @@ public class EntityDeathListener implements Listener {
 
         // Grave
         if (!graveItemStackList.isEmpty()) {
-            Grave grave = plugin.getGraveManager().createGrave(livingEntity,
-                    plugin.getGraveManager().getGraveItemStackList(graveItemStackList, removedItemStackList,
-                            livingEntity, permissionList), permissionList);
+            Grave grave = new Grave(UUID.randomUUID());
 
+            grave.setOwnerType(livingEntity.getType());
+            grave.setOwnerName(entityName);
+            grave.setOwnerNameDisplay(livingEntity instanceof Player ? ((Player) livingEntity).getDisplayName()
+                    : livingEntity.getCustomName());
+            grave.setOwnerUUID(livingEntity.getUniqueId());
             grave.setPermissionList(permissionList);
             grave.setOwnerTexture(SkinUtil.getTextureBase64(livingEntity, plugin));
             grave.setYaw(livingEntity.getLocation().getYaw());
             grave.setPitch(livingEntity.getLocation().getPitch());
             grave.setTimeAlive(plugin.getConfig("grave.time", grave).getInt("grave.time") * 1000L);
 
+            plugin.debugMessage("Creating grave " + grave.getUUID() + " for entity " + entityName, 1);
+
             // Experience
-            if (plugin.getConfig("experience.store", grave).getBoolean("experience.store")) {
-                float percent = (float) plugin.getConfig("experience.store-percent", grave)
-                        .getDouble("experience.store-percent");
+            float percent = (float) plugin.getConfig("experience.store", grave)
+                    .getDouble("experience.store");
+            if (percent >= 0) {
 
                 if (livingEntity instanceof Player) {
                     Player player = (Player) livingEntity;
@@ -352,15 +357,25 @@ public class EntityDeathListener implements Listener {
                 plugin.getServer().getPluginManager().callEvent(graveCreateEvent);
 
                 if (!graveCreateEvent.isCancelled()) {
-                    if (!plugin.getVersionManager().isMohist()
-                            || (event.getEntityType() == EntityType.PLAYER && event instanceof PlayerDeathEvent)) {
+                    if (event.getEntityType() != EntityType.PLAYER || event instanceof PlayerDeathEvent) {
+                        graveItemStackList = plugin.getGraveManager().getGraveItemStackList(graveItemStackList,
+                                removedItemStackList, livingEntity, permissionList);
+                        String title = StringUtil.parseString(plugin
+                                        .getConfig("gui.grave.title", livingEntity, permissionList)
+                                        .getString("gui.grave.title"), livingEntity,
+                                livingEntity.getLocation(), grave, plugin);
+                        Grave.StorageMode storageMode = plugin.getGraveManager()
+                                .getStorageMode(plugin.getConfig("storage.mode", livingEntity, permissionList)
+                                        .getString("storage.mode"));
+
                         event.setDroppedExp(0);
+                        grave.setInventory(plugin.getGraveManager().createGraveInventory(grave, livingEntity
+                                .getLocation(), graveItemStackList, title, storageMode));
                         plugin.getGraveManager().placeGrave(location, grave);
-                        plugin.getPlayerManager().runCommands("command.create", livingEntity, location, grave);
-                        plugin.getPlayerManager().sendMessage("message.death", livingEntity, location, grave);
+                        plugin.getEntityManager().runCommands("event.command.create", livingEntity, location, grave);
+                        plugin.getEntityManager().sendMessage("message.death", livingEntity, location, grave);
                         plugin.getDataManager().addGrave(grave);
                     } else {
-                        // Mohist Support, for some reason without this it dupes the items.
                         event.getDrops().clear();
                         event.setDroppedExp(0);
                     }
@@ -369,7 +384,7 @@ public class EntityDeathListener implements Listener {
                 }
             } else {
                 event.getDrops().addAll(graveItemStackList);
-                plugin.getPlayerManager().sendMessage("message.failure", livingEntity,
+                plugin.getEntityManager().sendMessage("message.failure", livingEntity,
                         livingEntity.getLocation(), grave);
                 plugin.debugMessage("Grave not created for " + entityName
                         + " because a safe location could not be found", 2);

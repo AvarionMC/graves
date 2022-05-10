@@ -59,7 +59,7 @@ public final class StringUtil {
             }
 
             if (string.contains("%teleport_cost%")) {
-                string = string.replace("%teleport_cost%", String.valueOf(plugin.getPlayerManager()
+                string = string.replace("%teleport_cost%", String.valueOf(plugin.getEntityManager()
                         .getTeleportCost(location, grave.getLocationDeath(), grave)));
             }
         }
@@ -113,7 +113,7 @@ public final class StringUtil {
                         .replace("%experience%", "0");
             }
 
-            if (grave.getOwnerType() == EntityType.PLAYER && plugin.hasPlaceholderAPI()) {
+            if (grave.getOwnerType() == EntityType.PLAYER && plugin.getIntegrationManager().hasPlaceholderAPI()) {
                 string = PlaceholderAPI.setPlaceholders(plugin.getServer()
                         .getOfflinePlayer(grave.getOwnerUUID()), string);
             }

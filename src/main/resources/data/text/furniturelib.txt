@@ -1,0 +1,27 @@
+################
+# FurnitureLib #
+################
+Graves comes bundled with custom models and injects them into FurnitureLib, these models are in the public domain
+and can be used without the Graves plugin if you wish. Any FurnitureLib compatible model can be used,
+these can be from DiceFurniture, custom models, manually added to the models folder or downloaded
+from the Dicecraft website.
+
+Models Sources:
+DiceFurniture Models: https://dicecraft.de/furniture/dModels.php
+User Models: https://dicecraft.de/furniture/models.php
+Custom Models: https://www.spigotmc.org/resources/furnituremaker.20667/
+
+Graves Bundled Models:
+Grave1 - Bundled by Graves
+Grave2 - Bundled by Graves
+Grave3 - Bundled by Graves
+Skull1 - Bundled by Graves
+
+Recommended Models:
+Gravestone - Bundled in DiceFurniture
+HumanSkeleton - Bundled in DiceFurniture
+Campfire1 - Bundled in DiceFurniture
+WirdowwScarecrow - /furniture download 91429442
+Grave_Luke1779 - /furniture download 80823949
+KEJackOLanternA - /furniture download 38097318
+KEJackOLanternB - /furniture download 16193965

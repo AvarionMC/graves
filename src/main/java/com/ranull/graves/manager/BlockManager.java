@@ -64,15 +64,15 @@ public final class BlockManager {
 
             location.add(offsetX, offsetY, offsetZ);
 
-            BlockData blockData = plugin.getCompatibility().placeBlock(location,
+            BlockData blockData = plugin.getCompatibility().setBlockData(location,
                     material, grave, plugin);
 
-            if (plugin.hasItemsAdder()) {
-                plugin.getItemsAdder().createBlock(location, grave);
+            if (plugin.getIntegrationManager().hasItemsAdder()) {
+                plugin.getIntegrationManager().getItemsAdder().createBlock(location, grave);
             }
 
-            if (plugin.hasOraxen()) {
-                plugin.getOraxen().createBlock(location, grave);
+            if (plugin.getIntegrationManager().hasOraxen()) {
+                plugin.getIntegrationManager().getOraxen().createBlock(location, grave);
             }
 
             plugin.getDataManager().addBlockData(blockData);
@@ -120,12 +120,14 @@ public final class BlockManager {
     public void removeBlock(BlockData blockData) {
         Location location = blockData.getLocation();
 
-        if (plugin.hasItemsAdder() && plugin.getItemsAdder().isCustomBlock(location)) {
-            plugin.getItemsAdder().removeBlock(location);
+        if (plugin.getIntegrationManager().hasItemsAdder() && plugin.getIntegrationManager().getItemsAdder()
+                .isCustomBlock(location)) {
+            plugin.getIntegrationManager().getItemsAdder().removeBlock(location);
         }
 
-        if (plugin.hasOraxen() && plugin.getOraxen().isCustomBlock(location)) {
-            plugin.getOraxen().removeBlock(location);
+        if (plugin.getIntegrationManager().hasOraxen() && plugin.getIntegrationManager().getOraxen()
+                .isCustomBlock(location)) {
+            plugin.getIntegrationManager().getOraxen().removeBlock(location);
         }
 
         if (location.getWorld() != null) {

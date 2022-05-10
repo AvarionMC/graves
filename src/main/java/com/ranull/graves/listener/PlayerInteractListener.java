@@ -58,7 +58,7 @@ public class PlayerInteractListener implements Listener {
 
                 if (itemStack.getItemMeta() != null && itemStack.getItemMeta() instanceof CompassMeta) {
                     CompassMeta compassMeta = (CompassMeta) itemStack.getItemMeta();
-                    UUID uuid = plugin.getPlayerManager().getUUIDFromItemStack(itemStack);
+                    UUID uuid = plugin.getEntityManager().getUUIDFromItemStack(itemStack);
 
                     if (compassMeta.getLodestone() != null && uuid != null) {
                         if (plugin.getDataManager().getGraveMap().containsKey(uuid)) {
@@ -71,20 +71,24 @@ public class PlayerInteractListener implements Listener {
 
                                 if (!compassMeta.getLodestone().equals(location)) {
                                     player.getInventory().setItem(player.getInventory().getHeldItemSlot(),
-                                            plugin.getPlayerManager().getCompassItemStack(location, grave));
+                                            plugin.getEntityManager().getCompassItemStack(location, grave));
                                 }
 
                                 if (player.getWorld().equals(location.getWorld())) {
-                                    plugin.getPlayerManager().sendMessage("message.distance", player,
+                                    plugin.getEntityManager().sendMessage("message.distance", player,
                                             location, grave);
                                 } else {
-                                    plugin.getPlayerManager().sendMessage("message.distance-world", player,
+                                    plugin.getEntityManager().sendMessage("message.distance-world", player,
                                             location, grave);
                                 }
+                            } else {
+                                player.getInventory().remove(itemStack);
                             }
                         } else {
                             player.getInventory().remove(itemStack);
                         }
+
+                        event.setCancelled(true);
                     }
                 }
             }

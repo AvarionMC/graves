@@ -17,7 +17,7 @@ public final class ReflectionUtil {
 
             sendPacket.invoke(playerConnection, packetPlayOutAnimation);
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | NoSuchFieldException
-                | ClassNotFoundException | InstantiationException ignored) {
+                 | ClassNotFoundException | InstantiationException ignored) {
         }
     }
 

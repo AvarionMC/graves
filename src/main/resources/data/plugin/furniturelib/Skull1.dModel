@@ -1,0 +1,21 @@
+# ------------------------------------  #
+#                                       #
+#       never touch the system-ID !     #
+#                                       #
+# ------------------------------------  #
+
+Skull1:
+  system-ID: Skull1
+  displayName: '&fSkull 1'
+  spawnMaterial: COW_SPAWN_EGG
+  itemGlowEffect: false
+  itemLore: ''
+  placeAbleSide: TOP
+  crafting:
+    disable: true
+    recipe: xxx,xxx,xxx
+    index:
+      x: BEDROCK
+  projectData:
+    entities:
+      '0': H4sIAAAAAAAA/0VNvW7CMBj8QkhqzFyJlQdg69QFhSailcqPaAbCggx8CVZdGzkOKBtvxtKX6SvAUoeGctPd6X4oAAEaScNNGZc7hHYwG01my484GIcutAYsx6lgBsHC6je55zlfiUo7Lvgjpj9R/4mHoVAHLrMqSu1oIVAHMhNIofkaBaEPzvz0073EYa9jeQI1LF/AP+j1BKVRuqyLBBp8A49fXOJas9Q87wQrUS+3yDYOeC+qkMapmuRdrZnhSvpA5r1JmuZoTt+3F7Korf7dSm6p8/FqeeAm7DB4qvgvY5e6PRwBAAA=

@@ -10,6 +10,7 @@ import com.ranull.graves.util.ResourceUtil;
 import dev.lone.itemsadder.api.CustomBlock;
 import dev.lone.itemsadder.api.CustomFurniture;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
 
@@ -51,6 +52,7 @@ public final class ItemsAdder extends EntityDataManager {
                 .getBoolean("itemsadder.furniture.enabled")) {
             String name = plugin.getConfig("itemsadder.furniture.name", grave)
                     .getString("itemsadder.furniture.name", "");
+            location.getBlock().setType(Material.AIR);
             CustomFurniture customFurniture = createCustomFurniture(name, location);
 
             if (customFurniture != null && customFurniture.getArmorstand() != null) {

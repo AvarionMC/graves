@@ -29,7 +29,7 @@ public class PlayerRespawnListener implements Listener {
             Grave grave = graveList.get(graveList.size() - 1);
 
             plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-                plugin.getPlayerManager().runFunction(player, plugin
+                plugin.getEntityManager().runFunction(player, plugin
                         .getConfig("respawn.function", player, permissionList)
                         .getString("respawn.function", "none"), grave);
             }, 1L);
@@ -43,7 +43,7 @@ public class PlayerRespawnListener implements Listener {
                         .getGraveLocationList(event.getRespawnLocation(), grave);
 
                 if (!locationList.isEmpty()) {
-                    ItemStack itemStack = plugin.getPlayerManager().getCompassItemStack(locationList.get(0), grave);
+                    ItemStack itemStack = plugin.getEntityManager().getCompassItemStack(locationList.get(0), grave);
 
                     if (itemStack != null) {
                         player.getInventory().addItem(itemStack);

@@ -19,7 +19,7 @@ public class PlayerDropItemListener implements Listener {
     public void onBlockBreak(PlayerDropItemEvent event) {
         ItemStack itemStack = event.getItemDrop().getItemStack();
 
-        if (itemStack.getType() == Material.COMPASS && plugin.getPlayerManager().getUUIDFromItemStack(itemStack) != null) {
+        if (itemStack.getType() == Material.COMPASS && plugin.getEntityManager().getUUIDFromItemStack(itemStack) != null) {
             event.getItemDrop().remove();
         }
     }

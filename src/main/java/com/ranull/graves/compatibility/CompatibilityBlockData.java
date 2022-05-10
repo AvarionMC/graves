@@ -1,5 +1,7 @@
 package com.ranull.graves.compatibility;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import com.ranull.graves.Graves;
 import com.ranull.graves.data.BlockData;
 import com.ranull.graves.inventory.Grave;
@@ -23,9 +25,12 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import java.lang.reflect.Field;
+import java.util.Collection;
+
 public final class CompatibilityBlockData implements Compatibility {
     @Override
-    public BlockData placeBlock(Location location, Material material, Grave grave, Graves plugin) {
+    public BlockData setBlockData(Location location, Material material, Grave grave, Graves plugin) {
         if (material != null) {
             Block block = location.getBlock();
             String originalMaterial = block.getType().name();
@@ -86,6 +91,7 @@ public final class CompatibilityBlockData implements Compatibility {
         return block.getState() instanceof TileState;
     }
 
+    @SuppressWarnings("deprecation")
     private void updateSkullBlock(Block block, Grave grave, Graves plugin) {
         int headType = plugin.getConfig("block.head.type", grave).getInt("block.head.type");
         String headBase64 = plugin.getConfig("block.head.base64", grave).getString("block.head.base64");
@@ -130,5 +136,32 @@ public final class CompatibilityBlockData implements Compatibility {
         }
 
         return itemStack;
+    }
+
+    @Override
+    public String getSkullTexture(ItemStack itemStack) {
+        if (itemStack.getType() == Material.PLAYER_HEAD && itemStack.getItemMeta() != null) {
+            SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
+
+            try {
+                Field profileField = skullMeta.getClass().getDeclaredField("profile");
+
+                profileField.setAccessible(true);
+
+                GameProfile gameProfile = (GameProfile) profileField.get(skullMeta);
+
+                if (gameProfile != null && gameProfile.getProperties().containsKey("textures")) {
+                    Collection<Property> propertyCollection = gameProfile.getProperties().get("textures");
+
+                    if (!propertyCollection.isEmpty()) {
+                        return propertyCollection.stream().findFirst().get().getValue();
+                    }
+                }
+            } catch (NoSuchFieldException | IllegalAccessException exception) {
+                exception.printStackTrace();
+            }
+        }
+
+        return null;
     }
 }

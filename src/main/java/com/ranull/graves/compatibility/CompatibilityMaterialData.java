@@ -1,5 +1,7 @@
 package com.ranull.graves.compatibility;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import com.ranull.graves.Graves;
 import com.ranull.graves.data.BlockData;
 import com.ranull.graves.inventory.Grave;
@@ -18,9 +20,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.material.Openable;
 
+import java.lang.reflect.Field;
+import java.util.Collection;
+
 public final class CompatibilityMaterialData implements Compatibility {
     @Override
-    public BlockData placeBlock(Location location, Material material, Grave grave, Graves plugin) {
+    public BlockData setBlockData(Location location, Material material, Grave grave, Graves plugin) {
         if (material != null) {
             Block block = location.getBlock();
             String replaceMaterial = location.getBlock().getType().name();
@@ -115,6 +120,35 @@ public final class CompatibilityMaterialData implements Compatibility {
             }
 
             return itemStack;
+        }
+
+        return null;
+    }
+
+    @Override
+    public String getSkullTexture(ItemStack itemStack) {
+        Material material = Material.matchMaterial("SKULL_ITEM");
+
+        if (material != null && itemStack.getType() == material && itemStack.getItemMeta() != null) {
+            SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
+
+            try {
+                Field profileField = skullMeta.getClass().getDeclaredField("profile");
+
+                profileField.setAccessible(true);
+
+                GameProfile gameProfile = (GameProfile) profileField.get(skullMeta);
+
+                if (gameProfile != null && gameProfile.getProperties().containsKey("textures")) {
+                    Collection<Property> propertyCollection = gameProfile.getProperties().get("textures");
+
+                    if (!propertyCollection.isEmpty()) {
+                        return propertyCollection.stream().findFirst().get().getValue();
+                    }
+                }
+            } catch (NoSuchFieldException | IllegalAccessException exception) {
+                exception.printStackTrace();
+            }
         }
 
         return null;

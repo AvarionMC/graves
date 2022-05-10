@@ -9,6 +9,7 @@ import com.ranull.graves.listener.integration.furnitureengine.FurnitureInteractL
 import com.ranull.graves.manager.EntityDataManager;
 import com.ranull.graves.util.BlockFaceUtil;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Rotation;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
@@ -56,6 +57,8 @@ public final class FurnitureEngine extends EntityDataManager {
                 .getBoolean("furnitureengine.enabled")) {
             String name = plugin.getConfig("furnitureengine.name", grave)
                     .getString("furnitureengine.name", "");
+
+            location.getBlock().setType(Material.AIR);
 
             if (placeFurniture(name, location, BlockFaceUtil.getBlockFaceRotation(BlockFaceUtil
                     .getYawBlockFace(grave.getYaw())))) {

@@ -10,6 +10,7 @@ import com.griefdefender.api.permission.PermissionManager;
 import com.griefdefender.api.permission.flag.Flag;
 import com.griefdefender.api.registry.CatalogRegistryModule;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.util.HashSet;
@@ -94,7 +95,7 @@ public final class GriefDefender {
     }
      */
 
-    public boolean canTeleport(Player player, Location location) {
+    public boolean canTeleport(Entity entity, Location location) {
         return true; // TODO
     }
 }

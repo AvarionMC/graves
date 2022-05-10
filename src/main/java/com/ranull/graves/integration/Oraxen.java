@@ -6,7 +6,6 @@ import com.ranull.graves.inventory.Grave;
 import com.ranull.graves.listener.integration.oraxen.FurnitureBreakListener;
 import com.ranull.graves.listener.integration.oraxen.FurnitureInteractListener;
 import com.ranull.graves.manager.EntityDataManager;
-import com.ranull.graves.manager.VersionManager;
 import com.ranull.graves.util.BlockFaceUtil;
 import com.ranull.graves.util.ResourceUtil;
 import io.th0rgal.oraxen.mechanics.MechanicFactory;
@@ -37,7 +36,6 @@ public final class Oraxen extends EntityDataManager {
     public Oraxen(Graves plugin, Plugin oraxenPlugin) {
         super(plugin);
 
-        VersionManager versionManager = plugin.getVersionManager();
         this.plugin = plugin;
         this.oraxenPlugin = oraxenPlugin;
         this.furnitureInteractListener = new FurnitureInteractListener(plugin, this);
@@ -82,11 +80,10 @@ public final class Oraxen extends EntityDataManager {
                 FurnitureMechanic furnitureMechanic = getFurnitureMechanic(name);
 
                 if (furnitureMechanic != null && location.getWorld() != null) {
-                    furnitureMechanic.place(BlockFaceUtil.getBlockFaceRotation(BlockFaceUtil
-                                    .getYawBlockFace(grave.getYaw())), grave.getYaw(),
-                            BlockFace.UP, location, name);
+                    location.getBlock().setType(Material.AIR);
 
-                    ItemFrame itemFrame = FurnitureMechanic.getItemFrame(location);
+                    ItemFrame itemFrame = furnitureMechanic.place(BlockFaceUtil.getBlockFaceRotation(BlockFaceUtil
+                            .getYawBlockFace(grave.getYaw())), grave.getYaw(), BlockFace.UP, location);
 
                     if (itemFrame != null) {
                         createEntityData(location, itemFrame.getUniqueId(), grave.getUUID(), EntityData.Type.ORAXEN);

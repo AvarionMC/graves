@@ -18,8 +18,8 @@ public final class ProtectionLib {
     }
 
     public boolean canBuild(Location location, Player player) {
-        if (plugin.hasFurnitureLib()) {
-            return plugin.getFurnitureLib().canBuild(location, player);
+        if (plugin.getIntegrationManager().hasFurnitureLib()) {
+            return plugin.getIntegrationManager().getFurnitureLib().canBuild(location, player);
         } else {
             try {
                 Object protectionLib = Class.forName("de.Ste3et_C0st.ProtectionLib.main.ProtectionLib")
@@ -31,7 +31,7 @@ public final class ProtectionLib {
 
                 return (boolean) canBuild.invoke(protectionLib, location, player);
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException
-                    | ClassNotFoundException ignored) {
+                     | ClassNotFoundException ignored) {
             }
         }
 

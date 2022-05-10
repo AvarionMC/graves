@@ -27,14 +27,14 @@ public class InventoryCloseListener implements Listener {
 
             if (grave.getItemAmount() <= 0) {
                 grave.getInventory().getViewers().remove(player);
-                plugin.getPlayerManager().runCommands("command.loot", player, player.getLocation(), grave);
-                plugin.getPlayerManager().sendMessage("message.loot", player, player.getLocation(), grave);
+                plugin.getEntityManager().runCommands("event.command.loot", player, player.getLocation(), grave);
+                plugin.getEntityManager().sendMessage("message.loot", player, player.getLocation(), grave);
                 plugin.getEntityManager().spawnZombie(grave.getLocationDeath(), player, player, grave);
                 plugin.getGraveManager().giveGraveExperience(player, grave);
                 plugin.getGraveManager().removeGrave(grave);
             }
 
-            plugin.getPlayerManager().playWorldSound("sound.close", player, grave);
+            plugin.getEntityManager().playWorldSound("sound.close", player, grave);
         }
     }
 }

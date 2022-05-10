@@ -1,0 +1,39 @@
+###################
+# Entity Override #
+###################
+# Override default config options for entities that match these types, entity type names must be uppercase.
+# https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html
+settings:
+  entity:
+    # Here we override the options for entities, remember you can copy options from the default section.
+    PLAYER: # Override default options for players.
+      grave:
+        enabled: true
+
+    ENDER_DRAGON: # Override default options for Ender Dragons.
+      grave:
+        enabled: false
+        time: -1
+        explode: false
+      block:
+        material: DRAGON_HEAD
+      gui:
+        grave:
+          title: "%owner_name% Corpse"
+      command:
+        create:
+          - "say %killer_name% killed the %owner_name%."
+
+    WITHER: # Override default options for Withers.
+      grave:
+        enabled: false
+        time: -1
+        explode: false
+      block:
+        enabled: false
+      gui:
+        grave:
+          title: "%owner_name% Corpse"
+      schematic:
+        enabled: true
+        name: "grave_wither"

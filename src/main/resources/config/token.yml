@@ -1,0 +1,20 @@
+###############
+# Token Setup #
+###############
+# Here is where you define your tokens that you can use for a grave. Supported only on 1.12+
+settings:
+  token:
+    basic: # Token name, you can define multiple tokens.
+      material: SUNFLOWER # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+      name: "Grave Token" # Grave token name.
+      craft: true # Can players craft this grave token.
+      glow: true # Should the grave token glow.
+      model-data: -1 # Custom model data for the token item, -1 is none.
+      lore: # Grave token lore.
+        - "&7Keep this in your inventory and"
+        - "&7when you die a grave will be"
+        - "&7created."
+      recipe: # Grave token recipe, use AIR for an empty square, make sure it is unique.
+        - "GOLD_INGOT GOLD_INGOT GOLD_INGOT"
+        - "GOLD_INGOT EMERALD GOLD_INGOT"
+        - "GOLD_INGOT GOLD_INGOT GOLD_INGOT"

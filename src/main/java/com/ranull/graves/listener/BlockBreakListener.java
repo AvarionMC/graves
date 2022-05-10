@@ -25,7 +25,7 @@ public class BlockBreakListener implements Listener {
 
         if (grave != null) {
             if (plugin.getConfig("grave.break", grave).getBoolean("grave.break")) {
-                if (plugin.getPlayerManager().canOpenGrave(player, grave)) {
+                if (plugin.getEntityManager().canOpenGrave(player, grave)) {
                     GraveBreakEvent graveBreakEvent = new GraveBreakEvent(block, player, grave);
 
                     graveBreakEvent.setDropItems(plugin.getConfig("drop.break", grave)
@@ -46,12 +46,12 @@ public class BlockBreakListener implements Listener {
                         plugin.getGraveManager().closeGrave(grave);
                         plugin.getGraveManager().playEffect("effect.loot", block.getLocation(), grave);
                         plugin.getEntityManager().spawnZombie(block.getLocation(), player, player, grave);
-                        plugin.getPlayerManager().runCommands("command.break", player, block.getLocation(), grave);
+                        plugin.getEntityManager().runCommands("event.command.break", player, block.getLocation(), grave);
                     } else {
                         event.setCancelled(true);
                     }
                 } else {
-                    plugin.getPlayerManager().sendMessage("message.protection", player, player.getLocation(), grave);
+                    plugin.getEntityManager().sendMessage("message.protection", player, player.getLocation(), grave);
                     event.setCancelled(true);
                 }
             } else {

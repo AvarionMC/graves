@@ -11,11 +11,14 @@ import de.Ste3et_C0st.FurnitureLib.Crafting.Project;
 import de.Ste3et_C0st.FurnitureLib.Utilitis.LocationUtil;
 import de.Ste3et_C0st.FurnitureLib.main.FurniturePlugin;
 import de.Ste3et_C0st.FurnitureLib.main.ObjectID;
+import de.Ste3et_C0st.FurnitureLib.main.entity.fEntity;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
@@ -70,6 +73,8 @@ public final class FurnitureLib extends EntityDataManager {
             Project project = furnitureLib.getFurnitureManager().getProject(name);
 
             if (project != null && project.haveModelSchematic()) {
+                location.getBlock().setType(Material.AIR);
+
                 ObjectID objectID = new ObjectID(project.getName(), project.getPlugin().getName(), location);
 
                 location.setYaw(furnitureLib.getLocationUtil().FaceToYaw(LocationUtil.yawToFace(grave.getYaw())
@@ -77,10 +82,16 @@ public final class FurnitureLib extends EntityDataManager {
                 furnitureLib.spawn(project, objectID);
                 objectID.setUUID(UUID.randomUUID());
                 objectID.getBlockList().stream()
-                        .filter(blockLocation -> blockLocation.getBlock().getType().name().contains("SIGN"))
+                        .filter(signLocation -> signLocation.getBlock().getType().name().contains("SIGN"))
                         .forEach((signLocation) -> setSign(signLocation.getBlock(),
                                 plugin.getConfig("furniturelib.line", grave)
                                         .getStringList("furniturelib.line"), grave));
+
+                if (plugin.getConfig("furniturelib.head.replace", grave)
+                        .getBoolean("furniturelib.head.replace")) {
+                    objectID.getPacketList().forEach((fEntity) -> setSkull(fEntity, grave));
+                }
+
                 furnitureLib.getFurnitureManager().addObjectID(objectID);
                 createEntityData(objectID.getStartLocation(), objectID.getUUID(), grave.getUUID(),
                         EntityData.Type.FURNITURELIB);
@@ -131,6 +142,46 @@ public final class FurnitureLib extends EntityDataManager {
         }
     }
 
+    private void setSkull(fEntity fEntity, Grave grave) {
+        List<String> materialList = plugin.getConfig("furniturelib.head.material", grave)
+                .getStringList("furniturelib.head.material");
+        ItemStack itemStack = plugin.getCompatibility().getEntitySkullItemStack(grave, plugin);
+
+        if (fEntity.getItemInMainHand() != null && materialList.contains(fEntity.getItemInMainHand().getType().name())
+                && isSkullTextureBlank(fEntity.getItemInMainHand())) {
+            fEntity.setItemInMainHand(itemStack);
+        }
+
+        if (fEntity.getItemInOffHand() != null && materialList.contains(fEntity.getItemInOffHand().getType().name())
+                && isSkullTextureBlank(fEntity.getItemInOffHand())) {
+            fEntity.setItemInOffHand(itemStack);
+        }
+
+        if (fEntity.getHelmet() != null && materialList.contains(fEntity.getHelmet().getType().name())
+                && isSkullTextureBlank(fEntity.getHelmet())) {
+            fEntity.setHelmet(itemStack);
+        }
+
+        if (fEntity.getChestPlate() != null && materialList.contains(fEntity.getChestPlate().getType().name())
+                && isSkullTextureBlank(fEntity.getChestPlate())) {
+            fEntity.setChestPlate(itemStack);
+        }
+
+        if (fEntity.getLeggings() != null && materialList.contains(fEntity.getLeggings().getType().name())
+                && isSkullTextureBlank(fEntity.getLeggings())) {
+            fEntity.setLeggings(itemStack);
+        }
+
+        if (fEntity.getBoots() != null && materialList.contains(fEntity.getBoots().getType().name())
+                && isSkullTextureBlank(fEntity.getBoots())) {
+            fEntity.setBoots(itemStack);
+        }
+    }
+
+    private boolean isSkullTextureBlank(ItemStack itemStack) {
+        return plugin.getCompatibility().getSkullTexture(itemStack) == null;
+    }
+
     public class Furniture extends FurniturePlugin {
         public Furniture(Plugin plugin) {
             super(plugin);
@@ -142,9 +193,10 @@ public final class FurnitureLib extends EntityDataManager {
             String path = "data" + File.separator + "plugin" + File.separator + "furniturelib";
 
             try {
-                new Project("Grave1", getPlugin(), getResource(path + File.separator + "grave_1.dModel"));
-                new Project("Grave2", getPlugin(), getResource(path + File.separator + "grave_2.dModel"));
-                new Project("Grave3", getPlugin(), getResource(path + File.separator + "grave_3.dModel"));
+                new Project("Grave1", getPlugin(), getResource(path + File.separator + "Grave1.dModel"));
+                new Project("Grave2", getPlugin(), getResource(path + File.separator + "Grave2.dModel"));
+                new Project("Grave3", getPlugin(), getResource(path + File.separator + "Grave3.dModel"));
+                new Project("Skull1", getPlugin(), getResource(path + File.separator + "Skull1.dModel"));
             } catch (Exception exception) {
                 plugin.warningMessage(exception.getMessage());
             }

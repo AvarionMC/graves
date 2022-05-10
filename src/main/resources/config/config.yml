@@ -1,0 +1,77 @@
+config-version: 3 # Config version, you should never manually change this.
+
+###############
+# Core Config #
+###############
+# Core config for backend processes or misc options.
+# If you are looking to edit graves the main grave config file is grave.yml.
+settings:
+  ###########
+  # Storage #
+  ###########
+  # Data storage system.
+  storage:
+    type: SQLITE # SQLITE, More storage types will be added in the future.
+    sqlite: # Unless you know what you're doing leave options under sqlite default.
+      journal-mode: "WAL" # https://www.sqlite.org/pragma.html#pragma_journal_mode
+      synchronous: "OFF" # https://www.sqlite.org/pragma.html#pragma_synchronous
+
+  #########
+  # Debug #
+  #########
+  # Debug information, debug level 2 can be useful in finding out why a Grave does not spawn on your server.
+  debug:
+    admin: # UUID or name of admins to send debug information to. https://mcuuid.net/
+      - "c59ac6d2-4851-4183-a9f7-15d1a293eed6" # Ranull
+      - "069a79f4-44e9-4726-a5be-fca90e38aaf5" # Notch
+    level: 0 # 0 = Nothing, 1 = Information, 2 = Failures
+
+  #########
+  # Dump #
+  #########
+  # Dump server information to help debug the plugin.
+  # Methods: HASTEBIN, FILE
+  dump:
+    method: HASTEBIN # HASTEBIN, FILE
+
+  ###############
+  # Integration #
+  ###############
+  # Enable/Disable integrations into other plugins, if you are having errors relating to another plugin
+  # try disabling them here.
+  integration:
+    vault: # https://www.spigotmc.org/resources/vault.34315/
+      enabled: true # Should Vault integration be enabled.
+    worldedit: # https://dev.bukkit.org/projects/worldedit/
+      enabled: true # Should WorldEdit integration be enabled.
+      write: true # Should Graves write its schematics into its own folder.
+    worldguard: # https://dev.bukkit.org/projects/worldguard/
+      enabled: true # Should WorldGuard integration be enabled.
+    griefdefender: # https://www.spigotmc.org/resources/griefdefender.68900/
+      enabled: true # Should GriefDefender integration be enabled.
+    furniturelib: # https://www.spigotmc.org/resources/furniturelibary.9368/
+      enabled: true # Should FurnitureLib integration be enabled.
+    furnitureengine: # https://www.spigotmc.org/resources/furnitureengine.97134/
+      enabled: true # Should FurnitureEngine integration be enabled.
+    protectionlib: # https://www.spigotmc.org/resources/protectionlib.9368/
+      enabled: true # Should ProtectionLib integration be enabled.
+    itemsadder: # https://www.spigotmc.org/resources/itemsadder.73355/
+      enabled: true # Should ItemsAdder integration be enabled.
+      write: true # Should Graves write its data into the ItemsAdder data folder.
+    oraxen: # https://www.spigotmc.org/resources/oraxen.72448/
+      enabled: true # Should Oraxen integration be enabled.
+      write: true # Should Graves write its pack into the Oraxen pack folder.
+    placeholderapi: # https://www.spigotmc.org/resources/placeholderapi.6245/
+      enabled: true # Should PlaceholderAPI integration be enabled.
+    skript: # https://github.com/SkriptLang/Skript/
+      enabled: true # Should Skript integration be enabled.
+    chestsort: # https://www.spigotmc.org/resources/chestsort.59773/
+      enabled: true # Should ChestSort integration be enabled.
+    itembridge: # https://www.spigotmc.org/resources/itembridge.77080/
+      enabled: true # Should ItemBridge integration be enabled.
+
+  #################
+  # Compatibility #
+  #################
+  compatibility:
+    warning: true # Warn when a plugin to have known incompatibilities is detected.

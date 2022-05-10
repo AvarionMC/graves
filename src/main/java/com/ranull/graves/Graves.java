@@ -1,42 +1,62 @@
 package com.ranull.graves;
 
+import com.google.common.base.Charsets;
 import com.ranull.graves.command.GravesCommand;
 import com.ranull.graves.compatibility.Compatibility;
 import com.ranull.graves.compatibility.CompatibilityBlockData;
 import com.ranull.graves.compatibility.CompatibilityMaterialData;
-import com.ranull.graves.integration.*;
 import com.ranull.graves.inventory.Grave;
 import com.ranull.graves.listener.*;
 import com.ranull.graves.manager.*;
 import com.ranull.graves.update.UpdateChecker;
+import com.ranull.graves.util.FileUtil;
+import com.ranull.graves.util.HastebinUtil;
+import com.ranull.graves.util.ResourceUtil;
+import com.ranull.graves.util.UUIDUtil;
 import org.bstats.bukkit.Metrics;
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.permissions.PermissionAttachmentInfo;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Graves extends JavaPlugin {
     private VersionManager versionManager;
+    private IntegrationManager integrationManager;
     private DataManager dataManager;
     private BlockManager blockManager;
     private EntityDataManager entityDataManager;
     private HologramManager hologramManager;
     private GUIManager guiManager;
-    private RecipeManager recipeManager;
-    private PlayerManager playerManager;
-    private LocationManager locationManager;
     private EntityManager entityManager;
+    private RecipeManager recipeManager;
+    private LocationManager locationManager;
     private GraveManager graveManager;
-    private IntegrationManager integrationManager;
     private Compatibility compatibility;
+    private FileConfiguration fileConfiguration;
+
+    @Override
+    public void onLoad() {
+        saveDefaultConfig();
+
+        integrationManager = new IntegrationManager(this);
+
+        integrationManager.loadWorldGuard();
+    }
 
     @Override
     public void onEnable() {
@@ -48,19 +68,19 @@ public class Graves extends JavaPlugin {
         entityDataManager = new EntityDataManager(this);
         hologramManager = new HologramManager(this);
         guiManager = new GUIManager(this);
-        playerManager = new PlayerManager(this);
-        locationManager = new LocationManager(this);
         entityManager = new EntityManager(this);
+        locationManager = new LocationManager(this);
         graveManager = new GraveManager(this);
 
         registerMetrics();
         registerCommands();
         registerListeners();
         registerRecipes();
+        saveTextFiles();
 
         getServer().getScheduler().runTask(this, () -> {
             compatibilityChecker();
-            configChecker();
+            updateConfig();
             updateChecker();
         });
     }
@@ -77,18 +97,37 @@ public class Graves extends JavaPlugin {
     }
 
     @Override
-    public void onLoad() {
-        saveDefaultConfig();
+    public void saveDefaultConfig() {
+        ResourceUtil.copyResources("config", getConfigFolder().getPath(), false, this);
+    }
 
-        integrationManager = new IntegrationManager(this);
+    @Override
+    public void reloadConfig() {
+        File singleConfigFile = new File(getDataFolder(), "config.yml");
 
-        integrationManager.loadWorldGuard();
+        if (!singleConfigFile.exists()) {
+            fileConfiguration = getConfigFiles(getConfigFolder());
+        } else {
+            fileConfiguration = getConfigFile(singleConfigFile);
+            loadResourceDefaults(fileConfiguration, singleConfigFile.getName());
+        }
+    }
+
+    @Override
+    @NotNull
+    public FileConfiguration getConfig() {
+        if (fileConfiguration == null) {
+            reloadConfig();
+        }
+
+        return fileConfiguration;
     }
 
     public void reload() {
         saveDefaultConfig();
+        saveTextFiles();
         reloadConfig();
-        configChecker();
+        updateConfig();
         updateChecker();
         unregisterListeners();
         registerListeners();
@@ -100,6 +139,25 @@ public class Graves extends JavaPlugin {
         }
 
         infoMessage(getName() + " reloaded.");
+    }
+
+    public void saveTextFiles() {
+        ResourceUtil.copyResources("data/text/readme.txt", getDataFolder().getPath()
+                + "/readme.txt", this);
+        ResourceUtil.copyResources("data/text/placeholders.txt", getDataFolder().getPath()
+                + "/placeholders.txt", this);
+
+        if (integrationManager != null) {
+            if (integrationManager.hasPlaceholderAPI()) {
+                ResourceUtil.copyResources("data/text/placeholderapi.txt", getDataFolder().getPath()
+                        + "/placeholderapi.txt", this);
+            }
+
+            if (integrationManager.hasFurnitureLib()) {
+                ResourceUtil.copyResources("data/text/furniturelib.txt", getDataFolder().getPath()
+                        + "/furniturelib.txt", this);
+            }
+        }
     }
 
     private void registerMetrics() {
@@ -142,7 +200,7 @@ public class Graves extends JavaPlugin {
     }
 
     private void registerRecipes() {
-        if (versionManager.hasPersistentData() && !versionManager.isMohist()) {
+        if (versionManager.hasPersistentData()) {
             recipeManager = new RecipeManager(this);
         }
     }
@@ -159,10 +217,26 @@ public class Graves extends JavaPlugin {
     }
 
     public void debugMessage(String string, int level) {
-        int debug = getConfig().getInt("settings.debug", 0);
-
-        if (debug >= level) {
+        if (getConfig().getInt("settings.debug.level", 0) >= level) {
             getLogger().info("Debug: " + string);
+
+            for (String admin : getConfig().getStringList("settings.debug.admin")) {
+                Player player = getServer().getPlayer(admin);
+                UUID uuid = UUIDUtil.getUUID(admin);
+
+                if (uuid != null) {
+                    Player uuidPlayer = getServer().getPlayer(uuid);
+
+                    if (uuidPlayer != null) {
+                        player = uuidPlayer;
+                    }
+                }
+
+                if (player != null) {
+                    player.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RED
+                            + "Debug:" + ChatColor.RESET + " " + string);
+                }
+            }
         }
     }
 
@@ -211,15 +285,26 @@ public class Graves extends JavaPlugin {
         }
     }
 
-    private void configChecker() {
-        double currentConfigVersion = 2;
-        double configVersion = getConfig().getDouble("config-version");
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private void updateConfig() {
+        double currentConfigVersion = 3;
+        double configVersion = getConfig().getInt("config-version");
 
         if (configVersion < currentConfigVersion) {
-            warningMessage("Outdated config detected (v" + configVersion + "), this version is out of date, " +
-                    "current version is (v" + currentConfigVersion + "), please rename or delete your current config to " +
-                    "regenerate it, if you choose not to default options may be applied and current confirmation changes " +
-                    "might not work.");
+            new File(getDataFolder(), "outdated").mkdirs();
+            File singleConfigFile = new File(getDataFolder(), "config.yml");
+            File folderConfigFile = new File(getDataFolder(), "config");
+
+            if (singleConfigFile.exists()) {
+                FileUtil.moveFile(singleConfigFile, "outdated/config.yml-" + configVersion);
+            } else {
+                FileUtil.moveFile(folderConfigFile, "outdated/config-" + configVersion);
+            }
+
+            warningMessage("Outdated config detected (v" + configVersion + "), current version is (v"
+                    + currentConfigVersion + "), renaming outdated config file.");
+            saveDefaultConfig();
+            reloadConfig();
         }
     }
 
@@ -237,15 +322,71 @@ public class Graves extends JavaPlugin {
         if (versionManager.isBukkit()) {
             infoMessage("Bukkit detected, Some functions won't work on Bukkit, like hex codes.");
         }
+    }
 
-        if (versionManager.isMohist()) {
-            infoMessage("Mohist detected, Graves will try and work around some of the issues introduced " +
-                    "by Mohist.");
+    public void dumpServerInfo(CommandSender commandSender) {
+        if (isEnabled()) {
+            getServer().getScheduler().runTaskAsynchronously(this, () -> {
+                String serverInfoDump = getServerInfoDump();
+                String message = serverInfoDump;
+
+                if (getConfig().getString("settings.dump.method", "HASTEBIN")
+                        .equalsIgnoreCase("HASTEBIN")) {
+                    String response = HastebinUtil.postDataToHastebin(serverInfoDump, true);
+
+                    if (response != null) {
+                        message = response;
+                    }
+                }
+
+                if (serverInfoDump.equals(message)) {
+                    try {
+                        String name = "dump-" + System.currentTimeMillis() + ".txt";
+                        PrintWriter printWriter = new PrintWriter(name, "UTF-8");
+
+                        printWriter.write(serverInfoDump);
+                        printWriter.close();
+
+                        message = name;
+                    } catch (FileNotFoundException | UnsupportedEncodingException exception) {
+                        exception.printStackTrace();
+                    }
+                }
+
+                commandSender.sendMessage(ChatColor.GRAY + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
+                        + "Dumped: " + message);
+            });
         }
+    }
+
+    private String getServerInfoDump() {
+        List<String> stringList = new ArrayList<>();
+
+        stringList.add("Implementation Name: " + getServer().getName());
+        stringList.add("Implementation Version: " + getServer().getVersion());
+        stringList.add("Bukkit Version: " + getServer().getBukkitVersion());
+        stringList.add("NMS Version: " + getServer().getClass().getPackage().getName().split("\\.")[3]);
+        stringList.add("Player Count: " + getServer().getOnlinePlayers().size());
+        stringList.add("Player List: " + getServer().getOnlinePlayers().stream().map(Player::getName)
+                .collect(Collectors.joining(", ")));
+        stringList.add("Plugin Count: " + getServer().getPluginManager().getPlugins().length);
+        stringList.add("Plugin List: " + Arrays.stream(getServer().getPluginManager().getPlugins())
+                .map(Plugin::getName).collect(Collectors.joining(", ")));
+        stringList.add(getDescription().getName() + " Version: " + getDescription().getVersion());
+        stringList.add(getDescription().getName() + " API Version: " + getDescription().getAPIVersion());
+        stringList.add(getDescription().getName() + " Config Version: " + getConfig().getInt("config-version"));
+        stringList.add(getDescription().getName() + " Config Base64: " + Base64.getEncoder()
+                .encodeToString(getConfig().saveToString().getBytes()));
+
+        return String.join("\n", stringList);
     }
 
     public VersionManager getVersionManager() {
         return versionManager;
+    }
+
+    public IntegrationManager getIntegrationManager() {
+        return integrationManager;
     }
 
     public GraveManager getGraveManager() {
@@ -276,10 +417,6 @@ public class Graves extends JavaPlugin {
         return recipeManager;
     }
 
-    public PlayerManager getPlayerManager() {
-        return playerManager;
-    }
-
     public LocationManager getLocationManager() {
         return locationManager;
     }
@@ -290,122 +427,6 @@ public class Graves extends JavaPlugin {
 
     public Compatibility getCompatibility() {
         return compatibility;
-    }
-
-    public boolean hasVault() {
-        return integrationManager.getVault() != null;
-    }
-
-    public boolean hasWorldEdit() {
-        return integrationManager.getWorldEdit() != null;
-    }
-
-    public boolean hasWorldGuard() {
-        return integrationManager.getWorldGuard() != null;
-    }
-
-    public boolean hasGriefDefender() {
-        return integrationManager.getGriefDefender() != null;
-    }
-
-    public boolean hasFurnitureLib() {
-        return integrationManager.getFurnitureLib() != null;
-    }
-
-    public boolean hasFurnitureEngine() {
-        return integrationManager.getFurnitureEngine() != null;
-    }
-
-    public boolean hasProtectionLib() {
-        return integrationManager.getProtectionLib() != null;
-    }
-
-    public boolean hasItemsAdder() {
-        return integrationManager.getItemsAdder() != null;
-    }
-
-    public boolean hasOraxen() {
-        return integrationManager.getOraxen() != null;
-    }
-
-    public boolean hasChestSort() {
-        return integrationManager.getChestSort() != null;
-    }
-
-    public boolean hasPlaceholderAPI() {
-        return integrationManager.getPlaceholderAPI() != null;
-    }
-
-    public Vault getVault() {
-        return integrationManager.getVault();
-    }
-
-    public WorldEdit getWorldEdit() {
-        return integrationManager.getWorldEdit();
-    }
-
-    public WorldGuard getWorldGuard() {
-        return integrationManager.getWorldGuard();
-    }
-
-    public GriefDefender getGriefDefender() {
-        return integrationManager.getGriefDefender();
-    }
-
-    public FurnitureLib getFurnitureLib() {
-        return integrationManager.getFurnitureLib();
-    }
-
-    public FurnitureEngine getFurnitureEngine() {
-        return integrationManager.getFurnitureEngine();
-    }
-
-    public ItemsAdder getItemsAdder() {
-        return integrationManager.getItemsAdder();
-    }
-
-    public Oraxen getOraxen() {
-        return integrationManager.getOraxen();
-    }
-
-    public ChestSort getChestSort() {
-        return integrationManager.getChestSort();
-    }
-
-    public ProtectionLib getProtectionLib() {
-        return integrationManager.getProtectionLib();
-    }
-
-    public List<String> getPermissionList(Entity entity) {
-        List<String> permissionList = new ArrayList<>();
-        List<String> permissionListSorted = new ArrayList<>();
-
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
-
-            for (PermissionAttachmentInfo permissionAttachmentInfo : player.getEffectivePermissions()) {
-                if (permissionAttachmentInfo.getPermission().startsWith("graves.permission.")) {
-                    String permission = permissionAttachmentInfo.getPermission()
-                            .replace("graves.permission.", "").toLowerCase();
-
-                    if (getConfig().isConfigurationSection("settings.permission." + permission)) {
-                        permissionList.add(permission);
-                    }
-                }
-            }
-
-            ConfigurationSection configurationSection = getConfig().getConfigurationSection("settings.permission");
-
-            if (configurationSection != null) {
-                for (String permission : configurationSection.getKeys(false)) {
-                    if (permissionList.contains(permission)) {
-                        permissionListSorted.add(permission);
-                    }
-                }
-            }
-        }
-
-        return permissionListSorted;
     }
 
     public ConfigurationSection getConfig(String config, Grave grave) {
@@ -452,6 +473,114 @@ public class Graves extends JavaPlugin {
         }
 
         return getConfig().getConfigurationSection("settings.default.default");
+    }
+
+    private void loadResourceDefaults(FileConfiguration fileConfiguration, String resource) {
+        InputStream inputStream = getResource(resource);
+
+        if (inputStream != null) {
+            fileConfiguration.addDefaults(YamlConfiguration
+                    .loadConfiguration(new InputStreamReader(inputStream, Charsets.UTF_8)));
+        }
+    }
+
+    private void bakeDefaults(FileConfiguration fileConfiguration) {
+        try {
+            fileConfiguration.options().copyDefaults(true);
+            fileConfiguration.loadFromString(fileConfiguration.saveToString());
+        } catch (InvalidConfigurationException ignored) {
+        }
+    }
+
+    public List<String> getPermissionList(Entity entity) {
+        List<String> permissionList = new ArrayList<>();
+        List<String> permissionListSorted = new ArrayList<>();
+
+        if (entity instanceof Player) {
+            Player player = (Player) entity;
+
+            for (PermissionAttachmentInfo permissionAttachmentInfo : player.getEffectivePermissions()) {
+                if (permissionAttachmentInfo.getPermission().startsWith("graves.permission.")) {
+                    String permission = permissionAttachmentInfo.getPermission()
+                            .replace("graves.permission.", "").toLowerCase();
+
+                    if (getConfig().isConfigurationSection("settings.permission." + permission)) {
+                        permissionList.add(permission);
+                    }
+                }
+            }
+
+            ConfigurationSection configurationSection = getConfig().getConfigurationSection("settings.permission");
+
+            if (configurationSection != null) {
+                for (String permission : configurationSection.getKeys(false)) {
+                    if (permissionList.contains(permission)) {
+                        permissionListSorted.add(permission);
+                    }
+                }
+            }
+        }
+
+        return permissionListSorted;
+    }
+
+    private FileConfiguration getConfigFiles(File folder) {
+        FileConfiguration fileConfiguration = new YamlConfiguration();
+        File[] files = folder.listFiles();
+
+        if (files != null) {
+            Arrays.sort(files);
+
+            List<File> fileList = new LinkedList<>(Arrays.asList(files));
+            File mainConfig = new File(getConfigFolder(), "config.yml");
+
+            if (fileList.contains(mainConfig)) {
+                fileList.remove(mainConfig);
+                fileList.add(0, mainConfig);
+            }
+
+            for (File file : fileList) {
+                if (isNameValidYAML(file)) {
+                    if (file.isDirectory()) {
+                        fileConfiguration.addDefaults(getConfigFiles(file));
+                    } else {
+                        FileConfiguration savedFileConfiguration = getConfigFile(file);
+
+                        if (savedFileConfiguration != null) {
+                            fileConfiguration.addDefaults(savedFileConfiguration);
+                            bakeDefaults(fileConfiguration);
+                            loadResourceDefaults(fileConfiguration, "config" + File.separator + file.getName());
+                        } else {
+                            warningMessage("Unable to load config " + file.getName());
+                        }
+                    }
+                }
+            }
+        }
+
+        return fileConfiguration;
+    }
+
+    private FileConfiguration getConfigFile(File file) {
+        FileConfiguration fileConfiguration = null;
+
+        if (isNameValidYAML(file)) {
+            try {
+                fileConfiguration = YamlConfiguration.loadConfiguration(file);
+            } catch (IllegalArgumentException exception) {
+                exception.printStackTrace();
+            }
+        }
+
+        return fileConfiguration;
+    }
+
+    private boolean isNameValidYAML(File file) {
+        return !file.getName().startsWith(".") && file.getName().endsWith(".yml");
+    }
+
+    public final File getConfigFolder() {
+        return new File(getDataFolder(), "config");
     }
 
     public final File getPluginsFolder() {

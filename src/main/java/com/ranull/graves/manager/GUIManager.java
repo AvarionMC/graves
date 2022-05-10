@@ -28,43 +28,46 @@ public final class GUIManager {
         this.plugin = plugin;
     }
 
-    public void openGraveList(Player player) {
-        openGraveList(player, player.getUniqueId(), true);
+    public void openGraveList(Entity entity) {
+        openGraveList(entity, entity.getUniqueId(), true);
     }
 
-    public void openGraveList(Player player, boolean sound) {
-        openGraveList(player, player.getUniqueId(), sound);
+    public void openGraveList(Entity entity, boolean sound) {
+        openGraveList(entity, entity.getUniqueId(), sound);
     }
 
-    public void openGraveList(Player player, Entity entity) {
-        openGraveList(player, entity.getUniqueId(), true);
+    public void openGraveList(Entity entity, Entity entity2) {
+        openGraveList(entity, entity2.getUniqueId(), true);
     }
 
-    public void openGraveList(Player player, UUID uuid) {
-        openGraveList(player, uuid, true);
+    public void openGraveList(Entity entity, UUID uuid) {
+        openGraveList(entity, uuid, true);
     }
 
-    public void openGraveList(Player player, UUID uuid, boolean sound) {
-        List<Grave> graveList = plugin.getGraveManager().getGraveList(uuid);
-        List<String> permissionList = plugin.getPermissionList(player);
+    public void openGraveList(Entity entity, UUID uuid, boolean sound) {
+        if (entity instanceof Player) {
+            Player player = (Player) entity;
+            List<Grave> graveList = plugin.getGraveManager().getGraveList(uuid);
+            List<String> permissionList = plugin.getPermissionList(player);
 
-        if (!graveList.isEmpty()) {
-            GraveList graveListMenu = new GraveList(uuid, graveList);
-            String title = StringUtil.parseString(plugin.getConfig("gui.menu.list.title", player, permissionList)
-                    .getString("gui.menu.list.title", "Graves Main Menu"), player, plugin);
+            if (!graveList.isEmpty()) {
+                GraveList graveListMenu = new GraveList(uuid, graveList);
+                String title = StringUtil.parseString(plugin.getConfig("gui.menu.list.title", player, permissionList)
+                        .getString("gui.menu.list.title", "Graves Main Menu"), player, plugin);
 
-            Inventory inventory = plugin.getServer().createInventory(graveListMenu,
-                    InventoryUtil.getInventorySize(graveList.size()), title);
+                Inventory inventory = plugin.getServer().createInventory(graveListMenu,
+                        InventoryUtil.getInventorySize(graveList.size()), title);
 
-            setGraveListItems(inventory, graveList);
-            graveListMenu.setInventory(inventory);
-            player.openInventory(graveListMenu.getInventory());
+                setGraveListItems(inventory, graveList);
+                graveListMenu.setInventory(inventory);
+                player.openInventory(graveListMenu.getInventory());
 
-            if (sound) {
-                plugin.getPlayerManager().playPlayerSound("sound.menu-open", player, permissionList);
+                if (sound) {
+                    plugin.getEntityManager().playPlayerSound("sound.menu-open", player, permissionList);
+                }
+            } else {
+                plugin.getEntityManager().sendMessage("message.empty", player, permissionList);
             }
-        } else {
-            plugin.getPlayerManager().sendMessage("message.empty", player, permissionList);
         }
     }
 
@@ -78,27 +81,30 @@ public final class GUIManager {
         int count = 1;
 
         for (Grave grave : graveList) {
-            inventory.addItem(createGraveMainMenuItemStack(count, grave));
+            inventory.addItem(createGraveListItemStack(count, grave));
             count++;
         }
     }
 
-    public void openGraveMenu(Player player, Grave grave) {
-        openGraveMenu(player, grave, true);
+    public void openGraveMenu(Entity entity, Grave grave) {
+        openGraveMenu(entity, grave, true);
     }
 
-    public void openGraveMenu(Player player, Grave grave, boolean sound) {
-        GraveMenu graveMenu = new GraveMenu(grave);
-        String title = StringUtil.parseString(plugin.getConfig("gui.menu.grave.title", player, grave.getPermissionList())
-                .getString("gui.menu.grave.title", "Grave"), player, plugin);
-        Inventory inventory = plugin.getServer().createInventory(graveMenu, InventoryUtil.getInventorySize(5), title);
+    public void openGraveMenu(Entity entity, Grave grave, boolean sound) {
+        if (entity instanceof Player) {
+            Player player = (Player) entity;
+            GraveMenu graveMenu = new GraveMenu(grave);
+            String title = StringUtil.parseString(plugin.getConfig("gui.menu.grave.title", player, grave.getPermissionList())
+                    .getString("gui.menu.grave.title", "Grave"), player, plugin);
+            Inventory inventory = plugin.getServer().createInventory(graveMenu, InventoryUtil.getInventorySize(5), title);
 
-        setGraveMenuItems(inventory, grave);
-        graveMenu.setInventory(inventory);
-        player.openInventory(graveMenu.getInventory());
+            setGraveMenuItems(inventory, grave);
+            graveMenu.setInventory(inventory);
+            player.openInventory(graveMenu.getInventory());
 
-        if (sound) {
-            plugin.getPlayerManager().playPlayerSound("sound.menu-open", player, grave);
+            if (sound) {
+                plugin.getEntityManager().playPlayerSound("sound.menu-open", player, grave);
+            }
         }
     }
 
@@ -121,7 +127,7 @@ public final class GUIManager {
         }
     }
 
-    private ItemStack createGraveMainMenuItemStack(int number, Grave grave) {
+    private ItemStack createGraveListItemStack(int number, Grave grave) {
         Material material;
 
         if (plugin.getConfig("gui.menu.list.item.block", grave).getBoolean("gui.menu.list.item.block")) {

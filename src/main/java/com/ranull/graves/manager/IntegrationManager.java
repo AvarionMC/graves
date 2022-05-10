@@ -35,8 +35,7 @@ public final class IntegrationManager {
         loadVault();
         loadWorldEdit();
         loadWorldGuard();
-        //loadGriefDefender();
-        loadPlaceholderAPI();
+        //loadGriefDefender(); // TODO
         loadFurnitureLib();
         loadFurnitureEngine();
         loadProtectionLib();
@@ -44,6 +43,8 @@ public final class IntegrationManager {
         loadOraxen();
         loadChestSort();
         loadItemBridge();
+        loadPlaceholderAPI();
+        //loadSkript(); // TODO
         loadCompatibilityWarnings();
     }
 
@@ -105,8 +106,48 @@ public final class IntegrationManager {
         return chestSort;
     }
 
-    public PlaceholderAPI getPlaceholderAPI() {
-        return placeholderAPI;
+    public boolean hasVault() {
+        return vault != null;
+    }
+
+    public boolean hasWorldEdit() {
+        return worldEdit != null;
+    }
+
+    public boolean hasWorldGuard() {
+        return worldGuard != null;
+    }
+
+    public boolean hasGriefDefender() {
+        return griefDefender != null;
+    }
+
+    public boolean hasFurnitureLib() {
+        return furnitureLib != null;
+    }
+
+    public boolean hasFurnitureEngine() {
+        return furnitureEngine != null;
+    }
+
+    public boolean hasProtectionLib() {
+        return protectionLib != null;
+    }
+
+    public boolean hasItemsAdder() {
+        return itemsAdder != null;
+    }
+
+    public boolean hasOraxen() {
+        return oraxen != null;
+    }
+
+    public boolean hasChestSort() {
+        return chestSort != null;
+    }
+
+    public boolean hasPlaceholderAPI() {
+        return placeholderAPI != null;
     }
 
     private void loadVault() {
@@ -126,30 +167,6 @@ public final class IntegrationManager {
             }
         } else {
             vault = null;
-        }
-    }
-
-    private void loadWorldEdit() {
-        if (plugin.getConfig().getBoolean("settings.integration.worldedit.enabled")) {
-            Plugin worldEditPlugin = plugin.getServer().getPluginManager().getPlugin("WorldEdit");
-
-            if (worldEditPlugin != null && worldEditPlugin.isEnabled()) {
-                try {
-                    Class.forName("com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats", false, getClass()
-                            .getClassLoader());
-
-                    worldEdit = new WorldEdit(plugin, worldEditPlugin);
-
-                    plugin.integrationMessage("Hooked into " + worldEditPlugin.getName() + " "
-                            + worldEditPlugin.getDescription().getVersion() + ".");
-                } catch (ClassNotFoundException ignored) {
-                    plugin.integrationMessage(worldEditPlugin.getName() + " "
-                            + worldEditPlugin.getDescription().getVersion()
-                            + " detected, Only WorldEdit 7+ is supported.Disabling WorldEdit support.");
-                }
-            }
-        } else {
-            worldEdit = null;
         }
     }
 
@@ -178,7 +195,31 @@ public final class IntegrationManager {
         }
     }
 
-    public void loadGriefDefender() {
+    private void loadWorldEdit() {
+        if (plugin.getConfig().getBoolean("settings.integration.worldedit.enabled")) {
+            Plugin worldEditPlugin = plugin.getServer().getPluginManager().getPlugin("WorldEdit");
+
+            if (worldEditPlugin != null && worldEditPlugin.isEnabled()) {
+                try {
+                    Class.forName("com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats", false, getClass()
+                            .getClassLoader());
+
+                    worldEdit = new WorldEdit(plugin, worldEditPlugin);
+
+                    plugin.integrationMessage("Hooked into " + worldEditPlugin.getName() + " "
+                            + worldEditPlugin.getDescription().getVersion() + ".");
+                } catch (ClassNotFoundException ignored) {
+                    plugin.integrationMessage(worldEditPlugin.getName() + " "
+                            + worldEditPlugin.getDescription().getVersion()
+                            + " detected, Only WorldEdit 7+ is supported.Disabling WorldEdit support.");
+                }
+            }
+        } else {
+            worldEdit = null;
+        }
+    }
+
+    private void loadGriefDefender() {
         if (plugin.getConfig().getBoolean("settings.integration.griefdefender.enabled")) {
             Plugin griefDefenderPlugin = plugin.getServer().getPluginManager().getPlugin("GriefDefender");
 
@@ -195,7 +236,7 @@ public final class IntegrationManager {
         }
     }
 
-    public void loadFurnitureLib() {
+    private void loadFurnitureLib() {
         if (plugin.getConfig().getBoolean("settings.integration.furniturelib.enabled")) {
             Plugin furnitureLibPlugin = plugin.getServer().getPluginManager().getPlugin("FurnitureLib");
 
@@ -210,7 +251,7 @@ public final class IntegrationManager {
         }
     }
 
-    public void loadFurnitureEngine() {
+    private void loadFurnitureEngine() {
         if (plugin.getConfig().getBoolean("settings.integration.furnitureengine.enabled")) {
             Plugin furnitureEnginePlugin = plugin.getServer().getPluginManager().getPlugin("FurnitureEngine");
 
@@ -233,7 +274,7 @@ public final class IntegrationManager {
         }
     }
 
-    public void loadProtectionLib() {
+    private void loadProtectionLib() {
         if (plugin.getConfig().getBoolean("settings.integration.protectionlib.enabled")) {
             Plugin protectionLibPlugin = plugin.getServer().getPluginManager().getPlugin("ProtectionLib");
 
@@ -248,7 +289,7 @@ public final class IntegrationManager {
         }
     }
 
-    public void loadItemsAdder() {
+    private void loadItemsAdder() {
         if (plugin.getConfig().getBoolean("settings.integration.itemsadder.enabled")) {
             Plugin itemsAdderPlugin = plugin.getServer().getPluginManager().getPlugin("ItemsAdder");
 
@@ -263,7 +304,7 @@ public final class IntegrationManager {
         }
     }
 
-    public void loadOraxen() {
+    private void loadOraxen() {
         if (plugin.getConfig().getBoolean("settings.integration.oraxen.enabled")) {
             Plugin oraxenPlugin = plugin.getServer().getPluginManager().getPlugin("Oraxen");
 
@@ -278,7 +319,7 @@ public final class IntegrationManager {
         }
     }
 
-    public void loadChestSort() {
+    private void loadChestSort() {
         if (plugin.getConfig().getBoolean("settings.integration.chestsort.enabled")) {
             Plugin chestSortPlugin = plugin.getServer().getPluginManager().getPlugin("ChestSort");
 
@@ -293,7 +334,7 @@ public final class IntegrationManager {
         }
     }
 
-    public void loadItemBridge() {
+    private void loadItemBridge() {
         if (plugin.getConfig().getBoolean("settings.integration.itembridge.enabled")) {
             Plugin itemBridgePlugin = plugin.getServer().getPluginManager().getPlugin("ItemBridge");
 

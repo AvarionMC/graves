@@ -11,6 +11,7 @@ import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -73,10 +74,10 @@ public final class WorldGuard {
         return false;
     }
 
-    public boolean canCreateGrave(Player player, Location location) {
-        return createFlag != null
+    public boolean canCreateGrave(Entity entity, Location location) {
+        return entity instanceof Player && createFlag != null
                 && worldGuard.getPlatform().getRegionContainer().createQuery().testState(BukkitAdapter.adapt(location),
-                WorldGuardPlugin.inst().wrapPlayer(player), createFlag);
+                WorldGuardPlugin.inst().wrapPlayer((Player) entity), createFlag);
     }
 
     public boolean canCreateGrave(Location location) {
@@ -85,10 +86,10 @@ public final class WorldGuard {
                 (RegionAssociable) null, createFlag);
     }
 
-    public boolean canTeleport(Player player, Location location) {
-        return createFlag != null
+    public boolean canTeleport(Entity entity, Location location) {
+        return entity instanceof Player && createFlag != null
                 && worldGuard.getPlatform().getRegionContainer().createQuery().testState(BukkitAdapter.adapt(location),
-                WorldGuardPlugin.inst().wrapPlayer(player), teleportFlag);
+                WorldGuardPlugin.inst().wrapPlayer((Player) entity), teleportFlag);
     }
 
     public boolean canTeleport(Location location) {

@@ -8,7 +8,7 @@
     <artifactId>graves</artifactId>
     <name>Graves</name>
     <description>Full featured lightweight death chest plugin.</description>
-    <version>4.7</version>
+    <version>4.8</version>
 
     <developers>
         <developer>
@@ -29,7 +29,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.7.0</version>
+                <version>3.8.1</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -121,6 +121,10 @@
             <url>https://hub.jeff-media.com/nexus/repository/jeff-media-public/</url>
         </repository>
         <repository>
+            <id>skript-repo</id>
+            <url>https://repo.skriptlang.org/releases</url>
+        </repository>
+        <repository>
             <id>enginehub</id>
             <url>https://maven.enginehub.org/repo/</url>
         </repository>
@@ -204,6 +208,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.github.SkriptLang</groupId>
+            <artifactId>Skript</artifactId>
+            <version>2.6.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.github.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.36.0.3</version>
@@ -224,7 +234,7 @@
         <dependency>
             <groupId>com.github.oraxen</groupId>
             <artifactId>oraxen</artifactId>
-            <version>-fe4ddcc632-1</version>
+            <version>-86bffe910f-1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

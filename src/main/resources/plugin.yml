@@ -23,6 +23,7 @@ softdepend:
   - ItemBridge
   - ProtocolLib
   - SkullTextureAPI
+  - Skript
 
 commands:
   graves:
@@ -67,6 +68,12 @@ permissions:
   graves.bypass:
     default: op
     description: Bypass grave protection
+  graves.dump:
+    default: op
+    description: Dump server information
+  graves.debug:
+    default: op
+    description: Change debug level
   graves.givetoken:
     default: op
     description: Give a grave token

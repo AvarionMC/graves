@@ -46,7 +46,7 @@ public class EntityExplodeListener implements Listener {
 
                         plugin.getGraveManager().closeGrave(grave);
                         plugin.getGraveManager().playEffect("effect.loot", location, grave);
-                        plugin.getPlayerManager().runCommands("command.explode", event.getEntity(), location, grave);
+                        plugin.getEntityManager().runCommands("event.command.explode", event.getEntity(), location, grave);
 
                         if (plugin.getConfig("zombie.explode", grave).getBoolean("zombie.explode")) {
                             plugin.getEntityManager().spawnZombie(location, grave);

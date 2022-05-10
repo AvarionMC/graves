@@ -13,10 +13,14 @@ import java.util.jar.JarFile;
 
 public final class ResourceUtil {
     public static void copyResources(String inputPath, String outputPath, JavaPlugin plugin) {
+        copyResources(inputPath, outputPath, true, plugin);
+    }
+
+    public static void copyResources(String inputPath, String outputPath, boolean overwrite, JavaPlugin plugin) {
         inputPath = formatString(inputPath);
         outputPath = formatString(outputPath);
 
-        saveResources(getResources(inputPath, plugin), inputPath, outputPath);
+        saveResources(getResources(inputPath, plugin), inputPath, outputPath, overwrite);
     }
 
     private static Map<String, InputStream> getResources(String path, JavaPlugin plugin) {
@@ -36,32 +40,35 @@ public final class ResourceUtil {
                         inputStreamHashMap.put(jarEntry.getName(), plugin.getResource(jarEntry.getName()));
                     }
                 }
-            } catch (IOException exception) {
+            } catch (IOException ignored) {
             }
         }
 
         return inputStreamHashMap;
     }
 
-    private static void saveResources(Map<String, InputStream> inputStreamMap, String inputPath, String outputPath) {
+    private static void saveResources(Map<String, InputStream> inputStreamMap, String inputPath, String outputPath,
+                                      boolean overwrite) {
         for (Map.Entry<String, InputStream> entry : inputStreamMap.entrySet()) {
             String path = entry.getKey();
             InputStream inputStream = entry.getValue();
             File outputFile = new File(outputPath + File.separator + path.replaceFirst(inputPath, ""));
 
-            if (createDirectories(outputFile)) {
-                try {
-                    OutputStream outputStream = new FileOutputStream(outputFile);
-                    byte[] bytes = new byte[1024];
-                    int len;
+            if (!outputFile.exists() || overwrite) {
+                if (createDirectories(outputFile)) {
+                    try {
+                        OutputStream outputStream = new FileOutputStream(outputFile);
+                        byte[] bytes = new byte[1024];
+                        int len;
 
-                    while ((len = entry.getValue().read(bytes)) > 0) {
-                        outputStream.write(bytes, 0, len);
+                        while ((len = entry.getValue().read(bytes)) > 0) {
+                            outputStream.write(bytes, 0, len);
+                        }
+
+                        outputStream.close();
+                        inputStream.close();
+                    } catch (IOException ignored) {
                     }
-
-                    outputStream.close();
-                    inputStream.close();
-                } catch (IOException exception) {
                 }
             }
         }

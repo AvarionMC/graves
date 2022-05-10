@@ -6,7 +6,6 @@
 
 Grave3:
   system-ID: Grave3
-  creator: 165af1f4-cefa-4af0-ae9f-8e758126dce3
   displayName: '&fGrave 3'
   spawnMaterial: COW_SPAWN_EGG
   itemGlowEffect: false

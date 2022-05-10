@@ -6,10 +6,7 @@ import com.ranull.graves.data.ChunkData;
 import com.ranull.graves.data.EntityData;
 import com.ranull.graves.data.HologramData;
 import com.ranull.graves.inventory.Grave;
-import com.ranull.graves.util.ClassUtil;
-import com.ranull.graves.util.InventoryUtil;
-import com.ranull.graves.util.LocationUtil;
-import com.ranull.graves.util.StringUtil;
+import com.ranull.graves.util.*;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
@@ -43,19 +40,19 @@ public final class DataManager {
             loadBlockMap();
             loadHologramMap();
 
-            if (plugin.hasFurnitureLib()) {
+            if (plugin.getIntegrationManager().hasFurnitureLib()) {
                 loadEntityDataMap("furniturelib", EntityData.Type.FURNITURELIB);
             }
 
-            if (plugin.hasFurnitureEngine()) {
+            if (plugin.getIntegrationManager().hasFurnitureEngine()) {
                 loadEntityDataMap("furnitureengine", EntityData.Type.FURNITUREENGINE);
             }
 
-            if (plugin.hasItemsAdder()) {
+            if (plugin.getIntegrationManager().hasItemsAdder()) {
                 loadEntityDataMap("itemsadder", EntityData.Type.ITEMSADDER);
             }
 
-            if (plugin.hasOraxen()) {
+            if (plugin.getIntegrationManager().hasOraxen()) {
                 loadEntityDataMap("oraxen", EntityData.Type.ORAXEN);
             }
         });
@@ -66,19 +63,19 @@ public final class DataManager {
         setupBlockTable();
         setupHologramTable();
 
-        if (plugin.hasFurnitureLib()) {
+        if (plugin.getIntegrationManager().hasFurnitureLib()) {
             setupFurnitureIntegrationTable("furniturelib");
         }
 
-        if (plugin.hasFurnitureEngine()) {
+        if (plugin.getIntegrationManager().hasFurnitureEngine()) {
             setupFurnitureIntegrationTable("furnitureengine");
         }
 
-        if (plugin.hasItemsAdder()) {
+        if (plugin.getIntegrationManager().hasItemsAdder()) {
             setupFurnitureIntegrationTable("itemsadder");
         }
 
-        if (plugin.hasOraxen()) {
+        if (plugin.getIntegrationManager().hasOraxen()) {
             setupFurnitureIntegrationTable("oraxen");
         }
     }
@@ -101,13 +98,30 @@ public final class DataManager {
 
             ClassUtil.loadClass("com.mysql.jdbc.Driver");
         } else {
-            this.url = "jdbc:sqlite:" + plugin.getDataFolder() + File.separatorChar + "data.db";
+            migrateRootDataSubData();
+
+            this.url = "jdbc:sqlite:" + plugin.getDataFolder() + File.separator + "data" + File.separator + "data.db";
 
             ClassUtil.loadClass("org.sqlite.JDBC");
             executeUpdate("PRAGMA journal_mode=" + plugin.getConfig()
                     .getString("settings.storage.sqlite.journal-mode", "WAL").toUpperCase() + ";");
             executeUpdate("PRAGMA synchronous=" + plugin.getConfig()
                     .getString("settings.storage.sqlite.synchronous", "OFF").toUpperCase() + ";");
+        }
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private void migrateRootDataSubData() {
+        new File(plugin.getDataFolder(), "data").mkdirs();
+
+        File[] files = plugin.getDataFolder().listFiles();
+
+        if (files != null) {
+            for (File file : files) {
+                if (file.getName().startsWith("data.db")) {
+                    FileUtil.moveFile(file, "data" + File.separator + file.getName());
+                }
+            }
         }
     }
 

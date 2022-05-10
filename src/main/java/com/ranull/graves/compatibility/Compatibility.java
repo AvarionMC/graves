@@ -10,11 +10,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public interface Compatibility {
-    BlockData placeBlock(Location location, Material material, Grave grave, Graves plugin);
+    BlockData setBlockData(Location location, Material material, Grave grave, Graves plugin);
 
     boolean canBuild(Player player, Location location, Graves plugin);
 
     boolean hasTitleData(Block block);
 
     ItemStack getEntitySkullItemStack(Grave grave, Graves plugin);
+
+    String getSkullTexture(ItemStack itemStack);
 }
