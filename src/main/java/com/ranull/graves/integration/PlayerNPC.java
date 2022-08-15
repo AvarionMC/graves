@@ -30,7 +30,7 @@ public final class PlayerNPC extends EntityDataManager {
         this.npcLib = NPCLib.getInstance();
         this.npcInteractListener = new NPCInteractListener(plugin, this);
 
-        if (NPCLib.getInstance().isRegistered(plugin)) {
+        if (!NPCLib.getInstance().isRegistered(plugin)) {
             NPCLib.getInstance().registerPlugin(plugin);
         }
 
@@ -90,17 +90,21 @@ public final class PlayerNPC extends EntityDataManager {
                     }
 
                     NPC.Global npc = npcLib.generateGlobalNPC(plugin, uuid.toString(), npcLocation);
+                    NPC.Skin.Custom skin = NPC.Skin.Custom.getLoadedSkin(plugin, grave.getUUID().toString());
 
+                    if (skin == null && grave.getOwnerTexture() != null
+                            && grave.getOwnerTextureSignature() != null
+                            && grave.getOwnerName() != null) {
+                        skin = NPC.Skin.Custom.createCustomSkin(plugin, grave.getUUID().toString(),
+                                grave.getOwnerTexture(), grave.getOwnerTextureSignature());
+                    }
+
+                    npc.setSkin(skin);
+                    npc.setPose(pose);
                     npc.setAutoCreate(true);
                     npc.setAutoShow(true);
                     npc.setCustomData("grave_uuid", grave.getUUID().toString());
-                    npc.setPose(pose);
-                    npc.setSkin(grave.getOwnerTexture() != null
-                            && grave.getOwnerTextureSignature() != null
-                            && grave.getOwnerName() != null
-                            ? NPC.Skin.Custom.createCustomSkin(plugin, grave.getOwnerName(),
-                            grave.getOwnerTexture(), grave.getOwnerTextureSignature())
-                            : NPC.Skin.Minecraft.getSteveSkin());
+
                     npc.setCollidable(plugin.getConfig("playernpc.corpse.collide", grave)
                             .getBoolean("playernpc.corpse.collide"));
 

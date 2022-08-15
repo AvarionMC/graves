@@ -421,7 +421,8 @@ public class EntityDeathListener implements Listener {
                         ? plugin.getEntityManager().getEquipmentMap(livingEntity, grave) : new HashMap<>());
 
                 // Placeable
-                locationMap.entrySet().removeIf(entry -> plugin.getLocationManager().isVoid(entry.getKey())
+                locationMap.entrySet().removeIf(entry -> plugin.getLocationManager().hasGrave(entry.getKey())
+                        || plugin.getLocationManager().isVoid(entry.getKey())
                         || !plugin.getLocationManager().isInsideBorder(entry.getKey()));
 
                 if (!locationMap.isEmpty()) {

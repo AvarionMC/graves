@@ -150,7 +150,7 @@ public final class LocationManager {
                 Location solidLocation = plugin.getLocationManager().getLastSolidLocation(entity);
 
                 if (solidLocation != null) {
-                    return solidLocation;
+                    return !hasGrave(solidLocation) ? solidLocation : getRoof(solidLocation, entity, grave);
                 }
             }
 
@@ -175,7 +175,7 @@ public final class LocationManager {
             Location solidLocation = plugin.getLocationManager().getLastSolidLocation(entity);
 
             if (solidLocation != null) {
-                return solidLocation;
+                return !hasGrave(solidLocation) ? solidLocation : getRoof(solidLocation, entity, grave);
             }
         }
 
