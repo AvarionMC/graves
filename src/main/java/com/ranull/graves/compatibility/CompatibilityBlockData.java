@@ -4,7 +4,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.ranull.graves.Graves;
 import com.ranull.graves.data.BlockData;
-import com.ranull.graves.inventory.Grave;
+import com.ranull.graves.type.Grave;
 import com.ranull.graves.util.BlockFaceUtil;
 import com.ranull.graves.util.MaterialUtil;
 import com.ranull.graves.util.SkinUtil;
@@ -120,7 +120,7 @@ public final class CompatibilityBlockData implements Compatibility {
     }
 
     @Override
-    public ItemStack getEntitySkullItemStack(Grave grave, Graves plugin) {
+    public ItemStack getSkullItemStack(Grave grave, Graves plugin) {
         ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
 
         if (itemStack.getItemMeta() != null) {

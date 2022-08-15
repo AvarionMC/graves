@@ -2,9 +2,10 @@ package com.ranull.graves.data;
 
 import org.bukkit.Location;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class BlockData {
+public class BlockData implements Serializable {
     private final Location location;
     private final UUID graveUUID;
     private final String replaceMaterial;
@@ -31,5 +32,11 @@ public class BlockData {
 
     public String getReplaceData() {
         return replaceData;
+    }
+
+    public enum BlockType {
+        DEATH,
+        NORMAL,
+        GRAVEYARD
     }
 }

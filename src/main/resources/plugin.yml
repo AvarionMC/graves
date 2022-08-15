@@ -5,11 +5,15 @@ main: com.ranull.graves.Graves
 api-version: 1.13
 author: Ranull
 load: POSTWORLD
+
 loadbefore:
   - GriefPrevention
-  - XItemsRemover
+  - GriefDefender
+  - Towny
+
 softdepend:
   - Vault
+  - ProtocolLib
   - WorldEdit
   - WorldGuard
   - GriefDefender
@@ -17,66 +21,122 @@ softdepend:
   - FurnitureLib
   - FurnitureEngine
   - ProtectionLib
+  - MineDownPlugin
   - ChestSort
   - ItemsAdder
   - Oraxen
-  - ItemBridge
   - ProtocolLib
   - SkullTextureAPI
+  - ItemBridge
+  - PlayerNPC
   - Skript
 
 commands:
   graves:
-    description: Graves info
+    description: Graves command
     default: true
     usage: /graves
     aliases:
       - grave
+      - tombstones
+      - tombstone
       - deathchests
       - deathchest
-      - dc
+      - deaths
       - death
+      - tombs
+      - tomb
+      - dc
+
+  graveyards:
+    description: Graveyards command
+    default: true
+    usage: /graveyards
+    aliases:
+      - graveyard
+      - cemeteries
+      - cemetery
+      - burialgrounds
+      - burialground
+      - churchyards
+      - churchyard
+      - necropolises
+      - necropolis
+      - gy
 
 permissions:
   graves.place:
     default: true
     description: Can place a graves
+
   graves.open:
     default: true
     description: Can open a grave
+
   graves.autoloot:
     default: true
     description: Can Autoloot a grave
+
   graves.break:
     default: true
     description: Can break a grave
+
   graves.gui:
     default: true
     description: Can view graves
+
   graves.gui.other:
     default: op
     description: Can view other peoples graves
+
   graves.experience:
     default: true
     description: Can store experience in graves
+
   graves.protection:
     default: true
     description: Can have protection on graves
+
   graves.teleport:
     default: true
     description: Can teleport to grave
+
   graves.bypass:
     default: op
     description: Bypass grave protection
+
   graves.dump:
     default: op
     description: Dump server information
+
+  graves.purge:
+    default: op
+    description: Purge graves
+
+  graves.cleanup:
+    default: op
+    description: Cleanup graves
+
   graves.debug:
     default: op
     description: Change debug level
+
+  graves.update.notify:
+    default: op
+    description: Notify player about plugin update
+
+  graves.import:
+    default: op
+    description: Import graves from another plugin
+
   graves.givetoken:
     default: op
     description: Give a grave token
+
+  graves.graveyard:
+    default: true
+    description: Graveyard menu
+
   graves.reload:
     default: op
     description: Reload Graves

@@ -1,6 +1,6 @@
 package com.ranull.graves.event;
 
-import com.ranull.graves.inventory.Grave;
+import com.ranull.graves.type.Grave;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.Cancellable;

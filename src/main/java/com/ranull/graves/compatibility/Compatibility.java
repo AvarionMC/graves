@@ -2,7 +2,7 @@ package com.ranull.graves.compatibility;
 
 import com.ranull.graves.Graves;
 import com.ranull.graves.data.BlockData;
-import com.ranull.graves.inventory.Grave;
+import com.ranull.graves.type.Grave;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -16,7 +16,7 @@ public interface Compatibility {
 
     boolean hasTitleData(Block block);
 
-    ItemStack getEntitySkullItemStack(Grave grave, Graves plugin);
+    ItemStack getSkullItemStack(Grave grave, Graves plugin);
 
     String getSkullTexture(ItemStack itemStack);
 }

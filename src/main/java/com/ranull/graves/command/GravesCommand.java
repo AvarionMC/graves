@@ -1,13 +1,15 @@
 package com.ranull.graves.command;
 
 import com.ranull.graves.Graves;
-import com.ranull.graves.inventory.Grave;
+import com.ranull.graves.type.Grave;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -180,17 +182,70 @@ public final class GravesCommand implements CommandExecutor, TabCompleter {
             } else if (commandSender instanceof Player) {
                 plugin.getEntityManager().sendMessage("message.permission-denied", (Player) commandSender);
             }
-        } else if (args[0].equalsIgnoreCase("purge")) {
-            if (commandSender.hasPermission("graves.purge")) {
-                List<Grave> graveList = new ArrayList<>(plugin.getDataManager().getGraveMap().values());
+        } else if (args[0].equalsIgnoreCase("cleanup")) {
+            if (commandSender.hasPermission("graves.cleanup")) {
+                List<Grave> graveList = new ArrayList<>(plugin.getCacheManager().getGraveMap().values());
 
                 for (Grave grave : graveList) {
                     plugin.getGraveManager().removeGrave(grave);
                 }
 
-                commandSender.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
-                        + graveList.size() + " Graves purged.");
+                commandSender.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » "
+                        + ChatColor.RESET + graveList.size() + " graves cleaned up.");
             } else if (commandSender instanceof Player) {
+                plugin.getEntityManager().sendMessage("message.permission-denied", (Player) commandSender);
+            }
+        } else if (args[0].equalsIgnoreCase("purge")) {
+            if (commandSender.hasPermission("graves.purge")) {
+                if (args.length > 1 && !args[1].equalsIgnoreCase("graves") && !args[1].equalsIgnoreCase("grave")) {
+                    if (args[1].equalsIgnoreCase("holograms") || args[1].equalsIgnoreCase("hologram")) {
+                        int count = 0;
+
+                        for (World world : plugin.getServer().getWorlds()) {
+                            for (Entity entity : world.getEntities()) {
+                                if (entity.getScoreboardTags().contains("graveHologram")) {
+                                    entity.remove();
+                                    count++;
+                                }
+                            }
+                        }
+
+                        commandSender.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » "
+                                + ChatColor.RESET + count + " holograms purged.");
+                    }
+                } else {
+                    List<Grave> graveList = new ArrayList<>(plugin.getCacheManager().getGraveMap().values());
+
+                    for (Grave grave : graveList) {
+                        plugin.getGraveManager().removeGrave(grave);
+                    }
+
+                    commandSender.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
+                            + graveList.size() + " graves purged.");
+                }
+            } else {
+                plugin.getEntityManager().sendMessage("message.permission-denied", (Player) commandSender);
+            }
+        } else if (args[0].equalsIgnoreCase("import")) {
+            if (commandSender.hasPermission("graves.import")) {
+                // Disable for everyone except Ranull, not ready for production.
+                if (!commandSender.getName().equals("Ranull")) {
+                    commandSender.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
+                            + "Import functionality not ready for production.");
+
+                    return true;
+                }
+
+                List<Grave> graveList = plugin.getImportManager().importExternalPluginGraves();
+
+                for (Grave grave : graveList) {
+                    plugin.getDataManager().addGrave(grave);
+                    plugin.getGraveManager().placeGrave(grave.getLocationDeath(), grave);
+                }
+
+                commandSender.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
+                        + " Imported " + graveList.size() + " graves.");
+            } else {
                 plugin.getEntityManager().sendMessage("message.permission-denied", (Player) commandSender);
             }
         }
@@ -200,7 +255,7 @@ public final class GravesCommand implements CommandExecutor, TabCompleter {
 
     public void sendHelpMenu(CommandSender sender) {
         sender.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RED + "Graves "
-                + ChatColor.DARK_GRAY + "v" + plugin.getDescription().getVersion());
+                + ChatColor.DARK_GRAY + "v" + plugin.getVersion());
 
         if (sender.hasPermission("graves.gui")) {
             sender.sendMessage(
@@ -245,7 +300,6 @@ public final class GravesCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    @NotNull
     public List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command,
                                       @NotNull String string, @NotNull String @NotNull [] args) {
         List<String> stringList = new ArrayList<>();
@@ -270,6 +324,14 @@ public final class GravesCommand implements CommandExecutor, TabCompleter {
                 stringList.add("debug");
             }
 
+            if (commandSender.hasPermission("graves.cleanup")) {
+                stringList.add("cleanup");
+            }
+
+            if (commandSender.hasPermission("graves.purge")) {
+                stringList.add("purge");
+            }
+
             if (plugin.getRecipeManager() != null && commandSender.hasPermission("graves.givetoken")) {
                 stringList.add("givetoken");
             }
@@ -277,6 +339,15 @@ public final class GravesCommand implements CommandExecutor, TabCompleter {
             if ((args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("gui"))
                     && commandSender.hasPermission("graves.gui.other")) {
                 plugin.getServer().getOnlinePlayers().forEach((player -> stringList.add(player.getName())));
+            } else if (args[0].equals("debug") && commandSender.hasPermission("graves.debug")) {
+                stringList.add("0");
+                stringList.add("1");
+                stringList.add("2");
+            } else if (args[0].equals("purge") && commandSender.hasPermission("graves.purge")) {
+                if (args.length == 2) {
+                    stringList.add("graves");
+                    stringList.add("holograms");
+                }
             } else if (plugin.getRecipeManager() != null && args[0].equalsIgnoreCase("givetoken")
                     && commandSender.hasPermission("graves.givetoken")) {
                 if (args.length == 2) {

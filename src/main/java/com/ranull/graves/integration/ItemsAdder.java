@@ -2,8 +2,8 @@ package com.ranull.graves.integration;
 
 import com.ranull.graves.Graves;
 import com.ranull.graves.data.EntityData;
-import com.ranull.graves.inventory.Grave;
 import com.ranull.graves.manager.EntityDataManager;
+import com.ranull.graves.type.Grave;
 import com.ranull.graves.util.BlockFaceUtil;
 import com.ranull.graves.util.LocationUtil;
 import com.ranull.graves.util.ResourceUtil;
@@ -45,7 +45,7 @@ public final class ItemsAdder extends EntityDataManager {
     public void createFurniture(Location location, Grave grave) {
         location = LocationUtil.roundLocation(location).add(0.5, 0, 0.5);
 
-        location.setYaw(BlockFaceUtil.getBlockFaceYaw(BlockFaceUtil.getYawBlockFace(grave.getYaw()).getOppositeFace()));
+        location.setYaw(BlockFaceUtil.getBlockFaceYaw(BlockFaceUtil.getYawBlockFace(location.getYaw()).getOppositeFace()));
         location.setPitch(grave.getPitch());
 
         if (plugin.getConfig("itemsadder.furniture.enabled", grave)

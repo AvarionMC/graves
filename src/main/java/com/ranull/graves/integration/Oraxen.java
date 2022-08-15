@@ -2,10 +2,11 @@ package com.ranull.graves.integration;
 
 import com.ranull.graves.Graves;
 import com.ranull.graves.data.EntityData;
-import com.ranull.graves.inventory.Grave;
-import com.ranull.graves.listener.integration.oraxen.FurnitureBreakListener;
-import com.ranull.graves.listener.integration.oraxen.FurnitureInteractListener;
+import com.ranull.graves.listener.integration.oraxen.EntityDamageListener;
+import com.ranull.graves.listener.integration.oraxen.HangingBreakListener;
+import com.ranull.graves.listener.integration.oraxen.PlayerInteractEntityListener;
 import com.ranull.graves.manager.EntityDataManager;
+import com.ranull.graves.type.Grave;
 import com.ranull.graves.util.BlockFaceUtil;
 import com.ranull.graves.util.ResourceUtil;
 import io.th0rgal.oraxen.mechanics.MechanicFactory;
@@ -30,16 +31,18 @@ import java.util.Map;
 public final class Oraxen extends EntityDataManager {
     private final Graves plugin;
     private final Plugin oraxenPlugin;
-    private final FurnitureInteractListener furnitureInteractListener;
-    private final FurnitureBreakListener furnitureBreakListener;
+    private final PlayerInteractEntityListener playerInteractEntityListener;
+    private final EntityDamageListener entityDamageListener;
+    private final HangingBreakListener hangingBreakListener;
 
     public Oraxen(Graves plugin, Plugin oraxenPlugin) {
         super(plugin);
 
         this.plugin = plugin;
         this.oraxenPlugin = oraxenPlugin;
-        this.furnitureInteractListener = new FurnitureInteractListener(plugin, this);
-        this.furnitureBreakListener = new FurnitureBreakListener(this);
+        this.playerInteractEntityListener = new PlayerInteractEntityListener(plugin, this);
+        this.entityDamageListener = new EntityDamageListener(this);
+        this.hangingBreakListener = new HangingBreakListener(this);
 
         saveData();
         registerListeners();
@@ -57,17 +60,22 @@ public final class Oraxen extends EntityDataManager {
     }
 
     public void registerListeners() {
-        plugin.getServer().getPluginManager().registerEvents(furnitureInteractListener, plugin);
-        plugin.getServer().getPluginManager().registerEvents(furnitureBreakListener, plugin);
+        plugin.getServer().getPluginManager().registerEvents(playerInteractEntityListener, plugin);
+        plugin.getServer().getPluginManager().registerEvents(entityDamageListener, plugin);
+        plugin.getServer().getPluginManager().registerEvents(hangingBreakListener, plugin);
     }
 
     public void unregisterListeners() {
-        if (furnitureInteractListener != null) {
-            HandlerList.unregisterAll(furnitureInteractListener);
+        if (playerInteractEntityListener != null) {
+            HandlerList.unregisterAll(playerInteractEntityListener);
         }
 
-        if (furnitureBreakListener != null) {
-            HandlerList.unregisterAll(furnitureBreakListener);
+        if (entityDamageListener != null) {
+            HandlerList.unregisterAll(entityDamageListener);
+        }
+
+        if (hangingBreakListener != null) {
+            HandlerList.unregisterAll(hangingBreakListener);
         }
     }
 
@@ -83,7 +91,7 @@ public final class Oraxen extends EntityDataManager {
                     location.getBlock().setType(Material.AIR);
 
                     ItemFrame itemFrame = furnitureMechanic.place(BlockFaceUtil.getBlockFaceRotation(BlockFaceUtil
-                            .getYawBlockFace(grave.getYaw())), grave.getYaw(), BlockFace.UP, location);
+                            .getYawBlockFace(location.getYaw())), location.getYaw(), BlockFace.UP, location);
 
                     if (itemFrame != null) {
                         createEntityData(location, itemFrame.getUniqueId(), grave.getUUID(), EntityData.Type.ORAXEN);

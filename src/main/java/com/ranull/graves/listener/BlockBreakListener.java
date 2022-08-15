@@ -2,7 +2,7 @@ package com.ranull.graves.listener;
 
 import com.ranull.graves.Graves;
 import com.ranull.graves.event.GraveBreakEvent;
-import com.ranull.graves.inventory.Grave;
+import com.ranull.graves.type.Grave;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -28,12 +28,23 @@ public class BlockBreakListener implements Listener {
                 if (plugin.getEntityManager().canOpenGrave(player, grave)) {
                     GraveBreakEvent graveBreakEvent = new GraveBreakEvent(block, player, grave);
 
-                    graveBreakEvent.setDropItems(plugin.getConfig("drop.break", grave)
-                            .getBoolean("drop.break"));
+                    graveBreakEvent.setDropItems(plugin.getConfig("drop.break", grave).getBoolean("drop.break"));
                     plugin.getServer().getPluginManager().callEvent(graveBreakEvent);
 
                     if (!graveBreakEvent.isCancelled()) {
-                        if (graveBreakEvent.isDropItems()) {
+                        if (plugin.getConfig("drop.auto-loot.enabled", grave).getBoolean("drop.auto-loot.enabled")) {
+                            player.sendMessage("here");
+                            plugin.getGraveManager().autoLootGrave(player, block.getLocation(), grave);
+
+                            if (graveBreakEvent.isDropItems() && plugin.getConfig("drop.auto-loot.break", grave)
+                                    .getBoolean("drop.auto-loot.break")) {
+                                plugin.getGraveManager().breakGrave(block.getLocation(), grave);
+                            } else {
+                                event.setCancelled(true);
+
+                                return;
+                            }
+                        } else if (graveBreakEvent.isDropItems()) {
                             plugin.getGraveManager().breakGrave(block.getLocation(), grave);
                         } else {
                             plugin.getGraveManager().removeGrave(grave);

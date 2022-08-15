@@ -17,6 +17,13 @@ settings:
       synchronous: "OFF" # https://www.sqlite.org/pragma.html#pragma_synchronous
 
   #########
+  # Cache #
+  #########
+  # Data storage system.
+  cache:
+    type: NORMAL # Cache type.
+
+  #########
   # Debug #
   #########
   # Debug information, debug level 2 can be useful in finding out why a Grave does not spawn on your server.
@@ -34,19 +41,39 @@ settings:
   dump:
     method: HASTEBIN # HASTEBIN, FILE
 
+  ##########
+  # Update #
+  ##########
+  update:
+    check: true # Should Graves try and check for an update.
+
+  #################
+  # Compatibility #
+  #################
+  compatibility:
+    warning: true # Warn when a plugin to have known incompatibilities is detected.
+
   ###############
   # Integration #
   ###############
   # Enable/Disable integrations into other plugins, if you are having errors relating to another plugin
   # try disabling them here.
   integration:
+    multipaper: # https://multipaper.io/
+      enabled: true # Should MultiPaper integration be enabled.
+    multicache: # https://github.com/PestoNotPasta/MultiCache/
+      enabled: true # Should MultiCache integration be enabled.
     vault: # https://www.spigotmc.org/resources/vault.34315/
       enabled: true # Should Vault integration be enabled.
+    protocollib: # https://www.spigotmc.org/resources/protocollib.1997/
+      enabled: true # Should ProtocolLib integration be enabled.
     worldedit: # https://dev.bukkit.org/projects/worldedit/
       enabled: true # Should WorldEdit integration be enabled.
       write: true # Should Graves write its schematics into its own folder.
     worldguard: # https://dev.bukkit.org/projects/worldguard/
       enabled: true # Should WorldGuard integration be enabled.
+    towny: # https://www.spigotmc.org/resources/towny-advanced.72694/
+      enabled: true # Should Towny integration be enabled.
     griefdefender: # https://www.spigotmc.org/resources/griefdefender.68900/
       enabled: true # Should GriefDefender integration be enabled.
     furniturelib: # https://www.spigotmc.org/resources/furniturelibary.9368/
@@ -67,11 +94,11 @@ settings:
       enabled: true # Should Skript integration be enabled.
     chestsort: # https://www.spigotmc.org/resources/chestsort.59773/
       enabled: true # Should ChestSort integration be enabled.
+    minimessage: # https://docs.adventure.kyori.net/minimessage/index.html
+      enabled: true # Should MiniMessage integration be enabled.
+    minedown: # https://github.com/Phoenix616/MineDownPlugin/
+      enabled: true # Should MineDown integration be enabled.
+    playernpc: # https://www.spigotmc.org/resources/playernpc.93625/
+      enabled: true # Should PlayerNPC integration be enabled.
     itembridge: # https://www.spigotmc.org/resources/itembridge.77080/
       enabled: true # Should ItemBridge integration be enabled.
-
-  #################
-  # Compatibility #
-  #################
-  compatibility:
-    warning: true # Warn when a plugin to have known incompatibilities is detected.

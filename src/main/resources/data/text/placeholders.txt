@@ -10,6 +10,8 @@
 %killer_name_display% - Killer name display
 %killer_type% - Killer type
 %killer_uuid% - Killer UUID
+%time_creation% - Creation time
+%time_creation_formatted% - Creation time formatted
 %time_alive_remaining% - Remaining alive time
 %time_alive_remaining_formatted% - Remaining alive time formatted
 %time_protection_remaining% - Remaining protection time

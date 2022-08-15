@@ -2,10 +2,10 @@ package com.ranull.graves.integration;
 
 import com.ranull.graves.Graves;
 import com.ranull.graves.data.EntityData;
-import com.ranull.graves.inventory.Grave;
 import com.ranull.graves.listener.integration.furniturelib.ProjectBreakListener;
 import com.ranull.graves.listener.integration.furniturelib.ProjectClickListener;
 import com.ranull.graves.manager.EntityDataManager;
+import com.ranull.graves.type.Grave;
 import com.ranull.graves.util.StringUtil;
 import de.Ste3et_C0st.FurnitureLib.Crafting.Project;
 import de.Ste3et_C0st.FurnitureLib.Utilitis.LocationUtil;
@@ -77,7 +77,7 @@ public final class FurnitureLib extends EntityDataManager {
 
                 ObjectID objectID = new ObjectID(project.getName(), project.getPlugin().getName(), location);
 
-                location.setYaw(furnitureLib.getLocationUtil().FaceToYaw(LocationUtil.yawToFace(grave.getYaw())
+                location.setYaw(furnitureLib.getLocationUtil().FaceToYaw(LocationUtil.yawToFace(location.getYaw())
                         .getOppositeFace()));
                 furnitureLib.spawn(project, objectID);
                 objectID.setUUID(UUID.randomUUID());
@@ -145,7 +145,7 @@ public final class FurnitureLib extends EntityDataManager {
     private void setSkull(fEntity fEntity, Grave grave) {
         List<String> materialList = plugin.getConfig("furniturelib.head.material", grave)
                 .getStringList("furniturelib.head.material");
-        ItemStack itemStack = plugin.getCompatibility().getEntitySkullItemStack(grave, plugin);
+        ItemStack itemStack = plugin.getCompatibility().getSkullItemStack(grave, plugin);
 
         if (fEntity.getItemInMainHand() != null && materialList.contains(fEntity.getItemInMainHand().getType().name())
                 && isSkullTextureBlank(fEntity.getItemInMainHand())) {

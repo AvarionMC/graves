@@ -3,6 +3,7 @@ package com.ranull.graves.listener;
 import com.ranull.graves.Graves;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -19,9 +20,9 @@ public class EntityDamageByEntityListener implements Listener {
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         Entity entity = event.getEntity();
 
-        if ((plugin.getVersionManager().is_v1_7() || entity instanceof ArmorStand)
-                && plugin.getIntegrationManager().hasItemsAdder()) {
-            event.setCancelled(plugin.getIntegrationManager().getItemsAdder().getGrave(entity) != null);
+        if (entity instanceof ItemFrame
+                || (plugin.getVersionManager().is_v1_7() || entity instanceof ArmorStand)) {
+            event.setCancelled(plugin.getEntityDataManager().getGrave(entity) != null);
         }
     }
 }

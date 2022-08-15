@@ -2,7 +2,7 @@ package com.ranull.graves.listener;
 
 import com.ranull.graves.Graves;
 import com.ranull.graves.event.GraveOpenEvent;
-import com.ranull.graves.inventory.Grave;
+import com.ranull.graves.type.Grave;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;

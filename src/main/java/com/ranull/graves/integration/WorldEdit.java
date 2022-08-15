@@ -1,7 +1,7 @@
 package com.ranull.graves.integration;
 
 import com.ranull.graves.Graves;
-import com.ranull.graves.inventory.Grave;
+import com.ranull.graves.type.Grave;
 import com.ranull.graves.util.BlockFaceUtil;
 import com.ranull.graves.util.ResourceUtil;
 import com.sk89q.worldedit.EditSession;
@@ -91,7 +91,7 @@ public final class WorldEdit {
                 int offsetZ = plugin.getConfig("schematic.offset.z", grave).getInt("schematic.offset.z");
 
 
-                pasteSchematic(location.clone().add(offsetX, offsetY, offsetZ), grave.getYaw(), schematicName);
+                pasteSchematic(location.clone().add(offsetX, offsetY, offsetZ), location.getYaw(), schematicName);
                 //PasteBuilder test = getSchematic(location.clone().add(offsetX, offsetY, offsetZ), grave.getYaw(), schematicName);
                 //buildSchematic(test);
                 plugin.debugMessage("Placing schematic for " + grave.getUUID() + " at "

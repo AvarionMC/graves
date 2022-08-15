@@ -2,9 +2,13 @@ package com.ranull.graves.util;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,7 +61,7 @@ public final class ResourceUtil {
             if (!outputFile.exists() || overwrite) {
                 if (createDirectories(outputFile)) {
                     try {
-                        OutputStream outputStream = new FileOutputStream(outputFile);
+                        OutputStream outputStream = Files.newOutputStream(outputFile.toPath());
                         byte[] bytes = new byte[1024];
                         int len;
 

@@ -1,38 +1,31 @@
 package com.ranull.graves.manager;
 
 import com.ranull.graves.Graves;
-import com.ranull.graves.inventory.Grave;
-import com.ranull.graves.util.EntityUtil;
+import com.ranull.graves.type.Grave;
 import com.ranull.graves.util.LocationUtil;
 import com.ranull.graves.util.MaterialUtil;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 public final class LocationManager {
     private final Graves plugin;
-    private final Map<UUID, Location> lastSolidLocationMap;
 
     public LocationManager(Graves plugin) {
         this.plugin = plugin;
-        this.lastSolidLocationMap = new HashMap<>();
     }
 
     public void setLastSolidLocation(Entity entity, Location location) {
-        lastSolidLocationMap.put(entity.getUniqueId(), location);
+        plugin.getCacheManager().getLastLocationMap().put(entity.getUniqueId(), location);
     }
 
     public Location getLastSolidLocation(Entity entity) {
-        Location location = lastSolidLocationMap.get(entity.getUniqueId());
+        Location location = plugin.getCacheManager().getLastLocationMap().get(entity.getUniqueId());
 
         return location != null && location.getWorld() != null
                 && location.getWorld().equals(entity.getWorld())
@@ -40,7 +33,7 @@ public final class LocationManager {
     }
 
     public void removeLastSolidLocation(Entity entity) {
-        lastSolidLocationMap.remove(entity.getUniqueId());
+        plugin.getCacheManager().getLastLocationMap().remove(entity.getUniqueId());
     }
 
     public Location getSafeTeleportLocation(Entity entity, Location location, Grave grave, Graves plugin) {
@@ -51,19 +44,12 @@ public final class LocationManager {
             } else if (plugin.getConfig("teleport.top", grave).getBoolean("teleport.top")) {
                 Location topLocation = getTop(location, entity, grave);
 
-                if (topLocation != null && topLocation.getWorld() != null) {
-                    if (topLocation.getWorld().getEnvironment() != World.Environment.NETHER
-                            || plugin.getConfig("teleport.top-nether", grave).getBoolean("teleport.top-nether")) {
-                        plugin.getEntityManager().sendMessage("message.teleport-top", entity, topLocation, grave);
+                if (topLocation != null && isLocationSafePlayer(topLocation) && topLocation.getWorld() != null) {
+                    plugin.getEntityManager().sendMessage("message.teleport-top", entity, topLocation, grave);
 
-                        return topLocation;
-                    }
+                    return topLocation;
                 }
             }
-        }
-
-        if (EntityUtil.hasPermission(entity, "graves.bypass")) {
-            return location;
         }
 
         return null;
@@ -263,7 +249,8 @@ public final class LocationManager {
     }
 
     public boolean isInsideBorder(Location location) {
-        return location.getWorld() != null && location.getWorld().getWorldBorder().isInside(location);
+        return plugin.getVersionManager().is_v1_7()
+                || (location.getWorld() != null && location.getWorld().getWorldBorder().isInside(location));
     }
 
     public boolean isVoid(Location location) {

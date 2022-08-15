@@ -13,6 +13,8 @@
 %graves_item_<UUID>% - Item amount
 %graves_experience_<UUID>% - Experience amount
 %graves_level_<UUID>% - Level amount
+%graves_time_creation_<UUID>% - Creation time
+%graves_time_creation_formatted_<UUID>% - Creation time formatted
 %graves_time_alive_remaining_<UUID>% - Remaining alive time
 %graves_time_alive_remaining_formatted_<UUID>% - Remaining alive time formatted
 %graves_time_protection_remaining_<UUID>% - Remaining protection time

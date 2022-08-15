@@ -1,7 +1,6 @@
 package com.ranull.graves.util;
 
 import com.ranull.graves.Graves;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -141,7 +140,8 @@ public final class InventoryUtil {
             stringList.add(Base64Util.objectToBase64(itemStack != null ? itemStack : itemStackAir));
         }
 
-        return StringUtils.join(stringList, '|');
+        return String.join("|", stringList);
+        //return StringUtils.join(stringList, '|');
     }
 
     public static Inventory stringToInventory(InventoryHolder inventoryHolder, String string, String title, Graves plugin) {

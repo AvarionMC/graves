@@ -2,18 +2,16 @@ package com.ranull.graves;
 
 import com.google.common.base.Charsets;
 import com.ranull.graves.command.GravesCommand;
+import com.ranull.graves.command.GraveyardsCommand;
 import com.ranull.graves.compatibility.Compatibility;
 import com.ranull.graves.compatibility.CompatibilityBlockData;
 import com.ranull.graves.compatibility.CompatibilityMaterialData;
-import com.ranull.graves.inventory.Grave;
 import com.ranull.graves.listener.*;
 import com.ranull.graves.manager.*;
-import com.ranull.graves.update.UpdateChecker;
-import com.ranull.graves.util.FileUtil;
-import com.ranull.graves.util.HastebinUtil;
-import com.ranull.graves.util.ResourceUtil;
-import com.ranull.graves.util.UUIDUtil;
+import com.ranull.graves.type.Grave;
+import com.ranull.graves.util.*;
 import org.bstats.bukkit.Metrics;
+import org.bstats.charts.SingleLineChart;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
@@ -32,13 +30,17 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 public class Graves extends JavaPlugin {
     private VersionManager versionManager;
     private IntegrationManager integrationManager;
+    private CacheManager cacheManager;
     private DataManager dataManager;
+    private ImportManager importManager;
     private BlockManager blockManager;
+    private ItemStackManager itemStackManager;
     private EntityDataManager entityDataManager;
     private HologramManager hologramManager;
     private GUIManager guiManager;
@@ -46,6 +48,7 @@ public class Graves extends JavaPlugin {
     private RecipeManager recipeManager;
     private LocationManager locationManager;
     private GraveManager graveManager;
+    private GraveyardManager graveyardManager;
     private Compatibility compatibility;
     private FileConfiguration fileConfiguration;
 
@@ -62,15 +65,19 @@ public class Graves extends JavaPlugin {
     public void onEnable() {
         integrationManager.load();
 
-        versionManager = new VersionManager(this);
+        versionManager = new VersionManager();
+        cacheManager = new CacheManager();
         dataManager = new DataManager(this);
+        importManager = new ImportManager(this);
         blockManager = new BlockManager(this);
+        itemStackManager = new ItemStackManager(this);
         entityDataManager = new EntityDataManager(this);
         hologramManager = new HologramManager(this);
         guiManager = new GUIManager(this);
         entityManager = new EntityManager(this);
         locationManager = new LocationManager(this);
         graveManager = new GraveManager(this);
+        graveyardManager = new GraveyardManager(this);
 
         registerMetrics();
         registerCommands();
@@ -89,6 +96,7 @@ public class Graves extends JavaPlugin {
     public void onDisable() {
         dataManager.closeConnection();
         graveManager.unload();
+        graveyardManager.unload();
         integrationManager.unload();
 
         if (recipeManager != null) {
@@ -128,7 +136,6 @@ public class Graves extends JavaPlugin {
         saveTextFiles();
         reloadConfig();
         updateConfig();
-        updateChecker();
         unregisterListeners();
         registerListeners();
         dataManager.reload();
@@ -161,16 +168,26 @@ public class Graves extends JavaPlugin {
     }
 
     private void registerMetrics() {
-        new Metrics(this, 12849);
+        Metrics metrics = new Metrics(this, getMetricsID());
+
+        metrics.addCustomChart(new SingleLineChart("graves", new Callable<Integer>() {
+            @Override
+            public Integer call() throws Exception {
+                return cacheManager.getGraveMap().size();
+            }
+        }));
     }
 
     public void registerListeners() {
         getServer().getPluginManager().registerEvents(new PlayerInteractListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerInteractEntityListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerMoveListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerBucketEmptyListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerRespawnListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerDropItemListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerDeathListener(this), this);
         getServer().getPluginManager().registerEvents(new EntityDeathListener(this), this);
         getServer().getPluginManager().registerEvents(new EntityExplodeListener(this), this);
         getServer().getPluginManager().registerEvents(new EntityDamageByEntityListener(this), this);
@@ -178,6 +195,7 @@ public class Graves extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new BlockBreakListener(this), this);
         getServer().getPluginManager().registerEvents(new BlockFromToListener(this), this);
         getServer().getPluginManager().registerEvents(new BlockPistonExtendListener(this), this);
+        getServer().getPluginManager().registerEvents(new HangingBreakListener(this), this);
         getServer().getPluginManager().registerEvents(new InventoryClickListener(this), this);
         getServer().getPluginManager().registerEvents(new InventoryDragListener(this), this);
         getServer().getPluginManager().registerEvents(new InventoryCloseListener(this), this);
@@ -200,19 +218,27 @@ public class Graves extends JavaPlugin {
     }
 
     private void registerRecipes() {
-        if (versionManager.hasPersistentData()) {
+        if (versionManager.hasPersistentData() && !versionManager.isMohist()) {
             recipeManager = new RecipeManager(this);
         }
     }
 
     private void registerCommands() {
-        PluginCommand pluginCommand = getCommand("graves");
+        PluginCommand gravesPluginCommand = getCommand("graves");
+        PluginCommand graveyardsPluginCommand = getCommand("graveyards");
 
-        if (pluginCommand != null) {
+        if (gravesPluginCommand != null) {
             GravesCommand gravesCommand = new GravesCommand(this);
 
-            pluginCommand.setExecutor(gravesCommand);
-            pluginCommand.setTabCompleter(gravesCommand);
+            gravesPluginCommand.setExecutor(gravesCommand);
+            gravesPluginCommand.setTabCompleter(gravesCommand);
+        }
+
+        if (graveyardsPluginCommand != null) {
+            GraveyardsCommand graveyardsCommand = new GraveyardsCommand(this);
+
+            graveyardsPluginCommand.setExecutor(graveyardsCommand);
+            graveyardsPluginCommand.setTabCompleter(graveyardsCommand);
         }
     }
 
@@ -233,8 +259,11 @@ public class Graves extends JavaPlugin {
                 }
 
                 if (player != null) {
-                    player.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RED
-                            + "Debug:" + ChatColor.RESET + " " + string);
+                    String debug = !integrationManager.hasMultiPaper() ? "Debug:" : "Debug ("
+                            + integrationManager.getMultiPaper().getLocalServerName() + "):";
+
+                    player.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RED + debug
+                            + ChatColor.RESET + " " + string);
                 }
             }
         }
@@ -264,34 +293,13 @@ public class Graves extends JavaPlugin {
         getLogger().info("Integration: " + string);
     }
 
-    private void updateChecker() {
-        String response = new UpdateChecker(this, 74208).getVersion();
-
-        if (response != null) {
-            try {
-                double pluginVersion = Double.parseDouble(getDescription().getVersion());
-                double pluginVersionLatest = Double.parseDouble(response);
-
-                if (pluginVersion < pluginVersionLatest) {
-                    updateMessage("Outdated version detected " + pluginVersion + ", latest version is "
-                            + pluginVersionLatest + ", https://www.spigotmc.org/resources/graves.74208/");
-                }
-            } catch (NumberFormatException exception) {
-                if (!getDescription().getVersion().equalsIgnoreCase(response)) {
-                    updateMessage("Outdated version detected " + getDescription().getVersion()
-                            + ", latest version is " + response + ", https://www.spigotmc.org/resources/graves.74208/");
-                }
-            }
-        }
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void updateConfig() {
         double currentConfigVersion = 3;
         double configVersion = getConfig().getInt("config-version");
 
         if (configVersion < currentConfigVersion) {
             new File(getDataFolder(), "outdated").mkdirs();
+
             File singleConfigFile = new File(getDataFolder(), "config.yml");
             File folderConfigFile = new File(getDataFolder(), "config");
 
@@ -308,26 +316,55 @@ public class Graves extends JavaPlugin {
         }
     }
 
-    private void compatibilityChecker() {
-        if (versionManager.hasBlockData()) {
-            compatibility = new CompatibilityBlockData();
-        } else {
-            compatibility = new CompatibilityMaterialData();
+    private void updateChecker() {
+        if (getConfig().getBoolean("settings.update.check")) {
+            getServer().getScheduler().runTaskAsynchronously(this, () -> {
+                String latestVersion = getLatestVersion();
 
+                if (latestVersion != null) {
+                    try {
+                        double pluginVersion = Double.parseDouble(getDescription().getVersion());
+                        double pluginVersionLatest = Double.parseDouble(latestVersion);
+
+                        if (pluginVersion < pluginVersionLatest) {
+                            getLogger().info("Update: Outdated version detected " + pluginVersion
+                                    + ", latest version is " + pluginVersionLatest
+                                    + ", https://www.spigotmc.org/resources/" + getSpigotID() + "/");
+                        }
+                    } catch (NumberFormatException exception) {
+                        if (!getDescription().getVersion().equalsIgnoreCase(latestVersion)) {
+                            getLogger().info("Update: Outdated version detected " + getDescription().getVersion()
+                                    + ", latest version is " + latestVersion + ", https://www.spigotmc.org/resources/"
+                                    + getSpigotID() + "/");
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    private void compatibilityChecker() {
+        compatibility = versionManager.hasBlockData() ? new CompatibilityBlockData() : new CompatibilityMaterialData();
+
+        if (!versionManager.hasBlockData()) {
             infoMessage("Legacy version detected, Graves will run but may have problems with material names, " +
                     "the default config is setup for the latest version of the game, you can alter the config manually to fix " +
                     "any issues you encounter, you will need to find the names of materials and sounds for your version.");
         }
 
         if (versionManager.isBukkit()) {
-            infoMessage("Bukkit detected, Some functions won't work on Bukkit, like hex codes.");
+            infoMessage("Bukkit detected, some functions won't work on Bukkit, like hex codes.");
+        }
+
+        if (versionManager.isMohist()) {
+            infoMessage("Mohist detected, not injecting custom recipes.");
         }
     }
 
     public void dumpServerInfo(CommandSender commandSender) {
         if (isEnabled()) {
             getServer().getScheduler().runTaskAsynchronously(this, () -> {
-                String serverInfoDump = getServerInfoDump();
+                String serverInfoDump = ServerUtil.getServerInfoDump(this);
                 String message = serverInfoDump;
 
                 if (getConfig().getString("settings.dump.method", "HASTEBIN")
@@ -353,7 +390,7 @@ public class Graves extends JavaPlugin {
                     }
                 }
 
-                commandSender.sendMessage(ChatColor.GRAY + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
+                commandSender.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
                         + "Dumped: " + message);
             });
         }
@@ -393,6 +430,10 @@ public class Graves extends JavaPlugin {
         return graveManager;
     }
 
+    public GraveyardManager getGraveyardManager() {
+        return graveyardManager;
+    }
+
     public HologramManager getHologramManager() {
         return hologramManager;
     }
@@ -401,12 +442,24 @@ public class Graves extends JavaPlugin {
         return blockManager;
     }
 
+    public ItemStackManager getItemStackManager() {
+        return itemStackManager;
+    }
+
     public EntityDataManager getEntityDataManager() {
         return entityDataManager;
     }
 
+    public CacheManager getCacheManager() {
+        return cacheManager;
+    }
+
     public DataManager getDataManager() {
         return dataManager;
+    }
+
+    public ImportManager getImportManager() {
+        return importManager;
     }
 
     public GUIManager getGUIManager() {
@@ -540,7 +593,7 @@ public class Graves extends JavaPlugin {
             }
 
             for (File file : fileList) {
-                if (isNameValidYAML(file)) {
+                if (YAMLUtil.isValidYAML(file)) {
                     if (file.isDirectory()) {
                         fileConfiguration.addDefaults(getConfigFiles(file));
                     } else {
@@ -564,7 +617,7 @@ public class Graves extends JavaPlugin {
     private FileConfiguration getConfigFile(File file) {
         FileConfiguration fileConfiguration = null;
 
-        if (isNameValidYAML(file)) {
+        if (YAMLUtil.isValidYAML(file)) {
             try {
                 fileConfiguration = YamlConfiguration.loadConfiguration(file);
             } catch (IllegalArgumentException exception) {
@@ -575,15 +628,27 @@ public class Graves extends JavaPlugin {
         return fileConfiguration;
     }
 
-    private boolean isNameValidYAML(File file) {
-        return !file.getName().startsWith(".") && file.getName().endsWith(".yml");
-    }
-
     public final File getConfigFolder() {
         return new File(getDataFolder(), "config");
     }
 
     public final File getPluginsFolder() {
         return getDataFolder().getParentFile();
+    }
+
+    public String getVersion() {
+        return getDescription().getVersion();
+    }
+
+    public String getLatestVersion() {
+        return UpdateUtil.getLatestVersion(getSpigotID());
+    }
+
+    public final int getSpigotID() {
+        return 74208;
+    }
+
+    public final int getMetricsID() {
+        return 12849;
     }
 }

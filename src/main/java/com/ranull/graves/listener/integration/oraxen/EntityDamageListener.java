@@ -7,16 +7,15 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 
-public class FurnitureBreakListener implements Listener {
+public class EntityDamageListener implements Listener {
     private final Oraxen oraxen;
 
-    public FurnitureBreakListener(Oraxen oraxen) {
+    public EntityDamageListener(Oraxen oraxen) {
         this.oraxen = oraxen;
     }
 
     @EventHandler(priority = EventPriority.LOW)
-    public void onFurnitureBreak(EntityDamageEvent event) {
-        event.setCancelled(event.getEntity() instanceof ItemFrame
-                && oraxen.getGrave(event.getEntity()) != null);
+    public void onEntityDamage(EntityDamageEvent event) {
+        event.setCancelled(event.getEntity() instanceof ItemFrame && oraxen.getGrave(event.getEntity()) != null);
     }
 }

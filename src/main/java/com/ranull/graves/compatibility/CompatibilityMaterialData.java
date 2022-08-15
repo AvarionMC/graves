@@ -4,7 +4,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.ranull.graves.Graves;
 import com.ranull.graves.data.BlockData;
-import com.ranull.graves.inventory.Grave;
+import com.ranull.graves.type.Grave;
 import com.ranull.graves.util.BlockFaceUtil;
 import com.ranull.graves.util.SkinUtil;
 import org.bukkit.Location;
@@ -102,7 +102,7 @@ public final class CompatibilityMaterialData implements Compatibility {
 
     @SuppressWarnings("deprecation")
     @Override
-    public ItemStack getEntitySkullItemStack(Grave grave, Graves plugin) {
+    public ItemStack getSkullItemStack(Grave grave, Graves plugin) {
         Material material = Material.matchMaterial("SKULL_ITEM");
 
         if (material != null) {

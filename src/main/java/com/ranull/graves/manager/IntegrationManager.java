@@ -9,9 +9,12 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 
 public final class IntegrationManager {
     private final Graves plugin;
+    private MultiPaper multiPaper;
     private Vault vault;
+    private ProtocolLib protocolLib;
     private WorldEdit worldEdit;
     private WorldGuard worldGuard;
+    private Towny towny;
     private GriefDefender griefDefender;
     private FurnitureLib furnitureLib;
     private FurnitureEngine furnitureEngine;
@@ -19,7 +22,10 @@ public final class IntegrationManager {
     private ItemsAdder itemsAdder;
     private Oraxen oraxen;
     private ChestSort chestSort;
+    private MiniMessage miniMessage;
+    private MineDown mineDown;
     private ItemBridge itemBridge;
+    private PlayerNPC playerNPC;
     private PlaceholderAPI placeholderAPI;
 
     public IntegrationManager(Graves plugin) {
@@ -32,16 +38,22 @@ public final class IntegrationManager {
     }
 
     public void load() {
+        loadMultiPaper();
         loadVault();
+        loadProtocolLib();
         loadWorldEdit();
         loadWorldGuard();
+        loadTowny();
         //loadGriefDefender(); // TODO
         loadFurnitureLib();
         loadFurnitureEngine();
         loadProtectionLib();
         loadItemsAdder();
         loadOraxen();
+        loadMiniMessage();
+        loadMineDown();
         loadChestSort();
+        loadPlayerNPC();
         loadItemBridge();
         loadPlaceholderAPI();
         //loadSkript(); // TODO
@@ -64,10 +76,26 @@ public final class IntegrationManager {
         if (placeholderAPI != null) {
             placeholderAPI.unregister();
         }
+
+        if (playerNPC != null) {
+            playerNPC.unregisterListeners();
+        }
+
+        if (towny != null) {
+            towny.unregisterListeners();
+        }
+    }
+
+    public MultiPaper getMultiPaper() {
+        return multiPaper;
     }
 
     public Vault getVault() {
         return vault;
+    }
+
+    public ProtocolLib getProtocolLib() {
+        return protocolLib;
     }
 
     public WorldEdit getWorldEdit() {
@@ -76,6 +104,10 @@ public final class IntegrationManager {
 
     public WorldGuard getWorldGuard() {
         return worldGuard;
+    }
+
+    public Towny getTowny() {
+        return towny;
     }
 
     public GriefDefender getGriefDefender() {
@@ -102,12 +134,32 @@ public final class IntegrationManager {
         return oraxen;
     }
 
+    public MiniMessage getMiniMessage() {
+        return miniMessage;
+    }
+
+    public MineDown getMineDown() {
+        return mineDown;
+    }
+
     public ChestSort getChestSort() {
         return chestSort;
     }
 
+    public PlayerNPC getPlayerNPC() {
+        return playerNPC;
+    }
+
+    public boolean hasMultiPaper() {
+        return multiPaper != null;
+    }
+
     public boolean hasVault() {
         return vault != null;
+    }
+
+    public boolean hasProtocolLib() {
+        return protectionLib != null;
     }
 
     public boolean hasWorldEdit() {
@@ -116,6 +168,10 @@ public final class IntegrationManager {
 
     public boolean hasWorldGuard() {
         return worldGuard != null;
+    }
+
+    public boolean hasTowny() {
+        return towny != null;
     }
 
     public boolean hasGriefDefender() {
@@ -142,12 +198,39 @@ public final class IntegrationManager {
         return oraxen != null;
     }
 
+    public boolean hasMiniMessage() {
+        return miniMessage != null;
+    }
+
+    public boolean hasMineDown() {
+        return mineDown != null;
+    }
+
     public boolean hasChestSort() {
         return chestSort != null;
     }
 
+    public boolean hasPlayerNPC() {
+        return playerNPC != null;
+    }
+
     public boolean hasPlaceholderAPI() {
         return placeholderAPI != null;
+    }
+
+    private void loadMultiPaper() {
+        if (plugin.getConfig().getBoolean("settings.integration.multipaper.enabled")) {
+            try {
+                Class.forName("puregero.multipaper.MultiPaper", false, getClass().getClassLoader());
+
+                multiPaper = new MultiPaper(plugin);
+
+                plugin.infoMessage("MultiPaper detected, enabling MultiLib.");
+            } catch (ClassNotFoundException ignored) {
+            }
+        } else {
+            multiPaper = null;
+        }
     }
 
     private void loadVault() {
@@ -167,6 +250,21 @@ public final class IntegrationManager {
             }
         } else {
             vault = null;
+        }
+    }
+
+    private void loadProtocolLib() {
+        if (plugin.getConfig().getBoolean("settings.integration.protocollib.enabled")) {
+            Plugin protocolLibPlugin = plugin.getServer().getPluginManager().getPlugin("ProtocolLib");
+
+            if (protocolLibPlugin != null && protocolLibPlugin.isEnabled()) {
+                protocolLib = new ProtocolLib(plugin);
+
+                plugin.integrationMessage("Hooked into " + protocolLibPlugin.getName() + " "
+                        + protocolLibPlugin.getDescription().getVersion() + ".");
+            }
+        } else {
+            protocolLib = null;
         }
     }
 
@@ -192,6 +290,21 @@ public final class IntegrationManager {
             }
         } else {
             worldGuard = null;
+        }
+    }
+
+    public void loadTowny() {
+        if (plugin.getConfig().getBoolean("settings.integration.towny.enabled")) {
+            Plugin townyPlugin = plugin.getServer().getPluginManager().getPlugin("Towny");
+
+            if (townyPlugin != null) {
+                towny = new Towny(plugin, townyPlugin);
+
+                plugin.integrationMessage("Hooked into " + townyPlugin.getName() + " "
+                        + townyPlugin.getDescription().getVersion() + ".");
+            }
+        } else {
+            towny = null;
         }
     }
 
@@ -319,6 +432,39 @@ public final class IntegrationManager {
         }
     }
 
+    private void loadMiniMessage() {
+        if (plugin.getConfig().getBoolean("settings.integration.minimessage.enabled")) {
+            try {
+                Class.forName("net.kyori.adventure.text.minimessage.MiniMessage", false,
+                        getClass().getClassLoader());
+                Class.forName("net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer", false,
+                        getClass().getClassLoader());
+
+                miniMessage = new MiniMessage();
+
+                plugin.integrationMessage("Hooked into MiniMessage.");
+            } catch (ClassNotFoundException ignored) {
+            }
+        } else {
+            miniMessage = null;
+        }
+    }
+
+    private void loadMineDown() {
+        if (plugin.getConfig().getBoolean("settings.integration.minedown.enabled")) {
+            Plugin mineDownPlugin = plugin.getServer().getPluginManager().getPlugin("MineDownPlugin");
+
+            if (mineDownPlugin != null && mineDownPlugin.isEnabled()) {
+                mineDown = new MineDown();
+
+                plugin.integrationMessage("Hooked into " + mineDownPlugin.getName() + " "
+                        + mineDownPlugin.getDescription().getVersion() + ".");
+            }
+        } else {
+            mineDown = null;
+        }
+    }
+
     private void loadChestSort() {
         if (plugin.getConfig().getBoolean("settings.integration.chestsort.enabled")) {
             Plugin chestSortPlugin = plugin.getServer().getPluginManager().getPlugin("ChestSort");
@@ -331,6 +477,21 @@ public final class IntegrationManager {
             }
         } else {
             chestSort = null;
+        }
+    }
+
+    private void loadPlayerNPC() {
+        if (plugin.getConfig().getBoolean("settings.integration.playernpc.enabled")) {
+            Plugin playerNPCPlugin = plugin.getServer().getPluginManager().getPlugin("PlayerNPC");
+
+            if (playerNPCPlugin != null && playerNPCPlugin.isEnabled()) {
+                playerNPC = new PlayerNPC(plugin);
+
+                plugin.integrationMessage("Hooked into " + playerNPCPlugin.getName() + " "
+                        + playerNPCPlugin.getDescription().getVersion() + ".");
+            }
+        } else {
+            playerNPC = null;
         }
     }
 

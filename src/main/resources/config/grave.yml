@@ -22,7 +22,7 @@ settings:
         can-build-protectionlib: false # Only create graves where the entity can build, (According to ProtectionLib).
         ground: true # If the entity dies in the air should the grave fall to the ground.
         void: true # If the entity dies in the void, should it place a grave in the air if it can't find anywhere else.
-        lava-top: true # If the entity dies in lava should the grave it float to the top.
+        lava-top: true # If the entity dies in lava should the grave it floats to the top.
         void-smart: true # If the entity dies in the void, try place the grave on the last solid block they stood on. (Only works for players)
         lava-smart: true # If the entity dies in lava, try place the grave on the last solid block they stood on. (Only works for players)
         failure-keep-inventory: true # If a grave tries is trying to be created and can't find a valid location should the player keep their inventory.
@@ -46,6 +46,9 @@ settings:
       ########
       # Should a grave drop it's contents when destroyed for the following reasons.
       drop:
+        auto-loot:
+          enabled: false # If broken by a player, should we try to autoloot the graves contents.
+          break: true # If not all items can be picked up when auto looting a grave, should we break the grave anyway and drop them on the ground.
         timeout: false # When a grave times out drop everything in it. If false it gets destroyed.
         explode: true # When a grave explodes drop everything in it. If false it gets destroyed.
         break: true # When a grave is broken drop everything in it. If false it gets destroyed.
@@ -102,6 +105,25 @@ settings:
           protected: "&c✘"
           unprotected: "&a✔"
 
+      #############
+      # Graveyard #
+      #############
+      graveyard:
+        enabled: true # Enable the graveyard feature.
+        death: false # If a suitable graveyard is found, should we still spawn the grave where the entity died.
+
+      ############
+      # Teleport #
+      ############
+      # Teleportation options.
+      teleport:
+        enabled: true # Can the entity teleport to their grave from the Graves GUI.
+        cost: 5 # How much it costs to teleport to a grave, you need Vault for this.
+        cost-different-world: 20 # Extra cost added on top of cost if the grave is in a different world.
+        cost-distance-increase: true # Increase the price the further away the grave is.
+        unsafe: false # Should entities be allowed to always teleport to a grave even if unsafe.
+        top: true # If the grave is in an unsafe location, should the entity be teleported to the top.
+
       ###########
       # Storage #
       ###########
@@ -128,8 +150,8 @@ settings:
       # Particle #
       ############
       particle:
-        enabled: false # Enable the particles feature.
-        type: "REDSTONE" # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
+        enabled: true # Enable the particles feature.
+        type: "ENCHANTMENT_TABLE" # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
         count: 4 # Amount of particles.
         dust-size: 4 # Only applies to REDSTONE.
         dust-color: "RED" # only applies to REDSTONE, https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Color.html
@@ -146,27 +168,56 @@ settings:
         function: "distance" # The function that gets run on right click.
         ignore: true # Ignore the compass if an entity dies with it, drop it normally.
         destroy: true # Should a previous compass be destroyed when creating a new grave.
+        recovery: true # Should the compass be a recovery compass, 1.19+ only.
         name: "%owner_name%'s Grave"
+        glow: true # Should the compass glow.
+        model-data: -1 # Custom model data for the compass, -1 is none.
         lore:
           - "%world_formatted%, %x%x, %y%y, %z%z"
 
       ############
-      # Teleport #
+      # Obituary #
       ############
-      # Teleportation options.
-      teleport:
-        enabled: true # Can the entity teleport to their grave from the Graves GUI.
-        cost: 5 # How much it costs to teleport to a grave, you need Vault for this.
-        cost-different-world: 20 # Extra cost added on top of cost if the grave is in a different world.
-        cost-distance-increase: true # Increase the price the further away the grave is.
-        unsafe: false # Should entities be allowed to always teleport to a grave even if unsafe.
-        top: true # If the grave is in an unsafe location, should the entity be teleported to the top.
+      # Put an obituary for the entity in the grave.
+      obituary:
+        enabled: true # Should obituaries be enabled.
+        title: "&c%owner_name%'s Obituary"
+        author: "%killer_name%"
+        glow: true # Should the obituary glow.
+        model-data: -1 # Custom model data, -1 is none.
+        line:
+          - "         Obituary         "
+          - "-------------------"
+          - "  Name: %owner_name%"
+          - "  Cause: %killer_name%"
+          - "  Date: %time_creation_formatted%"
+          - "  Items: %item%"
+          - "  Exp: %experience%"
+          - "  Location:"
+          - "    World: %world_formatted%"
+          - "    X: %x%"
+          - "    Y: %y%"
+          - "    Z: %z%"
+        lore:
+          - "Date: %time_creation_formatted%"
+
+      ########
+      # Head #
+      ########
+      # Drop a head belonging to the grave owner.
+      head:
+        enabled: false
+        percent: 0.2 # Chance a head should be created, 0.2 = 20%, 1 = 100%, 0 = 0%.
+        model-data: -1 # Custom model data, -1 is none.
+        name: "%owner_name%'s Head"
+        lore:
+          - "%time_creation_formatted%"
 
       ##########
       # Zombie #
       ##########
       zombie:
-        type: ZOMBIE # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/LivingEntity.html
+        type: ZOMBIE # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/LivingEntity.html(
         name: "%owner_name%'s Zombie"
         spawn-owner: false # Should a grave spawn a zombie when it is looted by its owner.
         spawn-other: true # Should a grave spawn a zombie if it is looted by another player.
@@ -177,6 +228,13 @@ settings:
         pickup: false # Can the zombie pickup dropped items.
         drop: false # Do grave zombies drop items, this may include the head it is wearing.
 
+      #########
+      # Token #
+      #########
+      token: # You have to define a token to be used in the token.yml file.
+        enabled: false # Should graves require tokens for their creation.
+        name: "basic" # Name of the token defined in token.yml file.
+
       ###########
       # Virtual #
       ###########
@@ -184,17 +242,34 @@ settings:
       virtual:
         distance: 15 # Minimum distance entities need to be from a grave to open it virtually. -1 for infinite distance.
 
-      #############
-      # Schematic #
-      #############
-      # Schematic options, this feature is in beta. Schematics don't get cleaned up when the grave is removed.
-      schematic:
-        enabled: false # Should schematics be enabled.
-        name: "grave_default" # Schematic file name.
+      ###############
+      # Armor Stand #
+      ###############
+      # This option allows you to set an armor stand with a custom item equipped to spawn on a gave.
+      armor-stand:
+        enabled: false # Should armor stands be used.
+        slot: HEAD # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/inventory/EquipmentSlot.html
+        material: PAPER # Item placed on the armor stand.
+        model-data: -1 # Custom model data, -1 is none.
+        marker: false # Should the armor stand be a marker, you can't interact with markers.
+        small: false # Should the armor stand be small.
         offset:
-          x: 0 # Schematic offset X.
-          y: 0 # Schematic offset Y.
-          z: 0 # Schematic offset Z.
+          x: 0 # Armor Stand offset X.
+          y: 0 # Armor Stand offset Y.
+          z: 0 # Armor Stand offset Z.
+
+      ###############
+      # Item Frame #
+      ###############
+      # This option allows you to set an item frame with a custom item placed inside to spawn on a gave.
+      item-frame:
+        enabled: false # Should item frames be used.
+        material: PAPER # Item placed in the item frame.
+        model-data: -1 # Custom model data, -1 is none.
+        offset:
+          x: 0 # Item Frame offset X.
+          y: 0 # Item Frame offset Y.
+          z: 0 # Item Frame offset Z.
 
       ################
       # FurnitureLib #
@@ -219,7 +294,7 @@ settings:
       ###################
       # This option requires FurnitureEngine, you must have this installed to use models.
       furnitureengine:
-        enabled: true # Should FurnitureEngine furniture be used.
+        enabled: false # Should FurnitureEngine furniture be used.
         name: "grave" # Furniture name.
 
       ##############
@@ -229,8 +304,8 @@ settings:
       # Graves automatically adds models into ItemsAdder, if you want to use it you will need to re-generate your pack and use "graves:grave" as the furniture name.
       itemsadder:
         furniture:
-          enabled: true # Should we use ItemsAdder furniture?
-          name: "itemsadder:mysterious_stone" # Furniture name.
+          enabled: false # Should we use ItemsAdder furniture?
+          name: "graves:grave" # Furniture name.
         block:
           enabled: false # Should we use ItemsAdder blocks?
           name: "itemsadder:nice_stone" # Block name.
@@ -242,18 +317,38 @@ settings:
       # Graves automatically adds models into Oraxen, if you want to use it you will need to re-generate your pack and use "grave" as the furniture name.
       oraxen:
         furniture:
-          enabled: true # Should we use Oraxen furniture?
+          enabled: false # Should we use Oraxen furniture?
           name: "grave" # Block name.
         block:
           enabled: false # Should we use Oraxen blocks?
           name: "caveblock" # Block name.
 
-      #########
-      # Token #
-      #########
-      token: # You have to define a token to be used in the token.yml file.
-        enabled: false # Should graves require tokens for their creation.
-        name: "basic" # Name of the token defined in token.yml file.
+      #############
+      # PlayerNPC #
+      #############
+      # The option requires PlayerNPC, you must have this installed to use corpses, only supported on 1.17+.
+      playernpc:
+        corpse:
+          enabled: false # Should we create a corpse?
+          pose: "SWIMMING" # What pose should the entity use? https://sergiferry.github.io/PlayerNPC/dev/sergiferry/playernpc/api/NPC.Pose.html
+          armor: true # Should the corpse wear the players armor?
+          hand: true # Should the corpse hold the players items?
+          collide: false # Should corpses be collidable?
+          glow:
+            enabled: false # Should corpses glow?
+            color: RED # Glow color.
+
+      #############
+      # Schematic #
+      #############
+      # Schematic options, this feature is in beta. Schematics don't get cleaned up when the grave is removed.
+      schematic:
+        enabled: false # Should schematics be enabled.
+        name: "grave_default" # Schematic file name.
+        offset:
+          x: 0 # Schematic offset X.
+          y: 0 # Schematic offset Y.
+          z: 0 # Schematic offset Z.
 
       #########
       # Sound #
@@ -284,6 +379,9 @@ settings:
           create:
             - ""
             #- "say %owner_name% was killed by %killer_name% at %x%x %y%y %z%z, grave lasts for %time_alive_remaining_formatted%."
+          block:
+            - ""
+            #- "say %owner_name% grave block placed at %x%x %y%y %z%z."
           open:
             - ""
             #- "say %interact_name% is looting %owner_name%'s grave."
@@ -413,10 +511,13 @@ settings:
         loot: ""
         experience: "Looted &c%level% &rlevels from grave."
         empty: "You don't have any graves."
-        death: "You died in &c%world_formatted% &rat &c%x%&rx, &c%y%&ry, &c%z%&rz, a grave was created that lasts for &c%time_alive_remaining_formatted%&r."
+        death: "You were killed in &c%world_formatted% &rby &c%killer_name%&r."
+        block: "Grave created at &c%x%&rx, &c%y%&ry, &c%z%&rz in &c%world_formatted%&r."
+        timeout: "Your grave at &c%x%&rx, &c%y%&ry, &c%z%&rz in &c%world_formatted%&r timed out with &c%item% &ritems and &c%experience% &rExperience."
         ignore: "A grave was not created because you died in &c%name%&r."
         max: "A grave was not created, you have reached the maximum."
-        failure: "A grave was unable to be placed, item's dropped on ground."
+        failure-keep-inventory: "A grave was unable to find a suitable location, preserving inventory."
+        failure: "A grave was unable to find a suitable location, item's dropped on ground."
         no-money: "You don't have enough money, you need &c%teleport_cost%&r."
         no-token: "A grave was not created because you didn't have a grave token."
         give-token: "You were given a Grave Token."
@@ -462,10 +563,10 @@ settings:
           THORNS: "Thorned"
           DRAGON_BREATH: "Dragon Breath"
           CUSTOM: "Dark Magic"
-          FLY_INTO_WALL: "Highspeed Splat"
+          FLY_INTO_WALL: "Splat"
           HOT_FLOOR: "Burned Feet"
           CRAMMING: "Crushed"
-          DRYOUT: "Suffocated"
+          DRYOUT: "Dried Out"
           FREEZE: "Froze"
 
       ########
@@ -477,6 +578,7 @@ settings:
         hour: "&c%hour%&fh "
         day: "&c%day%&fd "
         infinite: "&cForever"
+        date: "dd-MM-yyyy"
 
       #######
       # GUI #
@@ -501,7 +603,7 @@ settings:
               - "Created &f%time_lived_formatted% &cago"
 
           grave:
-            title: "Grave Menu"
+            title: "Grave"
             slot:
               0:
                 material: "PAPER"
@@ -531,3 +633,17 @@ settings:
               #  model-data: -1
               #  lore:
               #    - "Toggle grave protection"
+
+          graveyard:
+            title: "Graveyards"
+            slot:
+              0:
+                material: "PAPER"
+                function: "distance"
+                name: "Information"
+                glow: false
+                model-data: -1
+                lore:
+                  - "Items: &f%item%"
+                  - "Levels: &f%level%"
+                  - "Death Location: &f%world_formatted%, %x%x, %y%y, %z%z"

@@ -3,7 +3,7 @@ package com.ranull.graves.listener.integration.furnitureengine;
 import com.mira.furnitureengine.api.events.FurnitureInteractEvent;
 import com.ranull.graves.Graves;
 import com.ranull.graves.integration.FurnitureEngine;
-import com.ranull.graves.inventory.Grave;
+import com.ranull.graves.type.Grave;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

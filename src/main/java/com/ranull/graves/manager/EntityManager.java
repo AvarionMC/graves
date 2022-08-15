@@ -1,15 +1,21 @@
 package com.ranull.graves.manager;
 
 import com.ranull.graves.Graves;
-import com.ranull.graves.inventory.Grave;
+import com.ranull.graves.data.EntityData;
+import com.ranull.graves.type.Grave;
 import com.ranull.graves.util.*;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.server.ServerCommandEvent;
+import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.persistence.PersistentDataType;
@@ -17,10 +23,12 @@ import org.bukkit.util.NumberConversions;
 
 import java.util.*;
 
-public final class EntityManager {
+public final class EntityManager extends EntityDataManager {
     private final Graves plugin;
 
     public EntityManager(Graves plugin) {
+        super(plugin);
+
         this.plugin = plugin;
     }
 
@@ -32,27 +40,56 @@ public final class EntityManager {
         }
     }
 
-    public ItemStack getCompassItemStack(Location location, Grave grave) {
-        if (plugin.getVersionManager().hasPersistentData() && plugin.getVersionManager().hasLodestone()) {
-            ItemStack itemStack = new ItemStack(Material.COMPASS);
-            CompassMeta compassMeta = (CompassMeta) itemStack.getItemMeta();
+    public ItemStack createGraveCompass(Player player, Location location, Grave grave) {
+        if (plugin.getVersionManager().hasPersistentData()) {
+            Material material = Material.COMPASS;
 
-            if (compassMeta != null) {
+            if (plugin.getConfig("compass.recovery", grave).getBoolean("compass.recovery")) {
+                try {
+                    material = Material.valueOf("RECOVERY_COMPASS");
+                } catch (IllegalArgumentException ignored) {
+                }
+            }
+
+            ItemStack itemStack = new ItemStack(material);
+            ItemMeta itemMeta = itemStack.getItemMeta();
+
+            if (itemMeta != null) {
+                if (plugin.getVersionManager().hasCompassMeta() && itemMeta instanceof CompassMeta) {
+                    CompassMeta compassMeta = (CompassMeta) itemMeta;
+
+                    compassMeta.setLodestoneTracked(false);
+                    compassMeta.setLodestone(location);
+                } else if (itemStack.getType().name().equals("RECOVERY_COMPASS")) {
+                    try {
+                        player.setLastDeathLocation(location);
+                    } catch (NoSuchMethodError ignored) {
+                    }
+                }
+
                 List<String> loreList = new ArrayList<>();
+                int customModelData = plugin.getConfig("compass.model-data", grave).getInt("compass.model-data", -1);
 
-                compassMeta.setLodestoneTracked(false);
-                compassMeta.setLodestone(location);
-                compassMeta.setDisplayName(ChatColor.RESET + StringUtil.parseString(plugin
+                if (customModelData > -1) {
+                    itemMeta.setCustomModelData(customModelData);
+                }
+
+                if (plugin.getConfig("compass.glow", grave).getBoolean("compass.glow")) {
+                    itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
+                    itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                }
+
+                itemMeta.setDisplayName(ChatColor.WHITE + StringUtil.parseString(plugin
                         .getConfig("compass.name", grave).getString("compass.name"), grave, plugin));
-                compassMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, "graveUUID"),
+                itemMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, "graveUUID"),
                         PersistentDataType.STRING, grave.getUUID().toString());
 
                 for (String string : plugin.getConfig("compass.lore", grave).getStringList("compass.lore")) {
                     loreList.add(ChatColor.GRAY + StringUtil.parseString(string, location, grave, plugin));
                 }
 
-                compassMeta.setLore(loreList);
-                itemStack.setItemMeta(compassMeta);
+                itemMeta.setLore(loreList);
+                itemStack.setItemMeta(itemMeta);
             }
 
             return itemStack;
@@ -61,21 +98,23 @@ public final class EntityManager {
         return null;
     }
 
-    public Map<ItemStack, UUID> getCompassFromInventory(HumanEntity player) {
-        if (plugin.getVersionManager().hasPersistentData() && plugin.getVersionManager().hasLodestone()) {
+    public Map<ItemStack, UUID> getCompassesFromInventory(HumanEntity player) {
+        Map<ItemStack, UUID> itemStackUUIDMap = new HashMap<>();
+
+        if (plugin.getVersionManager().hasPersistentData()) {
             for (ItemStack itemStack : player.getInventory().getContents()) {
-                UUID uuid = getUUIDFromItemStack(itemStack);
+                UUID uuid = getGraveUUIDFromItemStack(itemStack);
 
                 if (uuid != null) {
-                    return Collections.singletonMap(itemStack, uuid);
+                    itemStackUUIDMap.put(itemStack, uuid);
                 }
             }
         }
 
-        return null;
+        return itemStackUUIDMap;
     }
 
-    public UUID getUUIDFromItemStack(ItemStack itemStack) {
+    public UUID getGraveUUIDFromItemStack(ItemStack itemStack) {
         if (plugin.getVersionManager().hasPersistentData() && itemStack != null && itemStack.getItemMeta() != null) {
             if (itemStack.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(plugin, "graveUUID"),
                     PersistentDataType.STRING)) {
@@ -129,6 +168,8 @@ public final class EntityManager {
                 } else {
                     entity.teleport(locationTeleport);
                 }
+            } else {
+                plugin.getEntityManager().sendMessage("message.teleport-failure", entity, location, grave);
             }
         } else {
             plugin.getEntityManager().sendMessage("message.region-teleport-deny", entity, location, grave);
@@ -299,7 +340,9 @@ public final class EntityManager {
 
     private void runCommands(String string, Entity entity, String name, Location location, Grave grave) {
         for (String command : plugin.getConfig(string, grave).getStringList(string)) {
-            runConsoleCommand(StringUtil.parseString(command, entity, name, location, grave, plugin));
+            if (command != null && !command.equals("")) {
+                runConsoleCommand(StringUtil.parseString(command, entity, name, location, grave, plugin));
+            }
         }
     }
 
@@ -472,7 +515,7 @@ public final class EntityManager {
 
                 if (livingEntity.getEquipment() != null) {
                     if (plugin.getConfig("zombie.owner-head", grave).getBoolean("zombie.owner-head")) {
-                        livingEntity.getEquipment().setHelmet(plugin.getCompatibility().getEntitySkullItemStack(grave, plugin));
+                        livingEntity.getEquipment().setHelmet(plugin.getCompatibility().getSkullItemStack(grave, plugin));
                     }
 
                     livingEntity.getEquipment().setChestplate(null);
@@ -500,6 +543,11 @@ public final class EntityManager {
 
                 setDataByte(livingEntity, "graveZombie");
                 setDataString(livingEntity, "graveUUID", grave.getUUID().toString());
+                setDataString(livingEntity, "graveEntityType", grave.getOwnerType().name());
+
+                if (grave.getPermissionList() != null && !grave.getPermissionList().isEmpty()) {
+                    setDataString(livingEntity, "gravePermissionList", String.join("|", grave.getPermissionList()));
+                }
 
                 if (livingEntity instanceof Mob && targetEntity != null && !targetEntity.isInvulnerable()
                         && (!(targetEntity instanceof Player) || ((Player) targetEntity).getGameMode()
@@ -520,7 +568,203 @@ public final class EntityManager {
         }
     }
 
-    @SuppressWarnings({"redundant"})
+    public void createArmorStand(Location location, Grave grave) {
+        if (!plugin.getVersionManager().is_v1_7()
+                && plugin.getConfig("armor-stand.enabled", grave).getBoolean("armor-stand.enabled")) {
+            double offsetX = plugin.getConfig("armor-stand.offset.x", grave).getDouble("armor-stand.offset.x");
+            double offsetY = plugin.getConfig("armor-stand.offset.y", grave).getDouble("armor-stand.offset.y");
+            double offsetZ = plugin.getConfig("armor-stand.offset.z", grave).getDouble("armor-stand.offset.z");
+            boolean marker = plugin.getConfig("armor-stand.marker", grave).getBoolean("armor-stand.marker");
+            location = LocationUtil.roundLocation(location)
+                    .add(offsetX + 0.5, offsetY, offsetZ + 0.5);
+
+            location.setYaw(grave.getYaw());
+            location.setPitch(grave.getPitch());
+
+            if (location.getWorld() != null) {
+                Material material = Material.matchMaterial(plugin.getConfig("armor-stand.material", grave)
+                        .getString("armor-stand.material", "AIR"));
+
+                if (material != null && !MaterialUtil.isAir(material)) {
+                    ItemStack itemStack = new ItemStack(material, 1);
+                    ItemMeta itemMeta = itemStack.getItemMeta();
+                    int customModelData = plugin.getConfig("armor-stand.model-data", grave)
+                            .getInt("armor-stand.model-data", -1);
+
+                    if (itemMeta != null) {
+                        if (customModelData > -1) {
+                            itemMeta.setCustomModelData(customModelData);
+                        }
+
+                        itemStack.setItemMeta(itemMeta);
+                        location.getBlock().setType(Material.AIR);
+
+                        ArmorStand armorStand = location.getWorld().spawn(location, ArmorStand.class);
+
+                        createEntityData(location, armorStand.getUniqueId(), grave.getUUID(),
+                                EntityData.Type.ARMOR_STAND);
+
+                        if (!plugin.getVersionManager().is_v1_7()) {
+                            try {
+                                armorStand.setMarker(marker);
+                            } catch (NoSuchMethodError ignored) {
+                            }
+                        }
+
+                        if (!plugin.getVersionManager().is_v1_7() && !plugin.getVersionManager().is_v1_8()) {
+                            armorStand.setInvulnerable(true);
+                        }
+
+                        if (plugin.getVersionManager().hasScoreboardTags()) {
+                            armorStand.getScoreboardTags().add("graveArmorStand");
+                            armorStand.getScoreboardTags().add("graveArmorStandUUID:" + grave.getUUID());
+                        }
+
+                        armorStand.setVisible(false);
+                        armorStand.setGravity(false);
+                        armorStand.setCustomNameVisible(false);
+                        armorStand.setSmall(plugin.getConfig("armor-stand.small", grave)
+                                .getBoolean("armor-stand.small"));
+
+                        if (armorStand.getEquipment() != null) {
+                            EquipmentSlot equipmentSlot = EquipmentSlot.HEAD;
+
+                            try {
+                                equipmentSlot = EquipmentSlot.valueOf(plugin.getConfig("armor-stand.slot", grave)
+                                        .getString("armor-stand.slot", "HEAD"));
+                            } catch (IllegalArgumentException ignored) {
+                            }
+
+                            armorStand.getEquipment().setItem(equipmentSlot, itemStack);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void createItemFrame(Location location, Grave grave) {
+        if (plugin.getConfig("item-frame.enabled", grave).getBoolean("item-frame.enabled")) {
+            double offsetX = plugin.getConfig("item-frame.offset.x", grave).getDouble("item-frame.offset.x");
+            double offsetY = plugin.getConfig("item-frame.offset.y", grave).getDouble("item-frame.offset.y");
+            double offsetZ = plugin.getConfig("item-frame.offset.z", grave).getDouble("item-frame.offset.z");
+            location = LocationUtil.roundLocation(location).add(offsetX + 0.5, offsetY, offsetZ + 0.5);
+
+            location.setYaw(grave.getYaw());
+            location.setPitch(grave.getPitch());
+
+            if (location.getWorld() != null) {
+                Material material = Material.matchMaterial(plugin.getConfig("item-frame.material", grave)
+                        .getString("item-frame.material", "AIR"));
+
+                if (material != null && !MaterialUtil.isAir(material)) {
+                    ItemStack itemStack = new ItemStack(material, 1);
+                    ItemMeta itemMeta = itemStack.getItemMeta();
+                    int customModelData = plugin.getConfig("item-frame.model-data", grave)
+                            .getInt("item-frame.model-data", -1);
+
+                    if (itemMeta != null) {
+                        if (customModelData > -1) {
+                            itemMeta.setCustomModelData(customModelData);
+                        }
+
+                        itemStack.setItemMeta(itemMeta);
+                        location.getBlock().setType(Material.AIR);
+
+                        ItemFrame itemFrame = location.getWorld().spawn(location, ItemFrame.class);
+
+                        itemFrame.setFacingDirection(BlockFace.UP);
+                        itemFrame.setRotation(BlockFaceUtil.getBlockFaceRotation(BlockFaceUtil
+                                .getYawBlockFace(location.getYaw())));
+                        itemFrame.setVisible(false);
+                        itemFrame.setGravity(false);
+                        itemFrame.setCustomNameVisible(false);
+                        itemFrame.setItem(itemStack);
+
+                        if (!plugin.getVersionManager().is_v1_7() && !plugin.getVersionManager().is_v1_8()) {
+                            itemFrame.setInvulnerable(true);
+                        }
+
+                        if (plugin.getVersionManager().hasScoreboardTags()) {
+                            itemFrame.getScoreboardTags().add("graveItemFrame");
+                            itemFrame.getScoreboardTags().add("graveItemFrameUUID:" + grave.getUUID());
+                        }
+
+                        createEntityData(location, itemFrame.getUniqueId(), grave.getUUID(),
+                                EntityData.Type.ITEM_FRAME);
+                    }
+                }
+            }
+        }
+    }
+
+    public void removeEntity(Grave grave) {
+        removeEntity(getEntityDataMap(getLoadedEntityDataList(grave)));
+    }
+
+    public void removeEntity(Map<EntityData, Entity> entityDataMap) {
+        List<EntityData> entityDataList = new ArrayList<>();
+
+        for (Map.Entry<EntityData, Entity> entry : entityDataMap.entrySet()) {
+            if (entry.getKey().getType() == EntityData.Type.ARMOR_STAND
+                    || entry.getKey().getType() == EntityData.Type.ITEM_FRAME
+                    || entry.getKey().getType() == EntityData.Type.HOLOGRAM) {
+                entry.getValue().remove();
+                entityDataList.add(entry.getKey());
+            }
+        }
+
+        plugin.getDataManager().removeEntityData(entityDataList);
+    }
+
+    public Map<EquipmentSlot, ItemStack> getEquipmentMap(LivingEntity livingEntity, Grave grave) {
+        Map<EquipmentSlot, ItemStack> equipmentSlotItemStackMap = new HashMap<>();
+
+        if (livingEntity.getEquipment() != null) {
+            EntityEquipment entityEquipment = livingEntity.getEquipment();
+
+            if (entityEquipment.getHelmet() != null
+                    && grave.getInventory().contains(entityEquipment.getHelmet())) {
+                equipmentSlotItemStackMap.put(EquipmentSlot.HEAD, entityEquipment.getHelmet());
+            }
+
+            if (entityEquipment.getChestplate() != null
+                    && grave.getInventory().contains(entityEquipment.getChestplate())) {
+                equipmentSlotItemStackMap.put(EquipmentSlot.CHEST, entityEquipment.getChestplate());
+            }
+
+            if (entityEquipment.getLeggings() != null
+                    && grave.getInventory().contains(entityEquipment.getLeggings())) {
+                equipmentSlotItemStackMap.put(EquipmentSlot.LEGS, entityEquipment.getLeggings());
+            }
+
+            if (entityEquipment.getBoots() != null
+                    && grave.getInventory().contains(entityEquipment.getBoots())) {
+                equipmentSlotItemStackMap.put(EquipmentSlot.FEET, entityEquipment.getBoots());
+            }
+
+            if (plugin.getVersionManager().hasSecondHand()) {
+                if (entityEquipment.getItemInMainHand().getType() != Material.AIR
+                        && grave.getInventory().contains(entityEquipment.getItemInMainHand())) {
+                    equipmentSlotItemStackMap.put(EquipmentSlot.HAND, entityEquipment.getItemInMainHand());
+                }
+
+                if (entityEquipment.getItemInOffHand().getType() != Material.AIR
+                        && grave.getInventory().contains(entityEquipment.getItemInOffHand())) {
+                    equipmentSlotItemStackMap.put(EquipmentSlot.OFF_HAND, entityEquipment.getItemInOffHand());
+                }
+            } else {
+                if (entityEquipment.getItemInHand().getType() != Material.AIR
+                        && grave.getInventory().contains(entityEquipment.getItemInHand())) {
+                    equipmentSlotItemStackMap.put(EquipmentSlot.HAND, entityEquipment.getItemInHand());
+                }
+            }
+        }
+
+        return equipmentSlotItemStackMap;
+    }
+
+    @SuppressWarnings("redundant")
     public String getEntityName(Entity entity) {
         if (entity != null) {
             if (entity instanceof Player) {
@@ -573,13 +817,13 @@ public final class EntityManager {
     public Grave getGraveFromEntityData(Entity entity) {
         if (plugin.getVersionManager().hasPersistentData() && entity.getPersistentDataContainer()
                 .has(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING)) {
-            return plugin.getDataManager().getGraveMap().get(UUIDUtil.getUUID(entity.getPersistentDataContainer()
+            return plugin.getCacheManager().getGraveMap().get(UUIDUtil.getUUID(entity.getPersistentDataContainer()
                     .get(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING)));
         } else if (entity.hasMetadata("graveUUID")) {
             List<MetadataValue> metadataValue = entity.getMetadata("graveUUID");
 
             if (!metadataValue.isEmpty()) {
-                return plugin.getDataManager().getGraveMap().get(UUIDUtil.getUUID(metadataValue.get(0).asString()));
+                return plugin.getCacheManager().getGraveMap().get(UUIDUtil.getUUID(metadataValue.get(0).asString()));
             }
         }
 

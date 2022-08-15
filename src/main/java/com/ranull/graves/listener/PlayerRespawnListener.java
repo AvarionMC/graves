@@ -1,7 +1,7 @@
 package com.ranull.graves.listener;
 
 import com.ranull.graves.Graves;
-import com.ranull.graves.inventory.Grave;
+import com.ranull.graves.type.Grave;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -34,7 +34,7 @@ public class PlayerRespawnListener implements Listener {
                         .getString("respawn.function", "none"), grave);
             }, 1L);
 
-            if (plugin.getVersionManager().hasLodestone()
+            if (plugin.getVersionManager().hasCompassMeta()
                     && plugin.getConfig("respawn.compass", player, permissionList)
                     .getBoolean("respawn.compass")
                     && grave.getLivedTime() <= plugin.getConfig("respawn.compass-time", player, permissionList)
@@ -43,7 +43,7 @@ public class PlayerRespawnListener implements Listener {
                         .getGraveLocationList(event.getRespawnLocation(), grave);
 
                 if (!locationList.isEmpty()) {
-                    ItemStack itemStack = plugin.getEntityManager().getCompassItemStack(locationList.get(0), grave);
+                    ItemStack itemStack = plugin.getEntityManager().createGraveCompass(player, locationList.get(0), grave);
 
                     if (itemStack != null) {
                         player.getInventory().addItem(itemStack);

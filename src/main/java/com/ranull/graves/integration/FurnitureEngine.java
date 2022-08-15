@@ -3,10 +3,10 @@ package com.ranull.graves.integration;
 import com.mira.furnitureengine.api.FurnitureAPI;
 import com.ranull.graves.Graves;
 import com.ranull.graves.data.EntityData;
-import com.ranull.graves.inventory.Grave;
 import com.ranull.graves.listener.integration.furnitureengine.FurnitureBreakListener;
 import com.ranull.graves.listener.integration.furnitureengine.FurnitureInteractListener;
 import com.ranull.graves.manager.EntityDataManager;
+import com.ranull.graves.type.Grave;
 import com.ranull.graves.util.BlockFaceUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -61,7 +61,7 @@ public final class FurnitureEngine extends EntityDataManager {
             location.getBlock().setType(Material.AIR);
 
             if (placeFurniture(name, location, BlockFaceUtil.getBlockFaceRotation(BlockFaceUtil
-                    .getYawBlockFace(grave.getYaw())))) {
+                    .getYawBlockFace(location.getYaw())))) {
                 ItemFrame itemFrame = getItemFrame(location);
 
                 if (itemFrame != null && location.getWorld() != null) {

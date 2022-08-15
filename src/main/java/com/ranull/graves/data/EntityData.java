@@ -2,9 +2,10 @@ package com.ranull.graves.data;
 
 import org.bukkit.Location;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class EntityData {
+public class EntityData implements Serializable {
     private final Location location;
     private final UUID uuidEntity;
     private final UUID uuidGrave;
@@ -35,9 +36,12 @@ public class EntityData {
 
     public enum Type {
         HOLOGRAM,
+        ARMOR_STAND,
+        ITEM_FRAME,
         FURNITURELIB,
         FURNITUREENGINE,
         ITEMSADDER,
         ORAXEN,
+        PLAYERNPC,
     }
 }

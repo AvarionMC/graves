@@ -1,6 +1,6 @@
 package com.ranull.graves.manager;
 
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.Bukkit;
 
 public final class VersionManager {
     private final String version;
@@ -8,22 +8,18 @@ public final class VersionManager {
     private final boolean hasPersistentData;
     private final boolean hasScoreboardTags;
     private final boolean hasHexColors;
-    private final boolean hasLodestone;
+    private final boolean hasCompassMeta;
     private final boolean hasSwingHand;
     private final boolean hasWorldHeight;
     private final boolean hasSecondHand;
     private final boolean hasEnchantmentCurse;
+    private final boolean hasParticle;
     private final boolean hasConfigContains;
     private boolean isBukkit;
+    private boolean isMohist;
 
-    public VersionManager(JavaPlugin plugin) {
-        try {
-            Class.forName("org.spigotmc.SpigotConfig", false, getClass().getClassLoader());
-        } catch (ClassNotFoundException ignored) {
-            this.isBukkit = true;
-        }
-
-        this.version = plugin.getServer().getClass().getPackage().getName().split("\\.")[3];
+    public VersionManager() {
+        this.version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
         this.hasConfigContains = !is_v1_7() && !is_v1_8() && !is_v1_9();
         this.hasBlockData = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10() && !is_v1_11() && !is_v1_12();
         this.hasPersistentData = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10() && !is_v1_11() && !is_v1_12()
@@ -31,7 +27,7 @@ public final class VersionManager {
         this.hasScoreboardTags = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10();
         this.hasHexColors = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10() && !is_v1_11() && !is_v1_12()
                 && !is_v1_13() && !is_v1_14() && !is_v1_15() && !isBukkit();
-        this.hasLodestone = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10() && !is_v1_11()
+        this.hasCompassMeta = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10() && !is_v1_11()
                 && !is_v1_12() && !is_v1_13() && !is_v1_14() && !is_v1_15()
                 && !version.matches("(?i)v1_16_R1|");
         this.hasSwingHand = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10() && !is_v1_11() && !is_v1_12()
@@ -40,10 +36,31 @@ public final class VersionManager {
                 && !is_v1_13() && !is_v1_14() && !is_v1_15() && !is_v1_16();
         this.hasSecondHand = !is_v1_7() && !is_v1_8();
         this.hasEnchantmentCurse = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10();
+        this.hasParticle = !is_v1_7() && !is_v1_8();
+
+        try {
+            Class.forName("org.spigotmc.SpigotConfig", false, getClass().getClassLoader());
+
+            this.isBukkit = false;
+        } catch (ClassNotFoundException ignored) {
+            this.isBukkit = true;
+        }
+
+        try {
+            Class.forName("com.mohistmc.config.MohistConfigUtil", false, getClass().getClassLoader());
+
+            this.isMohist = true;
+        } catch (ClassNotFoundException ignored) {
+            this.isBukkit = false;
+        }
     }
 
     public boolean isBukkit() {
         return isBukkit;
+    }
+
+    public boolean isMohist() {
+        return isMohist;
     }
 
     public boolean hasConfigContains() {
@@ -66,8 +83,8 @@ public final class VersionManager {
         return hasHexColors;
     }
 
-    public boolean hasLodestone() {
-        return hasLodestone;
+    public boolean hasCompassMeta() {
+        return hasCompassMeta;
     }
 
     public boolean hasSwingHand() {
@@ -85,6 +102,10 @@ public final class VersionManager {
 
     public boolean hasEnchantmentCurse() {
         return hasEnchantmentCurse;
+    }
+
+    public boolean hasParticle() {
+        return hasParticle;
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")

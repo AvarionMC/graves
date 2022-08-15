@@ -3,7 +3,7 @@ package com.ranull.graves.manager;
 import com.ranull.graves.Graves;
 import com.ranull.graves.data.BlockData;
 import com.ranull.graves.data.ChunkData;
-import com.ranull.graves.inventory.Grave;
+import com.ranull.graves.type.Grave;
 import com.ranull.graves.util.LocationUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -35,8 +35,8 @@ public final class BlockManager {
     public Grave getGraveFromBlock(Block block) {
         BlockData blockData = getBlockData(block);
 
-        return blockData != null && plugin.getDataManager().getGraveMap().containsKey(blockData.getGraveUUID())
-                ? plugin.getDataManager().getGraveMap().get(blockData.getGraveUUID()) : null;
+        return blockData != null && plugin.getCacheManager().getGraveMap().containsKey(blockData.getGraveUUID())
+                ? plugin.getCacheManager().getGraveMap().get(blockData.getGraveUUID()) : null;
     }
 
     public void createBlock(Location location, Grave grave) {
@@ -67,6 +67,12 @@ public final class BlockManager {
             BlockData blockData = plugin.getCompatibility().setBlockData(location,
                     material, grave, plugin);
 
+            plugin.getDataManager().addBlockData(blockData);
+
+            if (plugin.getIntegrationManager().hasMultiPaper()) {
+                plugin.getIntegrationManager().getMultiPaper().notifyBlockCreation(blockData);
+            }
+
             if (plugin.getIntegrationManager().hasItemsAdder()) {
                 plugin.getIntegrationManager().getItemsAdder().createBlock(location, grave);
             }
@@ -74,8 +80,6 @@ public final class BlockManager {
             if (plugin.getIntegrationManager().hasOraxen()) {
                 plugin.getIntegrationManager().getOraxen().createBlock(location, grave);
             }
-
-            plugin.getDataManager().addBlockData(blockData);
 
             if (material != null) {
                 plugin.debugMessage("Placing grave block for " + grave.getUUID() + " at "
@@ -89,10 +93,24 @@ public final class BlockManager {
         }
     }
 
+    public List<BlockData> getBlockDataList(Grave grave) {
+        List<BlockData> blockDataList = new ArrayList<>();
+
+        for (Map.Entry<String, ChunkData> chunkDataEntry : plugin.getCacheManager().getChunkMap().entrySet()) {
+            for (BlockData blockData : new ArrayList<>(chunkDataEntry.getValue().getBlockDataMap().values())) {
+                if (grave.getUUID().equals(blockData.getGraveUUID())) {
+                    blockDataList.add(blockData);
+                }
+            }
+        }
+
+        return blockDataList;
+    }
+
     public List<Location> getBlockList(Grave grave) {
         List<Location> locationList = new ArrayList<>();
 
-        for (Map.Entry<String, ChunkData> chunkDataEntry : plugin.getDataManager().getChunkDataMap().entrySet()) {
+        for (Map.Entry<String, ChunkData> chunkDataEntry : plugin.getCacheManager().getChunkMap().entrySet()) {
             for (BlockData blockData : new ArrayList<>(chunkDataEntry.getValue().getBlockDataMap().values())) {
                 if (grave.getUUID().equals(blockData.getGraveUUID())) {
                     locationList.add(blockData.getLocation());
@@ -104,10 +122,9 @@ public final class BlockManager {
     }
 
     public void removeBlock(Grave grave) {
-        for (Map.Entry<String, ChunkData> chunkDataEntry : plugin.getDataManager().getChunkDataMap().entrySet()) {
-            ChunkData chunkData = chunkDataEntry.getValue();
+        for (ChunkData chunkData : plugin.getCacheManager().getChunkMap().values()) {
 
-            if (chunkDataEntry.getValue().isLoaded()) {
+            if (chunkData.isLoaded()) {
                 for (BlockData blockData : new ArrayList<>(chunkData.getBlockDataMap().values())) {
                     if (grave.getUUID().equals(blockData.getGraveUUID())) {
                         removeBlock(blockData);

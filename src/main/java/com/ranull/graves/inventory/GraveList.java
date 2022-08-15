@@ -1,5 +1,6 @@
 package com.ranull.graves.inventory;
 
+import com.ranull.graves.type.Grave;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;

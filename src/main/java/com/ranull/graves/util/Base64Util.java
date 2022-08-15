@@ -27,7 +27,8 @@ public final class Base64Util {
 
     public static Object base64ToObject(String string) {
         try {
-            return new BukkitObjectInputStream(new ByteArrayInputStream(Base64.getDecoder().decode(string))).readObject();
+            return new BukkitObjectInputStream(new ByteArrayInputStream(Base64.getDecoder().decode(string)))
+                    .readObject();
         } catch (IOException | ClassNotFoundException exception) {
             exception.printStackTrace();
         }

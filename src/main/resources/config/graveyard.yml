@@ -1,0 +1,17 @@
+###################
+# Graveyard Setup #
+###################
+settings:
+  graveyard:
+    facing: true # Should graveyards override the direction graves are facing.
+    worldguard:
+      enabled: true # Should Graveyards hook into WorldGuard.
+    towny:
+      enabled: true # Should Graveyards hook into Towny.
+      tax: 5 # Extra tax for graveyard
+    factions:
+      enabled: true # Should Graveyards hook into Factions.
+    offset:
+      x: 0 # Grave offset X.
+      y: 0 # Grave offset Y.
+      z: 0 # Grave offset Z.

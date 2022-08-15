@@ -1,23 +1,24 @@
 package com.ranull.graves.util;
 
 import com.ranull.graves.Graves;
-import com.ranull.graves.inventory.Grave;
+import com.ranull.graves.type.Grave;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatColor;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class StringUtil {
     public static String format(String string) {
-        return WordUtils.capitalizeFully(string
-                .replace("_", " "));
+        return capitalizeFully(string.replace("_", " "));
     }
 
     public static String parseString(String string, Graves plugin) {
@@ -84,6 +85,10 @@ public final class StringUtil {
                             ? grave.getKillerType().name() : "")
                     .replace("%killer_uuid%", grave.getKillerUUID() != null
                             ? grave.getKillerUUID().toString() : "")
+                    .replace("%time_creation%",
+                            String.valueOf(grave.getTimeCreation()))
+                    .replace("%time_creation_formatted%",
+                            getDateString(grave, grave.getTimeCreation(), plugin))
                     .replace("%time_alive_remaining%",
                             String.valueOf(grave.getTimeAliveRemaining()))
                     .replace("%time_alive_remaining_formatted%",
@@ -128,16 +133,6 @@ public final class StringUtil {
             string = string.replace("%world_formatted%", "");
         }
 
-        Pattern pattern = Pattern.compile("&#[a-fA-f0-9]{6}");
-        Matcher matcher = pattern.matcher(string);
-
-        while (matcher.find()) {
-            String colorHex = string.substring(matcher.start() + 1, matcher.end());
-            string = plugin.getVersionManager().hasHexColors() ? string.replace("&" + colorHex,
-                    ChatColor.of(colorHex).toString()) : string.replace(colorHex, "");
-            matcher = pattern.matcher(string);
-        }
-
         if (name != null) {
             string = string.replace("%name%", name)
                     .replace("%interact_name%", name)
@@ -149,6 +144,26 @@ public final class StringUtil {
             string = string.replace("%interact_name%", plugin.getEntityManager().getEntityName(entity))
                     .replace("%interact_type%", entity.getType().name())
                     .replace("%interact_uuid%", entity.getUniqueId().toString());
+        }
+
+        if (plugin.getIntegrationManager().hasMineDown()) {
+            string = plugin.getIntegrationManager().getMineDown().parseString(string);
+        }
+
+        Pattern pattern = Pattern.compile("&#[a-fA-f0-9]{6}");
+        Matcher matcher = pattern.matcher(string);
+
+        while (matcher.find()) {
+            String colorHex = string.substring(matcher.start() + 1, matcher.end());
+            string = plugin.getVersionManager().hasHexColors()
+                    ? string.replace("&" + colorHex, ChatColor.of(colorHex).toString())
+                    : string.replace(colorHex, "");
+            matcher = pattern.matcher(string);
+        }
+
+        if (plugin.getIntegrationManager().hasMiniMessage()) {
+            string = string.replace("§", "&");
+            string = plugin.getIntegrationManager().getMiniMessage().parseString(string);
         }
 
         return string.replace("&", "§");
@@ -178,6 +193,15 @@ public final class StringUtil {
         }
 
         return string;
+    }
+
+    public static String getDateString(Grave grave, long time, Graves plugin) {
+        if (time > 0) {
+            return new SimpleDateFormat(plugin.getConfig("time.date", grave)
+                    .getString("time.date", "dd-MM-yyyy")).format(new Date(time));
+        }
+
+        return plugin.getConfig("time.infinite", grave).getString("time.infinite");
     }
 
     public static String getTimeString(Grave grave, long time, Graves plugin) {
@@ -213,9 +237,27 @@ public final class StringUtil {
                         .replace("%second%", String.valueOf(second));
             }
 
-            return StringUtils.normalizeSpace(timeDay + timeHour + timeMinute + timeSecond);
+            return normalizeSpace(timeDay + timeHour + timeMinute + timeSecond);
         }
 
         return plugin.getConfig("time.infinite", grave).getString("time.infinite");
+    }
+
+    private static String normalizeSpace(String string) {
+        try {
+            string = StringUtils.normalizeSpace(string);
+        } catch (NoClassDefFoundError ignored) {
+        }
+
+        return string;
+    }
+
+    private static String capitalizeFully(String string) {
+        try {
+            string = WordUtils.capitalizeFully(string);
+        } catch (NoClassDefFoundError ignored) {
+        }
+
+        return string;
     }
 }

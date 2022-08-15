@@ -1,9 +1,9 @@
 package com.ranull.graves.listener;
 
 import com.ranull.graves.Graves;
-import com.ranull.graves.inventory.Grave;
 import com.ranull.graves.inventory.GraveList;
 import com.ranull.graves.inventory.GraveMenu;
+import com.ranull.graves.type.Grave;
 import com.ranull.graves.util.InventoryUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -27,10 +27,9 @@ public class InventoryClickListener implements Listener {
             if (inventoryHolder instanceof Grave) {
                 Grave grave = (Grave) inventoryHolder;
 
-                plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-                    plugin.getDataManager().updateGrave(grave, "inventory",
-                            InventoryUtil.inventoryToString(grave.getInventory()));
-                }, 1L);
+                plugin.getServer().getScheduler().runTaskLater(plugin, () ->
+                        plugin.getDataManager().updateGrave(grave, "inventory",
+                                InventoryUtil.inventoryToString(grave.getInventory())), 1L);
             } else if (event.getWhoClicked() instanceof Player) {
                 Player player = (Player) event.getWhoClicked();
 

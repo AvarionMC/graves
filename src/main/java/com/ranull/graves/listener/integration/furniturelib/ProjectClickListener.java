@@ -2,7 +2,7 @@ package com.ranull.graves.listener.integration.furniturelib;
 
 import com.ranull.graves.Graves;
 import com.ranull.graves.integration.FurnitureLib;
-import com.ranull.graves.inventory.Grave;
+import com.ranull.graves.type.Grave;
 import de.Ste3et_C0st.FurnitureLib.SchematicLoader.Events.ProjectClickEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

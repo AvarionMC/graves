@@ -1,19 +1,23 @@
-package com.ranull.graves.inventory;
+package com.ranull.graves.type;
 
+import com.ranull.graves.data.LocationData;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-import java.util.UUID;
+import java.io.Serializable;
+import java.util.*;
 
-public class Grave implements InventoryHolder {
+public class Grave implements InventoryHolder, Serializable {
     private final UUID uuid;
+    private transient Inventory inventory;
+    private Map<EquipmentSlot, ItemStack> equipmentMap;
     private List<String> permissionList;
-    private Location locationDeath;
+    private LocationData locationDeath;
     private float yaw;
     private float pitch;
     private EntityType ownerType;
@@ -21,11 +25,11 @@ public class Grave implements InventoryHolder {
     private String ownerNameDisplay;
     private UUID ownerUUID;
     private String ownerTexture;
+    private String ownerTextureSignature;
     private EntityType killerType;
     private String killerName;
     private String killerNameDisplay;
     private UUID killerUUID;
-    private Inventory inventory;
     private int experience;
     private boolean protection;
     private long timeAlive;
@@ -47,6 +51,18 @@ public class Grave implements InventoryHolder {
         this.inventory = inventory;
     }
 
+    public Map<EquipmentSlot, ItemStack> getEquipmentMap() {
+        return equipmentMap;
+    }
+
+    public void setEquipmentMap(Map<EquipmentSlot, ItemStack> equipmentMap) {
+        this.equipmentMap = equipmentMap;
+    }
+
+    public List<ItemStack> getInventoryItemStack() {
+        return inventory != null ? Arrays.asList(inventory.getContents()) : new ArrayList<>();
+    }
+
     public UUID getUUID() {
         return uuid;
     }
@@ -60,11 +76,11 @@ public class Grave implements InventoryHolder {
     }
 
     public Location getLocationDeath() {
-        return locationDeath;
+        return locationDeath != null ? locationDeath.getLocation() : null;
     }
 
     public void setLocationDeath(Location locationDeath) {
-        this.locationDeath = locationDeath;
+        this.locationDeath = new LocationData(locationDeath);
     }
 
     public float getYaw() {
@@ -121,6 +137,14 @@ public class Grave implements InventoryHolder {
 
     public void setOwnerTexture(String ownerTexture) {
         this.ownerTexture = ownerTexture;
+    }
+
+    public String getOwnerTextureSignature() {
+        return ownerTextureSignature;
+    }
+
+    public void setOwnerTextureSignature(String ownerTextureSignature) {
+        this.ownerTextureSignature = ownerTextureSignature;
     }
 
     public EntityType getKillerType() {

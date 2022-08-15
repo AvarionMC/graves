@@ -3,7 +3,7 @@ package com.ranull.graves.manager;
 import com.ranull.graves.Graves;
 import com.ranull.graves.data.EntityData;
 import com.ranull.graves.data.HologramData;
-import com.ranull.graves.inventory.Grave;
+import com.ranull.graves.type.Grave;
 import com.ranull.graves.util.LocationUtil;
 import com.ranull.graves.util.StringUtil;
 import org.bukkit.Location;
@@ -25,7 +25,7 @@ public final class HologramManager extends EntityDataManager {
     }
 
     public void createHologram(Location location, Grave grave) {
-        if (!plugin.getVersionManager().is_v1_7() && location.getWorld() != null
+        if (!plugin.getVersionManager().is_v1_7()
                 && plugin.getConfig("hologram.enabled", grave).getBoolean("hologram.enabled")) {
             double offsetX = plugin.getConfig("hologram.offset.x", grave).getDouble("hologram.offset.x");
             double offsetY = plugin.getConfig("hologram.offset.y", grave).getDouble("hologram.offset.y");
@@ -66,11 +66,18 @@ public final class HologramManager extends EntityDataManager {
 
                     if (plugin.getVersionManager().hasScoreboardTags()) {
                         armorStand.getScoreboardTags().add("graveHologram");
+                        armorStand.getScoreboardTags().add("graveHologramGraveUUID:" + grave.getUUID());
                     }
 
-                    plugin.getDataManager().addHologramData(new HologramData(location, armorStand.getUniqueId(),
-                            grave.getUUID(), lineNumber));
+                    HologramData hologramData = new HologramData(location, armorStand.getUniqueId(),
+                            grave.getUUID(), lineNumber);
+
+                    plugin.getDataManager().addHologramData(hologramData);
                     lineNumber++;
+
+                    if (plugin.getIntegrationManager().hasMultiPaper()) {
+                        plugin.getIntegrationManager().getMultiPaper().notifyHologramCreation(hologramData);
+                    }
                 }
             }
         }
