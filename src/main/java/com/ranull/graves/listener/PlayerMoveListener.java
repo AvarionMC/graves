@@ -5,6 +5,7 @@ import com.ranull.graves.data.BlockData;
 import com.ranull.graves.data.ChunkData;
 import com.ranull.graves.type.Grave;
 import com.ranull.graves.util.LocationUtil;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -22,12 +23,12 @@ public class PlayerMoveListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerMove(PlayerMoveEvent event) {
-        if (event.getTo() != null) {
-            Player player = event.getPlayer();
+        Player player = event.getPlayer();
 
-            if (event.getTo().getBlockX() != event.getFrom().getBlockX()
+        if (plugin.getVersionManager().is_v1_7() || player.getGameMode() != GameMode.SPECTATOR) {
+            if (event.getTo() != null && (event.getTo().getBlockX() != event.getFrom().getBlockX()
                     || event.getTo().getBlockY() != event.getFrom().getBlockY()
-                    || event.getTo().getBlockZ() != event.getFrom().getBlockZ()) {
+                    || event.getTo().getBlockZ() != event.getFrom().getBlockZ())) {
                 Location location = LocationUtil.roundLocation(player.getLocation());
 
                 if (plugin.getLocationManager().isInsideBorder(location)

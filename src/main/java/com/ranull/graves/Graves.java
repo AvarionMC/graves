@@ -24,14 +24,12 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.permissions.PermissionAttachmentInfo;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
 
 public class Graves extends JavaPlugin {
     private VersionManager versionManager;
@@ -364,24 +362,24 @@ public class Graves extends JavaPlugin {
     public void dumpServerInfo(CommandSender commandSender) {
         if (isEnabled()) {
             getServer().getScheduler().runTaskAsynchronously(this, () -> {
-                String serverInfoDump = ServerUtil.getServerInfoDump(this);
-                String message = serverInfoDump;
+                String serverDumpInfo = ServerUtil.getServerDumpInfo(this);
+                String message = serverDumpInfo;
 
                 if (getConfig().getString("settings.dump.method", "HASTEBIN")
                         .equalsIgnoreCase("HASTEBIN")) {
-                    String response = HastebinUtil.postDataToHastebin(serverInfoDump, true);
+                    String response = HastebinUtil.postDataToHastebin(serverDumpInfo, true);
 
                     if (response != null) {
                         message = response;
                     }
                 }
 
-                if (serverInfoDump.equals(message)) {
+                if (serverDumpInfo.equals(message)) {
                     try {
-                        String name = "dump-" + System.currentTimeMillis() + ".txt";
+                        String name = "graves-dump-" + System.currentTimeMillis() + ".txt";
                         PrintWriter printWriter = new PrintWriter(name, "UTF-8");
 
-                        printWriter.write(serverInfoDump);
+                        printWriter.write(serverDumpInfo);
                         printWriter.close();
 
                         message = name;
@@ -394,28 +392,6 @@ public class Graves extends JavaPlugin {
                         + "Dumped: " + message);
             });
         }
-    }
-
-    private String getServerInfoDump() {
-        List<String> stringList = new ArrayList<>();
-
-        stringList.add("Implementation Name: " + getServer().getName());
-        stringList.add("Implementation Version: " + getServer().getVersion());
-        stringList.add("Bukkit Version: " + getServer().getBukkitVersion());
-        stringList.add("NMS Version: " + getServer().getClass().getPackage().getName().split("\\.")[3]);
-        stringList.add("Player Count: " + getServer().getOnlinePlayers().size());
-        stringList.add("Player List: " + getServer().getOnlinePlayers().stream().map(Player::getName)
-                .collect(Collectors.joining(", ")));
-        stringList.add("Plugin Count: " + getServer().getPluginManager().getPlugins().length);
-        stringList.add("Plugin List: " + Arrays.stream(getServer().getPluginManager().getPlugins())
-                .map(Plugin::getName).collect(Collectors.joining(", ")));
-        stringList.add(getDescription().getName() + " Version: " + getDescription().getVersion());
-        stringList.add(getDescription().getName() + " API Version: " + getDescription().getAPIVersion());
-        stringList.add(getDescription().getName() + " Config Version: " + getConfig().getInt("config-version"));
-        stringList.add(getDescription().getName() + " Config Base64: " + Base64.getEncoder()
-                .encodeToString(getConfig().saveToString().getBytes()));
-
-        return String.join("\n", stringList);
     }
 
     public VersionManager getVersionManager() {

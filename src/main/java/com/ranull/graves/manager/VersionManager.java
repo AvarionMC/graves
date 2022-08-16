@@ -4,6 +4,8 @@ import org.bukkit.Bukkit;
 
 public final class VersionManager {
     private final String version;
+    private final boolean hasConfigContains;
+    private final boolean hasAPIVersion;
     private final boolean hasBlockData;
     private final boolean hasPersistentData;
     private final boolean hasScoreboardTags;
@@ -14,13 +16,13 @@ public final class VersionManager {
     private final boolean hasSecondHand;
     private final boolean hasEnchantmentCurse;
     private final boolean hasParticle;
-    private final boolean hasConfigContains;
     private boolean isBukkit;
     private boolean isMohist;
 
     public VersionManager() {
         this.version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
         this.hasConfigContains = !is_v1_7() && !is_v1_8() && !is_v1_9();
+        this.hasAPIVersion = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10() && !is_v1_11() && !is_v1_12();
         this.hasBlockData = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10() && !is_v1_11() && !is_v1_12();
         this.hasPersistentData = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10() && !is_v1_11() && !is_v1_12()
                 && !is_v1_13();
@@ -65,6 +67,10 @@ public final class VersionManager {
 
     public boolean hasConfigContains() {
         return hasConfigContains;
+    }
+
+    public boolean hasAPIVersion() {
+        return hasAPIVersion;
     }
 
     public boolean hasBlockData() {

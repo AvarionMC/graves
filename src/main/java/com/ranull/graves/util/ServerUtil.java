@@ -1,8 +1,8 @@
 package com.ranull.graves.util;
 
+import com.ranull.graves.Graves;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,27 +11,31 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public final class ServerUtil {
-    public static String getServerInfoDump(JavaPlugin javaPlugin) {
+    public static String getServerDumpInfo(Graves plugin) {
         List<String> stringList = new ArrayList<>();
 
-        stringList.add("Implementation Name: " + javaPlugin.getServer().getName());
-        stringList.add("Implementation Version: " + javaPlugin.getServer().getVersion());
-        stringList.add("Bukkit Version: " + javaPlugin.getServer().getBukkitVersion());
-        stringList.add("NMS Version: " + javaPlugin.getServer().getClass().getPackage().getName().split("\\.")[3]);
-        stringList.add("Player Count: " + javaPlugin.getServer().getOnlinePlayers().size());
-        stringList.add("Player List: " + javaPlugin.getServer().getOnlinePlayers().stream().map(Player::getName)
+        stringList.add("Implementation Name: " + plugin.getServer().getName());
+        stringList.add("Implementation Version: " + plugin.getServer().getVersion());
+        stringList.add("Bukkit Version: " + plugin.getServer().getBukkitVersion());
+        stringList.add("NMS Version: " + plugin.getServer().getClass().getPackage().getName().split("\\.")[3]);
+        stringList.add("Player Count: " + plugin.getServer().getOnlinePlayers().size());
+        stringList.add("Player List: " + plugin.getServer().getOnlinePlayers().stream().map(Player::getName)
                 .collect(Collectors.joining(", ")));
-        stringList.add("Plugin Count: " + javaPlugin.getServer().getPluginManager().getPlugins().length);
-        stringList.add("Plugin List: " + Arrays.stream(javaPlugin.getServer().getPluginManager().getPlugins())
+        stringList.add("Plugin Count: " + plugin.getServer().getPluginManager().getPlugins().length);
+        stringList.add("Plugin List: " + Arrays.stream(plugin.getServer().getPluginManager().getPlugins())
                 .map(Plugin::getName).collect(Collectors.joining(", ")));
-        stringList.add(javaPlugin.getDescription().getName() + " Version: "
-                + javaPlugin.getDescription().getVersion());
-        stringList.add(javaPlugin.getDescription().getName() + " API Version: "
-                + javaPlugin.getDescription().getAPIVersion());
-        stringList.add(javaPlugin.getDescription().getName() + " Config Version: "
-                + javaPlugin.getConfig().getInt("config-version"));
-        stringList.add(javaPlugin.getDescription().getName() + " Config Base64: "
-                + Base64.getEncoder().encodeToString(javaPlugin.getConfig().saveToString().getBytes()));
+        stringList.add(plugin.getDescription().getName() + " Version: "
+                + plugin.getDescription().getVersion());
+
+        if (plugin.getVersionManager().hasAPIVersion()) {
+            stringList.add(plugin.getDescription().getName() + " API Version: "
+                    + plugin.getDescription().getAPIVersion());
+        }
+
+        stringList.add(plugin.getDescription().getName() + " Config Version: "
+                + plugin.getConfig().getInt("config-version"));
+        stringList.add(plugin.getDescription().getName() + " Config Base64: "
+                + Base64.getEncoder().encodeToString(plugin.getConfig().saveToString().getBytes()));
 
         return String.join("\n", stringList);
     }

@@ -75,7 +75,8 @@ public final class PlayerNPC extends EntityDataManager {
                 Player player = plugin.getServer().getPlayer(grave.getOwnerUUID());
                 Location npcLocation = location.clone();
 
-                if (player != null && npcLocation.getWorld() != null) {
+                if (player != null && npcLocation.getWorld() != null
+                        && npcLib.getGlobalNPC(plugin, uuid.toString()) == null) {
                     location.getBlock().setType(Material.AIR);
                     NPC.Pose pose = NPC.Pose.SWIMMING;
 
@@ -140,7 +141,8 @@ public final class PlayerNPC extends EntityDataManager {
                     if (plugin.getConfig("playernpc.corpse.glow.enabled", grave)
                             .getBoolean("playernpc.corpse.glow.enabled")) {
                         try {
-                            npc.setGlowing(true, ChatColor.valueOf(plugin.getConfig("playernpc.corpse.glow.color", grave)
+                            npc.setGlowing(true, ChatColor.valueOf(plugin
+                                    .getConfig("playernpc.corpse.glow.color", grave)
                                     .getString("playernpc.corpse.glow.color")));
                         } catch (IllegalArgumentException ignored) {
                             npc.setGlowing(true);
