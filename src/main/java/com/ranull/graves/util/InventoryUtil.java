@@ -134,14 +134,16 @@ public final class InventoryUtil {
 
     public static String inventoryToString(Inventory inventory) {
         List<String> stringList = new ArrayList<>();
-        ItemStack itemStackAir = new ItemStack(Material.AIR);
 
         for (ItemStack itemStack : inventory.getContents()) {
-            stringList.add(Base64Util.objectToBase64(itemStack != null ? itemStack : itemStackAir));
+            String base64 = Base64Util.objectToBase64(itemStack != null ? itemStack : new ItemStack(Material.AIR));
+
+            if (base64 != null) {
+                stringList.add(base64);
+            }
         }
 
         return String.join("|", stringList);
-        //return StringUtils.join(stringList, '|');
     }
 
     public static Inventory stringToInventory(InventoryHolder inventoryHolder, String string, String title, Graves plugin) {

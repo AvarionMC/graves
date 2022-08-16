@@ -211,7 +211,7 @@ settings:
         model-data: -1 # Custom model data, -1 is none.
         name: "%owner_name%'s Head"
         lore:
-          - "%time_creation_formatted%"
+          - "Killed by %killer_name%"
 
       ##########
       # Zombie #

@@ -249,7 +249,9 @@ public final class LocationManager {
     }
 
     public boolean isInsideBorder(Location location) {
-        return plugin.getVersionManager().is_v1_7()
+        return plugin.getVersionManager().is_v1_7() || plugin.getVersionManager().is_v1_8()
+                || plugin.getVersionManager().is_v1_9() || plugin.getVersionManager().is_v1_10()
+                || plugin.getVersionManager().is_v1_11()
                 || (location.getWorld() != null && location.getWorld().getWorldBorder().isInside(location));
     }
 

@@ -18,8 +18,7 @@ public final class Base64Util {
             bukkitObjectOutputStream.close();
 
             return Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());
-        } catch (IOException exception) {
-            exception.printStackTrace();
+        } catch (IOException ignored) {
         }
 
         return null;
@@ -29,8 +28,7 @@ public final class Base64Util {
         try {
             return new BukkitObjectInputStream(new ByteArrayInputStream(Base64.getDecoder().decode(string)))
                     .readObject();
-        } catch (IOException | ClassNotFoundException exception) {
-            exception.printStackTrace();
+        } catch (IOException | ClassNotFoundException ignored) {
         }
 
         return null;

@@ -34,35 +34,28 @@ public class PlayerMoveListener implements Listener {
                         && location.getBlock().getRelative(BlockFace.DOWN).getType().isSolid()
                         && plugin.getLocationManager().isLocationSafePlayer(location)) {
                     plugin.getLocationManager().setLastSolidLocation(player, location.clone());
+                }
 
-                    //player.sendMessage(Math.abs(event.getFrom().getX() - event.getTo().getX()) + ""); // TODO FIX WALK OVER HALF STEP
+                if (location.getWorld() != null && plugin.getDataManager().hasChunkData(location)) {
+                    ChunkData chunkData = plugin.getDataManager().getChunkData(location);
+                    BlockData blockData = null;
 
-                    if ((event.getTo().getX() != event.getFrom().getX())
-                            || event.getTo().getBlockY() != event.getFrom().getBlockY()
-                            || event.getTo().getBlockZ() != event.getFrom().getBlockZ()) {
-                        //Location location = LocationUtil.roundLocation(player.getLocation());
+                    if (chunkData.getBlockDataMap().containsKey(location)) {
+                        blockData = chunkData.getBlockDataMap().get(location);
+                    } else if (chunkData.getBlockDataMap().containsKey(location.clone().add(0, 1, 0))) {
+                        blockData = chunkData.getBlockDataMap().get(location.clone().add(0, 1, 0));
+                    } else if (chunkData.getBlockDataMap().containsKey(location.clone().subtract(0, 1, 0))) {
+                        blockData = chunkData.getBlockDataMap().get(location.clone().subtract(0, 1, 0));
+                    }
 
-                        if (location.getWorld() != null && plugin.getDataManager().hasChunkData(location)) {
-                            ChunkData chunkData = plugin.getDataManager().getChunkData(location);
-                            BlockData blockData = null;
+                    if (blockData != null && plugin.getCacheManager().getGraveMap()
+                            .containsKey(blockData.getGraveUUID())) {
+                        Grave grave = plugin.getCacheManager().getGraveMap().get(blockData.getGraveUUID());
 
-                            if (chunkData.getBlockDataMap().containsKey(location)) {
-                                blockData = chunkData.getBlockDataMap().get(location);
-                            } else if (chunkData.getBlockDataMap().containsKey(location.clone().add(0, 1, 0))) {
-                                blockData = chunkData.getBlockDataMap().get(location.clone().add(0, 1, 0));
-                            } else if (chunkData.getBlockDataMap().containsKey(location.clone().subtract(0, 1, 0))) {
-                                blockData = chunkData.getBlockDataMap().get(location.clone().subtract(0, 1, 0));
-                            }
-
-                            if (blockData != null && plugin.getCacheManager().getGraveMap().containsKey(blockData.getGraveUUID())) {
-                                Grave grave = plugin.getCacheManager().getGraveMap().get(blockData.getGraveUUID());
-
-                                if (grave != null && plugin.getConfig("block.walk-over", grave).getBoolean("block.walk-over")
-                                        && plugin.getEntityManager().canOpenGrave(player, grave)) {
-                                    plugin.getGraveManager().cleanupCompasses(player, grave);
-                                    plugin.getGraveManager().autoLootGrave(event.getPlayer(), location, grave);
-                                }
-                            }
+                        if (grave != null && plugin.getConfig("block.walk-over", grave).getBoolean("block.walk-over")
+                                && plugin.getEntityManager().canOpenGrave(player, grave)) {
+                            plugin.getGraveManager().cleanupCompasses(player, grave);
+                            plugin.getGraveManager().autoLootGrave(event.getPlayer(), location, grave);
                         }
                     }
                 }

@@ -163,9 +163,9 @@ public final class GraveManager {
     }
 
     public void graveParticle(Location location, Grave grave) {
-        if (plugin.getVersionManager().hasParticle() && location.getWorld() != null
-                && plugin.getConfig("particle.enabled", grave)
-                .getBoolean("particle.enabled")) {
+        if (plugin.getVersionManager().hasParticle()
+                && location.getWorld() != null
+                && plugin.getConfig("particle.enabled", grave).getBoolean("particle.enabled")) {
             Particle particle = Particle.REDSTONE;
             String particleType = plugin.getConfig("particle.type", grave).getString("particle.type");
 
@@ -185,8 +185,8 @@ public final class GraveManager {
             location = location.clone().add(offsetX + 0.5, offsetY + 0.5, offsetZ + 0.5);
 
             if (location.getWorld() != null) {
-                switch (particle) {
-                    case REDSTONE:
+                switch (particle.name()) {
+                    case "REDSTONE":
                         int size = plugin.getConfig("particle.dust-size", grave).getInt("particle.dust-size");
                         Color color = ColorUtil.getColor(plugin.getConfig("particle.dust-color", grave)
                                 .getString("particle.dust-color", "RED"));
@@ -198,7 +198,7 @@ public final class GraveManager {
                         location.getWorld().spawnParticle(particle, location, count,
                                 new Particle.DustOptions(color, size));
                         break;
-                    case SHRIEK:
+                    case "SHRIEK":
                         location.getWorld().spawnParticle(particle, location, count, 1);
                         break;
                     default:
