@@ -7,7 +7,6 @@ import com.ranull.graves.listener.integration.oraxen.HangingBreakListener;
 import com.ranull.graves.listener.integration.oraxen.PlayerInteractEntityListener;
 import com.ranull.graves.manager.EntityDataManager;
 import com.ranull.graves.type.Grave;
-import com.ranull.graves.util.BlockFaceUtil;
 import com.ranull.graves.util.ResourceUtil;
 import io.th0rgal.oraxen.mechanics.MechanicFactory;
 import io.th0rgal.oraxen.mechanics.MechanicsManager;
@@ -24,7 +23,6 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -90,8 +88,12 @@ public final class Oraxen extends EntityDataManager {
                 if (furnitureMechanic != null && location.getWorld() != null) {
                     location.getBlock().setType(Material.AIR);
 
-                    ItemFrame itemFrame = furnitureMechanic.place(BlockFaceUtil.getBlockFaceRotation(BlockFaceUtil
-                            .getYawBlockFace(location.getYaw())), location.getYaw(), BlockFace.UP, location);
+                    ItemFrame itemFrame = (ItemFrame) furnitureMechanic.place(
+                            location,
+                            location.getYaw(),
+                            BlockFace.UP
+                            // , BlockFaceUtil.getBlockFaceRotation(BlockFaceUtil.getYawBlockFace(location.getYaw()))
+                    );
 
                     if (itemFrame != null) {
                         createEntityData(location, itemFrame.getUniqueId(), grave.getUUID(), EntityData.Type.ORAXEN);
@@ -109,10 +111,6 @@ public final class Oraxen extends EntityDataManager {
 
     public void removeFurniture(Grave grave) {
         removeFurniture(getEntityDataMap(getLoadedEntityDataList(grave)));
-    }
-
-    public void removeFurniture(EntityData entityData) {
-        removeFurniture(getEntityDataMap(Collections.singletonList(entityData)));
     }
 
     public void removeFurniture(Map<EntityData, Entity> entityDataMap) {

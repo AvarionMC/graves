@@ -15,6 +15,10 @@
             <name>Ranull</name>
             <url>https://gitlab.com/ranull/minecraft/graves/</url>
         </developer>
+        <developer>
+            <name>Steven 'KaReL' Van Ingelgem</name>
+            <url>https://github.com/svaningelgem/graves/</url>
+        </developer>
     </developers>
 
     <properties>
@@ -38,7 +42,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.3.1-SNAPSHOT</version>
+                <version>3.5.2</version>
                 <configuration>
                     <relocations>
                         <relocation>
@@ -93,6 +97,11 @@
     </build>
 
     <repositories>
+        <repository>
+            <id>oraxen-releases</id>
+            <name>Oraxen Repository</name>
+            <url>https://repo.oraxen.com/releases/</url>
+        </repository>
         <repository>
             <id>spigotmc-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
@@ -281,9 +290,20 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.oraxen</groupId>
+            <groupId>io.th0rgal</groupId>
             <artifactId>oraxen</artifactId>
-            <version>-86bffe910f-1</version>
+            <version>1.171.0</version>
+            <classifier>dev</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>me.gabytm.util</groupId>
+                    <artifactId>actions-spigot</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.ticxo</groupId>
+                    <artifactId>PlayerAnimator</artifactId>
+                </exclusion>
+            </exclusions>
             <scope>provided</scope>
         </dependency>
         <dependency>
