@@ -98,11 +98,6 @@
 
     <repositories>
         <repository>
-            <id>oraxen-releases</id>
-            <name>Oraxen Repository</name>
-            <url>https://repo.oraxen.com/releases/</url>
-        </repository>
-        <repository>
             <id>spigotmc-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
         </repository>
@@ -165,6 +160,11 @@
         <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <id>oraxen-releases</id>
+            <name>Oraxen Repository</name>
+            <url>https://repo.oraxen.com/releases/</url>
         </repository>
     </repositories>
 
