@@ -44,8 +44,15 @@ public final class SkinUtil {
                 if (propertyMap.containsKey("textures")) {
                     Collection<Property> propertyCollection = propertyMap.get("textures");
 
-                    return !propertyCollection.isEmpty()
-                            ? propertyCollection.stream().findFirst().get().getValue() : null;
+                    if (propertyCollection.isEmpty())
+                        return null;
+
+                    Property prop = propertyCollection.stream().findFirst().get();
+                    try {
+                        return prop.value();
+                    } catch (NoSuchMethodError ex) {
+                        return prop.getValue();
+                    }
                 }
             }
         } else {
