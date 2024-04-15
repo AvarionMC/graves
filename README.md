@@ -31,7 +31,7 @@ The **ULTIMATE** full-featured lightweight death chest plugin / player grave plu
 * Reload Safe
 
 ## Supports
-* 1.7.*, 1.8.*, 1.9.*, 1.10.*, 1.11.*, 1.12.*, 1.13.*, 1.14.*, 1.15.*, 1.16.*, 1.17.*, 1.18.*, 1.19.*, 1.20.*
+* 1.7.\*, 1.8.\*, 1.9.\*, 1.10.\*, 1.11.\*, 1.12.\*, 1.13.\*, 1.14.\*, 1.15.\*, 1.16.\*, 1.17.\*, 1.18.\*, 1.19.\*, 1.20.\*
 * Spigot, Paper, Purpur, Airplane, Pufferfish, Tuinity, CraftBukkit, CatServer, Mohist, Magma, MultiPaper
 * GeyserMC (Bedrock Players)
 * Forge/Bukkit Hybrid servers (Mohist, Magma, CatServer)
