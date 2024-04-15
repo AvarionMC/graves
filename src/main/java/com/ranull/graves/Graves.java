@@ -620,11 +620,9 @@ public class Graves extends JavaPlugin {
         return UpdateUtil.getLatestVersion(getSpigotID());
     }
 
-    public final int getSpigotID() {
-        return 74208;
-    }
+    public final int getSpigotID() { return 116202; }
 
     public final int getMetricsID() {
-        return 12849;
+        return 21607;
     }
 }

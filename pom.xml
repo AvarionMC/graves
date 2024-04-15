@@ -13,11 +13,11 @@
     <developers>
         <developer>
             <name>Ranull</name>
-            <url>https://gitlab.com/ranull/minecraft/graves/</url>
+            <url>https://gitlab.com/ranull/</url>
         </developer>
         <developer>
             <name>Steven 'KaReL' Van Ingelgem</name>
-            <url>https://github.com/svaningelgem/graves/</url>
+            <url>https://github.com/svaningelgem/</url>
         </developer>
     </developers>
 
@@ -337,4 +337,12 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/AvarionMC/graves</url>
+        </repository>
+    </distributionManagement>
 </project>
