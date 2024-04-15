@@ -1,0 +1,75 @@
+name: Maven Release
+
+on:
+  push:
+    tags:
+      - 'release-*'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      ##################################################################################################################
+      # Package
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+          server-id: maven
+          settings-path: ${{ github.workspace }}
+
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Package the jar file
+        run: mvn --batch-mode clean package
+
+      ##################################################################################################################
+      # Creation of the release artifact
+      - name: Create GitHub release
+        run: |
+          gh release upload "$TAG" target/Graves-*.jar --clobber
+          gh release edit "$TAG" --draft=false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: release-${{ CURRENT_VERSION }}
+
+      ##################################################################################################################
+      # Version PR
+      - name: Create version bump branch
+        run: |
+          git checkout -b version-bump-${GITHUB_SHA::8}
+          git config --global user.email "version_bumper@avarion.org"
+          git config --global user.name "GitHub Action -- Bump Version"
+
+      - name: Update version in pom.xml
+        run: |
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          NEW_VERSION="${CURRENT_VERSION%.*}.$((${CURRENT_VERSION##*.}+1))"
+          mvn versions:set -DnewVersion=$NEW_VERSION
+          mvn versions:commit
+
+      - name: Commit version change
+        run: |
+          git add pom.xml **/pom.xml
+          git commit -m "Incremented version to $NEW_VERSION"
+          git push --set-upstream origin version-bump-${GITHUB_SHA::8}
+
+      - name: Create pull request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh auth setup-git
+          gh pr create --title "Version bump to $NEW_VERSION" --body "This pull request increments the patch version following a release." --base master --head version-bump-${GITHUB_SHA::8}
