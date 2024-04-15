@@ -49,6 +49,12 @@ The **ULTIMATE** full-featured lightweight death chest plugin / player grave plu
 * ProtectionLib (Protected Region Detection)
 * PlayerNPC (Corpses)
 
+* Towny
+* GriefDefender
+* ItemBridge
+* MineDown
+* MiniMessage
+
 ## Screenshots
 
 ![Screenshot 1](images/screenshot_1.png)
