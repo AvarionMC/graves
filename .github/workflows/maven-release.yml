@@ -13,12 +13,10 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     steps:
-      ##################################################################################################################
-      # Package
       - uses: actions/checkout@v4
 
       - name: Set up JDK
@@ -26,6 +24,15 @@ jobs:
         with:
           java-version: '17'
           distribution: 'adopt'
+
+      - name: Set outputs
+        id: version
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          CURRENT_VERSION="${TAG#v}"
+
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+          echo "CURRENT_VERSION=$CURRENT_VERSION" >> "$GITHUB_ENV"
 
       - name: Cache Maven packages
         uses: actions/cache@v4
@@ -35,35 +42,12 @@ jobs:
           restore-keys: m2-cache
           save-always: true
 
-      - name: Package the jar file
-        run: mvn --batch-mode clean deploy
+      - name: Deploy the jar file
+        run: mvn --batch-mode -Drevision=${CURRENT_VERSION} clean deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#
-#      ##################################################################################################################
-#      # Version PR
-#      - name: Create version bump branch
-#        run: |
-#          git checkout -b version-bump-${GITHUB_SHA::8}
-#          git config --global user.email "version_bumper@avarion.org"
-#          git config --global user.name "GitHub Action -- Bump Version"
-#
-#      - name: Update version in pom.xml
-#        run: |
-#          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-#          NEW_VERSION="${CURRENT_VERSION%.*}.$((${CURRENT_VERSION##*.}+1))"
-#          mvn versions:set -DnewVersion=$NEW_VERSION
-#          mvn versions:commit
-#
-#      - name: Commit version change
-#        run: |
-#          git add pom.xml **/pom.xml
-#          git commit -m "Incremented version to $NEW_VERSION"
-#          git push --set-upstream origin version-bump-${GITHUB_SHA::8}
-#
-#      - name: Create pull request
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        run: |
-#          gh auth setup-git
-#          gh pr create --title "Version bump to $NEW_VERSION" --body "This pull request increments the patch version following a release." --base master --head version-bump-${GITHUB_SHA::8}
+
+      - name: Add jar file to release
+        run: gh release upload "${TAG}" "target/Graves-${CURRENT_VERSION}.jar" --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
