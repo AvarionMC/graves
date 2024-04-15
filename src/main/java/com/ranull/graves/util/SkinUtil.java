@@ -18,6 +18,23 @@ import java.util.UUID;
 
 public final class SkinUtil {
     private static String GAMEPROFILE_METHOD;
+    private static Method property_getValue;
+    private static Method property_getSignature;
+
+    static {
+        // Determine which method to use during class loading
+        try {
+            property_getValue = Property.class.getMethod("value");
+            property_getSignature = Property.class.getMethod("signature");
+        } catch (NoSuchMethodException e) {
+            try {
+                property_getValue = Property.class.getMethod("getValue");
+                property_getSignature = Property.class.getMethod("getSignature");
+            } catch (NoSuchMethodException ex) {
+                throw new RuntimeException("Failed to find a valid method for Property value/signature retrieval", ex);
+            }
+        }
+    }
 
     public static void setSkullBlockTexture(Skull skull, String name, String base64) {
         GameProfile gameProfile = new GameProfile(UUID.randomUUID(), name);
@@ -49,9 +66,9 @@ public final class SkinUtil {
 
                     Property prop = propertyCollection.stream().findFirst().get();
                     try {
-                        return prop.value();
-                    } catch (NoSuchMethodError ex) {
-                        return prop.getValue();
+                        return (String) property_getValue.invoke(prop);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        throw new RuntimeException(e);
                     }
                 }
             }
@@ -84,8 +101,15 @@ public final class SkinUtil {
                 if (propertyMap.containsKey("textures")) {
                     Collection<Property> propertyCollection = propertyMap.get("textures");
 
-                    return !propertyCollection.isEmpty()
-                            ? propertyCollection.stream().findFirst().get().getSignature() : null;
+                    if (propertyCollection.isEmpty())
+                        return null;
+
+                    Property prop = propertyCollection.stream().findFirst().get();
+                    try {
+                        return (String) property_getSignature.invoke(prop);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         }

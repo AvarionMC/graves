@@ -45,9 +45,6 @@ public final class ProtocolLib {
     }
 
     private void sendServerPacket(Player player, PacketContainer packetContainer) {
-        try {
-            protocolManager.sendServerPacket(player, packetContainer);
-        } catch (InvocationTargetException ignored) {
-        }
+        protocolManager.sendServerPacket(player, packetContainer);
     }
 }
