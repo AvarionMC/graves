@@ -99,4 +99,5 @@ If you find bugs please report them [here](https://github.com/svaningelgem/grave
 
 ## Links
 - **Spigot**: https://www.spigotmc.org/resources/graves.116202/
+- **bStats**: https://bstats.org/plugin/bukkit/AvarionGraves/21607
 - **GitHub**: https://github.com/AvarionMC/graves
