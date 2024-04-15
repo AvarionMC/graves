@@ -9,13 +9,13 @@ import com.ranull.graves.util.BlockFaceUtil;
 import com.ranull.graves.util.SkinUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.SkullType;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Skull;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.material.Openable;
@@ -49,12 +49,11 @@ public final class CompatibilityMaterialData implements Compatibility {
         return new BlockData(location, grave.getUUID(), null, null);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public boolean canBuild(Player player, Location location, Graves plugin) {
         BlockPlaceEvent blockPlaceEvent = new BlockPlaceEvent(location.getBlock(),
-                location.getBlock().getState(), location.getBlock(), player.getItemInHand(),
-                player, true);
+                location.getBlock().getState(), location.getBlock(), player.getInventory().getItemInMainHand(),
+                player, true, EquipmentSlot.HAND);
 
         plugin.getServer().getPluginManager().callEvent(blockPlaceEvent);
 
@@ -67,14 +66,13 @@ public final class CompatibilityMaterialData implements Compatibility {
         return block.getState() instanceof BlockState;
     }
 
-    @SuppressWarnings("deprecation")
     private void updateSkullBlock(Block block, Grave grave, Graves plugin) {
         int headType = plugin.getConfig("block.head.type", grave).getInt("block.head.type");
         String headBase64 = plugin.getConfig("block.head.base64", grave).getString("block.head.base64");
         String headName = plugin.getConfig("block.head.name", grave).getString("block.head.name");
         Skull skull = (Skull) block.getState();
 
-        skull.setSkullType(SkullType.PLAYER);
+        block.setType(Material.PLAYER_HEAD);
         skull.setRotation(BlockFaceUtil.getYawBlockFace(grave.getYaw()).getOppositeFace());
 
         if (headType == 0) {

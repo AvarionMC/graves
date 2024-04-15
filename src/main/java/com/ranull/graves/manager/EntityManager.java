@@ -754,9 +754,9 @@ public final class EntityManager extends EntityDataManager {
                     equipmentSlotItemStackMap.put(EquipmentSlot.OFF_HAND, entityEquipment.getItemInOffHand());
                 }
             } else {
-                if (entityEquipment.getItemInHand().getType() != Material.AIR
-                        && grave.getInventory().contains(entityEquipment.getItemInHand())) {
-                    equipmentSlotItemStackMap.put(EquipmentSlot.HAND, entityEquipment.getItemInHand());
+                if (entityEquipment.getItemInMainHand().getType() != Material.AIR
+                        && grave.getInventory().contains(entityEquipment.getItemInMainHand())) {
+                    equipmentSlotItemStackMap.put(EquipmentSlot.HAND, entityEquipment.getItemInMainHand());
                 }
             }
         }
