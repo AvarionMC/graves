@@ -28,11 +28,12 @@ jobs:
           distribution: 'adopt'
 
       - name: Cache Maven packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.m2
-          key: ${{ runner.os }}-m2
-          restore-keys: ${{ runner.os }}-m2
+          key: m2-cache
+          restore-keys: m2-cache
+          save-always: true
 
       - name: Package the jar file
         run: mvn --batch-mode clean deploy
