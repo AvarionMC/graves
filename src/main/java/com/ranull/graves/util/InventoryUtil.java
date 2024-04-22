@@ -137,6 +137,10 @@ public final class InventoryUtil {
                         "CHAINMAIL_BOOTS");
     }
 
+    public static boolean isOffhandItem(ItemStack itemStack) {
+        return itemStack != null && itemStack.getType().name().matches("(?i)SHIELD|TORCH");
+    }
+
     public static String inventoryToString(Inventory inventory) {
         List<String> stringList = new ArrayList<>();
 
