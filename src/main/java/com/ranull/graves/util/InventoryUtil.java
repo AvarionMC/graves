@@ -56,6 +56,11 @@ public final class InventoryUtil {
                     playArmorEquipSound(player, itemStack);
                     inventory.removeItem(itemStack);
                 }
+
+                if(player.getInventory().getItemInOffHand().getType().isAir() && isOffhandItem(itemStack)) {
+                    player.getInventory().setItemInOffHand(itemStack);
+                    inventory.removeItem(itemStack);
+                }
             }
         }
     }
