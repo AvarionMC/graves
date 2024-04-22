@@ -102,9 +102,6 @@ public class PlayerInteractListener implements Listener {
                         if (!locationList.isEmpty()) {
                             Location location = locationList.get(0);
 
-                            player.getInventory().setItem(player.getInventory().getHeldItemSlot(),
-                                    plugin.getEntityManager().createGraveCompass(player, location, grave));
-
                             if (player.getWorld().equals(location.getWorld())) {
                                 plugin.getEntityManager().sendMessage("message.distance", player,
                                         location, grave);
