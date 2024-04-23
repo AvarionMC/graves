@@ -84,21 +84,10 @@ public final class HologramManager extends EntityDataManager {
     }
 
     public void removeHologram(Grave grave) {
-        removeHologram(getEntityDataMap(getLoadedEntityDataList(grave)));
+        removeEntries(getEntityDataMap(getLoadedEntityDataList(grave)));
     }
 
     public void removeHologram(EntityData entityData) {
-        removeHologram(getEntityDataMap(Collections.singletonList(entityData)));
-    }
-
-    public void removeHologram(Map<EntityData, Entity> entityDataMap) {
-        List<EntityData> entityDataList = new ArrayList<>();
-
-        for (Map.Entry<EntityData, Entity> entry : entityDataMap.entrySet()) {
-            entry.getValue().remove();
-            entityDataList.add(entry.getKey());
-        }
-
-        plugin.getDataManager().removeEntityData(entityDataList);
+        removeEntries(getEntityDataMap(Collections.singletonList(entityData)));
     }
 }

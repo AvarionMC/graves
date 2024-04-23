@@ -51,7 +51,7 @@ public final class SkinUtil {
         }
     }
 
-    public static String getTexture(Entity entity) {
+    private static String getPlayerProperty(Entity entity, Method call_this) {
         if (entity instanceof Player) {
             GameProfile gameProfile = getPlayerGameProfile((Player) entity);
 
@@ -66,24 +66,10 @@ public final class SkinUtil {
 
                     Property prop = propertyCollection.stream().findFirst().get();
                     try {
-                        return (String) property_getValue.invoke(prop);
+                        return (String) call_this.invoke(prop);
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         throw new RuntimeException(e);
                     }
-                }
-            }
-        } else {
-            Plugin skullTextureAPIPlugin = Bukkit.getServer().getPluginManager().getPlugin("SkullTextureAPI");
-
-            if (skullTextureAPIPlugin != null && skullTextureAPIPlugin.isEnabled()
-                    && skullTextureAPIPlugin instanceof SkullTextureAPI) {
-                try {
-                    String base64 = SkullTextureAPI.getTexture(entity);
-
-                    if (base64 != null && !base64.equals("")) {
-                        return base64;
-                    }
-                } catch (NoSuchMethodError ignored) {
                 }
             }
         }
@@ -91,30 +77,30 @@ public final class SkinUtil {
         return null;
     }
 
-    public static String getSignature(Entity entity) {
+    public static String getTexture(Entity entity) {
         if (entity instanceof Player) {
-            GameProfile gameProfile = getPlayerGameProfile((Player) entity);
+            return getPlayerProperty(entity, property_getValue);
+        }
 
-            if (gameProfile != null) {
-                PropertyMap propertyMap = gameProfile.getProperties();
+        Plugin skullTextureAPIPlugin = Bukkit.getServer().getPluginManager().getPlugin("SkullTextureAPI");
 
-                if (propertyMap.containsKey("textures")) {
-                    Collection<Property> propertyCollection = propertyMap.get("textures");
+        if (skullTextureAPIPlugin != null && skullTextureAPIPlugin.isEnabled()
+                && skullTextureAPIPlugin instanceof SkullTextureAPI) {
+            try {
+                String base64 = SkullTextureAPI.getTexture(entity);
 
-                    if (propertyCollection.isEmpty())
-                        return null;
-
-                    Property prop = propertyCollection.stream().findFirst().get();
-                    try {
-                        return (String) property_getSignature.invoke(prop);
-                    } catch (IllegalAccessException | InvocationTargetException e) {
-                        throw new RuntimeException(e);
-                    }
+                if (base64 != null && !base64.equals("")) {
+                    return base64;
                 }
+            } catch (NoSuchMethodError ignored) {
             }
         }
 
         return null;
+    }
+
+    public static String getSignature(Entity entity) {
+        return getPlayerProperty(entity, property_getSignature);
     }
 
     public static GameProfile getPlayerGameProfile(Player player) {

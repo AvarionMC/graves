@@ -195,47 +195,4 @@ public final class ItemStackManager extends EntityDataManager {
 
         return itemStack;
     }
-
-    public ItemStack createGraveyardItemStack(int slot, Grave grave) {
-        String materialString = plugin.getConfig("gui.menu.grave.slot." + slot + ".material", grave)
-                .getString("gui.menu.grave.slot." + slot + ".material", "PAPER");
-        Material material = Material.matchMaterial(materialString);
-
-        if (material == null) {
-            material = Material.PAPER;
-
-            plugin.debugMessage(materialString.toUpperCase() + " is not a Material ENUM", 1);
-        }
-
-        ItemStack itemStack = new ItemStack(material);
-
-        if (itemStack.getItemMeta() != null) {
-            ItemMeta itemMeta = itemStack.getItemMeta();
-            String name = ChatColor.WHITE + StringUtil.parseString(plugin.getConfig("gui.menu.grave.slot." + slot + ".name", grave)
-                    .getString("gui.menu.grave.slot." + slot + ".name"), grave, plugin);
-            List<String> loreList = new ArrayList<>();
-            int customModelData = plugin.getConfig("gui.menu.grave.slot." + slot + ".model-data", grave)
-                    .getInt("gui.menu.grave.slot." + slot + ".model-data", -1);
-
-            for (String string : plugin.getConfig("gui.menu.grave.slot." + slot + ".lore", grave)
-                    .getStringList("gui.menu.grave.slot." + slot + ".lore")) {
-                loreList.add(ChatColor.GRAY + StringUtil.parseString(string, grave.getLocationDeath(), grave, plugin));
-            }
-
-            if (plugin.getConfig().getBoolean("gui.menu.grave.slot." + slot + ".glow")) {
-                itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
-                itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            }
-
-            if (customModelData > -1) {
-                itemMeta.setCustomModelData(customModelData);
-            }
-
-            itemMeta.setDisplayName(name);
-            itemMeta.setLore(loreList);
-            itemStack.setItemMeta(itemMeta);
-        }
-
-        return itemStack;
-    }
 }

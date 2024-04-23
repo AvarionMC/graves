@@ -110,18 +110,7 @@ public final class Oraxen extends EntityDataManager {
     }
 
     public void removeFurniture(Grave grave) {
-        removeFurniture(getEntityDataMap(getLoadedEntityDataList(grave)));
-    }
-
-    public void removeFurniture(Map<EntityData, Entity> entityDataMap) {
-        List<EntityData> entityDataList = new ArrayList<>();
-
-        for (Map.Entry<EntityData, Entity> entry : entityDataMap.entrySet()) {
-            entry.getValue().remove();
-            entityDataList.add(entry.getKey());
-        }
-
-        plugin.getDataManager().removeEntityData(entityDataList);
+        removeEntries(getEntityDataMap(getLoadedEntityDataList(grave)));
     }
 
     public void createBlock(Location location, Grave grave) {
