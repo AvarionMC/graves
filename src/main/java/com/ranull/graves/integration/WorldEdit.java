@@ -112,17 +112,16 @@ public final class WorldEdit {
                 int width = region.getWidth();
                 int height = region.getHeight();
                 int length = region.getLength();
-                //Location center = new Location(location.getWorld(), region.getWidth() + offset.getBlockX(), region.getHeight() + offset.getBlockY(), region.getLength() + offset.getBlockZ());
-                Location corner = location.clone().add(offset.getBlockX(), offset.getBlockY(), offset.getBlockZ());
+                Location corner = location.clone().add(offset.x(), offset.y(), offset.z());
 
                 Location leftTopCorner = location;
                 Location rightTopCorner = location;
 
                 switch (blockFace) {
                     case NORTH:
-                        leftTopCorner = location.clone().add(offset.getBlockX() - region.getWidth(), offset.getBlockY() - region.getHeight(), 0);
+                        leftTopCorner = location.clone().add(offset.x() - region.getWidth(), offset.y() - region.getHeight(), 0);
                     case WEST:
-                        leftTopCorner = location.clone().add(region.getWidth() - offset.getBlockX(), offset.getBlockY() - region.getHeight(), 0);
+                        leftTopCorner = location.clone().add(region.getWidth() - offset.x(), offset.y() - region.getHeight(), 0);
                 }
 
                 corner.getBlock().setType(Material.BEDROCK);
@@ -228,7 +227,7 @@ public final class WorldEdit {
     }
 
     private Location blockVector3ToLocation(World world, BlockVector3 blockVector3) {
-        return new Location(world, blockVector3.getBlockX(), blockVector3.getBlockY(), blockVector3.getBlockZ());
+        return new Location(world, blockVector3.x(), blockVector3.y(), blockVector3.z());
     }
 
     private EditSession getEditSession(World world) {

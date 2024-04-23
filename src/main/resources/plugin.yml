@@ -2,8 +2,8 @@ name: ${project.name}
 description: ${project.description}
 version: ${project.version}
 main: com.ranull.graves.Graves
-api-version: 1.13
-author: Ranull
+api-version: 1.18
+author: Ranull, svaningelgem
 load: POSTWORLD
 
 loadbefore:
