@@ -56,6 +56,11 @@ public final class InventoryUtil {
                     playArmorEquipSound(player, itemStack);
                     inventory.removeItem(itemStack);
                 }
+
+                if(player.getInventory().getItemInOffHand().getType().isAir() && isOffhandItem(itemStack)) {
+                    player.getInventory().setItemInOffHand(itemStack);
+                    inventory.removeItem(itemStack);
+                }
             }
         }
     }
@@ -130,6 +135,10 @@ public final class InventoryUtil {
         return itemStack != null && itemStack.getType().name()
                 .matches("(?i)NETHERITE_BOOTS|DIAMOND_BOOTS|GOLDEN_BOOTS|GOLD_BOOTS|IRON_BOOTS|LEATHER_BOOTS|" +
                         "CHAINMAIL_BOOTS");
+    }
+
+    public static boolean isOffhandItem(ItemStack itemStack) {
+        return itemStack != null && itemStack.getType().name().matches("(?i)SHIELD|TORCH");
     }
 
     public static String inventoryToString(Inventory inventory) {

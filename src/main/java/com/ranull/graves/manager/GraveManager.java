@@ -662,7 +662,9 @@ public final class GraveManager {
                                 player.getInventory().setItem(counter, itemStack);
                                 grave.getInventory().remove(itemStack);
 
-                                if ((counter == 39 && InventoryUtil.isHelmet(itemStack))
+                                // Added Shield and Torches to be auto looted
+                                if ((counter == 40 && InventoryUtil.isOffhandItem(itemStack))
+                                        || (counter == 39 && InventoryUtil.isHelmet(itemStack))
                                         || (counter == 38 && InventoryUtil.isChestplate(itemStack))
                                         || (counter == 37 && InventoryUtil.isLeggings(itemStack))
                                         || (counter == 36 && InventoryUtil.isBoots(itemStack))) {
