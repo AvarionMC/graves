@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.sql.*;
@@ -41,23 +42,23 @@ public final class DataManager {
             loadHologramMap();
 
             if (plugin.getIntegrationManager().hasFurnitureLib()) {
-                loadEntityDataMap("furniturelib", EntityData.Type.FURNITURELIB);
+                loadEntityMap("furniturelib", EntityData.Type.FURNITURELIB);
             }
 
             if (plugin.getIntegrationManager().hasFurnitureEngine()) {
-                loadEntityDataMap("furnitureengine", EntityData.Type.FURNITUREENGINE);
+                loadEntityMap("furnitureengine", EntityData.Type.FURNITUREENGINE);
             }
 
             if (plugin.getIntegrationManager().hasItemsAdder()) {
-                loadEntityDataMap("itemsadder", EntityData.Type.ITEMSADDER);
+                loadEntityMap("itemsadder", EntityData.Type.ITEMSADDER);
             }
 
             if (plugin.getIntegrationManager().hasOraxen()) {
-                loadEntityDataMap("oraxen", EntityData.Type.ORAXEN);
+                loadEntityMap("oraxen", EntityData.Type.ORAXEN);
             }
 
             if (plugin.getIntegrationManager().hasPlayerNPC()) {
-                loadEntityDataMap("playernpc", EntityData.Type.PLAYERNPC);
+                loadEntityMap("playernpc", EntityData.Type.PLAYERNPC);
                 plugin.getIntegrationManager().getPlayerNPC().createCorpses();
             }
         });
@@ -182,198 +183,100 @@ public final class DataManager {
         return columnList;
     }
 
+    private void createOrUpdateTable(String tableName, Map<String, String> fields) {
+        if ( fields.isEmpty()) return;
+
+        // 1. create the table SQL
+        StringBuilder sql = new StringBuilder();
+
+        sql.append("CREATE TABLE IF NOT EXISTS ");
+        sql.append(tableName);
+        sql.append(" (");
+
+        final boolean[] isFirst = {true}; // allow modification inside lambda
+        fields.forEach((key, value) -> {
+            if (!isFirst[0]) {
+                sql.append(", ");
+            }
+
+            sql.append(key);
+            sql.append(" ");
+            sql.append(value);
+
+            isFirst[0] = false;
+        });
+        sql.append(");");
+
+        // 2. Create the table if it's not there already
+        executeUpdate(sql.toString());
+
+        // 3. Verify that all fields are there
+        List<String> columnList = getColumnList(tableName);
+        fields.forEach((key, value) -> {
+            if (columnList.contains("inventory")) return;
+            executeUpdate("ALTER TABLE " + tableName + " ADD COLUMN " + key + " " + value + ";");
+        });
+    }
+
     public void setupGraveTable() {
-        String name = "grave";
+        Map<String, String> fields = new HashMap<>();
 
-        executeUpdate("CREATE TABLE IF NOT EXISTS " + name + " (" +
-                "uuid VARCHAR(255) UNIQUE,\n" +
-                "owner_type VARCHAR(255),\n" +
-                "owner_name VARCHAR(255),\n" +
-                "owner_name_display VARCHAR(255),\n" +
-                "owner_uuid VARCHAR(255),\n" +
-                "owner_texture VARCHAR(255),\n" +
-                "owner_texture_signature VARCHAR(255),\n" +
-                "killer_type VARCHAR(255),\n" +
-                "killer_name VARCHAR(255),\n" +
-                "killer_name_display VARCHAR(255),\n" +
-                "killer_uuid VARCHAR(255),\n" +
-                "location_death VARCHAR(255),\n" +
-                "yaw FLOAT(16),\n" +
-                "pitch FLOAT(16),\n" +
-                "inventory TEXT,\n" +
-                "equipment TEXT,\n" +
-                "experience INT(16),\n" +
-                "protection INT(1),\n" +
-                "time_alive INT(16),\n" +
-                "time_protection INT(11),\n" +
-                "time_creation INT(11),\n" +
-                "permissions TEXT);");
+        fields.put("uuid", "VARCHAR(255) UNIQUE");
+        fields.put("owner_type", "VARCHAR(255)");
+        fields.put("owner_name", "VARCHAR(255)");
+        fields.put("owner_name_display", "VARCHAR(255)");
+        fields.put("owner_uuid", "VARCHAR(255)");
+        fields.put("owner_texture", "VARCHAR(255)");
+        fields.put("owner_texture_signature", "VARCHAR(255+");
+        fields.put("killer_type", "VARCHAR(255)");
+        fields.put("killer_name", "VARCHAR(255)");
+        fields.put("killer_name_display", "VARCHAR(255)");
+        fields.put("killer_uuid", "VARCHAR(255)");
+        fields.put("location_death", "VARCHAR(255)");
+        fields.put("yaw", "FLOAT(16)");
+        fields.put("pitch", "FLOAT(16)");
+        fields.put("inventory", "TEXT");
+        fields.put("equipment", "TEXT");
+        fields.put("experience", "INT(16)");
+        fields.put("protection", "INT(1)");
+        fields.put("time_alive", "INT(16)");
+        fields.put("time_protection", "INT(11)");
+        fields.put("time_creation", "INT(11)");
+        fields.put("permissions", "TEXT");
 
-        List<String> columnList = getColumnList(name);
-
-        if (!columnList.contains("uuid")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN uuid VARCHAR(255) UNIQUE;");
-        }
-
-        if (!columnList.contains("owner_type")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN owner_type VARCHAR(255);");
-        }
-
-        if (!columnList.contains("owner_name")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN owner_name VARCHAR(255);");
-        }
-
-        if (!columnList.contains("owner_name_display")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN owner_name_display VARCHAR(255);");
-        }
-
-        if (!columnList.contains("owner_uuid")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN owner_uuid VARCHAR(255);");
-        }
-
-        if (!columnList.contains("owner_texture")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN owner_texture VARCHAR(255);");
-        }
-
-        if (!columnList.contains("owner_texture_signature")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN owner_texture_signature VARCHAR(255);");
-        }
-
-        if (!columnList.contains("killer_type")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN killer_type VARCHAR(255);");
-        }
-
-        if (!columnList.contains("killer_name")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN killer_name VARCHAR(255);");
-        }
-
-        if (!columnList.contains("killer_name_display")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN killer_name_display VARCHAR(255);");
-        }
-
-        if (!columnList.contains("killer_uuid")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN killer_uuid VARCHAR(255);");
-        }
-
-        if (!columnList.contains("location_death")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN location_death VARCHAR(255);");
-        }
-
-        if (!columnList.contains("yaw")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN yaw FLOAT(16);");
-        }
-
-        if (!columnList.contains("pitch")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN pitch FLOAT(16);");
-        }
-
-        if (!columnList.contains("inventory")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN inventory TEXT;");
-        }
-
-        if (!columnList.contains("equipment")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN equipment TEXT;");
-        }
-
-        if (!columnList.contains("experience")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN experience INT(16);");
-        }
-
-        if (!columnList.contains("protection")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN protection INT(1);");
-        }
-
-        if (!columnList.contains("time_alive")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN time_alive INT(16);");
-        }
-
-        if (!columnList.contains("time_protection")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN time_protection INT(16);");
-        }
-
-        if (!columnList.contains("time_creation")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN time_creation INT(16);");
-        }
-
-        if (!columnList.contains("permissions")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN permissions TEXT;");
-        }
+        createOrUpdateTable("grave", fields);
     }
 
     public void setupBlockTable() {
-        String name = "block";
+        Map<String, String> fields = new HashMap<>();
 
-        executeUpdate("CREATE TABLE IF NOT EXISTS " + name + " (" +
-                "location VARCHAR(255),\n" +
-                "uuid_grave VARCHAR(255),\n" +
-                "replace_material VARCHAR(255),\n" +
-                "replace_data TEXT);");
+        fields.put("location", "VARCHAR(255)");
+        fields.put("uuid_grave", "VARCHAR(255)");
+        fields.put("replace_material", "VARCHAR(255)");
+        fields.put("replace_data", "TEXT");
 
-        List<String> columnList = getColumnList(name);
-
-        if (!columnList.contains("location")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN location VARCHAR(255);");
-        }
-
-        if (!columnList.contains("uuid_grave")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN uuid_grave VARCHAR(255);");
-        }
-
-        if (!columnList.contains("replace_material")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN replace_material VARCHAR(255);");
-        }
-
-        if (!columnList.contains("replace_data")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN replace_data TEXT;");
-        }
+        createOrUpdateTable("block", fields);
     }
 
     public void setupHologramTable() {
-        String name = "hologram";
+        Map<String, String> fields = new HashMap<>();
 
-        executeUpdate("CREATE TABLE IF NOT EXISTS " + name + " (" +
-                "uuid_entity VARCHAR(255),\n" +
-                "uuid_grave VARCHAR(255),\n" +
-                "line INT(16));");
+        fields.put("location", "VARCHAR(255)");
+        fields.put("uuid_entity", "VARCHAR(255)");
+        fields.put("uuid_grave", "VARCHAR(255)");
+        fields.put("line", "INT(16)");
 
-        List<String> columnList = getColumnList(name);
-
-        if (!columnList.contains("location")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN location VARCHAR(255);");
-        }
-
-        if (!columnList.contains("uuid_entity")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN uuid_entity VARCHAR(255);");
-        }
-
-        if (!columnList.contains("uuid_grave")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN uuid_grave VARCHAR(255);");
-        }
-
-        if (!columnList.contains("line")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN line INT(16);");
-        }
+        createOrUpdateTable("hologram", fields);
     }
 
     private void setupEntityTable(String name) {
-        executeUpdate("CREATE TABLE IF NOT EXISTS " + name + " (" +
-                "location VARCHAR(255),\n" +
-                "uuid_entity VARCHAR(255),\n" +
-                "uuid_grave VARCHAR(255));");
+        Map<String, String> fields = new HashMap<>();
 
-        List<String> columnList = getColumnList(name);
+        fields.put("location", "VARCHAR(255)");
+        fields.put("uuid_entity", "VARCHAR(255)");
+        fields.put("uuid_grave", "VARCHAR(255)");
 
-        if (!columnList.contains("location")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN location VARCHAR(255);");
-        }
-
-        if (!columnList.contains("uuid_entity")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN uuid_entity VARCHAR(255);");
-        }
-
-        if (!columnList.contains("uuid_grave")) {
-            executeUpdate("ALTER TABLE " + name + " ADD COLUMN uuid_grave VARCHAR(255);");
-        }
+        createOrUpdateTable(name, fields);
     }
 
     private void loadGraveMap() {
@@ -463,32 +366,6 @@ public final class DataManager {
                         int line = resultSet.getInt("line");
 
                         getChunkData(location).addEntityData(new HologramData(location, uuidEntity, uuidGrave, line));
-                    }
-                }
-            } catch (SQLException exception) {
-                exception.printStackTrace();
-            }
-        }
-    }
-
-    private void loadEntityDataMap(String table, EntityData.Type type) {
-        ResultSet resultSet = executeQuery("SELECT * FROM " + table + ";");
-
-        if (resultSet != null) {
-            try {
-                while (resultSet.next()) {
-                    Location location = null;
-
-                    if (resultSet.getString("location") != null) {
-                        location = LocationUtil.stringToLocation(resultSet.getString("location"));
-                    } else if (resultSet.getString("chunk") != null) {
-                        location = LocationUtil.chunkStringToLocation(resultSet.getString("chunk"));
-                    }
-                    if (location != null) {
-                        UUID uuidEntity = UUID.fromString(resultSet.getString("uuid_entity"));
-                        UUID uuidGrave = UUID.fromString(resultSet.getString("uuid_grave"));
-
-                        getChunkData(location).addEntityData(new EntityData(location, uuidEntity, uuidGrave, type));
                     }
                 }
             } catch (SQLException exception) {

@@ -127,26 +127,8 @@ public final class CompatibilityMaterialData implements Compatibility {
     public String getSkullTexture(ItemStack itemStack) {
         Material material = Material.matchMaterial("SKULL_ITEM");
 
-        if (material != null && itemStack.getType() == material && itemStack.getItemMeta() != null) {
-            SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
-
-            try {
-                Field profileField = skullMeta.getClass().getDeclaredField("profile");
-
-                profileField.setAccessible(true);
-
-                GameProfile gameProfile = (GameProfile) profileField.get(skullMeta);
-
-                if (gameProfile != null && gameProfile.getProperties().containsKey("textures")) {
-                    Collection<Property> propertyCollection = gameProfile.getProperties().get("textures");
-
-                    if (!propertyCollection.isEmpty()) {
-                        return propertyCollection.stream().findFirst().get().getValue();
-                    }
-                }
-            } catch (NoSuchFieldException | IllegalAccessException exception) {
-                exception.printStackTrace();
-            }
+        if (material != null && itemStack.getType() == material) {
+            return getSkullMetaData(itemStack);
         }
 
         return null;

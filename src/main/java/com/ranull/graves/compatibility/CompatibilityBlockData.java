@@ -140,26 +140,8 @@ public final class CompatibilityBlockData implements Compatibility {
 
     @Override
     public String getSkullTexture(ItemStack itemStack) {
-        if (itemStack.getType() == Material.PLAYER_HEAD && itemStack.getItemMeta() != null) {
-            SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
-
-            try {
-                Field profileField = skullMeta.getClass().getDeclaredField("profile");
-
-                profileField.setAccessible(true);
-
-                GameProfile gameProfile = (GameProfile) profileField.get(skullMeta);
-
-                if (gameProfile != null && gameProfile.getProperties().containsKey("textures")) {
-                    Collection<Property> propertyCollection = gameProfile.getProperties().get("textures");
-
-                    if (!propertyCollection.isEmpty()) {
-                        return propertyCollection.stream().findFirst().get().getValue();
-                    }
-                }
-            } catch (NoSuchFieldException | IllegalAccessException exception) {
-                exception.printStackTrace();
-            }
+        if (itemStack.getType() == Material.PLAYER_HEAD) {
+            return getSkullMetaData(itemStack);
         }
 
         return null;
