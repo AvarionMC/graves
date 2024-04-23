@@ -2,11 +2,9 @@ package com.ranull.graves.util;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.JarURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.Enumeration;
@@ -32,19 +30,40 @@ public final class ResourceUtil {
         URL url = plugin.getClass().getClassLoader().getResource(path);
 
         if (url != null) {
-            try {
-                JarURLConnection connection = (JarURLConnection) url.openConnection();
-                JarFile jarFile = connection.getJarFile();
-                Enumeration<JarEntry> jarEntryEnumeration = jarFile.entries();
+            if (url.getProtocol().equals("file")) {
+                File dir = null;
+                try {
+                    dir = new File(url.toURI());
+                } catch (URISyntaxException ignored) {
+                    return null;
+                }
 
-                while (jarEntryEnumeration.hasMoreElements()) {
-                    JarEntry jarEntry = jarEntryEnumeration.nextElement();
-
-                    if (!jarEntry.isDirectory() && jarEntry.getName().startsWith(path)) {
-                        inputStreamHashMap.put(jarEntry.getName(), plugin.getResource(jarEntry.getName()));
+                File[] files = dir.listFiles();
+                if (files != null) {
+                    for (File file : files) {
+                        if (!file.isDirectory() && file.getName().startsWith(path)) {
+                            try {
+                                inputStreamHashMap.put(file.getName(), new FileInputStream(file));
+                            } catch (FileNotFoundException ignored) {
+                            }
+                        }
                     }
                 }
-            } catch (IOException ignored) {
+            } else {
+                try {
+                    JarURLConnection connection = (JarURLConnection) url.openConnection();
+                    JarFile jarFile = connection.getJarFile();
+                    Enumeration<JarEntry> jarEntryEnumeration = jarFile.entries();
+
+                    while (jarEntryEnumeration.hasMoreElements()) {
+                        JarEntry jarEntry = jarEntryEnumeration.nextElement();
+
+                        if (!jarEntry.isDirectory() && jarEntry.getName().startsWith(path)) {
+                            inputStreamHashMap.put(jarEntry.getName(), plugin.getResource(jarEntry.getName()));
+                        }
+                    }
+                } catch (IOException ignored) {
+                }
             }
         }
 

@@ -1,7 +1,5 @@
 package com.ranull.graves.manager;
 
-import org.bukkit.Bukkit;
-
 public final class VersionManager {
     private final String version;
     private final boolean hasConfigContains;
@@ -20,7 +18,7 @@ public final class VersionManager {
     private boolean isMohist;
 
     public VersionManager() {
-        this.version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+        this.version = BukkitVersion.getVersion();
         this.hasConfigContains = !is_v1_7() && !is_v1_8() && !is_v1_9();
         this.hasAPIVersion = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10() && !is_v1_11() && !is_v1_12();
         this.hasBlockData = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10() && !is_v1_11() && !is_v1_12();

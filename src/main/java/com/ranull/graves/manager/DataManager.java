@@ -213,7 +213,7 @@ public final class DataManager {
         // 3. Verify that all fields are there
         List<String> columnList = getColumnList(tableName);
         fields.forEach((key, value) -> {
-            if (columnList.contains("inventory")) return;
+            if (columnList.contains(key)) return;
             executeUpdate("ALTER TABLE " + tableName + " ADD COLUMN " + key + " " + value + ";");
         });
     }
@@ -227,7 +227,7 @@ public final class DataManager {
         fields.put("owner_name_display", "VARCHAR(255)");
         fields.put("owner_uuid", "VARCHAR(255)");
         fields.put("owner_texture", "VARCHAR(255)");
-        fields.put("owner_texture_signature", "VARCHAR(255+");
+        fields.put("owner_texture_signature", "VARCHAR(255)");
         fields.put("killer_type", "VARCHAR(255)");
         fields.put("killer_name", "VARCHAR(255)");
         fields.put("killer_name_display", "VARCHAR(255)");

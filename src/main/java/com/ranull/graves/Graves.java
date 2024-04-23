@@ -31,7 +31,10 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.Callable;
 
+
 public class Graves extends JavaPlugin {
+    private static boolean IS_TEST = false;
+
     private VersionManager versionManager;
     private IntegrationManager integrationManager;
     private CacheManager cacheManager;
@@ -49,6 +52,7 @@ public class Graves extends JavaPlugin {
     private GraveyardManager graveyardManager;
     private Compatibility compatibility;
     private FileConfiguration fileConfiguration;
+
 
     @Override
     public void onLoad() {
@@ -92,13 +96,29 @@ public class Graves extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        dataManager.closeConnection();
-        graveManager.unload();
-        graveyardManager.unload();
-        integrationManager.unload();
+        if (dataManager != null) {
+            dataManager.closeConnection();
+            dataManager = null;
+        }
+
+        if ( graveManager != null ) {
+            graveManager.unload();
+            graveManager = null;
+        }
+
+        if  ( graveyardManager != null ) {
+            graveyardManager.unload();
+            graveyardManager = null;
+        }
+
+        if ( integrationManager != null ) {
+            integrationManager.unload();
+            integrationManager = null;
+        }
 
         if (recipeManager != null) {
             recipeManager.unload();
+            recipeManager = null;
         }
     }
 
@@ -166,6 +186,8 @@ public class Graves extends JavaPlugin {
     }
 
     private void registerMetrics() {
+        if ( IS_TEST ) return;
+
         Metrics metrics = new Metrics(this, getMetricsID());
 
         metrics.addCustomChart(new SingleLineChart("graves", new Callable<Integer>() {
