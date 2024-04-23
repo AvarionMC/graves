@@ -90,6 +90,17 @@ public class EntityDataManager {
         return entityDataMap;
     }
 
+    public void removeEntries(Map<EntityData, Entity> entityDataMap) {
+        List<EntityData> entityDataList = new ArrayList<>();
+
+        for (Map.Entry<EntityData, Entity> entry : entityDataMap.entrySet()) {
+            entry.getValue().remove();
+            entityDataList.add(entry.getKey());
+        }
+
+        plugin.getDataManager().removeEntityData(entityDataList);
+    }
+
     public void removeEntityData(List<EntityData> entityDataList) {
         List<EntityData> removedEntityDataList = new ArrayList<>();
 
