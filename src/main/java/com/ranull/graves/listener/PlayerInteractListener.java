@@ -89,7 +89,8 @@ public class PlayerInteractListener implements Listener {
             }
 
             // Compass
-            if (event.getItem() != null) {
+            if (event.getItem() != null &&
+                    player.getInventory().getItem(player.getInventory().getHeldItemSlot()) == event.getItem()) {
                 ItemStack itemStack = event.getItem();
                 UUID uuid = plugin.getEntityManager().getGraveUUIDFromItemStack(itemStack);
 
