@@ -41,23 +41,23 @@ public final class DataManager {
             loadHologramMap();
 
             if (plugin.getIntegrationManager().hasFurnitureLib()) {
-                loadEntityDataMap("furniturelib", EntityData.Type.FURNITURELIB);
+                loadEntityMap("furniturelib", EntityData.Type.FURNITURELIB);
             }
 
             if (plugin.getIntegrationManager().hasFurnitureEngine()) {
-                loadEntityDataMap("furnitureengine", EntityData.Type.FURNITUREENGINE);
+                loadEntityMap("furnitureengine", EntityData.Type.FURNITUREENGINE);
             }
 
             if (plugin.getIntegrationManager().hasItemsAdder()) {
-                loadEntityDataMap("itemsadder", EntityData.Type.ITEMSADDER);
+                loadEntityMap("itemsadder", EntityData.Type.ITEMSADDER);
             }
 
             if (plugin.getIntegrationManager().hasOraxen()) {
-                loadEntityDataMap("oraxen", EntityData.Type.ORAXEN);
+                loadEntityMap("oraxen", EntityData.Type.ORAXEN);
             }
 
             if (plugin.getIntegrationManager().hasPlayerNPC()) {
-                loadEntityDataMap("playernpc", EntityData.Type.PLAYERNPC);
+                loadEntityMap("playernpc", EntityData.Type.PLAYERNPC);
                 plugin.getIntegrationManager().getPlayerNPC().createCorpses();
             }
         });
@@ -463,32 +463,6 @@ public final class DataManager {
                         int line = resultSet.getInt("line");
 
                         getChunkData(location).addEntityData(new HologramData(location, uuidEntity, uuidGrave, line));
-                    }
-                }
-            } catch (SQLException exception) {
-                exception.printStackTrace();
-            }
-        }
-    }
-
-    private void loadEntityDataMap(String table, EntityData.Type type) {
-        ResultSet resultSet = executeQuery("SELECT * FROM " + table + ";");
-
-        if (resultSet != null) {
-            try {
-                while (resultSet.next()) {
-                    Location location = null;
-
-                    if (resultSet.getString("location") != null) {
-                        location = LocationUtil.stringToLocation(resultSet.getString("location"));
-                    } else if (resultSet.getString("chunk") != null) {
-                        location = LocationUtil.chunkStringToLocation(resultSet.getString("chunk"));
-                    }
-                    if (location != null) {
-                        UUID uuidEntity = UUID.fromString(resultSet.getString("uuid_entity"));
-                        UUID uuidGrave = UUID.fromString(resultSet.getString("uuid_grave"));
-
-                        getChunkData(location).addEntityData(new EntityData(location, uuidEntity, uuidGrave, type));
                     }
                 }
             } catch (SQLException exception) {
