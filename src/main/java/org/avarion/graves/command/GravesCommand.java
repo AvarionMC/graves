@@ -42,8 +42,7 @@ public final class GravesCommand implements CommandExecutor, TabCompleter {
             }
         }
         else if (args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("gui")) {
-            if (commandSender instanceof Player) {
-                Player player = (Player) commandSender;
+            if (commandSender instanceof Player player) {
 
                 if (args.length == 1) {
                     if (player.hasPermission("graves.gui")) {
@@ -96,8 +95,7 @@ public final class GravesCommand implements CommandExecutor, TabCompleter {
                                               + "/graves givetoken {player} {token}");
                 }
                 else if (args.length == 2) {
-                    if (commandSender instanceof Player) {
-                        Player player = (Player) commandSender;
+                    if (commandSender instanceof Player player) {
 
                         ItemStack itemStack = plugin.getRecipeManager().getToken(args[1].toLowerCase());
 

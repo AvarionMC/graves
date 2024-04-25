@@ -33,8 +33,7 @@ public final class CompatibilityBlockData implements Compatibility {
             String replaceData = location.getBlock().getBlockData().clone().getAsString(true);
 
             // Levelled
-            if (block.getBlockData() instanceof Levelled) {
-                Levelled leveled = (Levelled) block.getBlockData();
+            if (block.getBlockData() instanceof Levelled leveled) {
 
                 if (leveled.getLevel() != 0) {
                     replaceMaterial = null;
@@ -52,8 +51,7 @@ public final class CompatibilityBlockData implements Compatibility {
             location.getBlock().setType(material);
 
             // Waterlogged
-            if (block.getBlockData() instanceof Waterlogged) {
-                Waterlogged waterlogged = (Waterlogged) block.getBlockData();
+            if (block.getBlockData() instanceof Waterlogged waterlogged) {
 
                 waterlogged.setWaterlogged(MaterialUtil.isWater(originalMaterial));
                 block.setBlockData(waterlogged);

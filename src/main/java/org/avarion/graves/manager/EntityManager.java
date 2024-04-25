@@ -54,8 +54,7 @@ public final class EntityManager extends EntityDataManager {
             ItemMeta itemMeta = itemStack.getItemMeta();
 
             if (itemMeta != null) {
-                if (itemMeta instanceof CompassMeta) {
-                    CompassMeta compassMeta = (CompassMeta) itemMeta;
+                if (itemMeta instanceof CompassMeta compassMeta) {
 
                     compassMeta.setLodestoneTracked(false);
                     compassMeta.setLodestone(location);
@@ -63,8 +62,10 @@ public final class EntityManager extends EntityDataManager {
                 else if (itemStack.getType().name().equals("RECOVERY_COMPASS")) {
                     try {
                         // Not known in 1.18 yet...
-                        Method setLastDeathLocationMethod = player.getClass().getMethod("setLastDeathLocation", Location.class);
-                        setLastDeathLocationMethod.invoke(player, location);                    }
+                        Method setLastDeathLocationMethod = player.getClass()
+                                                                  .getMethod("setLastDeathLocation", Location.class);
+                        setLastDeathLocationMethod.invoke(player, location);
+                    }
                     catch (Exception ignored) {
                     }
                 }
@@ -158,8 +159,7 @@ public final class EntityManager extends EntityDataManager {
             }
 
             if (locationTeleport != null && locationTeleport.getWorld() != null) {
-                if (entity instanceof Player) {
-                    Player player = (Player) entity;
+                if (entity instanceof Player player) {
 
                     if (plugin.getIntegrationManager().hasVault()) {
                         double teleportCost = getTeleportCost(entity.getLocation(), locationTeleport, grave);
@@ -282,8 +282,7 @@ public final class EntityManager extends EntityDataManager {
     }
 
     public void playPlayerSound(String string, Entity entity, Location location, List<String> permissionList, float volume, float pitch) {
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+        if (entity instanceof Player player) {
             string = plugin.getConfig(string, entity, permissionList).getString(string);
 
             if (string != null && !string.equals("")) {
@@ -298,8 +297,7 @@ public final class EntityManager extends EntityDataManager {
     }
 
     public void sendMessage(String string, CommandSender commandSender) {
-        if (commandSender instanceof Player) {
-            Player player = (Player) commandSender;
+        if (commandSender instanceof Player player) {
 
             sendMessage(string, player, player.getLocation(), null, plugin.getPermissionList(player));
         }
@@ -330,8 +328,7 @@ public final class EntityManager extends EntityDataManager {
     }
 
     private void sendMessage(String string, Entity entity, String name, Location location, Grave grave, List<String> permissionList) {
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+        if (entity instanceof Player player) {
 
             if (grave != null) {
                 string = plugin.getConfig(string, grave).getString(string);
@@ -549,8 +546,7 @@ public final class EntityManager extends EntityDataManager {
 
             Entity entity = location.getWorld().spawnEntity(location, entityType);
 
-            if (entity instanceof LivingEntity) {
-                LivingEntity livingEntity = (LivingEntity) entity;
+            if (entity instanceof LivingEntity livingEntity) {
 
                 if (livingEntity.getEquipment() != null) {
                     if (plugin.getConfig("zombie.owner-head", grave).getBoolean("zombie.owner-head")) {
@@ -597,8 +593,7 @@ public final class EntityManager extends EntityDataManager {
                     ((Mob) livingEntity).setTarget(targetEntity);
                 }
 
-                if (livingEntity instanceof Zombie) {
-                    Zombie zombie = (Zombie) livingEntity;
+                if (livingEntity instanceof Zombie zombie) {
 
                     if (zombie.isBaby()) {
                         zombie.setBaby(false);
@@ -625,7 +620,7 @@ public final class EntityManager extends EntityDataManager {
                 Material material = Material.matchMaterial(plugin.getConfig("armor-stand.material", grave)
                                                                  .getString("armor-stand.material", "AIR"));
 
-                if (material != null && !MaterialUtil.isAir(material)) {
+                if (material != null && !material.isAir()) {
                     ItemStack itemStack = new ItemStack(material, 1);
                     ItemMeta itemMeta = itemStack.getItemMeta();
                     int customModelData = plugin.getConfig("armor-stand.model-data", grave)
@@ -698,7 +693,7 @@ public final class EntityManager extends EntityDataManager {
                 Material material = Material.matchMaterial(plugin.getConfig("item-frame.material", grave)
                                                                  .getString("item-frame.material", "AIR"));
 
-                if (material != null && !MaterialUtil.isAir(material)) {
+                if (material != null && !material.isAir()) {
                     ItemStack itemStack = new ItemStack(material, 1);
                     ItemMeta itemMeta = itemStack.getItemMeta();
                     int customModelData = plugin.getConfig("item-frame.model-data", grave)

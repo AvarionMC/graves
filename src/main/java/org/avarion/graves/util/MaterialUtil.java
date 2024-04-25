@@ -3,22 +3,6 @@ package org.avarion.graves.util;
 import org.bukkit.Material;
 
 public final class MaterialUtil {
-
-    public static boolean isAir(Material material) {
-        return isAir(material.name());
-    }
-
-    public static boolean isAir(String string) {
-        switch (string) {
-            case "AIR":
-            case "CAVE_AIR":
-            case "VOID_AIR":
-                return true;
-            default:
-                return false;
-        }
-    }
-
     public static boolean isLava(Material material) {
         return isLava(material.name());
     }

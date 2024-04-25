@@ -558,8 +558,7 @@ public class Graves extends JavaPlugin {
         List<String> permissionList = new ArrayList<>();
         List<String> permissionListSorted = new ArrayList<>();
 
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+        if (entity instanceof Player player) {
 
             for (PermissionAttachmentInfo permissionAttachmentInfo : player.getEffectivePermissions()) {
                 if (permissionAttachmentInfo.getPermission().startsWith("graves.permission.")) {

@@ -59,8 +59,7 @@ public final class GUIManager {
     }
 
     public void openGraveList(Entity entity, UUID uuid, boolean sound) {
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+        if (entity instanceof Player player) {
             List<String> permissionList = plugin.getPermissionList(player);
             List<Grave> playerGraveList = plugin.getGraveManager().getGraveList(uuid);
 
@@ -104,8 +103,7 @@ public final class GUIManager {
     }
 
     public void openGraveMenu(Entity entity, Grave grave, boolean sound) {
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+        if (entity instanceof Player player) {
             GraveMenu graveMenu = new GraveMenu(grave);
             String title = StringUtil.parseString(plugin.getConfig("gui.menu.grave.title", player, grave.getPermissionList())
                                                         .getString("gui.menu.grave.title", "Grave"), player, plugin);

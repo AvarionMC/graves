@@ -75,13 +75,10 @@ public final class LocationManager {
                     return getLavaTop(location, livingEntity, grave);
                 }
                 else {
-                    Location graveLocation = (MaterialUtil.isAir(block.getType())
-                                              || MaterialUtil.isWater(block.getType()))
-                                             ? (plugin.getConfig("placement.ground", grave)
-                                                      .getBoolean("placement.ground")
-                                                ? getGround(location, livingEntity, grave)
-                                                : null)
-                                             : getRoof(location, livingEntity, grave);
+                    Location graveLocation = (block.getType().isAir() || MaterialUtil.isWater(block.getType())) ? (
+                            plugin.getConfig("placement.ground", grave).getBoolean("placement.ground")
+                            ? getGround(location, livingEntity, grave)
+                            : null) : getRoof(location, livingEntity, grave);
 
                     if (graveLocation != null) {
                         return graveLocation;
@@ -199,7 +196,7 @@ public final class LocationManager {
                 while (counter <= location.getWorld().getMaxHeight()) {
                     Block block = location.getBlock();
 
-                    if ((MaterialUtil.isAir(block.getType()))
+                    if (block.getType().isAir()
                         && !plugin.getCompatibility().hasTitleData(block)
                         && !MaterialUtil.isLava(block.getType())) {
                         return location;
@@ -216,8 +213,7 @@ public final class LocationManager {
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean canBuild(LivingEntity livingEntity, Location location, List<String> permissionList) {
-        if (livingEntity instanceof Player) {
-            Player player = (Player) livingEntity;
+        if (livingEntity instanceof Player player) {
 
             return (!plugin.getConfig("placement.can-build", player, permissionList).getBoolean("placement.can-build")
                     || plugin.getCompatibility().canBuild(player, location, plugin)) && (!plugin.getIntegrationManager()
@@ -240,8 +236,7 @@ public final class LocationManager {
             Block blockBelow = block.getRelative(BlockFace.DOWN);
 
             return !block.getType().isSolid()
-                   && !MaterialUtil.isLava(blockAbove.getType())
-                   && !MaterialUtil.isAir(blockBelow.getType())
+                   && !MaterialUtil.isLava(blockAbove.getType()) && !blockBelow.getType().isAir()
                    && !MaterialUtil.isLava(blockBelow.getType());
         }
 
