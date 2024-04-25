@@ -366,7 +366,8 @@ public final class GraveManager {
     }
 
     public Inventory createGraveInventory(InventoryHolder inventoryHolder, Location location, List<ItemStack> itemStackList, String title, Grave.StorageMode storageMode) {
-        itemStackList.removeIf(itemStack -> itemStack != null && itemStack.containsEnchantment(Enchantment.VANISHING_CURSE));
+        itemStackList.removeIf(itemStack -> itemStack != null
+                                            && itemStack.containsEnchantment(Enchantment.VANISHING_CURSE));
 
         if (storageMode == Grave.StorageMode.COMPACT || storageMode == Grave.StorageMode.CHESTSORT) {
             Inventory tempInventory = plugin.getServer().createInventory(null, 54);

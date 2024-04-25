@@ -32,6 +32,7 @@ public final class ServerUtil {
         stringList.add(plugin.getDescription().getName() + " Version: " + plugin.getDescription().getVersion());
         stringList.add(plugin.getDescription().getName() + " API Version: " + plugin.getDescription().getAPIVersion());
         stringList.add(plugin.getDescription().getName() + " Config Version: " + plugin.getConfig()
+                                                                                       .getInt("config-version"));
         stringList.add(plugin.getDescription().getName() + " Config Base64: " + Base64.getEncoder()
                                                                                       .encodeToString(plugin.getConfig()
                                                                                                             .saveToString()

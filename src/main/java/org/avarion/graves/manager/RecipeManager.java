@@ -193,8 +193,12 @@ public final class RecipeManager {
     }
 
     public boolean isToken(String token, ItemStack itemStack) {
-        if (itemStack.getItemMeta() != null && itemStack.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(plugin, "token"), PersistentDataType.STRING)) {
-            String string = itemStack.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin, "token"), PersistentDataType.STRING);
+        if (itemStack.getItemMeta() != null && itemStack.getItemMeta()
+                                                        .getPersistentDataContainer()
+                                                        .has(new NamespacedKey(plugin, "token"), PersistentDataType.STRING)) {
+            String string = itemStack.getItemMeta()
+                                     .getPersistentDataContainer()
+                                     .get(new NamespacedKey(plugin, "token"), PersistentDataType.STRING);
 
             return string != null && string.equals(token);
         }
@@ -203,8 +207,12 @@ public final class RecipeManager {
     }
 
     public String getTokenName(ItemStack itemStack) {
-        if (itemStack.getItemMeta() != null && itemStack.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(plugin, "token"), PersistentDataType.STRING)) {
-            return itemStack.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin, "token"), PersistentDataType.STRING);
+        if (itemStack.getItemMeta() != null && itemStack.getItemMeta()
+                                                        .getPersistentDataContainer()
+                                                        .has(new NamespacedKey(plugin, "token"), PersistentDataType.STRING)) {
+            return itemStack.getItemMeta()
+                            .getPersistentDataContainer()
+                            .get(new NamespacedKey(plugin, "token"), PersistentDataType.STRING);
         }
 
         return null;
