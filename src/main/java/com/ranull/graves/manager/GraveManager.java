@@ -143,7 +143,7 @@ public final class GraveManager {
     @SuppressWarnings("ConstantConditions")
     public void unload() {
         for (Player player : plugin.getServer().getOnlinePlayers()) {
-            if (player.getOpenInventory() != null) { // Mohist, might return null even when Bukkit shouldn't.
+            if (player.getOpenInventory() != null && player.getOpenInventory().getTopInventory() != null) { // Mohist, might return null even when Bukkit shouldn't.
                 InventoryHolder inventoryHolder = player.getOpenInventory().getTopInventory().getHolder();
 
                 try {
@@ -301,28 +301,6 @@ public final class GraveManager {
                 }
             }
         }
-    }
-
-    public Grave createGrave(Entity entity, List<ItemStack> itemStackList) {
-        return createGrave(entity, itemStackList, plugin.getPermissionList(entity));
-    }
-
-    public Grave createGrave(Entity entity, List<ItemStack> itemStackList, List<String> permissionList) {
-        Grave grave = new Grave(UUID.randomUUID());
-        String entityName = plugin.getEntityManager().getEntityName(entity);
-
-        grave.setOwnerType(entity.getType());
-        grave.setOwnerName(entityName);
-        grave.setOwnerNameDisplay(entity instanceof Player ? ((Player) entity).getDisplayName()
-                : entity.getCustomName());
-        grave.setOwnerUUID(entity.getUniqueId());
-        grave.setInventory(createGraveInventory(grave, entity.getLocation(), itemStackList,
-                StringUtil.parseString(plugin.getConfig("gui.grave.title", entity, permissionList)
-                        .getString("gui.grave.title"), entity, entity.getLocation(), grave, plugin),
-                getStorageMode(plugin.getConfig("storage.mode", entity, permissionList).getString("storage.mode"))));
-        plugin.debugMessage("Creating grave " + grave.getUUID() + " for entity " + entityName, 1);
-
-        return grave;
     }
 
     public Grave.StorageMode getStorageMode(String string) {

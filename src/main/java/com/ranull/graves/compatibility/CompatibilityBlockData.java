@@ -35,7 +35,8 @@ public final class CompatibilityBlockData implements Compatibility {
             Block block = location.getBlock();
             String originalMaterial = block.getType().name();
             String replaceMaterial = location.getBlock().getType().name();
-            String replaceData = location.getBlock().getBlockData().clone().getAsString(true);
+            String replaceData = location.getBlock().getBlockData().clone().getAsString();
+//            String replaceData = location.getBlock().getBlockData().clone().getAsString(true);  // TODO: restore!
 
             // Levelled
             if (block.getBlockData() instanceof Levelled) {

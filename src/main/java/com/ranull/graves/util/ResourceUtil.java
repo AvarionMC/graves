@@ -41,9 +41,10 @@ public final class ResourceUtil {
                 File[] files = dir.listFiles();
                 if (files != null) {
                     for (File file : files) {
-                        if (!file.isDirectory() && file.getName().startsWith(path)) {
+                        String relative = file.getParentFile().getName() + File.separator + file.getName();
+                        if (!file.isDirectory() && relative.startsWith(path)) {
                             try {
-                                inputStreamHashMap.put(file.getName(), new FileInputStream(file));
+                                inputStreamHashMap.put(relative, new FileInputStream(file));
                             } catch (FileNotFoundException ignored) {
                             }
                         }

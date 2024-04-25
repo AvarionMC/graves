@@ -55,7 +55,7 @@ public final class ItemStackManager extends EntityDataManager {
 
             if (!plugin.getVersionManager().is_v1_7() && !plugin.getVersionManager().is_v1_8()
                     && !plugin.getVersionManager().is_v1_9()) {
-                bookMeta.setGeneration(null);
+                // bookMeta.setGeneration(null);  // TODO: restore!
             }
 
             bookMeta.setPages(String.join("\n", lineList));
