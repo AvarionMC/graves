@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.ranull</groupId>
+    <groupId>org.avarion</groupId>
     <artifactId>graves</artifactId>
     <name>Graves</name>
     <description>Full featured lightweight death chest plugin.</description>
@@ -88,6 +88,17 @@
                     </nonFilteredFileExtensions>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <testFailureIgnore>false</testFailureIgnore>
+                    <redirectTestOutputToFile>false</redirectTestOutputToFile>
+                    <trimStackTrace>false</trimStackTrace>
+                </configuration>
+            </plugin>
+
         </plugins>
         <resources>
             <resource>
@@ -173,7 +184,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.19-R0.1-SNAPSHOT</version>
+            <version>1.20.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

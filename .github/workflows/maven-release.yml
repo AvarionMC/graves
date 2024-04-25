@@ -2,7 +2,7 @@ name: Maven Release
 
 on:
   release:
-    types: [created]
+    types: [ created ]
 
 defaults:
   run:

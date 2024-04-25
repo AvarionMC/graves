@@ -1,9 +1,9 @@
 name: ${project.name}
 description: ${project.description}
 version: ${project.version}
-main: com.ranull.graves.Graves
-api-version: 1.13
-author: Ranull
+main: org.avarion.graves.Graves
+api-version: 1.20.4
+author: Ranull, svaningelgem
 load: POSTWORLD
 
 loadbefore:
@@ -34,7 +34,6 @@ softdepend:
 commands:
   graves:
     description: Graves command
-    default: true
     usage: /graves
     aliases:
       - grave
@@ -50,7 +49,6 @@ commands:
 
   graveyards:
     description: Graveyards command
-    default: true
     usage: /graveyards
     aliases:
       - graveyard
