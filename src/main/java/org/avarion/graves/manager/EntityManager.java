@@ -21,6 +21,7 @@ import org.bukkit.metadata.MetadataValue;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.NumberConversions;
 
+import java.lang.reflect.Method;
 import java.util.*;
 
 public final class EntityManager extends EntityDataManager {
@@ -61,9 +62,10 @@ public final class EntityManager extends EntityDataManager {
                 }
                 else if (itemStack.getType().name().equals("RECOVERY_COMPASS")) {
                     try {
-                        player.setLastDeathLocation(location);
-                    }
-                    catch (NoSuchMethodError ignored) {
+                        // Not known in 1.18 yet...
+                        Method setLastDeathLocationMethod = player.getClass().getMethod("setLastDeathLocation", Location.class);
+                        setLastDeathLocationMethod.invoke(player, location);                    }
+                    catch (Exception ignored) {
                     }
                 }
 

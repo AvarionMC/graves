@@ -3,30 +3,31 @@ package org.avarion.graves.manager;
 public final class VersionManager {
     public final String version;
     public final boolean hasHexColors;
-    public boolean isBukkit;
-    public boolean isMohist;
+    public final boolean isBukkit;
+    public final boolean isMohist;
 
     public VersionManager() {
+        boolean isMohist = false;
+        boolean isBukkit = false;
         this.version = BukkitVersion.getVersion();
 
         try {
             Class.forName("org.spigotmc.SpigotConfig", false, getClass().getClassLoader());
-
-            this.isBukkit = false;
         }
         catch (ClassNotFoundException ignored) {
-            this.isBukkit = true;
+            isBukkit = true;
         }
-
-        this.hasHexColors = !isBukkit;
 
         try {
             Class.forName("com.mohistmc.config.MohistConfigUtil", false, getClass().getClassLoader());
 
-            this.isMohist = true;
+            isMohist = true;
         }
         catch (ClassNotFoundException ignored) {
-            this.isMohist = false;
         }
+
+        this.isMohist = isMohist;
+        this.isBukkit = isBukkit;
+        this.hasHexColors = !isBukkit;
     }
 }
