@@ -26,7 +26,7 @@ public class PlayerMoveListener implements Listener {
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
 
-        if (plugin.getVersionManager().is_v1_7() || player.getGameMode() != GameMode.SPECTATOR) {
+        if (player.getGameMode() != GameMode.SPECTATOR) {
             if (event.getTo() != null && (event.getTo().getBlockX() != event.getFrom().getBlockX()
                                           || event.getTo().getBlockY() != event.getFrom().getBlockY()
                                           || event.getTo().getBlockZ() != event.getFrom().getBlockZ())) {

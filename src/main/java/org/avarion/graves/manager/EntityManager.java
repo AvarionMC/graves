@@ -21,6 +21,7 @@ import org.bukkit.metadata.MetadataValue;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.NumberConversions;
 
+import java.lang.reflect.Method;
 import java.util.*;
 
 public final class EntityManager extends EntityDataManager {
@@ -34,16 +35,11 @@ public final class EntityManager extends EntityDataManager {
     }
 
     public void swingMainHand(Player player) {
-        if (plugin.getVersionManager().hasSwingHand()) {
-            player.swingMainHand();
-        }
-        else {
-            ReflectionUtil.swingMainHand(player);
-        }
+        player.swingMainHand();
     }
 
     public ItemStack createGraveCompass(Player player, Location location, Grave grave) {
-        if (plugin.getVersionManager().hasPersistentData()) {
+        if (true) {
             Material material = Material.COMPASS;
 
             if (plugin.getConfig("compass.recovery", grave).getBoolean("compass.recovery")) {
@@ -58,7 +54,7 @@ public final class EntityManager extends EntityDataManager {
             ItemMeta itemMeta = itemStack.getItemMeta();
 
             if (itemMeta != null) {
-                if (plugin.getVersionManager().hasCompassMeta() && itemMeta instanceof CompassMeta) {
+                if (itemMeta instanceof CompassMeta) {
                     CompassMeta compassMeta = (CompassMeta) itemMeta;
 
                     compassMeta.setLodestoneTracked(false);
@@ -66,9 +62,10 @@ public final class EntityManager extends EntityDataManager {
                 }
                 else if (itemStack.getType().name().equals("RECOVERY_COMPASS")) {
                     try {
-                        player.setLastDeathLocation(location);
-                    }
-                    catch (NoSuchMethodError ignored) {
+                        // Not known in 1.18 yet...
+                        Method setLastDeathLocationMethod = player.getClass().getMethod("setLastDeathLocation", Location.class);
+                        setLastDeathLocationMethod.invoke(player, location);                    }
+                    catch (Exception ignored) {
                     }
                 }
 
@@ -107,7 +104,7 @@ public final class EntityManager extends EntityDataManager {
     public Map<ItemStack, UUID> getCompassesFromInventory(HumanEntity player) {
         Map<ItemStack, UUID> itemStackUUIDMap = new HashMap<>();
 
-        if (plugin.getVersionManager().hasPersistentData()) {
+        if (true) {
             for (ItemStack itemStack : player.getInventory().getContents()) {
                 UUID uuid = getGraveUUIDFromItemStack(itemStack);
 
@@ -121,7 +118,7 @@ public final class EntityManager extends EntityDataManager {
     }
 
     public UUID getGraveUUIDFromItemStack(ItemStack itemStack) {
-        if (plugin.getVersionManager().hasPersistentData() && itemStack != null && itemStack.getItemMeta() != null) {
+        if (itemStack != null && itemStack.getItemMeta() != null) {
             if (itemStack.getItemMeta()
                          .getPersistentDataContainer()
                          .has(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING)) {
@@ -379,8 +376,7 @@ public final class EntityManager extends EntityDataManager {
 
             plugin.getServer().getPluginManager().callEvent(serverCommandEvent);
 
-            if ((plugin.getVersionManager().is_v1_7() || plugin.getVersionManager().is_v1_8())
-                || !serverCommandEvent.isCancelled()) {
+            if (!serverCommandEvent.isCancelled()) {
                 plugin.getServer()
                       .getScheduler()
                       .callSyncMethod(plugin, () -> plugin.getServer()
@@ -615,8 +611,7 @@ public final class EntityManager extends EntityDataManager {
     }
 
     public void createArmorStand(Location location, Grave grave) {
-        if (!plugin.getVersionManager().is_v1_7() && plugin.getConfig("armor-stand.enabled", grave)
-                                                           .getBoolean("armor-stand.enabled")) {
+        if (plugin.getConfig("armor-stand.enabled", grave).getBoolean("armor-stand.enabled")) {
             double offsetX = plugin.getConfig("armor-stand.offset.x", grave).getDouble("armor-stand.offset.x");
             double offsetY = plugin.getConfig("armor-stand.offset.y", grave).getDouble("armor-stand.offset.y");
             double offsetZ = plugin.getConfig("armor-stand.offset.z", grave).getDouble("armor-stand.offset.z");
@@ -648,7 +643,7 @@ public final class EntityManager extends EntityDataManager {
 
                         createEntityData(location, armorStand.getUniqueId(), grave.getUUID(), EntityData.Type.ARMOR_STAND);
 
-                        if (!plugin.getVersionManager().is_v1_7()) {
+                        if (true) {
                             try {
                                 armorStand.setMarker(marker);
                             }
@@ -656,11 +651,11 @@ public final class EntityManager extends EntityDataManager {
                             }
                         }
 
-                        if (!plugin.getVersionManager().is_v1_7() && !plugin.getVersionManager().is_v1_8()) {
+                        if (true) {
                             armorStand.setInvulnerable(true);
                         }
 
-                        if (plugin.getVersionManager().hasScoreboardTags()) {
+                        if (true) {
                             armorStand.getScoreboardTags().add("graveArmorStand");
                             armorStand.getScoreboardTags().add("graveArmorStandUUID:" + grave.getUUID());
                         }
@@ -726,11 +721,11 @@ public final class EntityManager extends EntityDataManager {
                         itemFrame.setCustomNameVisible(false);
                         itemFrame.setItem(itemStack);
 
-                        if (!plugin.getVersionManager().is_v1_7() && !plugin.getVersionManager().is_v1_8()) {
+                        if (true) {
                             itemFrame.setInvulnerable(true);
                         }
 
-                        if (plugin.getVersionManager().hasScoreboardTags()) {
+                        if (true) {
                             itemFrame.getScoreboardTags().add("graveItemFrame");
                             itemFrame.getScoreboardTags().add("graveItemFrameUUID:" + grave.getUUID());
                         }
@@ -784,7 +779,7 @@ public final class EntityManager extends EntityDataManager {
                 equipmentSlotItemStackMap.put(EquipmentSlot.FEET, entityEquipment.getBoots());
             }
 
-            if (plugin.getVersionManager().hasSecondHand()) {
+            if (true) {
                 if (entityEquipment.getItemInMainHand().getType() != Material.AIR && grave.getInventory()
                                                                                           .contains(entityEquipment.getItemInMainHand())) {
                     equipmentSlotItemStackMap.put(EquipmentSlot.HAND, entityEquipment.getItemInMainHand());
@@ -812,7 +807,7 @@ public final class EntityManager extends EntityDataManager {
             if (entity instanceof Player) {
                 return entity.getName(); // Need redundancy for legacy support
             }
-            else if (!plugin.getVersionManager().is_v1_7()) {
+            else if (true) {
                 return entity.getName();
             }
 
@@ -823,22 +818,15 @@ public final class EntityManager extends EntityDataManager {
     }
 
     public boolean hasDataString(Entity entity, String string) {
-        return plugin.getVersionManager().hasPersistentData()
-               ? entity.getPersistentDataContainer()
-                       .has(new NamespacedKey(plugin, string), PersistentDataType.STRING)
-               : entity.hasMetadata(string);
+        return entity.getPersistentDataContainer().has(new NamespacedKey(plugin, string), PersistentDataType.STRING);
     }
 
     public boolean hasDataByte(Entity entity, String string) {
-        return plugin.getVersionManager().hasPersistentData()
-               ? entity.getPersistentDataContainer()
-                       .has(new NamespacedKey(plugin, string), PersistentDataType.BYTE)
-               : entity.hasMetadata(string);
+        return entity.getPersistentDataContainer().has(new NamespacedKey(plugin, string), PersistentDataType.BYTE);
     }
 
     public String getDataString(Entity entity, String key) {
-        if (plugin.getVersionManager().hasPersistentData() && entity.getPersistentDataContainer()
-                                                                    .has(new NamespacedKey(plugin, key), PersistentDataType.STRING)) {
+        if (entity.getPersistentDataContainer().has(new NamespacedKey(plugin, key), PersistentDataType.STRING)) {
             return entity.getPersistentDataContainer().get(new NamespacedKey(plugin, key), PersistentDataType.STRING);
         }
         else {
@@ -847,7 +835,7 @@ public final class EntityManager extends EntityDataManager {
     }
 
     public void setDataString(Entity entity, String key, String string) {
-        if (plugin.getVersionManager().hasPersistentData()) {
+        if (true) {
             entity.getPersistentDataContainer().set(new NamespacedKey(plugin, key), PersistentDataType.STRING, string);
         }
         else {
@@ -856,7 +844,7 @@ public final class EntityManager extends EntityDataManager {
     }
 
     public void setDataByte(Entity entity, String key) {
-        if (plugin.getVersionManager().hasPersistentData()) {
+        if (true) {
             entity.getPersistentDataContainer().set(new NamespacedKey(plugin, key), PersistentDataType.BYTE, (byte) 1);
         }
         else {
@@ -865,8 +853,8 @@ public final class EntityManager extends EntityDataManager {
     }
 
     public Grave getGraveFromEntityData(Entity entity) {
-        if (plugin.getVersionManager().hasPersistentData() && entity.getPersistentDataContainer()
-                                                                    .has(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING)) {
+        if (entity.getPersistentDataContainer()
+                  .has(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING)) {
             return plugin.getCacheManager()
                          .getGraveMap()
                          .get(UUIDUtil.getUUID(entity.getPersistentDataContainer()

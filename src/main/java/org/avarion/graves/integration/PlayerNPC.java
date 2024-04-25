@@ -137,8 +137,7 @@ public final class PlayerNPC extends EntityDataManager {
                             npc.setItemInRightHand(grave.getEquipmentMap().get(EquipmentSlot.HAND));
                         }
 
-                        if (plugin.getVersionManager().hasSecondHand() && grave.getEquipmentMap()
-                                                                               .containsKey(EquipmentSlot.OFF_HAND)) {
+                        if (grave.getEquipmentMap().containsKey(EquipmentSlot.OFF_HAND)) {
                             npc.setItemInLeftHand(grave.getEquipmentMap().get(EquipmentSlot.OFF_HAND));
                         }
                     }

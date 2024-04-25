@@ -5,7 +5,6 @@ import org.avarion.graves.command.GravesCommand;
 import org.avarion.graves.command.GraveyardsCommand;
 import org.avarion.graves.compatibility.Compatibility;
 import org.avarion.graves.compatibility.CompatibilityBlockData;
-import org.avarion.graves.compatibility.CompatibilityMaterialData;
 import org.avarion.graves.listener.*;
 import org.avarion.graves.manager.*;
 import org.avarion.graves.type.Grave;
@@ -223,14 +222,8 @@ public class Graves extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new InventoryCloseListener(this), this);
         getServer().getPluginManager().registerEvents(new InventoryOpenListener(this), this);
         getServer().getPluginManager().registerEvents(new CreatureSpawnListener(this), this);
-
-        if (!versionManager.is_v1_7()) {
-            getServer().getPluginManager().registerEvents(new PlayerInteractAtEntityListener(this), this);
-        }
-
-        if (!versionManager.is_v1_7() && !versionManager.is_v1_8()) {
-            getServer().getPluginManager().registerEvents(new BlockExplodeListener(this), this);
-        }
+        getServer().getPluginManager().registerEvents(new PlayerInteractAtEntityListener(this), this);
+        getServer().getPluginManager().registerEvents(new BlockExplodeListener(this), this);
 
         //getServer().getPluginManager().registerEvents(new GraveTestListener(this), this); // Test Listener
     }
@@ -240,7 +233,7 @@ public class Graves extends JavaPlugin {
     }
 
     private void registerRecipes() {
-        if (versionManager.hasPersistentData() && !versionManager.isMohist()) {
+        if (!versionManager.isMohist) {
             recipeManager = new RecipeManager(this);
         }
     }
@@ -387,19 +380,13 @@ public class Graves extends JavaPlugin {
     }
 
     private void compatibilityChecker() {
-        compatibility = versionManager.hasBlockData() ? new CompatibilityBlockData() : new CompatibilityMaterialData();
+        compatibility = new CompatibilityBlockData();
 
-        if (!versionManager.hasBlockData()) {
-            infoMessage("Legacy version detected, Graves will run but may have problems with material names, "
-                        + "the default config is setup for the latest version of the game, you can alter the config manually to fix "
-                        + "any issues you encounter, you will need to find the names of materials and sounds for your version.");
-        }
-
-        if (versionManager.isBukkit()) {
+        if (versionManager.isBukkit) {
             infoMessage("Bukkit detected, some functions won't work on Bukkit, like hex codes.");
         }
 
-        if (versionManager.isMohist()) {
+        if (versionManager.isMohist) {
             infoMessage("Mohist detected, not injecting custom recipes.");
         }
     }
@@ -528,9 +515,7 @@ public class Graves extends JavaPlugin {
                 if (getConfig().isConfigurationSection(section)) {
                     ConfigurationSection configurationSection = getConfig().getConfigurationSection(section);
 
-                    if (configurationSection != null && (versionManager.hasConfigContains()
-                                                         ? configurationSection.contains(config, true)
-                                                         : configurationSection.contains(config))) {
+                    if (configurationSection != null && configurationSection.contains(config, true)) {
                         return configurationSection;
                     }
                 }
@@ -543,9 +528,7 @@ public class Graves extends JavaPlugin {
             if (getConfig().isConfigurationSection(section)) {
                 ConfigurationSection configurationSection = getConfig().getConfigurationSection(section);
 
-                if (configurationSection != null && (versionManager.hasConfigContains()
-                                                     ? configurationSection.contains(config, true)
-                                                     : configurationSection.contains(config))) {
+                if (configurationSection != null && configurationSection.contains(config, true)) {
                     return configurationSection;
                 }
             }

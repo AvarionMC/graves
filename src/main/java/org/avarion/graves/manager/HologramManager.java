@@ -23,8 +23,7 @@ public final class HologramManager extends EntityDataManager {
     }
 
     public void createHologram(Location location, Grave grave) {
-        if (!plugin.getVersionManager().is_v1_7() && plugin.getConfig("hologram.enabled", grave)
-                                                           .getBoolean("hologram.enabled")) {
+        if (plugin.getConfig("hologram.enabled", grave).getBoolean("hologram.enabled")) {
             double offsetX = plugin.getConfig("hologram.offset.x", grave).getDouble("hologram.offset.x");
             double offsetY = plugin.getConfig("hologram.offset.y", grave).getDouble("hologram.offset.y");
             double offsetZ = plugin.getConfig("hologram.offset.z", grave).getDouble("hologram.offset.z");
@@ -49,22 +48,15 @@ public final class HologramManager extends EntityDataManager {
                     armorStand.setSmall(true);
                     armorStand.setCustomName(StringUtil.parseString(line, location, grave, plugin));
 
-                    if (!plugin.getVersionManager().is_v1_7()) {
-                        try {
-                            armorStand.setMarker(marker);
-                        }
-                        catch (NoSuchMethodError ignored) {
-                        }
+                    try {
+                        armorStand.setMarker(marker);
+                    }
+                    catch (NoSuchMethodError ignored) {
                     }
 
-                    if (!plugin.getVersionManager().is_v1_7() && !plugin.getVersionManager().is_v1_8()) {
-                        armorStand.setInvulnerable(true);
-                    }
-
-                    if (plugin.getVersionManager().hasScoreboardTags()) {
-                        armorStand.getScoreboardTags().add("graveHologram");
-                        armorStand.getScoreboardTags().add("graveHologramGraveUUID:" + grave.getUUID());
-                    }
+                    armorStand.setInvulnerable(true);
+                    armorStand.getScoreboardTags().add("graveHologram");
+                    armorStand.getScoreboardTags().add("graveHologramGraveUUID:" + grave.getUUID());
 
                     HologramData hologramData = new HologramData(location, armorStand.getUniqueId(), grave.getUUID(), lineNumber);
 

@@ -33,9 +33,9 @@ public class PlayerInteractListener implements Listener {
     public void onPlayerInteract(@NotNull PlayerInteractEvent event) {
         Player player = event.getPlayer();
 
-        if ((!plugin.getVersionManager().hasSecondHand() || (event.getHand() != null
-                                                             && event.getHand() == EquipmentSlot.HAND))
-            && (plugin.getVersionManager().is_v1_7() || player.getGameMode() != GameMode.SPECTATOR)) {
+        if (event.getHand() != null
+            && event.getHand() == EquipmentSlot.HAND
+            && player.getGameMode() != GameMode.SPECTATOR) {
             // Grave
             if (event.getClickedBlock() != null
                 && event.useInteractedBlock() != Event.Result.DENY

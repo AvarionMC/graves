@@ -29,7 +29,6 @@ settings:
   # Debug information, debug level 2 can be useful in finding out why a Grave does not spawn on your server.
   debug:
     admin: # UUID or name of admins to send debug information to. https://mcuuid.net/
-      - "12345678-9123-4567-8912-345678912345"
     level: 0 # 0 = Nothing, 1 = Information, 2 = Failures
 
   #########

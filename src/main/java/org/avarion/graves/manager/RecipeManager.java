@@ -183,57 +183,45 @@ public final class RecipeManager {
     }
 
     public void setRecipeData(String token, ItemStack itemStack) {
-        if (plugin.getVersionManager().hasPersistentData()) {
-            ItemMeta itemMeta = itemStack.getItemMeta();
+        ItemMeta itemMeta = itemStack.getItemMeta();
 
-            if (itemMeta != null) {
-                itemMeta.getPersistentDataContainer()
-                        .set(new NamespacedKey(plugin, "token"), PersistentDataType.STRING, token);
-                itemStack.setItemMeta(itemMeta);
-            }
+        if (itemMeta != null) {
+            itemMeta.getPersistentDataContainer()
+                    .set(new NamespacedKey(plugin, "token"), PersistentDataType.STRING, token);
+            itemStack.setItemMeta(itemMeta);
         }
     }
 
     public boolean isToken(String token, ItemStack itemStack) {
-        if (plugin.getVersionManager().hasPersistentData()) {
-            if (itemStack.getItemMeta() != null && itemStack.getItemMeta()
-                                                            .getPersistentDataContainer()
-                                                            .has(new NamespacedKey(plugin, "token"), PersistentDataType.STRING)) {
-                String string = itemStack.getItemMeta()
-                                         .getPersistentDataContainer()
-                                         .get(new NamespacedKey(plugin, "token"), PersistentDataType.STRING);
+        if (itemStack.getItemMeta() != null && itemStack.getItemMeta()
+                                                        .getPersistentDataContainer()
+                                                        .has(new NamespacedKey(plugin, "token"), PersistentDataType.STRING)) {
+            String string = itemStack.getItemMeta()
+                                     .getPersistentDataContainer()
+                                     .get(new NamespacedKey(plugin, "token"), PersistentDataType.STRING);
 
-                return string != null && string.equals(token);
-            }
-        }
-        else {
-            // TODO
-            return false;
+            return string != null && string.equals(token);
         }
 
         return false;
     }
 
     public String getTokenName(ItemStack itemStack) {
-        if (plugin.getVersionManager().hasPersistentData()) {
-            if (itemStack.getItemMeta() != null && itemStack.getItemMeta()
-                                                            .getPersistentDataContainer()
-                                                            .has(new NamespacedKey(plugin, "token"), PersistentDataType.STRING)) {
-                return itemStack.getItemMeta()
-                                .getPersistentDataContainer()
-                                .get(new NamespacedKey(plugin, "token"), PersistentDataType.STRING);
-            }
+        if (itemStack.getItemMeta() != null && itemStack.getItemMeta()
+                                                        .getPersistentDataContainer()
+                                                        .has(new NamespacedKey(plugin, "token"), PersistentDataType.STRING)) {
+            return itemStack.getItemMeta()
+                            .getPersistentDataContainer()
+                            .get(new NamespacedKey(plugin, "token"), PersistentDataType.STRING);
         }
 
         return null;
     }
 
     public boolean isToken(ItemStack itemStack) {
-        return plugin.getVersionManager().hasPersistentData()
-               && itemStack.getItemMeta() != null
-               && itemStack.getItemMeta()
-                           .getPersistentDataContainer()
-                           .has(new NamespacedKey(plugin, "token"), PersistentDataType.STRING);
+        return itemStack.getItemMeta() != null && itemStack.getItemMeta()
+                                                           .getPersistentDataContainer()
+                                                           .has(new NamespacedKey(plugin, "token"), PersistentDataType.STRING);
     }
 
     private char getChar(int count) {

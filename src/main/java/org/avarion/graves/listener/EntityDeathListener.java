@@ -242,8 +242,7 @@ public class EntityDeathListener implements Listener {
         }
 
         // Token
-        if (plugin.getVersionManager().hasPersistentData()
-            && plugin.getConfig("token.enabled", livingEntity, permissionList).getBoolean("token.enabled")) {
+        if (plugin.getConfig("token.enabled", livingEntity, permissionList).getBoolean("token.enabled")) {
             String name = plugin.getConfig("token.name", livingEntity).getString("token.name", "basic");
 
             if (plugin.getConfig().isConfigurationSection("settings.token." + name)) {
@@ -314,10 +313,8 @@ public class EntityDeathListener implements Listener {
             grave.setTimeAlive(plugin.getConfig("grave.time", grave).getInt("grave.time") * 1000L);
 
             // Skin
-            if (!plugin.getVersionManager().is_v1_7()) {
-                grave.setOwnerTexture(SkinUtil.getTexture(livingEntity));
-                grave.setOwnerTextureSignature(SkinUtil.getSignature(livingEntity));
-            }
+            grave.setOwnerTexture(SkinUtil.getTexture(livingEntity));
+            grave.setOwnerTextureSignature(SkinUtil.getSignature(livingEntity));
 
             // Experience
             float experiencePercent = (float) plugin.getConfig("experience.store", grave).getDouble("experience.store");
@@ -448,10 +445,7 @@ public class EntityDeathListener implements Listener {
                                          .getGraveInventory(grave, livingEntity, graveItemStackList, removedItemStackList, permissionList));
 
                 // Equipment
-                grave.setEquipmentMap(!plugin.getVersionManager().is_v1_7()
-                                      ? plugin.getEntityManager()
-                                              .getEquipmentMap(livingEntity, grave)
-                                      : new HashMap<>());
+                grave.setEquipmentMap(plugin.getEntityManager().getEquipmentMap(livingEntity, grave));
 
                 // Placeable
                 locationMap.entrySet()

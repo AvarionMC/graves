@@ -50,10 +50,6 @@ public final class BlockManager {
             if (plugin.getConfig("block.enabled", grave).getBoolean("block.enabled")) {
                 String materialString = plugin.getConfig("block.material", grave).getString("block.material", "CHEST");
 
-                if (materialString.equals("PLAYER_HEAD") && !plugin.getVersionManager().hasBlockData()) {
-                    materialString = "SKULL";
-                }
-
                 material = Material.matchMaterial(materialString);
             }
             else {

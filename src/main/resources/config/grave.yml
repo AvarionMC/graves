@@ -129,7 +129,7 @@ settings:
       ###########
       # How the items are saved in graves, compact mode stacks all items and puts them into a small as possible inventory. exact mode matches the players inventory exactly.
       storage:
-        mode: COMPACT # Storage mode: COMPACT, EXACT, CHESTSORT (Requires ChestSort).
+        mode: EXACT # Storage mode: COMPACT, EXACT, CHESTSORT (Requires ChestSort).
 
       ##############
       # Experience #
