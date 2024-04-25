@@ -356,7 +356,7 @@ public class EntityDeathListener implements Listener {
                 EntityDamageEvent entityDamageEvent = livingEntity.getLastDamageCause();
 
                 if (entityDamageEvent.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK
-                        && entityDamageEvent instanceof EntityDamageByEntityEvent) {
+                    && entityDamageEvent instanceof EntityDamageByEntityEvent) {
                     EntityDamageByEntityEvent entityDamageByEntityEvent = (EntityDamageByEntityEvent) entityDamageEvent;
 
                     grave.setKillerUUID(entityDamageByEntityEvent.getDamager().getUniqueId());
@@ -509,9 +509,10 @@ public class EntityDeathListener implements Listener {
                                   .runCommands("event.command.block", livingEntity, graveBlockPlaceEvent.getLocation(), grave);
                         }
                     }
-                } else {
+                }
+                else {
                     if (event instanceof PlayerDeathEvent && plugin.getConfig("placement.failure-keep-inventory", grave)
-                            .getBoolean("placement.failure-keep-inventory")) {
+                                                                   .getBoolean("placement.failure-keep-inventory")) {
                         PlayerDeathEvent playerDeathEvent = (PlayerDeathEvent) event;
 
                         try {

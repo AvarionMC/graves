@@ -284,8 +284,7 @@ public final class EntityManager extends EntityDataManager {
         playPlayerSound(string, entity, location, permissionList, 1, 1);
     }
 
-    public void playPlayerSound(String string, Entity entity, Location location, List<String> permissionList,
-                                float volume, float pitch) {
+    public void playPlayerSound(String string, Entity entity, Location location, List<String> permissionList, float volume, float pitch) {
         if (entity instanceof Player) {
             Player player = (Player) entity;
             string = plugin.getConfig(string, entity, permissionList).getString(string);
@@ -594,9 +593,11 @@ public final class EntityManager extends EntityDataManager {
                     setDataString(livingEntity, "gravePermissionList", String.join("|", grave.getPermissionList()));
                 }
 
-                if (livingEntity instanceof Mob && targetEntity != null && !targetEntity.isInvulnerable()
-                        && (!(targetEntity instanceof Player) || ((Player) targetEntity).getGameMode()
-                        != GameMode.CREATIVE)) {
+                if (livingEntity instanceof Mob
+                    && targetEntity != null
+                    && !targetEntity.isInvulnerable()
+                    && (!(targetEntity instanceof Player)
+                        || ((Player) targetEntity).getGameMode() != GameMode.CREATIVE)) {
                     ((Mob) livingEntity).setTarget(targetEntity);
                 }
 
@@ -809,8 +810,9 @@ public final class EntityManager extends EntityDataManager {
     public String getEntityName(Entity entity) {
         if (entity != null) {
             if (entity instanceof Player) {
-                return ((Player) entity).getName(); // Need redundancy for legacy support
-            } else if (!plugin.getVersionManager().is_v1_7()) {
+                return entity.getName(); // Need redundancy for legacy support
+            }
+            else if (!plugin.getVersionManager().is_v1_7()) {
                 return entity.getName();
             }
 

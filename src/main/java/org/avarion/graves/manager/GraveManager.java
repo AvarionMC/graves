@@ -151,8 +151,9 @@ public final class GraveManager {
                 InventoryHolder inventoryHolder = player.getOpenInventory().getTopInventory().getHolder();
 
                 try {
-                    if (inventoryHolder instanceof Grave || inventoryHolder instanceof GraveList
-                            || inventoryHolder instanceof GraveMenu) {
+                    if (inventoryHolder instanceof Grave
+                        || inventoryHolder instanceof GraveList
+                        || inventoryHolder instanceof GraveMenu) {
                         player.closeInventory();
                     }
                 }
@@ -453,8 +454,9 @@ public final class GraveManager {
     public List<ItemStack> filterGraveItemStackList(List<ItemStack> itemStackList, List<ItemStack> removedItemStackList, LivingEntity livingEntity, List<String> permissionList) {
         itemStackList = new ArrayList<>(itemStackList);
 
-        if (livingEntity instanceof Player && getStorageMode(plugin.getConfig("storage.mode",
-                livingEntity, permissionList).getString("storage.mode")) == Grave.StorageMode.EXACT) {
+        if (livingEntity instanceof Player
+            && getStorageMode(plugin.getConfig("storage.mode", livingEntity, permissionList).getString("storage.mode"))
+               == Grave.StorageMode.EXACT) {
             Player player = (Player) livingEntity;
             List<ItemStack> playerInventoryContentList = Arrays.asList(player.getInventory().getContents());
 

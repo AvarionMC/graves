@@ -46,11 +46,12 @@ public final class GUIManager {
                     Inventory inventory = player.getOpenInventory().getTopInventory();
 
                     if (inventory.getHolder() instanceof GraveList) {
-                        plugin.getGUIManager().setGraveListItems(inventory,
-                                ((GraveList) inventory.getHolder()).getUUID());
-                    } else if (inventory.getHolder() instanceof GraveMenu) {
-                        plugin.getGUIManager().setGraveMenuItems(inventory,
-                                ((GraveMenu) inventory.getHolder()).getGrave());
+                        plugin.getGUIManager()
+                              .setGraveListItems(inventory, ((GraveList) inventory.getHolder()).getUUID());
+                    }
+                    else if (inventory.getHolder() instanceof GraveMenu) {
+                        plugin.getGUIManager()
+                              .setGraveMenuItems(inventory, ((GraveMenu) inventory.getHolder()).getGrave());
                     }
                 }
             }
