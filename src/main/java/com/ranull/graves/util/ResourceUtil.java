@@ -83,8 +83,7 @@ public final class ResourceUtil {
 
             if (!outputFile.exists() || overwrite) {
                 if (createDirectories(outputFile)) {
-                    try {
-                        OutputStream outputStream = Files.newOutputStream(outputFile.toPath());
+                    try (OutputStream outputStream = Files.newOutputStream(outputFile.toPath())) {
                         byte[] bytes = new byte[1024];
                         int len;
 

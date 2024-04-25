@@ -102,9 +102,6 @@ public final class InventoryUtil {
             else if (itemStack.getType().name().startsWith("LEATHER")) {
                 player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
             }
-            else if (itemStack.getType().name().startsWith("LEATHER")) {
-                player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
-            }
             else if (itemStack.getType().name().startsWith("ELYTRA")) {
                 player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_ELYTRA, 1, 1);
             }

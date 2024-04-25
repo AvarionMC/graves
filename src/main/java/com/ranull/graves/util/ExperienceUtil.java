@@ -35,16 +35,16 @@ public final class ExperienceUtil {
         double result = 0;
 
         if (experience > 1395) {
-            result = (Math.sqrt(72 * experience - 54215) + 325) / 18;
+            result = (Math.sqrt(72. * experience - 54215) + 325) / 18;
         }
         else if (experience > 315) {
-            result = Math.sqrt(40 * experience - 7839) / 10 + 8.1;
+            result = Math.sqrt(40. * experience - 7839) / 10 + 8.1;
         }
         else if (experience > 0) {
-            result = Math.sqrt(experience + 9) - 3;
+            result = Math.sqrt(experience + 9.) - 3;
         }
 
-        return (long) (Math.round(result * 100.0) / 100.0);
+        return (long) (Math.round(result * 100.) / 100.);
     }
 
     public static int getDropPercent(int experience, float percent) {

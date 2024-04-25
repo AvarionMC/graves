@@ -760,7 +760,9 @@ public final class DataManager {
         }
 
         try {
-            connection.createStatement().executeUpdate(sql);
+            Statement stmt = connection.createStatement();
+            stmt.closeOnCompletion();
+            stmt.executeUpdate(sql);
         }
         catch (SQLException exception) {
             exception.printStackTrace();
@@ -773,7 +775,9 @@ public final class DataManager {
         }
 
         try {
-            return connection.createStatement().executeQuery(sql);
+            Statement stmt = connection.createStatement();
+            stmt.closeOnCompletion();
+            return stmt.executeQuery(sql);
         }
         catch (SQLException exception) {
             exception.printStackTrace();
