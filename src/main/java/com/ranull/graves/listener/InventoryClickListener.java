@@ -13,6 +13,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.InventoryHolder;
 
 public class InventoryClickListener implements Listener {
+
     private final Graves plugin;
 
     public InventoryClickListener(Graves plugin) {
@@ -27,32 +28,38 @@ public class InventoryClickListener implements Listener {
             if (inventoryHolder instanceof Grave) {
                 Grave grave = (Grave) inventoryHolder;
 
-                plugin.getServer().getScheduler().runTaskLater(plugin, () ->
-                        plugin.getDataManager().updateGrave(grave, "inventory",
-                                InventoryUtil.inventoryToString(grave.getInventory())), 1L);
-            } else if (event.getWhoClicked() instanceof Player) {
-                Player player = (Player) event.getWhoClicked();
+                plugin.getServer()
+                      .getScheduler()
+                      .runTaskLater(plugin, () -> plugin.getDataManager()
+                                                        .updateGrave(grave, "inventory", InventoryUtil.inventoryToString(grave.getInventory())), 1L);
+            }
+            else if (event.getWhoClicked() instanceof Player player) {
 
                 if (inventoryHolder instanceof GraveList) {
                     GraveList graveList = (GraveList) event.getInventory().getHolder();
                     Grave grave = graveList.getGrave(event.getSlot());
 
                     if (grave != null) {
-                        plugin.getEntityManager().runFunction(player, plugin.getConfig("gui.menu.list.function", grave)
-                                .getString("gui.menu.list.function", "menu"), grave);
+                        plugin.getEntityManager()
+                              .runFunction(player, plugin.getConfig("gui.menu.list.function", grave)
+                                                         .getString("gui.menu.list.function", "menu"), grave);
                         plugin.getGUIManager().setGraveListItems(graveList.getInventory(), graveList.getUUID());
                     }
 
                     event.setCancelled(true);
-                } else if (inventoryHolder instanceof GraveMenu) {
+                }
+                else if (inventoryHolder instanceof GraveMenu) {
                     GraveMenu graveMenu = (GraveMenu) event.getInventory().getHolder();
                     Grave grave = graveMenu.getGrave();
 
                     if (grave != null) {
-                        plugin.getEntityManager().runFunction(player,
-                                plugin.getConfig("gui.menu.grave.slot." + event.getSlot() + ".function", grave)
-                                        .getString("gui.menu.grave.slot." + event.getSlot()
-                                                + ".function", "none"), grave);
+                        plugin.getEntityManager()
+                              .runFunction(player, plugin.getConfig("gui.menu.grave.slot."
+                                                                    + event.getSlot()
+                                                                    + ".function", grave)
+                                                         .getString("gui.menu.grave.slot."
+                                                                    + event.getSlot()
+                                                                    + ".function", "none"), grave);
                         plugin.getGUIManager().setGraveMenuItems(graveMenu.getInventory(), grave);
                     }
 
@@ -61,4 +68,5 @@ public class InventoryClickListener implements Listener {
             }
         }
     }
+
 }

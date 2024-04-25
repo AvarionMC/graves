@@ -34,7 +34,8 @@ public final class ResourceUtil {
                 File dir = null;
                 try {
                     dir = new File(url.toURI());
-                } catch (URISyntaxException ignored) {
+                }
+                catch (URISyntaxException ignored) {
                     return null;
                 }
 
@@ -45,12 +46,14 @@ public final class ResourceUtil {
                         if (!file.isDirectory() && relative.startsWith(path)) {
                             try {
                                 inputStreamHashMap.put(relative, new FileInputStream(file));
-                            } catch (FileNotFoundException ignored) {
+                            }
+                            catch (FileNotFoundException ignored) {
                             }
                         }
                     }
                 }
-            } else {
+            }
+            else {
                 try {
                     JarURLConnection connection = (JarURLConnection) url.openConnection();
                     JarFile jarFile = connection.getJarFile();
@@ -63,7 +66,8 @@ public final class ResourceUtil {
                             inputStreamHashMap.put(jarEntry.getName(), plugin.getResource(jarEntry.getName()));
                         }
                     }
-                } catch (IOException ignored) {
+                }
+                catch (IOException ignored) {
                 }
             }
         }
@@ -71,8 +75,7 @@ public final class ResourceUtil {
         return inputStreamHashMap;
     }
 
-    private static void saveResources(Map<String, InputStream> inputStreamMap, String inputPath, String outputPath,
-                                      boolean overwrite) {
+    private static void saveResources(Map<String, InputStream> inputStreamMap, String inputPath, String outputPath, boolean overwrite) {
         for (Map.Entry<String, InputStream> entry : inputStreamMap.entrySet()) {
             String path = entry.getKey();
             InputStream inputStream = entry.getValue();
@@ -91,7 +94,8 @@ public final class ResourceUtil {
 
                         outputStream.close();
                         inputStream.close();
-                    } catch (IOException ignored) {
+                    }
+                    catch (IOException ignored) {
                     }
                 }
             }

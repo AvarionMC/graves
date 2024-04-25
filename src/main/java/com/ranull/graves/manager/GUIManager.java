@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 public final class GUIManager {
+
     private final Graves plugin;
 
     public GUIManager(Graves plugin) {
@@ -45,11 +46,12 @@ public final class GUIManager {
                     Inventory inventory = player.getOpenInventory().getTopInventory();
 
                     if (inventory.getHolder() instanceof GraveList) {
-                        plugin.getGUIManager().setGraveListItems(inventory,
-                                ((GraveList) inventory.getHolder()).getUUID());
-                    } else if (inventory.getHolder() instanceof GraveMenu) {
-                        plugin.getGUIManager().setGraveMenuItems(inventory,
-                                ((GraveMenu) inventory.getHolder()).getGrave());
+                        plugin.getGUIManager()
+                              .setGraveListItems(inventory, ((GraveList) inventory.getHolder()).getUUID());
+                    }
+                    else if (inventory.getHolder() instanceof GraveMenu) {
+                        plugin.getGUIManager()
+                              .setGraveMenuItems(inventory, ((GraveMenu) inventory.getHolder()).getGrave());
                     }
                 }
             }
@@ -57,17 +59,15 @@ public final class GUIManager {
     }
 
     public void openGraveList(Entity entity, UUID uuid, boolean sound) {
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+        if (entity instanceof Player player) {
             List<String> permissionList = plugin.getPermissionList(player);
             List<Grave> playerGraveList = plugin.getGraveManager().getGraveList(uuid);
 
             if (!playerGraveList.isEmpty()) {
                 GraveList graveList = new GraveList(uuid, playerGraveList);
-                Inventory inventory = plugin.getServer().createInventory(graveList,
-                        InventoryUtil.getInventorySize(playerGraveList.size()),
-                        StringUtil.parseString(plugin.getConfig("gui.menu.list.title", player, permissionList)
-                                .getString("gui.menu.list.title", "Graves Main Menu"), player, plugin));
+                Inventory inventory = plugin.getServer()
+                                            .createInventory(graveList, InventoryUtil.getInventorySize(playerGraveList.size()), StringUtil.parseString(plugin.getConfig("gui.menu.list.title", player, permissionList)
+                                                                                                                                                             .getString("gui.menu.list.title", "Graves Main Menu"), player, plugin));
 
                 setGraveListItems(inventory, playerGraveList);
                 graveList.setInventory(inventory);
@@ -76,7 +76,8 @@ public final class GUIManager {
                 if (sound) {
                     plugin.getEntityManager().playPlayerSound("sound.menu-open", player, permissionList);
                 }
-            } else {
+            }
+            else {
                 plugin.getEntityManager().sendMessage("message.empty", player, permissionList);
             }
         }
@@ -102,12 +103,12 @@ public final class GUIManager {
     }
 
     public void openGraveMenu(Entity entity, Grave grave, boolean sound) {
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+        if (entity instanceof Player player) {
             GraveMenu graveMenu = new GraveMenu(grave);
             String title = StringUtil.parseString(plugin.getConfig("gui.menu.grave.title", player, grave.getPermissionList())
-                    .getString("gui.menu.grave.title", "Grave"), player, plugin);
-            Inventory inventory = plugin.getServer().createInventory(graveMenu, InventoryUtil.getInventorySize(5), title);
+                                                        .getString("gui.menu.grave.title", "Grave"), player, plugin);
+            Inventory inventory = plugin.getServer()
+                                        .createInventory(graveMenu, InventoryUtil.getInventorySize(5), title);
 
             setGraveMenuItems(inventory, grave);
             graveMenu.setInventory(inventory);
@@ -123,7 +124,7 @@ public final class GUIManager {
         inventory.clear();
 
         ConfigurationSection configurationSection = plugin.getConfig("gui.menu.grave.slot", grave)
-                .getConfigurationSection("gui.menu.grave.slot");
+                                                          .getConfigurationSection("gui.menu.grave.slot");
 
         if (configurationSection != null) {
             for (String string : configurationSection.getKeys(false)) {
@@ -131,10 +132,12 @@ public final class GUIManager {
                     int slot = Integer.parseInt(string);
 
                     inventory.setItem(slot, plugin.getItemStackManager().createGraveMenuItemStack(slot, grave));
-                } catch (NumberFormatException exception) {
+                }
+                catch (NumberFormatException exception) {
                     plugin.debugMessage(string + " is not an int", 1);
                 }
             }
         }
     }
+
 }

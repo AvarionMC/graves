@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class PlayerInteractListener implements Listener {
+
     private final Graves plugin;
 
     public PlayerInteractListener(Graves plugin) {
@@ -33,11 +34,12 @@ public class PlayerInteractListener implements Listener {
         Player player = event.getPlayer();
 
         if ((!plugin.getVersionManager().hasSecondHand() || (event.getHand() != null
-                && event.getHand() == EquipmentSlot.HAND))
-                && (plugin.getVersionManager().is_v1_7() || player.getGameMode() != GameMode.SPECTATOR)) {
+                                                             && event.getHand() == EquipmentSlot.HAND))
+            && (plugin.getVersionManager().is_v1_7() || player.getGameMode() != GameMode.SPECTATOR)) {
             // Grave
-            if (event.getClickedBlock() != null && event.useInteractedBlock() != Event.Result.DENY
-                    && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            if (event.getClickedBlock() != null
+                && event.useInteractedBlock() != Event.Result.DENY
+                && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
                 Block block = event.getClickedBlock();
                 Grave grave = plugin.getBlockManager().getGraveFromBlock(block);
 
@@ -55,9 +57,10 @@ public class PlayerInteractListener implements Listener {
             }
 
             // Graveyard
-            if (event.getClickedBlock() != null && event.getItem() != null
-                    && event.getItem().getType() == Material.BONE
-                    && plugin.getGraveyardManager().isModifyingGraveyard(player)) {
+            if (event.getClickedBlock() != null
+                && event.getItem() != null
+                && event.getItem().getType() == Material.BONE
+                && plugin.getGraveyardManager().isModifyingGraveyard(player)) {
                 Graveyard graveyard = plugin.getGraveyardManager().getModifyingGraveyard(player);
                 Block block = event.getClickedBlock();
                 Location location = block.getLocation().clone();
@@ -73,16 +76,20 @@ public class PlayerInteractListener implements Listener {
                 if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
                     if (graveyard.hasGraveLocation(location)) {
                         plugin.getGraveyardManager().removeLocationInGraveyard(player, location, graveyard);
-                    } else if (graveyard.hasGraveLocation(locationRelative)) {
+                    }
+                    else if (graveyard.hasGraveLocation(locationRelative)) {
                         plugin.getGraveyardManager().removeLocationInGraveyard(player, locationRelative, graveyard);
-                    } else {
+                    }
+                    else {
                         if (plugin.getGraveyardManager().isLocationInGraveyard(locationRelative, graveyard)) {
                             plugin.getGraveyardManager().addLocationInGraveyard(player, locationRelative, graveyard);
-                        } else {
+                        }
+                        else {
                             player.sendMessage("outside graveyard " + graveyard.getName());
                         }
                     }
-                } else {
+                }
+                else {
                     player.sendMessage("can't break while modifying a graveyard");
                 }
 
@@ -90,8 +97,8 @@ public class PlayerInteractListener implements Listener {
             }
 
             // Compass
-            if (event.getItem() != null &&
-                    player.getInventory().getItem(player.getInventory().getHeldItemSlot()) == event.getItem()) {
+            if (event.getItem() != null
+                && player.getInventory().getItem(player.getInventory().getHeldItemSlot()) == event.getItem()) {
                 ItemStack itemStack = event.getItem();
                 UUID uuid = plugin.getEntityManager().getGraveUUIDFromItemStack(itemStack);
 
@@ -99,29 +106,33 @@ public class PlayerInteractListener implements Listener {
                     if (plugin.getCacheManager().getGraveMap().containsKey(uuid)) {
                         Grave grave = plugin.getCacheManager().getGraveMap().get(uuid);
                         List<Location> locationList = plugin.getGraveManager()
-                                .getGraveLocationList(player.getLocation(), grave);
+                                                            .getGraveLocationList(player.getLocation(), grave);
 
                         if (!locationList.isEmpty()) {
                             Location location = locationList.get(0);
 
-                            player.getInventory().setItem(player.getInventory().getHeldItemSlot(),
-                                    plugin.getEntityManager().createGraveCompass(player, location, grave));
+                            player.getInventory()
+                                  .setItem(player.getInventory().getHeldItemSlot(), plugin.getEntityManager()
+                                                                                          .createGraveCompass(player, location, grave));
 
                             if (player.getWorld().equals(location.getWorld())) {
-                                plugin.getEntityManager().sendMessage("message.distance", player,
-                                        location, grave);
-                            } else {
-                                plugin.getEntityManager().sendMessage("message.distance-world", player,
-                                        location, grave);
+                                plugin.getEntityManager().sendMessage("message.distance", player, location, grave);
                             }
-                        } else {
+                            else {
+                                plugin.getEntityManager()
+                                      .sendMessage("message.distance-world", player, location, grave);
+                            }
+                        }
+                        else {
                             player.getInventory().remove(itemStack);
                         }
-                    } else {
+                    }
+                    else {
                         player.getInventory().remove(itemStack);
                     }
                 }
             }
         }
     }
+
 }

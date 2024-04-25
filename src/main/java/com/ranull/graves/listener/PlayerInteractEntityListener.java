@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
 public class PlayerInteractEntityListener implements Listener {
+
     private final Graves plugin;
 
     public PlayerInteractEntityListener(Graves plugin) {
@@ -24,8 +25,8 @@ public class PlayerInteractEntityListener implements Listener {
         Player player = event.getPlayer();
 
         if ((!plugin.getVersionManager().hasSecondHand() || event.getHand() == EquipmentSlot.HAND)
-                && event.getRightClicked() instanceof ItemFrame
-                && (plugin.getVersionManager().is_v1_7() || player.getGameMode() != GameMode.SPECTATOR)) {
+            && event.getRightClicked() instanceof ItemFrame
+            && (plugin.getVersionManager().is_v1_7() || player.getGameMode() != GameMode.SPECTATOR)) {
             Entity entity = event.getRightClicked();
             Grave grave = plugin.getEntityDataManager().getGrave(entity);
 
@@ -34,4 +35,5 @@ public class PlayerInteractEntityListener implements Listener {
             }
         }
     }
+
 }

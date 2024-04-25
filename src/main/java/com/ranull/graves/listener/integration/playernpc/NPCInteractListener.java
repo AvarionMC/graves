@@ -12,6 +12,7 @@ import org.bukkit.event.Listener;
 import java.util.UUID;
 
 public class NPCInteractListener implements Listener {
+
     private final Graves plugin;
     private final PlayerNPC playerNPC;
 
@@ -23,7 +24,7 @@ public class NPCInteractListener implements Listener {
     @EventHandler(priority = EventPriority.LOW)
     public void onNPCInteract(NPC.Events.Interact event) {
         if (event.getClickType() == NPC.Interact.ClickType.RIGHT_CLICK) {
-            NPC.Personal npcPersonal = (NPC.Personal) event.getNPC();
+            NPC.Personal npcPersonal = event.getNPC();
 
             if (npcPersonal.hasGlobal()) {
                 NPC.Global npcGlobal = npcPersonal.getGlobal();
@@ -35,12 +36,13 @@ public class NPCInteractListener implements Listener {
                         Grave grave = plugin.getCacheManager().getGraveMap().get(uuid);
 
                         if (grave != null) {
-                            event.setCancelled(plugin.getGraveManager().openGrave(event.getPlayer(),
-                                    npcGlobal.getLocation(), grave));
+                            event.setCancelled(plugin.getGraveManager()
+                                                     .openGrave(event.getPlayer(), npcGlobal.getLocation(), grave));
                         }
                     }
                 }
             }
         }
     }
+
 }

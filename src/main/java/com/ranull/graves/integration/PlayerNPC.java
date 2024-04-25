@@ -19,6 +19,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import java.util.*;
 
 public final class PlayerNPC extends EntityDataManager {
+
     private final Graves plugin;
     private final NPCLib npcLib;
     private final NPCInteractListener npcInteractListener;
@@ -55,8 +56,9 @@ public final class PlayerNPC extends EntityDataManager {
                         Grave grave = plugin.getCacheManager().getGraveMap().get(entityData.getUUIDGrave());
 
                         if (grave != null) {
-                            plugin.getIntegrationManager().getPlayerNPC().createCorpse(entityData.getUUIDEntity(),
-                                    entityData.getLocation(), grave, false);
+                            plugin.getIntegrationManager()
+                                  .getPlayerNPC()
+                                  .createCorpse(entityData.getUUIDEntity(), entityData.getLocation(), grave, false);
                         }
                     }
                 }
@@ -71,19 +73,21 @@ public final class PlayerNPC extends EntityDataManager {
     public void createCorpse(UUID uuid, Location location, Grave grave, boolean createEntityData) {
         plugin.getServer().getScheduler().runTask(plugin, () -> {
             if (plugin.getConfig("playernpc.corpse.enabled", grave).getBoolean("playernpc.corpse.enabled")
-                    && grave.getOwnerType() == EntityType.PLAYER) {
+                && grave.getOwnerType() == EntityType.PLAYER) {
                 Player player = plugin.getServer().getPlayer(grave.getOwnerUUID());
                 Location npcLocation = location.clone();
 
-                if (player != null && npcLocation.getWorld() != null
-                        && npcLib.getGlobalNPC(plugin, uuid.toString()) == null) {
+                if (player != null
+                    && npcLocation.getWorld() != null
+                    && npcLib.getGlobalNPC(plugin, uuid.toString()) == null) {
                     location.getBlock().setType(Material.AIR);
                     NPC.Pose pose = NPC.Pose.SWIMMING;
 
                     try {
                         pose = NPC.Pose.valueOf(plugin.getConfig("playernpc.corpse.pose", grave)
-                                .getString("playernpc.corpse.pose"));
-                    } catch (IllegalArgumentException ignored) {
+                                                      .getString("playernpc.corpse.pose"));
+                    }
+                    catch (IllegalArgumentException ignored) {
                     }
 
                     if (pose == NPC.Pose.SWIMMING) {
@@ -93,11 +97,12 @@ public final class PlayerNPC extends EntityDataManager {
                     NPC.Global npc = npcLib.generateGlobalNPC(plugin, uuid.toString(), npcLocation);
                     NPC.Skin.Custom skin = NPC.Skin.Custom.getLoadedSkin(plugin, grave.getUUID().toString());
 
-                    if (skin == null && grave.getOwnerTexture() != null
-                            && grave.getOwnerTextureSignature() != null
-                            && grave.getOwnerName() != null) {
-                        skin = NPC.Skin.Custom.createCustomSkin(plugin, grave.getUUID().toString(),
-                                grave.getOwnerTexture(), grave.getOwnerTextureSignature());
+                    if (skin == null
+                        && grave.getOwnerTexture() != null
+                        && grave.getOwnerTextureSignature() != null
+                        && grave.getOwnerName() != null) {
+                        skin = NPC.Skin.Custom.createCustomSkin(plugin, grave.getUUID()
+                                                                             .toString(), grave.getOwnerTexture(), grave.getOwnerTextureSignature());
                     }
 
                     npc.setSkin(skin);
@@ -107,7 +112,7 @@ public final class PlayerNPC extends EntityDataManager {
                     npc.setCustomData("grave_uuid", grave.getUUID().toString());
 
                     npc.setCollidable(plugin.getConfig("playernpc.corpse.collide", grave)
-                            .getBoolean("playernpc.corpse.collide"));
+                                            .getBoolean("playernpc.corpse.collide"));
 
                     if (plugin.getConfig("playernpc.corpse.armor", grave).getBoolean("playernpc.corpse.armor")) {
                         if (grave.getEquipmentMap().containsKey(EquipmentSlot.HEAD)) {
@@ -132,27 +137,35 @@ public final class PlayerNPC extends EntityDataManager {
                             npc.setItemInRightHand(grave.getEquipmentMap().get(EquipmentSlot.HAND));
                         }
 
-                        if (plugin.getVersionManager().hasSecondHand()
-                                && grave.getEquipmentMap().containsKey(EquipmentSlot.OFF_HAND)) {
+                        if (plugin.getVersionManager().hasSecondHand() && grave.getEquipmentMap()
+                                                                               .containsKey(EquipmentSlot.OFF_HAND)) {
                             npc.setItemInLeftHand(grave.getEquipmentMap().get(EquipmentSlot.OFF_HAND));
                         }
                     }
 
                     if (plugin.getConfig("playernpc.corpse.glow.enabled", grave)
-                            .getBoolean("playernpc.corpse.glow.enabled")) {
+                              .getBoolean("playernpc.corpse.glow.enabled")) {
                         try {
-                            npc.setGlowing(true, ChatColor.valueOf(plugin
-                                    .getConfig("playernpc.corpse.glow.color", grave)
-                                    .getString("playernpc.corpse.glow.color")));
-                        } catch (IllegalArgumentException ignored) {
+                            npc.setGlowing(true, ChatColor.valueOf(plugin.getConfig("playernpc.corpse.glow.color", grave)
+                                                                         .getString("playernpc.corpse.glow.color")));
+                        }
+                        catch (IllegalArgumentException ignored) {
                             npc.setGlowing(true);
                         }
                     }
 
                     npc.forceUpdate();
-                    plugin.debugMessage("Spawning PlayerNPC NPC for " + grave.getUUID() + " at "
-                            + npcLocation.getWorld().getName() + ", " + (npcLocation.getBlockX() + 0.5) + "x, "
-                            + (npcLocation.getBlockY() + 0.5) + "y, " + (npcLocation.getBlockZ() + 0.5) + "z", 1);
+                    plugin.debugMessage("Spawning PlayerNPC NPC for "
+                                        + grave.getUUID()
+                                        + " at "
+                                        + npcLocation.getWorld().getName()
+                                        + ", "
+                                        + (npcLocation.getBlockX() + 0.5)
+                                        + "x, "
+                                        + (npcLocation.getBlockY() + 0.5)
+                                        + "y, "
+                                        + (npcLocation.getBlockZ() + 0.5)
+                                        + "z", 1);
 
                     if (createEntityData) {
                         createEntityData(location, uuid, grave.getUUID(), EntityData.Type.PLAYERNPC);
@@ -186,8 +199,8 @@ public final class PlayerNPC extends EntityDataManager {
 
         for (EntityData entityData : entityDataList) {
             for (NPC.Global npc : npcLib.getAllGlobalNPCs()) {
-                if (npc.hasCustomData("grave_uuid")
-                        && npc.getCustomData("grave_uuid").equals(entityData.getUUIDGrave().toString())) {
+                if (npc.hasCustomData("grave_uuid") && npc.getCustomData("grave_uuid")
+                                                          .equals(entityData.getUUIDGrave().toString())) {
                     entityDataMap.put(entityData, npc);
                 }
             }
@@ -195,4 +208,5 @@ public final class PlayerNPC extends EntityDataManager {
 
         return entityDataMap;
     }
+
 }

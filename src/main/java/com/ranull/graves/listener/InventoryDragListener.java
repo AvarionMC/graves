@@ -11,6 +11,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.InventoryHolder;
 
 public class InventoryDragListener implements Listener {
+
     private final Graves plugin;
 
     public InventoryDragListener(Graves plugin) {
@@ -24,11 +25,14 @@ public class InventoryDragListener implements Listener {
         if (inventoryHolder instanceof Grave) {
             Grave grave = (Grave) event.getInventory().getHolder();
 
-            plugin.getServer().getScheduler().runTaskLater(plugin, () ->
-                    plugin.getDataManager().updateGrave(grave, "inventory",
-                            InventoryUtil.inventoryToString(grave.getInventory())), 1L);
-        } else if (inventoryHolder instanceof GraveList) {
+            plugin.getServer()
+                  .getScheduler()
+                  .runTaskLater(plugin, () -> plugin.getDataManager()
+                                                    .updateGrave(grave, "inventory", InventoryUtil.inventoryToString(grave.getInventory())), 1L);
+        }
+        else if (inventoryHolder instanceof GraveList) {
             event.setCancelled(true);
         }
     }
+
 }

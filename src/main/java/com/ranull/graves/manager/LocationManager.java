@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import java.util.List;
 
 public final class LocationManager {
+
     private final Graves plugin;
 
     public LocationManager(Graves plugin) {
@@ -27,9 +28,10 @@ public final class LocationManager {
     public Location getLastSolidLocation(Entity entity) {
         Location location = plugin.getCacheManager().getLastLocationMap().get(entity.getUniqueId());
 
-        return location != null && location.getWorld() != null
-                && location.getWorld().equals(entity.getWorld())
-                && location.getBlock().getRelative(BlockFace.DOWN).getType().isSolid() ? location : null;
+        return location != null
+               && location.getWorld() != null
+               && location.getWorld().equals(entity.getWorld())
+               && location.getBlock().getRelative(BlockFace.DOWN).getType().isSolid() ? location : null;
     }
 
     public void removeLastSolidLocation(Entity entity) {
@@ -39,9 +41,10 @@ public final class LocationManager {
     public Location getSafeTeleportLocation(Entity entity, Location location, Grave grave, Graves plugin) {
         if (location.getWorld() != null) {
             if (plugin.getConfig("teleport.unsafe", grave).getBoolean("teleport.unsafe")
-                    || isLocationSafePlayer(location)) {
+                || isLocationSafePlayer(location)) {
                 return location;
-            } else if (plugin.getConfig("teleport.top", grave).getBoolean("teleport.top")) {
+            }
+            else if (plugin.getConfig("teleport.top", grave).getBoolean("teleport.top")) {
                 Location topLocation = getTop(location, entity, grave);
 
                 if (topLocation != null && isLocationSafePlayer(topLocation) && topLocation.getWorld() != null) {
@@ -63,17 +66,22 @@ public final class LocationManager {
 
             if (!hasGrave(location) && isLocationSafeGrave(location)) {
                 return location;
-            } else {
+            }
+            else {
                 if (isVoid(location) || !isInsideBorder(location)) {
                     return getVoid(location, livingEntity, grave);
-                } else if (MaterialUtil.isLava(block.getType())) {
+                }
+                else if (MaterialUtil.isLava(block.getType())) {
                     return getLavaTop(location, livingEntity, grave);
-                } else {
+                }
+                else {
                     Location graveLocation = (MaterialUtil.isAir(block.getType())
-                            || MaterialUtil.isWater(block.getType()))
-                            ? (plugin.getConfig("placement.ground", grave)
-                            .getBoolean("placement.ground") ? getGround(location, livingEntity, grave) : null)
-                            : getRoof(location, livingEntity, grave);
+                                              || MaterialUtil.isWater(block.getType()))
+                                             ? (plugin.getConfig("placement.ground", grave)
+                                                      .getBoolean("placement.ground")
+                                                ? getGround(location, livingEntity, grave)
+                                                : null)
+                                             : getRoof(location, livingEntity, grave);
 
                     if (graveLocation != null) {
                         return graveLocation;
@@ -87,7 +95,8 @@ public final class LocationManager {
 
     public Location getTop(Location location, Entity entity, Grave grave) {
         return findLocationDownFromY(location, entity, location.getWorld() != null
-                ? location.getWorld().getMaxHeight() : location.getBlockY(), grave);
+                                                       ? location.getWorld().getMaxHeight()
+                                                       : location.getBlockY(), grave);
     }
 
     public Location getRoof(Location location, Entity entity, Grave grave) {
@@ -108,7 +117,8 @@ public final class LocationManager {
             while (counter <= (getMinHeight(location) * -1) + location.getWorld().getMaxHeight()) {
                 if (MaterialUtil.isLava(location.getBlock().getType())) {
                     return getLavaTop(location, entity, grave);
-                } else if (isLocationSafeGrave(location) && !hasGrave(location)) {
+                }
+                else if (isLocationSafeGrave(location) && !hasGrave(location)) {
                     return location;
                 }
 
@@ -130,7 +140,8 @@ public final class LocationManager {
             while (counter <= (getMinHeight(location) * -1) + location.getWorld().getMaxHeight()) {
                 if (MaterialUtil.isLava(location.getBlock().getType())) {
                     return getLavaTop(location, entity, grave);
-                } else if (isLocationSafeGrave(location) && !hasGrave(location)) {
+                }
+                else if (isLocationSafeGrave(location) && !hasGrave(location)) {
                     return location;
                 }
 
@@ -189,8 +200,8 @@ public final class LocationManager {
                     Block block = location.getBlock();
 
                     if ((MaterialUtil.isAir(block.getType()))
-                            && !plugin.getCompatibility().hasTitleData(block)
-                            && !MaterialUtil.isLava(block.getType())) {
+                        && !plugin.getCompatibility().hasTitleData(block)
+                        && !MaterialUtil.isLava(block.getType())) {
                         return location;
                     }
 
@@ -205,16 +216,16 @@ public final class LocationManager {
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean canBuild(LivingEntity livingEntity, Location location, List<String> permissionList) {
-        if (livingEntity instanceof Player) {
-            Player player = (Player) livingEntity;
+        if (livingEntity instanceof Player player) {
 
-            return (!plugin.getConfig("placement.can-build", player, permissionList)
-                    .getBoolean("placement.can-build")
-                    || plugin.getCompatibility().canBuild(player, location, plugin))
-                    && (!plugin.getIntegrationManager().hasProtectionLib()
-                    || (!plugin.getConfig("placement.can-build-protectionlib", player, permissionList)
-                    .getBoolean("placement.can-build-protectionlib")
-                    || plugin.getIntegrationManager().getProtectionLib().canBuild(location, player)));
+            return (!plugin.getConfig("placement.can-build", player, permissionList).getBoolean("placement.can-build")
+                    || plugin.getCompatibility().canBuild(player, location, plugin)) && (!plugin.getIntegrationManager()
+                                                                                                .hasProtectionLib() || (
+                                                                                                 !plugin.getConfig("placement.can-build-protectionlib", player, permissionList)
+                                                                                                        .getBoolean("placement.can-build-protectionlib")
+                                                                                                 || plugin.getIntegrationManager()
+                                                                                                          .getProtectionLib()
+                                                                                                          .canBuild(location, player)));
         }
 
         return true;
@@ -227,8 +238,10 @@ public final class LocationManager {
             Block blockAbove = block.getRelative(BlockFace.UP);
             Block blockBelow = block.getRelative(BlockFace.DOWN);
 
-            return !block.getType().isSolid() && !MaterialUtil.isLava(blockAbove.getType())
-                    && !MaterialUtil.isAir(blockBelow.getType()) && !MaterialUtil.isLava(blockBelow.getType());
+            return !block.getType().isSolid()
+                   && !MaterialUtil.isLava(blockAbove.getType())
+                   && !MaterialUtil.isAir(blockBelow.getType())
+                   && !MaterialUtil.isLava(blockBelow.getType());
         }
 
         return false;
@@ -238,30 +251,36 @@ public final class LocationManager {
         location = LocationUtil.roundLocation(location);
         Block block = location.getBlock();
 
-        return isInsideBorder(location) && MaterialUtil.isSafeNotSolid(block.getType())
-                && MaterialUtil.isSafeSolid(block.getRelative(BlockFace.DOWN).getType());
+        return isInsideBorder(location)
+               && MaterialUtil.isSafeNotSolid(block.getType())
+               && MaterialUtil.isSafeSolid(block.getRelative(BlockFace.DOWN).getType());
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean hasGrave(Location location) {
-        return plugin.getDataManager().hasChunkData(location)
-                && plugin.getDataManager().getChunkData(location).getBlockDataMap().containsKey(location);
+        return plugin.getDataManager().hasChunkData(location) && plugin.getDataManager()
+                                                                       .getChunkData(location)
+                                                                       .getBlockDataMap()
+                                                                       .containsKey(location);
     }
 
     public boolean isInsideBorder(Location location) {
-        return plugin.getVersionManager().is_v1_7() || plugin.getVersionManager().is_v1_8()
-                || plugin.getVersionManager().is_v1_9() || plugin.getVersionManager().is_v1_10()
-                || plugin.getVersionManager().is_v1_11()
-                || (location.getWorld() != null && location.getWorld().getWorldBorder().isInside(location));
+        return plugin.getVersionManager().is_v1_7()
+               || plugin.getVersionManager().is_v1_8()
+               || plugin.getVersionManager().is_v1_9()
+               || plugin.getVersionManager().is_v1_10()
+               || plugin.getVersionManager().is_v1_11()
+               || (location.getWorld() != null && location.getWorld().getWorldBorder().isInside(location));
     }
 
     public boolean isVoid(Location location) {
         return location.getWorld() != null && (location.getY() < getMinHeight(location)
-                || location.getY() > location.getWorld().getMaxHeight());
+                                               || location.getY() > location.getWorld().getMaxHeight());
     }
 
     public int getMinHeight(Location location) {
-        return location.getWorld() != null && plugin.getVersionManager().hasMinHeight()
-                ? location.getWorld().getMinHeight() : 0;
+        return location.getWorld() != null && plugin.getVersionManager().hasMinHeight() ? location.getWorld()
+                                                                                                  .getMinHeight() : 0;
     }
+
 }

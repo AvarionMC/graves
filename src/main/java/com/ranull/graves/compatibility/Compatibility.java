@@ -16,6 +16,7 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 
 public interface Compatibility {
+
     BlockData setBlockData(Location location, Material material, Grave grave, Graves plugin);
 
     boolean canBuild(Player player, Location location, Graves plugin);
@@ -28,7 +29,7 @@ public interface Compatibility {
 
     default String getSkullMetaData(ItemStack itemStack) {
         SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
-        if ( skullMeta == null ) {
+        if (skullMeta == null) {
             return null;
         }
 
@@ -46,10 +47,12 @@ public interface Compatibility {
                     return propertyCollection.stream().findFirst().get().getValue();
                 }
             }
-        } catch (NoSuchFieldException | IllegalAccessException exception) {
+        }
+        catch (NoSuchFieldException | IllegalAccessException exception) {
             exception.printStackTrace();
         }
 
         return null;
     }
+
 }

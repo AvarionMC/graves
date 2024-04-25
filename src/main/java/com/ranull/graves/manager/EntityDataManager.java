@@ -10,6 +10,7 @@ import org.bukkit.entity.Entity;
 import java.util.*;
 
 public class EntityDataManager {
+
     private final Graves plugin;
 
     public EntityDataManager(Graves plugin) {
@@ -45,9 +46,9 @@ public class EntityDataManager {
     public Grave getGrave(Location location, UUID uuid) {
         EntityData entityData = getEntityData(location, uuid);
 
-        return entityData != null && plugin.getCacheManager().getGraveMap()
-                .containsKey(entityData.getUUIDGrave())
-                ? plugin.getCacheManager().getGraveMap().get(entityData.getUUIDGrave()) : null;
+        return entityData != null && plugin.getCacheManager().getGraveMap().containsKey(entityData.getUUIDGrave())
+               ? plugin.getCacheManager().getGraveMap().get(entityData.getUUIDGrave())
+               : null;
     }
 
     public Grave getGrave(Entity entity) {
@@ -114,4 +115,5 @@ public class EntityDataManager {
 
         plugin.getDataManager().removeEntityData(removedEntityDataList);
     }
+
 }

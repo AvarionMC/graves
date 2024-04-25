@@ -11,18 +11,24 @@ import org.bukkit.inventory.ItemStack;
 import java.util.*;
 
 public final class InventoryUtil {
+
     public static int getInventorySize(int size) {
         if (size <= 9) {
             return 9;
-        } else if (size <= 18) {
+        }
+        else if (size <= 18) {
             return 18;
-        } else if (size <= 27) {
+        }
+        else if (size <= 27) {
             return 27;
-        } else if (size <= 36) {
+        }
+        else if (size <= 36) {
             return 36;
-        } else if (size <= 45) {
+        }
+        else if (size <= 45) {
             return 45;
-        } else {
+        }
+        else {
             return 54;
         }
     }
@@ -74,7 +80,7 @@ public final class InventoryUtil {
         for (ItemStack itemStack : itemStackList) {
             for (Map.Entry<Integer, ItemStack> itemStackEntry : player.getInventory().addItem(itemStack).entrySet()) {
                 inventory.addItem(itemStackEntry.getValue())
-                        .forEach((key, value) -> player.getWorld().dropItem(player.getLocation(), value));
+                         .forEach((key, value) -> player.getWorld().dropItem(player.getLocation(), value));
             }
         }
     }
@@ -83,24 +89,33 @@ public final class InventoryUtil {
         try {
             if (itemStack.getType().name().startsWith("NETHERITE")) {
                 player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_NETHERITE, 1, 1);
-            } else if (itemStack.getType().name().startsWith("DIAMOND")) {
+            }
+            else if (itemStack.getType().name().startsWith("DIAMOND")) {
                 player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_DIAMOND, 1, 1);
-            } else if (itemStack.getType().name().startsWith("GOLD")) {
+            }
+            else if (itemStack.getType().name().startsWith("GOLD")) {
                 player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_DIAMOND, 1, 1);
-            } else if (itemStack.getType().name().startsWith("IRON")) {
+            }
+            else if (itemStack.getType().name().startsWith("IRON")) {
                 player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_DIAMOND, 1, 1);
-            } else if (itemStack.getType().name().startsWith("LEATHER")) {
+            }
+            else if (itemStack.getType().name().startsWith("LEATHER")) {
                 player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
-            } else if (itemStack.getType().name().startsWith("LEATHER")) {
+            }
+            else if (itemStack.getType().name().startsWith("LEATHER")) {
                 player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
-            } else if (itemStack.getType().name().startsWith("ELYTRA")) {
+            }
+            else if (itemStack.getType().name().startsWith("ELYTRA")) {
                 player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_ELYTRA, 1, 1);
-            } else if (itemStack.getType().name().startsWith("TURTLE")) {
+            }
+            else if (itemStack.getType().name().startsWith("TURTLE")) {
                 player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_TURTLE, 1, 1);
-            } else {
+            }
+            else {
                 player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_GENERIC, 1, 1);
             }
-        } catch (NoSuchFieldError ignored) {
+        }
+        catch (NoSuchFieldError ignored) {
         }
     }
 
@@ -109,27 +124,35 @@ public final class InventoryUtil {
     }
 
     public static boolean isHelmet(ItemStack itemStack) {
-        return itemStack != null && itemStack.getType().name()
-                .matches("(?i)NETHERITE_HELMET|DIAMOND_HELMET|GOLDEN_HELMET|GOLD_HELMET|IRON_HELMET|LEATHER_HELMET|" +
-                        "CHAINMAIL_HELMET|TURTLE_HELMET|CARVED_PUMPKIN|PUMPKIN");
+        return itemStack != null && itemStack.getType()
+                                             .name()
+                                             .matches(
+                                                     "(?i)NETHERITE_HELMET|DIAMOND_HELMET|GOLDEN_HELMET|GOLD_HELMET|IRON_HELMET|LEATHER_HELMET|"
+                                                     + "CHAINMAIL_HELMET|TURTLE_HELMET|CARVED_PUMPKIN|PUMPKIN");
     }
 
     public static boolean isChestplate(ItemStack itemStack) {
-        return itemStack != null && itemStack.getType().name()
-                .matches("(?i)NETHERITE_CHESTPLATE|DIAMOND_CHESTPLATE|GOLDEN_CHESTPLATE|GOLD_CHESTPLATE|" +
-                        "IRON_CHESTPLATE|LEATHER_CHESTPLATE|CHAINMAIL_CHESTPLATE|ELYTRA");
+        return itemStack != null && itemStack.getType()
+                                             .name()
+                                             .matches(
+                                                     "(?i)NETHERITE_CHESTPLATE|DIAMOND_CHESTPLATE|GOLDEN_CHESTPLATE|GOLD_CHESTPLATE|"
+                                                     + "IRON_CHESTPLATE|LEATHER_CHESTPLATE|CHAINMAIL_CHESTPLATE|ELYTRA");
     }
 
     public static boolean isLeggings(ItemStack itemStack) {
-        return itemStack != null && itemStack.getType().name()
-                .matches("(?i)NETHERITE_LEGGINGS|DIAMOND_LEGGINGS|GOLDEN_LEGGINGS|GOLD_LEGGINGS|IRON_LEGGINGS|" +
-                        "LEATHER_LEGGINGS|CHAINMAIL_LEGGINGS");
+        return itemStack != null && itemStack.getType()
+                                             .name()
+                                             .matches(
+                                                     "(?i)NETHERITE_LEGGINGS|DIAMOND_LEGGINGS|GOLDEN_LEGGINGS|GOLD_LEGGINGS|IRON_LEGGINGS|"
+                                                     + "LEATHER_LEGGINGS|CHAINMAIL_LEGGINGS");
     }
 
     public static boolean isBoots(ItemStack itemStack) {
-        return itemStack != null && itemStack.getType().name()
-                .matches("(?i)NETHERITE_BOOTS|DIAMOND_BOOTS|GOLDEN_BOOTS|GOLD_BOOTS|IRON_BOOTS|LEATHER_BOOTS|" +
-                        "CHAINMAIL_BOOTS");
+        return itemStack != null && itemStack.getType()
+                                             .name()
+                                             .matches(
+                                                     "(?i)NETHERITE_BOOTS|DIAMOND_BOOTS|GOLDEN_BOOTS|GOLD_BOOTS|IRON_BOOTS|LEATHER_BOOTS|"
+                                                     + "CHAINMAIL_BOOTS");
     }
 
     public static String inventoryToString(Inventory inventory) {
@@ -150,8 +173,8 @@ public final class InventoryUtil {
         String[] strings = string.split("\\|");
 
         if (strings.length > 0 && !strings[0].equals("")) {
-            Inventory inventory = plugin.getServer().createInventory(inventoryHolder,
-                    InventoryUtil.getInventorySize(strings.length), title);
+            Inventory inventory = plugin.getServer()
+                                        .createInventory(inventoryHolder, InventoryUtil.getInventorySize(strings.length), title);
 
             int counter = 0;
             for (String itemString : strings) {
@@ -168,4 +191,5 @@ public final class InventoryUtil {
 
         return plugin.getServer().createInventory(inventoryHolder, 9, title);
     }
+
 }

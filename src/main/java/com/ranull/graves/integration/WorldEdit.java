@@ -47,8 +47,9 @@ public final class WorldEdit {
 
     public void saveData() {
         if (plugin.getConfig().getBoolean("settings.integration.worldedit.write")) {
-            ResourceUtil.copyResources("data/plugin/" + worldEditPlugin.getName().toLowerCase() + "/schematics",
-                    plugin.getDataFolder() + "/schematics", plugin);
+            ResourceUtil.copyResources("data/plugin/"
+                                       + worldEditPlugin.getName().toLowerCase()
+                                       + "/schematics", plugin.getDataFolder() + "/schematics", plugin);
             plugin.debugMessage("Saving " + worldEditPlugin.getName() + " schematics.", 1);
         }
     }
@@ -62,18 +63,19 @@ public final class WorldEdit {
         if (listFiles != null) {
             for (File file : listFiles) {
                 if (file.isFile() && file.getName().contains(".schem")) {
-                    String name = file.getName().toLowerCase().replace(".schematic", "")
-                            .replace(".schem", "");
+                    String name = file.getName().toLowerCase().replace(".schematic", "").replace(".schem", "");
                     ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(file);
 
                     if (clipboardFormat != null) {
                         try (ClipboardReader clipboardReader = clipboardFormat.getReader(new FileInputStream(file))) {
                             stringClipboardMap.put(name, clipboardReader.read());
                             plugin.debugMessage("Loading schematic " + name, 1);
-                        } catch (IOException exception) {
+                        }
+                        catch (IOException exception) {
                             exception.printStackTrace();
                         }
-                    } else {
+                    }
+                    else {
                         plugin.warningMessage("Unable to load schematic " + name);
                     }
                 }
@@ -82,7 +84,8 @@ public final class WorldEdit {
     }
 
     public void createSchematic(Location location, Grave grave) {
-        if (location.getWorld() != null && plugin.getConfig("schematic.enabled", grave).getBoolean("schematic.enabled")) {
+        if (location.getWorld() != null && plugin.getConfig("schematic.enabled", grave)
+                                                 .getBoolean("schematic.enabled")) {
             String schematicName = plugin.getConfig("schematic.name", grave).getString("schematic.name");
 
             if (schematicName != null && !schematicName.equals("") && hasSchematic(schematicName)) {
@@ -94,10 +97,19 @@ public final class WorldEdit {
                 pasteSchematic(location.clone().add(offsetX, offsetY, offsetZ), location.getYaw(), schematicName);
                 //PasteBuilder test = getSchematic(location.clone().add(offsetX, offsetY, offsetZ), grave.getYaw(), schematicName);
                 //buildSchematic(test);
-                plugin.debugMessage("Placing schematic for " + grave.getUUID() + " at "
-                        + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
-                        + (location.getBlockY() + 0.5) + "y, " + (location.getBlockZ() + 0.5) + "z", 1);
-            } else {
+                plugin.debugMessage("Placing schematic for "
+                                    + grave.getUUID()
+                                    + " at "
+                                    + location.getWorld().getName()
+                                    + ", "
+                                    + (location.getBlockX() + 0.5)
+                                    + "x, "
+                                    + (location.getBlockY() + 0.5)
+                                    + "y, "
+                                    + (location.getBlockZ() + 0.5)
+                                    + "z", 1);
+            }
+            else {
                 plugin.debugMessage("Can't find schematic " + schematicName, 1);
             }
         }
@@ -119,9 +131,13 @@ public final class WorldEdit {
 
                 switch (blockFace) {
                     case NORTH:
-                        leftTopCorner = location.clone().add(offset.x() - region.getWidth(), offset.y() - region.getHeight(), 0);
+                        leftTopCorner = location.clone()
+                                                .add(offset.x() - region.getWidth(), offset.y()
+                                                                                     - region.getHeight(), 0);
                     case WEST:
-                        leftTopCorner = location.clone().add(region.getWidth() - offset.x(), offset.y() - region.getHeight(), 0);
+                        leftTopCorner = location.clone()
+                                                .add(region.getWidth() - offset.x(), offset.y()
+                                                                                     - region.getHeight(), 0);
                 }
 
                 corner.getBlock().setType(Material.BEDROCK);
@@ -130,7 +146,8 @@ public final class WorldEdit {
                 //plugin.getServer().broadcastMessage(region.toString());
                 //plugin.getServer().broadcastMessage(location.toString());
                 //center.getBlock().setType(Material.BEDROCK);
-            } else {
+            }
+            else {
                 plugin.debugMessage("Can't find schematic " + name, 1);
             }
         }
@@ -163,14 +180,18 @@ public final class WorldEdit {
                     ClipboardHolder clipboardHolder = new ClipboardHolder(clipboard);
 
                     clipboardHolder.setTransform(clipboardHolder.getTransform().combine(getYawTransform(yaw)));
-                    Operations.complete(clipboardHolder.createPaste(editSession).to(locationToBlockVector3(location))
-                            .ignoreAirBlocks(ignoreAirBlocks).build());
+                    Operations.complete(clipboardHolder.createPaste(editSession)
+                                                       .to(locationToBlockVector3(location))
+                                                       .ignoreAirBlocks(ignoreAirBlocks)
+                                                       .build());
 
                     return clipboardHolder.getClipboard();
-                } catch (WorldEditException exception) {
+                }
+                catch (WorldEditException exception) {
                     exception.printStackTrace();
                 }
-            } else {
+            }
+            else {
                 plugin.debugMessage("Can't find schematic " + name, 1);
             }
         }
@@ -190,8 +211,10 @@ public final class WorldEdit {
 
                 clipboardHolder.setTransform(clipboardHolder.getTransform().combine(getYawTransform(yaw)));
                 return clipboardHolder.createPaste(getEditSession(location.getWorld()))
-                        .to(locationToBlockVector3(location)).ignoreAirBlocks(ignoreAirBlocks);
-            } else {
+                                      .to(locationToBlockVector3(location))
+                                      .ignoreAirBlocks(ignoreAirBlocks);
+            }
+            else {
                 plugin.debugMessage("Can't find schematic " + name, 1);
             }
         }
@@ -202,7 +225,8 @@ public final class WorldEdit {
     public void buildSchematic(PasteBuilder pasteBuilder) {
         try {
             Operations.complete(pasteBuilder.build());
-        } catch (WorldEditException exception) {
+        }
+        catch (WorldEditException exception) {
             exception.printStackTrace();
         }
     }
@@ -210,16 +234,13 @@ public final class WorldEdit {
     private AffineTransform getYawTransform(float yaw) {
         AffineTransform affineTransform = new AffineTransform();
 
-        switch (BlockFaceUtil.getSimpleBlockFace(BlockFaceUtil.getYawBlockFace(yaw))) {
-            case SOUTH:
-                return affineTransform.rotateY(180);
-            case EAST:
-                return affineTransform.rotateY(270);
-            case WEST:
-                return affineTransform.rotateY(90);
-        }
+        return switch (BlockFaceUtil.getSimpleBlockFace(BlockFaceUtil.getYawBlockFace(yaw))) {
+            case SOUTH -> affineTransform.rotateY(180);
+            case EAST -> affineTransform.rotateY(270);
+            case WEST -> affineTransform.rotateY(90);
+            default -> affineTransform;
+        };
 
-        return affineTransform;
     }
 
     public BlockVector3 locationToBlockVector3(Location location) {

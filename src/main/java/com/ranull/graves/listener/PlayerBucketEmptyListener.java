@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 
 public class PlayerBucketEmptyListener implements Listener {
+
     private final Graves plugin;
 
     public PlayerBucketEmptyListener(Graves plugin) {
@@ -23,4 +24,5 @@ public class PlayerBucketEmptyListener implements Listener {
             event.setCancelled(true);
         }
     }
+
 }

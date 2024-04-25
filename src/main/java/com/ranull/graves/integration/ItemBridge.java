@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public final class ItemBridge implements ItemBridgeListener {
+
     private final Graves plugin;
     private com.jojodmo.itembridge.ItemBridge itemBridge;
 
@@ -42,7 +43,8 @@ public final class ItemBridge implements ItemBridgeListener {
             string = string.replaceFirst("token_", "");
 
             return plugin.getConfig().isSet("settings.token." + string)
-                    ? plugin.getRecipeManager().getToken(string) : null;
+                   ? plugin.getRecipeManager().getToken(string)
+                   : null;
         }
 
         return null;
@@ -61,4 +63,5 @@ public final class ItemBridge implements ItemBridgeListener {
     public boolean isItem(@NotNull ItemStack itemStack, @NotNull String string) {
         return string.equals(getItemName(itemStack));
     }
+
 }

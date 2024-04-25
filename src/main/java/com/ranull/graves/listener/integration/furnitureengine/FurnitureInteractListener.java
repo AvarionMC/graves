@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 public class FurnitureInteractListener implements Listener {
+
     private final Graves plugin;
     private final FurnitureEngine furnitureEngine;
 
@@ -25,8 +26,10 @@ public class FurnitureInteractListener implements Listener {
             Grave grave = furnitureEngine.getGrave(itemFrame.getLocation(), itemFrame.getUniqueId());
 
             if (grave != null) {
-                event.setCancelled(plugin.getGraveManager().openGrave(event.getPlayer(), itemFrame.getLocation(), grave));
+                event.setCancelled(plugin.getGraveManager()
+                                         .openGrave(event.getPlayer(), itemFrame.getLocation(), grave));
             }
         }
     }
+
 }

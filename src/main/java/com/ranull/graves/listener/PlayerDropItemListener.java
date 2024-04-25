@@ -8,6 +8,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class PlayerDropItemListener implements Listener {
+
     private final Graves plugin;
 
     public PlayerDropItemListener(Graves plugin) {
@@ -22,4 +23,5 @@ public class PlayerDropItemListener implements Listener {
             event.getItemDrop().remove();
         }
     }
+
 }

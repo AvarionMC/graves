@@ -12,9 +12,8 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.InvocationTargetException;
-
 public final class ProtocolLib {
+
     private final Graves plugin;
     private final ProtocolManager protocolManager;
 
@@ -47,4 +46,5 @@ public final class ProtocolLib {
     private void sendServerPacket(Player player, PacketContainer packetContainer) {
         protocolManager.sendServerPacket(player, packetContainer);
     }
+
 }

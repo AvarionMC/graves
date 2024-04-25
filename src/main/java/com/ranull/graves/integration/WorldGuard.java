@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class WorldGuard {
+
     private final JavaPlugin plugin;
     private final com.sk89q.worldguard.WorldGuard worldGuard;
     private final StateFlag createFlag;
@@ -40,14 +41,16 @@ public final class WorldGuard {
             if (flag instanceof StateFlag) {
                 return (StateFlag) flag;
             }
-        } else {
+        }
+        else {
             try {
                 StateFlag flag = new StateFlag(string, true);
 
                 worldGuard.getFlagRegistry().register(flag);
 
                 return flag;
-            } catch (FlagConflictException exception) {
+            }
+            catch (FlagConflictException exception) {
                 Flag<?> flag = worldGuard.getFlagRegistry().get(string);
 
                 if (flag instanceof StateFlag) {
@@ -61,12 +64,12 @@ public final class WorldGuard {
 
     public boolean hasCreateGrave(Location location) {
         if (location.getWorld() != null && createFlag != null) {
-            RegionManager regionManager = worldGuard.getPlatform().getRegionContainer()
-                    .get(BukkitAdapter.adapt(location.getWorld()));
+            RegionManager regionManager = worldGuard.getPlatform()
+                                                    .getRegionContainer()
+                                                    .get(BukkitAdapter.adapt(location.getWorld()));
 
             if (regionManager != null) {
-                ApplicableRegionSet applicableRegions = regionManager.getApplicableRegions(BlockVector3
-                        .at(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+                ApplicableRegionSet applicableRegions = regionManager.getApplicableRegions(BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
 
                 for (ProtectedRegion protectedRegion : applicableRegions.getRegions()) {
                     if (protectedRegion.getFlag(createFlag) != null) {
@@ -80,27 +83,33 @@ public final class WorldGuard {
     }
 
     public boolean canCreateGrave(Entity entity, Location location) {
-        return entity instanceof Player && createFlag != null
-                && worldGuard.getPlatform().getRegionContainer().createQuery().testState(BukkitAdapter.adapt(location),
-                WorldGuardPlugin.inst().wrapPlayer((Player) entity), createFlag);
+        return entity instanceof Player && createFlag != null && worldGuard.getPlatform()
+                                                                           .getRegionContainer()
+                                                                           .createQuery()
+                                                                           .testState(BukkitAdapter.adapt(location), WorldGuardPlugin.inst()
+                                                                                                                                     .wrapPlayer((Player) entity), createFlag);
     }
 
     public boolean canCreateGrave(Location location) {
-        return createFlag != null
-                && worldGuard.getPlatform().getRegionContainer().createQuery().testState(BukkitAdapter.adapt(location),
-                (RegionAssociable) null, createFlag);
+        return createFlag != null && worldGuard.getPlatform()
+                                               .getRegionContainer()
+                                               .createQuery()
+                                               .testState(BukkitAdapter.adapt(location), (RegionAssociable) null, createFlag);
     }
 
     public boolean canTeleport(Entity entity, Location location) {
-        return entity instanceof Player && createFlag != null
-                && worldGuard.getPlatform().getRegionContainer().createQuery().testState(BukkitAdapter.adapt(location),
-                WorldGuardPlugin.inst().wrapPlayer((Player) entity), teleportFlag);
+        return entity instanceof Player && createFlag != null && worldGuard.getPlatform()
+                                                                           .getRegionContainer()
+                                                                           .createQuery()
+                                                                           .testState(BukkitAdapter.adapt(location), WorldGuardPlugin.inst()
+                                                                                                                                     .wrapPlayer((Player) entity), teleportFlag);
     }
 
     public boolean canTeleport(Location location) {
-        return createFlag != null
-                && worldGuard.getPlatform().getRegionContainer().createQuery().testState(BukkitAdapter.adapt(location),
-                (RegionAssociable) null, teleportFlag);
+        return createFlag != null && worldGuard.getPlatform()
+                                               .getRegionContainer()
+                                               .createQuery()
+                                               .testState(BukkitAdapter.adapt(location), (RegionAssociable) null, teleportFlag);
     }
 
     public World getRegionWorld(String region) {
@@ -129,12 +138,12 @@ public final class WorldGuard {
 
     public boolean isInsideRegion(Location location, String region) {
         if (location.getWorld() != null) {
-            RegionManager regionManager = worldGuard.getPlatform().getRegionContainer()
-                    .get(BukkitAdapter.adapt(location.getWorld()));
+            RegionManager regionManager = worldGuard.getPlatform()
+                                                    .getRegionContainer()
+                                                    .get(BukkitAdapter.adapt(location.getWorld()));
 
             if (regionManager != null) {
-                ApplicableRegionSet applicableRegions = regionManager.getApplicableRegions(BlockVector3
-                        .at(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+                ApplicableRegionSet applicableRegions = regionManager.getApplicableRegions(BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
 
                 for (ProtectedRegion protectedRegion : applicableRegions.getRegions()) {
                     if (protectedRegion.getId().equals(region)) {
@@ -148,8 +157,9 @@ public final class WorldGuard {
     }
 
     public Location calculateRoughLocation(Graveyard graveyard) {
-        RegionManager regionManager = worldGuard.getPlatform().getRegionContainer()
-                .get(BukkitAdapter.adapt(graveyard.getWorld()));
+        RegionManager regionManager = worldGuard.getPlatform()
+                                                .getRegionContainer()
+                                                .get(BukkitAdapter.adapt(graveyard.getWorld()));
 
         if (regionManager != null) {
             ProtectedRegion protectedRegion = regionManager.getRegion(graveyard.getName());
@@ -173,12 +183,12 @@ public final class WorldGuard {
         List<String> regionNameList = new ArrayList<>();
 
         if (location.getWorld() != null) {
-            RegionManager regionManager = worldGuard.getPlatform().getRegionContainer()
-                    .get(BukkitAdapter.adapt(location.getWorld()));
+            RegionManager regionManager = worldGuard.getPlatform()
+                                                    .getRegionContainer()
+                                                    .get(BukkitAdapter.adapt(location.getWorld()));
 
             if (regionManager != null) {
-                ApplicableRegionSet applicableRegions = regionManager.getApplicableRegions(BlockVector3
-                        .at(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+                ApplicableRegionSet applicableRegions = regionManager.getApplicableRegions(BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
 
                 for (ProtectedRegion protectedRegion : applicableRegions.getRegions()) {
                     regionNameList.add("worldguard|" + location.getWorld().getName() + "|" + protectedRegion.getId());
@@ -188,4 +198,5 @@ public final class WorldGuard {
 
         return regionNameList;
     }
+
 }

@@ -9,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 
 public class BlockPistonExtendListener implements Listener {
+
     private final Graves plugin;
 
     public BlockPistonExtendListener(Graves plugin) {
@@ -21,7 +22,8 @@ public class BlockPistonExtendListener implements Listener {
 
         if (plugin.getBlockManager().getGraveFromBlock(block) != null) {
             event.setCancelled(true);
-        } else {
+        }
+        else {
             for (Entity entity : block.getWorld().getNearbyEntities(block.getLocation(), 0.5, 0.5, 0.5)) {
                 if (plugin.getHologramManager().getGrave(entity) != null) {
                     event.setCancelled(true);
@@ -29,4 +31,5 @@ public class BlockPistonExtendListener implements Listener {
             }
         }
     }
+
 }

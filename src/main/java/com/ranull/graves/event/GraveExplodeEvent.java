@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class GraveExplodeEvent extends Event implements Cancellable {
+
     private static final HandlerList HANDLERS = new HandlerList();
     private final Location location;
     private final Entity entity;
@@ -55,4 +56,5 @@ public class GraveExplodeEvent extends Event implements Cancellable {
     public Entity getEntity() {
         return entity;
     }
+
 }

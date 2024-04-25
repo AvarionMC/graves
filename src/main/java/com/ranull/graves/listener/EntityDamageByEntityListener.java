@@ -10,6 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 public class EntityDamageByEntityListener implements Listener {
+
     private final Graves plugin;
 
     public EntityDamageByEntityListener(Graves plugin) {
@@ -20,9 +21,9 @@ public class EntityDamageByEntityListener implements Listener {
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         Entity entity = event.getEntity();
 
-        if (entity instanceof ItemFrame
-                || (plugin.getVersionManager().is_v1_7() || entity instanceof ArmorStand)) {
+        if (entity instanceof ItemFrame || (plugin.getVersionManager().is_v1_7() || entity instanceof ArmorStand)) {
             event.setCancelled(plugin.getEntityDataManager().getGrave(entity) != null);
         }
     }
+
 }

@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 public final class SkinUtil {
+
     private static String GAMEPROFILE_METHOD;
     private static Method property_getValue;
     private static Method property_getSignature;
@@ -26,11 +27,13 @@ public final class SkinUtil {
         try {
             property_getValue = Property.class.getMethod("value");
             property_getSignature = Property.class.getMethod("signature");
-        } catch (NoSuchMethodException e) {
+        }
+        catch (NoSuchMethodException e) {
             try {
                 property_getValue = Property.class.getMethod("getValue");
                 property_getSignature = Property.class.getMethod("getSignature");
-            } catch (NoSuchMethodException ex) {
+            }
+            catch (NoSuchMethodException ex) {
                 throw new RuntimeException("Failed to find a valid method for Property value/signature retrieval", ex);
             }
         }
@@ -46,7 +49,8 @@ public final class SkinUtil {
 
             profileField.setAccessible(true);
             profileField.set(skull, gameProfile);
-        } catch (NoSuchFieldException | IllegalAccessException exception) {
+        }
+        catch (NoSuchFieldException | IllegalAccessException exception) {
             exception.printStackTrace();
         }
     }
@@ -61,13 +65,15 @@ public final class SkinUtil {
                 if (propertyMap.containsKey("textures")) {
                     Collection<Property> propertyCollection = propertyMap.get("textures");
 
-                    if (propertyCollection.isEmpty())
+                    if (propertyCollection.isEmpty()) {
                         return null;
+                    }
 
                     Property prop = propertyCollection.stream().findFirst().get();
                     try {
                         return (String) call_this.invoke(prop);
-                    } catch (IllegalAccessException | InvocationTargetException e) {
+                    }
+                    catch (IllegalAccessException | InvocationTargetException e) {
                         throw new RuntimeException(e);
                     }
                 }
@@ -84,15 +90,17 @@ public final class SkinUtil {
 
         Plugin skullTextureAPIPlugin = Bukkit.getServer().getPluginManager().getPlugin("SkullTextureAPI");
 
-        if (skullTextureAPIPlugin != null && skullTextureAPIPlugin.isEnabled()
-                && skullTextureAPIPlugin instanceof SkullTextureAPI) {
+        if (skullTextureAPIPlugin != null
+            && skullTextureAPIPlugin.isEnabled()
+            && skullTextureAPIPlugin instanceof SkullTextureAPI) {
             try {
                 String base64 = SkullTextureAPI.getTexture(entity);
 
                 if (base64 != null && !base64.equals("")) {
                     return base64;
                 }
-            } catch (NoSuchMethodError ignored) {
+            }
+            catch (NoSuchMethodError ignored) {
             }
         }
 
@@ -118,7 +126,8 @@ public final class SkinUtil {
 
                 return (GameProfile) gameProfile.invoke(playerObject);
             }
-        } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException ignored) {
+        }
+        catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException ignored) {
         }
 
         return null;
@@ -135,4 +144,5 @@ public final class SkinUtil {
 
         GAMEPROFILE_METHOD = "";
     }
+
 }

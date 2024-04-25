@@ -9,6 +9,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 public class ProjectClickListener implements Listener {
+
     private final Graves plugin;
     private final FurnitureLib furnitureLib;
 
@@ -27,4 +28,5 @@ public class ProjectClickListener implements Listener {
             }
         }
     }
+
 }

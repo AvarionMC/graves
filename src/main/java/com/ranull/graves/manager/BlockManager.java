@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 public final class BlockManager {
+
     private final Graves plugin;
 
     public BlockManager(Graves plugin) {
@@ -36,7 +37,8 @@ public final class BlockManager {
         BlockData blockData = getBlockData(block);
 
         return blockData != null && plugin.getCacheManager().getGraveMap().containsKey(blockData.getGraveUUID())
-                ? plugin.getCacheManager().getGraveMap().get(blockData.getGraveUUID()) : null;
+               ? plugin.getCacheManager().getGraveMap().get(blockData.getGraveUUID())
+               : null;
     }
 
     public void createBlock(Location location, Grave grave) {
@@ -46,15 +48,15 @@ public final class BlockManager {
             Material material;
 
             if (plugin.getConfig("block.enabled", grave).getBoolean("block.enabled")) {
-                String materialString = plugin.getConfig("block.material", grave)
-                        .getString("block.material", "CHEST");
+                String materialString = plugin.getConfig("block.material", grave).getString("block.material", "CHEST");
 
                 if (materialString.equals("PLAYER_HEAD") && !plugin.getVersionManager().hasBlockData()) {
                     materialString = "SKULL";
                 }
 
                 material = Material.matchMaterial(materialString);
-            } else {
+            }
+            else {
                 material = null;
             }
 
@@ -64,8 +66,7 @@ public final class BlockManager {
 
             location.add(offsetX, offsetY, offsetZ);
 
-            BlockData blockData = plugin.getCompatibility().setBlockData(location,
-                    material, grave, plugin);
+            BlockData blockData = plugin.getCompatibility().setBlockData(location, material, grave, plugin);
 
             plugin.getDataManager().addBlockData(blockData);
 
@@ -82,13 +83,32 @@ public final class BlockManager {
             }
 
             if (material != null) {
-                plugin.debugMessage("Placing grave block for " + grave.getUUID() + " at "
-                        + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
-                        + (location.getBlockY() + 0.5) + "y, " + (location.getBlockZ() + 0.5) + "z", 1);
-            } else {
-                plugin.debugMessage("Placing access location for " + grave.getUUID() + " at "
-                        + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
-                        + (location.getBlockY() + 0.5) + "y, " + (location.getBlockZ() + 0.5) + "z", 1);
+                plugin.debugMessage("Placing grave block for "
+                                    + grave.getUUID()
+                                    + " at "
+                                    + location.getWorld()
+                                              .getName()
+                                    + ", "
+                                    + (location.getBlockX() + 0.5)
+                                    + "x, "
+                                    + (location.getBlockY() + 0.5)
+                                    + "y, "
+                                    + (location.getBlockZ() + 0.5)
+                                    + "z", 1);
+            }
+            else {
+                plugin.debugMessage("Placing access location for "
+                                    + grave.getUUID()
+                                    + " at "
+                                    + location.getWorld()
+                                              .getName()
+                                    + ", "
+                                    + (location.getBlockX() + 0.5)
+                                    + "x, "
+                                    + (location.getBlockY() + 0.5)
+                                    + "y, "
+                                    + (location.getBlockZ() + 0.5)
+                                    + "z", 1);
             }
         }
     }
@@ -137,13 +157,15 @@ public final class BlockManager {
     public void removeBlock(BlockData blockData) {
         Location location = blockData.getLocation();
 
-        if (plugin.getIntegrationManager().hasItemsAdder() && plugin.getIntegrationManager().getItemsAdder()
-                .isCustomBlock(location)) {
+        if (plugin.getIntegrationManager().hasItemsAdder() && plugin.getIntegrationManager()
+                                                                    .getItemsAdder()
+                                                                    .isCustomBlock(location)) {
             plugin.getIntegrationManager().getItemsAdder().removeBlock(location);
         }
 
-        if (plugin.getIntegrationManager().hasOraxen() && plugin.getIntegrationManager().getOraxen()
-                .isCustomBlock(location)) {
+        if (plugin.getIntegrationManager().hasOraxen() && plugin.getIntegrationManager()
+                                                                .getOraxen()
+                                                                .isCustomBlock(location)) {
             plugin.getIntegrationManager().getOraxen().removeBlock(location);
         }
 
@@ -154,19 +176,31 @@ public final class BlockManager {
                 if (material != null) {
                     blockData.getLocation().getBlock().setType(material);
                 }
-            } else {
+            }
+            else {
                 blockData.getLocation().getBlock().setType(Material.AIR);
             }
 
             if (blockData.getReplaceData() != null) {
-                blockData.getLocation().getBlock().setBlockData(plugin.getServer()
-                        .createBlockData(blockData.getReplaceData()));
+                blockData.getLocation()
+                         .getBlock()
+                         .setBlockData(plugin.getServer().createBlockData(blockData.getReplaceData()));
             }
 
             plugin.getDataManager().removeBlockData(location);
-            plugin.debugMessage("Replacing grave block for " + blockData.getGraveUUID() + " at "
-                    + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
-                    + (location.getBlockY() + 0.5) + "y, " + (location.getBlockZ() + 0.5) + "z", 1);
+            plugin.debugMessage("Replacing grave block for "
+                                + blockData.getGraveUUID()
+                                + " at "
+                                + location.getWorld()
+                                          .getName()
+                                + ", "
+                                + (location.getBlockX() + 0.5)
+                                + "x, "
+                                + (location.getBlockY() + 0.5)
+                                + "y, "
+                                + (location.getBlockZ() + 0.5)
+                                + "z", 1);
         }
     }
+
 }

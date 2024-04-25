@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class Towny {
+
     private final Graves plugin;
     private final Plugin townyPlugin;
     private final TownyAPI townyAPI;
@@ -65,7 +66,8 @@ public final class Towny {
     private void registerType(TownBlockType townBlockType) {
         try {
             TownBlockTypeHandler.registerType(townBlockType);
-        } catch (TownyException exception) {
+        }
+        catch (TownyException exception) {
             exception.printStackTrace();
         }
     }
@@ -76,7 +78,8 @@ public final class Towny {
         if (resident != null && resident.hasTown()) {
             try {
                 return resident.getTown().getName().equals(town);
-            } catch (NotRegisteredException ignored) {
+            }
+            catch (NotRegisteredException ignored) {
             }
         }
 
@@ -97,7 +100,8 @@ public final class Towny {
         Resident resident = townyAPI.getResident(player);
 
         return resident != null && resident.getTownOrNull() != null
-                ? getTownPlotsByName(resident.getTownOrNull(), name) : new ArrayList<>();
+               ? getTownPlotsByName(resident.getTownOrNull(), name)
+               : new ArrayList<>();
     }
 
 
@@ -134,4 +138,5 @@ public final class Towny {
 
         return townBlock != null && townBlock.getType() == graveyardBlockType;
     }
+
 }

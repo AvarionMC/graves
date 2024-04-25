@@ -1,7 +1,5 @@
 package com.ranull.graves.compatibility;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import com.ranull.graves.Graves;
 import com.ranull.graves.data.BlockData;
 import com.ranull.graves.type.Grave;
@@ -20,10 +18,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.material.Openable;
 
-import java.lang.reflect.Field;
-import java.util.Collection;
-
 public final class CompatibilityMaterialData implements Compatibility {
+
     @Override
     public BlockData setBlockData(Location location, Material material, Grave grave, Graves plugin) {
         if (material != null) {
@@ -51,9 +47,9 @@ public final class CompatibilityMaterialData implements Compatibility {
 
     @Override
     public boolean canBuild(Player player, Location location, Graves plugin) {
-        BlockPlaceEvent blockPlaceEvent = new BlockPlaceEvent(location.getBlock(),
-                location.getBlock().getState(), location.getBlock(), player.getInventory().getItemInMainHand(),
-                player, true, EquipmentSlot.HAND);
+        BlockPlaceEvent blockPlaceEvent = new BlockPlaceEvent(location.getBlock(), location.getBlock()
+                                                                                           .getState(), location.getBlock(), player.getInventory()
+                                                                                                                                   .getItemInMainHand(), player, true, EquipmentSlot.HAND);
 
         plugin.getServer().getPluginManager().callEvent(blockPlaceEvent);
 
@@ -78,20 +74,25 @@ public final class CompatibilityMaterialData implements Compatibility {
         if (headType == 0) {
             if (grave.getOwnerType() == EntityType.PLAYER) {
                 skull.setOwner(grave.getOwnerName());
-            } else {
+            }
+            else {
                 if (!plugin.getVersionManager().is_v1_7()) {
                     SkinUtil.setSkullBlockTexture(skull, grave.getOwnerName(), headBase64);
-                } else {
+                }
+                else {
                     skull.setOwner(grave.getOwnerName());
                 }
             }
-        } else if (headType == 1 && headBase64 != null && !headBase64.equals("")) {
+        }
+        else if (headType == 1 && headBase64 != null && !headBase64.equals("")) {
             if (!plugin.getVersionManager().is_v1_7()) {
                 SkinUtil.setSkullBlockTexture(skull, grave.getOwnerName(), headBase64);
-            } else {
+            }
+            else {
                 skull.setOwner(grave.getOwnerName());
             }
-        } else if (headType == 2 && headName != null && headName.length() <= 16) {
+        }
+        else if (headType == 2 && headName != null && headName.length() <= 16) {
             skull.setOwner(headName);
         }
 
@@ -112,7 +113,8 @@ public final class CompatibilityMaterialData implements Compatibility {
 
                     skullMeta.setOwner(grave.getOwnerName());
                     itemStack.setItemMeta(skullMeta);
-                } else {
+                }
+                else {
                     // TODO ENTITY
                 }
             }
@@ -133,4 +135,5 @@ public final class CompatibilityMaterialData implements Compatibility {
 
         return null;
     }
+
 }

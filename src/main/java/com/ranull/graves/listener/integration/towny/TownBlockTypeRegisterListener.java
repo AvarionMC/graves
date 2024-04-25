@@ -7,6 +7,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 public class TownBlockTypeRegisterListener implements Listener {
+
     private final Towny towny;
 
     public TownBlockTypeRegisterListener(Towny towny) {
@@ -17,4 +18,5 @@ public class TownBlockTypeRegisterListener implements Listener {
     public void onTownBlockTypeRegister(TownBlockTypeRegisterEvent ignored) {
         towny.registerGraveyardBlockType();
     }
+
 }

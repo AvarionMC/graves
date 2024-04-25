@@ -1,7 +1,5 @@
 package com.ranull.graves.compatibility;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import com.ranull.graves.Graves;
 import com.ranull.graves.data.BlockData;
 import com.ranull.graves.type.Grave;
@@ -25,9 +23,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.lang.reflect.Field;
-import java.util.Collection;
-
 public final class CompatibilityBlockData implements Compatibility {
     @Override
     public BlockData setBlockData(Location location, Material material, Grave grave, Graves plugin) {
@@ -35,12 +30,10 @@ public final class CompatibilityBlockData implements Compatibility {
             Block block = location.getBlock();
             String originalMaterial = block.getType().name();
             String replaceMaterial = location.getBlock().getType().name();
-            String replaceData = location.getBlock().getBlockData().clone().getAsString();
-//            String replaceData = location.getBlock().getBlockData().clone().getAsString(true);  // TODO: restore!
+            String replaceData = location.getBlock().getBlockData().clone().getAsString(true);
 
             // Levelled
-            if (block.getBlockData() instanceof Levelled) {
-                Levelled leveled = (Levelled) block.getBlockData();
+            if (block.getBlockData() instanceof Levelled leveled) {
 
                 if (leveled.getLevel() != 0) {
                     replaceMaterial = null;
@@ -58,8 +51,7 @@ public final class CompatibilityBlockData implements Compatibility {
             location.getBlock().setType(material);
 
             // Waterlogged
-            if (block.getBlockData() instanceof Waterlogged) {
-                Waterlogged waterlogged = (Waterlogged) block.getBlockData();
+            if (block.getBlockData() instanceof Waterlogged waterlogged) {
 
                 waterlogged.setWaterlogged(MaterialUtil.isWater(originalMaterial));
                 block.setBlockData(waterlogged);
@@ -78,9 +70,9 @@ public final class CompatibilityBlockData implements Compatibility {
 
     @Override
     public boolean canBuild(Player player, Location location, Graves plugin) {
-        BlockPlaceEvent blockPlaceEvent = new BlockPlaceEvent(location.getBlock(),
-                location.getBlock().getState(), location.getBlock(), player.getInventory().getItemInMainHand(),
-                player, true, EquipmentSlot.HAND);
+        BlockPlaceEvent blockPlaceEvent = new BlockPlaceEvent(location.getBlock(), location.getBlock()
+                                                                                           .getState(), location.getBlock(), player.getInventory()
+                                                                                                                                   .getItemInMainHand(), player, true, EquipmentSlot.HAND);
 
         plugin.getServer().getPluginManager().callEvent(blockPlaceEvent);
 
@@ -106,14 +98,18 @@ public final class CompatibilityBlockData implements Compatibility {
         if (headType == 0) {
             if (grave.getOwnerType() == EntityType.PLAYER) {
                 skull.setOwningPlayer(plugin.getServer().getOfflinePlayer(grave.getOwnerUUID()));
-            } else if (grave.getOwnerTexture() != null) {
+            }
+            else if (grave.getOwnerTexture() != null) {
                 SkinUtil.setSkullBlockTexture(skull, grave.getOwnerName(), grave.getOwnerTexture());
-            } else if (headBase64 != null && !headBase64.equals("")) {
+            }
+            else if (headBase64 != null && !headBase64.equals("")) {
                 SkinUtil.setSkullBlockTexture(skull, grave.getOwnerName(), headBase64);
             }
-        } else if (headType == 1 && headBase64 != null && !headBase64.equals("")) {
+        }
+        else if (headType == 1 && headBase64 != null && !headBase64.equals("")) {
             SkinUtil.setSkullBlockTexture(skull, grave.getOwnerName(), headBase64);
-        } else if (headType == 2 && headName != null && headName.length() <= 16) {
+        }
+        else if (headType == 2 && headName != null && headName.length() <= 16) {
             skull.setOwningPlayer(plugin.getServer().getOfflinePlayer(headName));
         }
 
@@ -131,7 +127,8 @@ public final class CompatibilityBlockData implements Compatibility {
 
                 skullMeta.setOwningPlayer(offlinePlayer);
                 itemStack.setItemMeta(skullMeta);
-            } else {
+            }
+            else {
                 // TODO ENTITY
             }
         }

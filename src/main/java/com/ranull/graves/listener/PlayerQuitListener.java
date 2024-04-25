@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class PlayerQuitListener implements Listener {
+
     private final Graves plugin;
 
     public PlayerQuitListener(Graves plugin) {
@@ -24,4 +25,5 @@ public class PlayerQuitListener implements Listener {
             plugin.getGraveyardManager().stopModifyingGraveyard(player);
         }
     }
+
 }

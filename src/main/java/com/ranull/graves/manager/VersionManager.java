@@ -22,18 +22,53 @@ public final class VersionManager {
         this.hasConfigContains = !is_v1_7() && !is_v1_8() && !is_v1_9();
         this.hasAPIVersion = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10() && !is_v1_11() && !is_v1_12();
         this.hasBlockData = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10() && !is_v1_11() && !is_v1_12();
-        this.hasPersistentData = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10() && !is_v1_11() && !is_v1_12()
-                && !is_v1_13();
+        this.hasPersistentData = !is_v1_7()
+                                 && !is_v1_8()
+                                 && !is_v1_9()
+                                 && !is_v1_10()
+                                 && !is_v1_11()
+                                 && !is_v1_12()
+                                 && !is_v1_13();
         this.hasScoreboardTags = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10();
-        this.hasHexColors = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10() && !is_v1_11() && !is_v1_12()
-                && !is_v1_13() && !is_v1_14() && !is_v1_15() && !isBukkit();
-        this.hasCompassMeta = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10() && !is_v1_11()
-                && !is_v1_12() && !is_v1_13() && !is_v1_14() && !is_v1_15()
-                && !version.matches("(?i)v1_16_R1|");
-        this.hasSwingHand = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10() && !is_v1_11() && !is_v1_12()
-                && !is_v1_13() && !is_v1_14() && !is_v1_15();
-        this.hasWorldHeight = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10() && !is_v1_11() && !is_v1_12()
-                && !is_v1_13() && !is_v1_14() && !is_v1_15() && !is_v1_16();
+        this.hasHexColors = !is_v1_7()
+                            && !is_v1_8()
+                            && !is_v1_9()
+                            && !is_v1_10()
+                            && !is_v1_11()
+                            && !is_v1_12()
+                            && !is_v1_13()
+                            && !is_v1_14()
+                            && !is_v1_15()
+                            && !isBukkit();
+        this.hasCompassMeta = !is_v1_7()
+                              && !is_v1_8()
+                              && !is_v1_9()
+                              && !is_v1_10()
+                              && !is_v1_11()
+                              && !is_v1_12()
+                              && !is_v1_13()
+                              && !is_v1_14()
+                              && !is_v1_15()
+                              && !version.matches("(?i)v1_16_R1|");
+        this.hasSwingHand = !is_v1_7()
+                            && !is_v1_8()
+                            && !is_v1_9()
+                            && !is_v1_10()
+                            && !is_v1_11()
+                            && !is_v1_12()
+                            && !is_v1_13()
+                            && !is_v1_14()
+                            && !is_v1_15();
+        this.hasWorldHeight = !is_v1_7()
+                              && !is_v1_8()
+                              && !is_v1_9()
+                              && !is_v1_10()
+                              && !is_v1_11()
+                              && !is_v1_12()
+                              && !is_v1_13()
+                              && !is_v1_14()
+                              && !is_v1_15()
+                              && !is_v1_16();
         this.hasSecondHand = !is_v1_7() && !is_v1_8();
         this.hasEnchantmentCurse = !is_v1_7() && !is_v1_8() && !is_v1_9() && !is_v1_10();
         this.hasParticle = !is_v1_7() && !is_v1_8();
@@ -42,7 +77,8 @@ public final class VersionManager {
             Class.forName("org.spigotmc.SpigotConfig", false, getClass().getClassLoader());
 
             this.isBukkit = false;
-        } catch (ClassNotFoundException ignored) {
+        }
+        catch (ClassNotFoundException ignored) {
             this.isBukkit = true;
         }
 
@@ -50,7 +86,8 @@ public final class VersionManager {
             Class.forName("com.mohistmc.config.MohistConfigUtil", false, getClass().getClassLoader());
 
             this.isMohist = true;
-        } catch (ClassNotFoundException ignored) {
+        }
+        catch (ClassNotFoundException ignored) {
             this.isBukkit = false;
         }
     }

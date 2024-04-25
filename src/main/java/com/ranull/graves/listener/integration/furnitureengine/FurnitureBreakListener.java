@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 public class FurnitureBreakListener implements Listener {
+
     private final FurnitureEngine furnitureEngine;
 
     public FurnitureBreakListener(FurnitureEngine furnitureEngine) {
@@ -18,8 +19,8 @@ public class FurnitureBreakListener implements Listener {
         ItemFrame itemFrame = furnitureEngine.getItemFrame(event.getFurnitureLocation());
 
         if (itemFrame != null) {
-            event.setCancelled(furnitureEngine.getGrave(event.getFurnitureLocation(),
-                    itemFrame.getUniqueId()) != null);
+            event.setCancelled(furnitureEngine.getGrave(event.getFurnitureLocation(), itemFrame.getUniqueId()) != null);
         }
     }
+
 }

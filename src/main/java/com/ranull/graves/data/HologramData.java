@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import java.util.UUID;
 
 public class HologramData extends EntityData {
+
     private final int line;
 
     public HologramData(Location location, UUID uuidEntity, UUID uuidGrave, int line) {
@@ -16,4 +17,5 @@ public class HologramData extends EntityData {
     public int getLine() {
         return line;
     }
+
 }

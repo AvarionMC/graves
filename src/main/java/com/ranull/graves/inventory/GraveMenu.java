@@ -6,6 +6,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
 
 public class GraveMenu implements InventoryHolder {
+
     private final Grave grave;
     private Inventory inventory;
 
@@ -26,4 +27,5 @@ public class GraveMenu implements InventoryHolder {
     public Grave getGrave() {
         return grave;
     }
+
 }

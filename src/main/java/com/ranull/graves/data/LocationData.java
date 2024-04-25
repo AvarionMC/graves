@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 public class LocationData implements Serializable {
+
     UUID uuid;
     float yaw;
     float pitch;
@@ -26,4 +27,5 @@ public class LocationData implements Serializable {
     public Location getLocation() {
         return uuid != null ? new Location(Bukkit.getWorld(uuid), x, y, z, yaw, pitch) : null;
     }
+
 }

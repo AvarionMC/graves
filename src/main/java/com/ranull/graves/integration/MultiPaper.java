@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 public final class MultiPaper {
+
     private final Graves plugin;
 
     public MultiPaper(Graves plugin) {
@@ -28,8 +29,9 @@ public final class MultiPaper {
     }
 
     public void notifyGraveCreation(Grave grave) {
-        MultiLib.notify("graves:grave_create", Base64Util.objectToBase64(grave) + "|"
-                + Base64Util.objectToBase64(grave.getInventoryItemStack()));
+        MultiLib.notify("graves:grave_create", Base64Util.objectToBase64(grave)
+                                               + "|"
+                                               + Base64Util.objectToBase64(grave.getInventoryItemStack()));
     }
 
     public void notifyGraveRemoval(Grave grave) {
@@ -57,15 +59,17 @@ public final class MultiPaper {
 
             if (grave != null && itemStackList != null) {
                 String title = StringUtil.parseString(plugin.getConfig("gui.grave.title", grave)
-                        .getString("gui.grave.title"), grave.getLocationDeath(), grave, plugin);
+                                                            .getString("gui.grave.title"), grave.getLocationDeath(), grave, plugin);
                 Grave.StorageMode storageMode = plugin.getGraveManager()
-                        .getStorageMode(plugin.getConfig("storage.mode", grave).getString("storage.mode"));
+                                                      .getStorageMode(plugin.getConfig("storage.mode", grave)
+                                                                            .getString("storage.mode"));
 
-                grave.setInventory(plugin.getGraveManager().createGraveInventory(grave, grave.getLocationDeath(),
-                        itemStackList, title, storageMode));
+                grave.setInventory(plugin.getGraveManager()
+                                         .createGraveInventory(grave, grave.getLocationDeath(), itemStackList, title, storageMode));
                 plugin.getDataManager().addGrave(grave);
                 plugin.debugMessage("MultiLib, importing grave " + grave.getUUID(), 2);
-            } else {
+            }
+            else {
                 plugin.debugMessage("MultiLib, ERROR grave_create is malformed ", 2);
             }
         });
@@ -76,7 +80,8 @@ public final class MultiPaper {
             if (blockData != null) {
                 plugin.getDataManager().addBlockData(blockData);
                 plugin.debugMessage("MultiLib, importing block for grave " + blockData.getGraveUUID().toString(), 2);
-            } else {
+            }
+            else {
                 plugin.debugMessage("MultiLib, ERROR block_create is malformed ", 2);
             }
         });
@@ -86,9 +91,10 @@ public final class MultiPaper {
 
             if (hologramData != null) {
                 plugin.getDataManager().addHologramData(hologramData);
-                plugin.debugMessage("MultiLib, importing hologram for grave "
-                        + hologramData.getUUIDGrave().toString(), 2);
-            } else {
+                plugin.debugMessage("MultiLib, importing hologram for grave " + hologramData.getUUIDGrave()
+                                                                                            .toString(), 2);
+            }
+            else {
                 plugin.debugMessage("MultiLib, ERROR hologram_create is malformed ", 2);
             }
         });
@@ -99,7 +105,8 @@ public final class MultiPaper {
             if (entityData != null) {
                 plugin.getDataManager().addEntityData(entityData);
                 plugin.debugMessage("MultiLib, importing entity for grave " + entityData.getUUIDGrave().toString(), 2);
-            } else {
+            }
+            else {
                 plugin.debugMessage("MultiLib, ERROR entity_create is malformed ", 2);
             }
         });
@@ -112,9 +119,11 @@ public final class MultiPaper {
                     plugin.getDataManager().removeGrave(uuid);
                     plugin.debugMessage("MultiLib, removing grave " + uuid, 2);
                 }
-            } else {
+            }
+            else {
                 plugin.debugMessage("MultiLib, ERROR grave_remove is malformed ", 2);
             }
         });
     }
+
 }

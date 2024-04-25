@@ -9,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 public class PlayerJoinListener implements Listener {
+
     private final Graves plugin;
 
     public PlayerJoinListener(Graves plugin) {
@@ -29,21 +30,39 @@ public class PlayerJoinListener implements Listener {
                         double pluginVersionLatest = Double.parseDouble(latestVersion);
 
                         if (pluginVersion < pluginVersionLatest) {
-                            player.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
-                                    + "Outdated version detected " + pluginVersion
-                                    + ", latest version is " + pluginVersionLatest
-                                    + ", https://www.spigotmc.org/resources/" + plugin.getSpigotID() + "/");
+                            player.sendMessage(ChatColor.RED
+                                               + "☠"
+                                               + ChatColor.DARK_GRAY
+                                               + " » "
+                                               + ChatColor.RESET
+                                               + "Outdated version detected "
+                                               + pluginVersion
+                                               + ", latest version is "
+                                               + pluginVersionLatest
+                                               + ", https://www.spigotmc.org/resources/"
+                                               + plugin.getSpigotID()
+                                               + "/");
                         }
-                    } catch (NumberFormatException exception) {
+                    }
+                    catch (NumberFormatException exception) {
                         if (!plugin.getVersion().equalsIgnoreCase(latestVersion)) {
-                            player.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
-                                    + "Outdated version detected " + plugin.getVersion()
-                                    + ", latest version is " + latestVersion + ", https://www.spigotmc.org/resources/"
-                                    + plugin.getSpigotID() + "/");
+                            player.sendMessage(ChatColor.RED
+                                               + "☠"
+                                               + ChatColor.DARK_GRAY
+                                               + " » "
+                                               + ChatColor.RESET
+                                               + "Outdated version detected "
+                                               + plugin.getVersion()
+                                               + ", latest version is "
+                                               + latestVersion
+                                               + ", https://www.spigotmc.org/resources/"
+                                               + plugin.getSpigotID()
+                                               + "/");
                         }
                     }
                 }
             });
         }
     }
+
 }

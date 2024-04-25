@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Graveyard {
+
     private final String name;
     private final World world;
     private final Graveyard.Type type;
@@ -101,8 +102,7 @@ public class Graveyard {
     }
 
     public enum Type {
-        WORLDGUARD,
-        TOWNY,
-        FACTIONS
+        WORLDGUARD, TOWNY, FACTIONS
     }
+
 }

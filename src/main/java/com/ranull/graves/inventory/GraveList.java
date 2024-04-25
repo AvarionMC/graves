@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class GraveList implements InventoryHolder {
+
     private final UUID uuid;
     private final List<Grave> graveList;
     private Inventory inventory;
@@ -35,4 +36,5 @@ public class GraveList implements InventoryHolder {
     public Grave getGrave(int slot) {
         return slot >= 0 && graveList.size() > slot ? graveList.get(slot) : null;
     }
+
 }

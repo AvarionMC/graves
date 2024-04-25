@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 public final class ImportManager {
+
     private final Graves plugin;
 
     public ImportManager(Graves plugin) {
@@ -116,8 +117,7 @@ public final class ImportManager {
             List<ItemStack> itemStackList = new ArrayList<>();
 
             if (angelChest.contains("armorInv")) {
-                List<ItemStack> armorItemStackList = (List<ItemStack>) angelChest.getList("armorInv",
-                        new ArrayList<ItemStack>());
+                List<ItemStack> armorItemStackList = (List<ItemStack>) angelChest.getList("armorInv", new ArrayList<ItemStack>());
 
                 Collections.reverse(armorItemStackList);
                 itemStackList.addAll(armorItemStackList);
@@ -133,12 +133,13 @@ public final class ImportManager {
 
             if (!itemStackList.isEmpty()) {
                 String title = StringUtil.parseString(plugin.getConfig("gui.grave.title", grave)
-                        .getString("gui.grave.title"), grave.getLocationDeath(), grave, plugin);
+                                                            .getString("gui.grave.title"), grave.getLocationDeath(), grave, plugin);
                 Grave.StorageMode storageMode = plugin.getGraveManager()
-                        .getStorageMode(plugin.getConfig("storage.mode", grave).getString("storage.mode"));
+                                                      .getStorageMode(plugin.getConfig("storage.mode", grave)
+                                                                            .getString("storage.mode"));
 
-                Inventory inventory = plugin.getGraveManager().createGraveInventory(grave, grave.getLocationDeath(),
-                        itemStackList, title, storageMode);
+                Inventory inventory = plugin.getGraveManager()
+                                            .createGraveInventory(grave, grave.getLocationDeath(), itemStackList, title, storageMode);
 
                 grave.setInventory(inventory);
             }
@@ -153,10 +154,12 @@ public final class ImportManager {
         if (YAMLUtil.isValidYAML(file)) {
             try {
                 return YamlConfiguration.loadConfiguration(file);
-            } catch (Exception ignored) {
+            }
+            catch (Exception ignored) {
             }
         }
 
         return null;
     }
+
 }

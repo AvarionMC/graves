@@ -7,6 +7,7 @@ import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
 
 public class GraveCloseEvent extends InventoryCloseEvent {
+
     private static final HandlerList HANDLERS = new HandlerList();
     private final Grave grave;
 
@@ -31,4 +32,5 @@ public class GraveCloseEvent extends InventoryCloseEvent {
     public Grave getGrave() {
         return grave;
     }
+
 }

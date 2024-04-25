@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 public final class PermissionUtil {
+
     public static int getHighestInt(Player player, String permission) {
         List<Integer> gravePermissions = new ArrayList<>();
 
@@ -15,7 +16,8 @@ public final class PermissionUtil {
             if (perm.getPermission().contains(permission)) {
                 try {
                     gravePermissions.add(Integer.parseInt(perm.getPermission().replace(permission, "")));
-                } catch (NumberFormatException ignored) {
+                }
+                catch (NumberFormatException ignored) {
                 }
             }
         }
@@ -34,7 +36,8 @@ public final class PermissionUtil {
             if (perm.getPermission().contains(permission)) {
                 try {
                     gravePermissions.add(Double.parseDouble(perm.getPermission().replace(permission, "")));
-                } catch (NumberFormatException ignored) {
+                }
+                catch (NumberFormatException ignored) {
                 }
             }
         }
@@ -45,4 +48,5 @@ public final class PermissionUtil {
 
         return 0;
     }
+
 }

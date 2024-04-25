@@ -17,16 +17,12 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.NoteBlock;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 public final class Oraxen extends EntityDataManager {
+
     private final Graves plugin;
     private final Plugin oraxenPlugin;
     private final PlayerInteractEntityListener playerInteractEntityListener;
@@ -48,11 +44,16 @@ public final class Oraxen extends EntityDataManager {
 
     public void saveData() {
         if (plugin.getConfig().getBoolean("settings.integration.oraxen.write")) {
-            ResourceUtil.copyResources("data/plugin/" + oraxenPlugin.getName().toLowerCase() + "/items",
-                    plugin.getPluginsFolder() + "/" + oraxenPlugin.getName() + "/items", plugin);
-            ResourceUtil.copyResources("data/model/grave.json",
-                    plugin.getPluginsFolder() + "/" + oraxenPlugin.getName()
-                            + "/pack/assets/minecraft/models/graves/grave.json", plugin);
+            ResourceUtil.copyResources("data/plugin/"
+                                       + oraxenPlugin.getName().toLowerCase()
+                                       + "/items", plugin.getPluginsFolder()
+                                                   + "/"
+                                                   + oraxenPlugin.getName()
+                                                   + "/items", plugin);
+            ResourceUtil.copyResources("data/model/grave.json", plugin.getPluginsFolder()
+                                                                + "/"
+                                                                + oraxenPlugin.getName()
+                                                                + "/pack/assets/minecraft/models/graves/grave.json", plugin);
             plugin.debugMessage("Saving " + oraxenPlugin.getName() + " data.", 1);
         }
     }
@@ -78,33 +79,38 @@ public final class Oraxen extends EntityDataManager {
     }
 
     public void createFurniture(Location location, Grave grave) {
-        if (plugin.getConfig("oraxen.furniture.enabled", grave)
-                .getBoolean("oraxen.furniture.enabled")) {
+        if (plugin.getConfig("oraxen.furniture.enabled", grave).getBoolean("oraxen.furniture.enabled")) {
             try {
-                String name = plugin.getConfig("oraxen.furniture.name", grave)
-                        .getString("oraxen.furniture.name", "");
+                String name = plugin.getConfig("oraxen.furniture.name", grave).getString("oraxen.furniture.name", "");
                 FurnitureMechanic furnitureMechanic = getFurnitureMechanic(name);
 
                 if (furnitureMechanic != null && location.getWorld() != null) {
                     location.getBlock().setType(Material.AIR);
 
-                    ItemFrame itemFrame = (ItemFrame) furnitureMechanic.place(
-                            location,
-                            location.getYaw(),
-                            BlockFace.UP
+                    ItemFrame itemFrame = (ItemFrame) furnitureMechanic.place(location, location.getYaw(), BlockFace.UP
                             // , BlockFaceUtil.getBlockFaceRotation(BlockFaceUtil.getYawBlockFace(location.getYaw()))
                     );
 
                     if (itemFrame != null) {
                         createEntityData(location, itemFrame.getUniqueId(), grave.getUUID(), EntityData.Type.ORAXEN);
-                        plugin.debugMessage("Placing Oraxen furniture for " + grave.getUUID() + " at "
-                                + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
-                                + (location.getBlockY() + 0.5) + "y, " + (location.getBlockZ() + 0.5) + "z", 1);
+                        plugin.debugMessage("Placing Oraxen furniture for "
+                                            + grave.getUUID()
+                                            + " at "
+                                            + location.getWorld().getName()
+                                            + ", "
+                                            + (location.getBlockX() + 0.5)
+                                            + "x, "
+                                            + (location.getBlockY() + 0.5)
+                                            + "y, "
+                                            + (location.getBlockZ() + 0.5)
+                                            + "z", 1);
                     }
                 }
-            } catch (NoSuchMethodError ignored) {
-                plugin.warningMessage("This version of Minecraft does not support " + oraxenPlugin.getName()
-                        + " furniture");
+            }
+            catch (NoSuchMethodError ignored) {
+                plugin.warningMessage("This version of Minecraft does not support "
+                                      + oraxenPlugin.getName()
+                                      + " furniture");
             }
         }
     }
@@ -114,30 +120,36 @@ public final class Oraxen extends EntityDataManager {
     }
 
     public void createBlock(Location location, Grave grave) {
-        if (plugin.getConfig("oraxen.block.enabled", grave)
-                .getBoolean("oraxen.block.enabled")) {
-            String name = plugin.getConfig("oraxen.block.name", grave)
-                    .getString("oraxen.block.name", "");
+        if (plugin.getConfig("oraxen.block.enabled", grave).getBoolean("oraxen.block.enabled")) {
+            String name = plugin.getConfig("oraxen.block.name", grave).getString("oraxen.block.name", "");
             NoteBlockMechanic noteBlockMechanic = getNoteBlockMechanic(name);
 
             if (noteBlockMechanic != null && location.getWorld() != null) {
-                location.getBlock().setBlockData(NoteBlockMechanicFactory
-                        .createNoteBlockData(noteBlockMechanic.getCustomVariation()), false);
-                plugin.debugMessage("Placing Oraxen block for " + grave.getUUID() + " at "
-                        + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
-                        + (location.getBlockY() + 0.5) + "y, " + (location.getBlockZ() + 0.5) + "z", 1);
+                location.getBlock()
+                        .setBlockData(NoteBlockMechanicFactory.createNoteBlockData(noteBlockMechanic.getCustomVariation()), false);
+                plugin.debugMessage("Placing Oraxen block for "
+                                    + grave.getUUID()
+                                    + " at "
+                                    + location.getWorld()
+                                              .getName()
+                                    + ", "
+                                    + (location.getBlockX() + 0.5)
+                                    + "x, "
+                                    + (location.getBlockY() + 0.5)
+                                    + "y, "
+                                    + (location.getBlockZ() + 0.5)
+                                    + "z", 1);
             }
         }
     }
 
     @SuppressWarnings("deprecation")
     public boolean isCustomBlock(Location location) {
-        if (location.getBlock().getBlockData() instanceof NoteBlock) {
-            NoteBlock noteBlock = (NoteBlock) location.getBlock().getBlockData();
+        if (location.getBlock().getBlockData() instanceof NoteBlock noteBlock) {
 
-            return NoteBlockMechanicFactory.getBlockMechanic((int) (noteBlock
-                    .getInstrument().getType()) * 25 + (int) noteBlock.getNote().getId()
-                    + (noteBlock.isPowered() ? 400 : 0) - 26) != null;
+            return NoteBlockMechanicFactory.getBlockMechanic((int) (noteBlock.getInstrument().getType()) * 25
+                                                             + (int) noteBlock.getNote().getId()
+                                                             + (noteBlock.isPowered() ? 400 : 0) - 26) != null;
         }
 
         return false;
@@ -158,4 +170,5 @@ public final class Oraxen extends EntityDataManager {
 
         return mechanicFactory != null ? (NoteBlockMechanic) mechanicFactory.getMechanic(string) : null;
     }
+
 }

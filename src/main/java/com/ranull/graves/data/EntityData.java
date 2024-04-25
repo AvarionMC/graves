@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 public class EntityData implements Serializable {
+
     private final Location location;
     private final UUID uuidEntity;
     private final UUID uuidGrave;
@@ -35,13 +36,7 @@ public class EntityData implements Serializable {
     }
 
     public enum Type {
-        HOLOGRAM,
-        ARMOR_STAND,
-        ITEM_FRAME,
-        FURNITURELIB,
-        FURNITUREENGINE,
-        ITEMSADDER,
-        ORAXEN,
-        PLAYERNPC,
+        HOLOGRAM, ARMOR_STAND, ITEM_FRAME, FURNITURELIB, FURNITUREENGINE, ITEMSADDER, ORAXEN, PLAYERNPC,
     }
+
 }

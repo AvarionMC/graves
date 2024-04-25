@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public final class GriefDefender {
+
     private final Core core;
     private final Registry registry;
     private final PermissionManager permissionManager;
@@ -40,18 +41,18 @@ public final class GriefDefender {
 
     private Flag buildCreateFlag() {
         return Flag.builder()
-                .id("graves:graves-create")
-                .name("graves-create")
-                .permission("griefdefender.flag.graves.graves-create")
-                .build();
+                   .id("graves:graves-create")
+                   .name("graves-create")
+                   .permission("griefdefender.flag.graves.graves-create")
+                   .build();
     }
 
     private Flag buildTeleportFlag() {
         return Flag.builder()
-                .id("graves:graves-teleport")
-                .name("graves-teleport")
-                .permission("griefdefender.flag.graves.graves-teleport")
-                .build();
+                   .id("graves:graves-teleport")
+                   .name("graves-teleport")
+                   .permission("griefdefender.flag.graves.graves-teleport")
+                   .build();
     }
 
     public boolean canCreateGrave(Player player, Location location) {
@@ -64,8 +65,7 @@ public final class GriefDefender {
 
                 contextSet.add(new Context("graves:graves_create", player.getName()));
 
-                Tristate tristate = permissionManager.getActiveFlagPermissionValue(null, location, claim,
-                        playerData.getUser(), createFlag, player, player, contextSet, null, true);
+                Tristate tristate = permissionManager.getActiveFlagPermissionValue(null, location, claim, playerData.getUser(), createFlag, player, player, contextSet, null, true);
 
                 return tristate == Tristate.TRUE;
             }
@@ -98,4 +98,5 @@ public final class GriefDefender {
     public boolean canTeleport(Entity entity, Location location) {
         return true; // TODO
     }
+
 }

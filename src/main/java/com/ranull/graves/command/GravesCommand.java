@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class GravesCommand implements CommandExecutor, TabCompleter {
+
     private final Graves plugin;
 
     public GravesCommand(Graves plugin) {
@@ -26,69 +27,98 @@ public final class GravesCommand implements CommandExecutor, TabCompleter {
 
     @SuppressWarnings("deprecation")
     @Override
-    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command,
-                             @NotNull String string, String[] args) {
+    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String string, String[] args) {
         if (args.length < 1) {
             if (commandSender instanceof Player) {
                 if (commandSender.hasPermission("graves.gui")) {
                     plugin.getGUIManager().openGraveList((Player) commandSender);
-                } else {
+                }
+                else {
                     plugin.getEntityManager().sendMessage("message.permission-denied", commandSender);
                 }
-            } else {
+            }
+            else {
                 sendHelpMenu(commandSender);
             }
-        } else if (args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("gui")) {
-            if (commandSender instanceof Player) {
-                Player player = (Player) commandSender;
+        }
+        else if (args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("gui")) {
+            if (commandSender instanceof Player player) {
 
                 if (args.length == 1) {
                     if (player.hasPermission("graves.gui")) {
                         plugin.getGUIManager().openGraveList(player);
-                    } else {
+                    }
+                    else {
                         plugin.getEntityManager().sendMessage("message.permission-denied", player);
                     }
-                } else if (args.length == 2) {
+                }
+                else if (args.length == 2) {
                     if (player.hasPermission("graves.gui.other")) {
                         OfflinePlayer otherPlayer = plugin.getServer().getOfflinePlayer(args[1]);
 
                         if (!plugin.getGraveManager().getGraveList(otherPlayer).isEmpty()) {
                             plugin.getGUIManager().openGraveList(player, otherPlayer.getUniqueId());
-                        } else {
-                            commandSender.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » "
-                                    + ChatColor.RESET + ChatColor.RED + args[1] + ChatColor.RESET + " has no graves.");
                         }
-                    } else {
+                        else {
+                            commandSender.sendMessage(ChatColor.RED
+                                                      + "☠"
+                                                      + ChatColor.DARK_GRAY
+                                                      + " » "
+                                                      + ChatColor.RESET
+                                                      + ChatColor.RED
+                                                      + args[1]
+                                                      + ChatColor.RESET
+                                                      + " has no graves.");
+                        }
+                    }
+                    else {
                         plugin.getEntityManager().sendMessage("message.permission-denied", player);
                     }
                 }
-            } else {
+            }
+            else {
                 sendHelpMenu(commandSender);
             }
-        } else if (args[0].equalsIgnoreCase("help")) {
+        }
+        else if (args[0].equalsIgnoreCase("help")) {
             sendHelpMenu(commandSender);
-        } else if (plugin.getRecipeManager() != null && args[0].equalsIgnoreCase("givetoken")) {
+        }
+        else if (plugin.getRecipeManager() != null && args[0].equalsIgnoreCase("givetoken")) {
             if (commandSender.hasPermission("graves.givetoken")) {
                 if (args.length == 1) {
-                    commandSender.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
-                            + ChatColor.RESET + "/graves givetoken {player} {token}");
-                } else if (args.length == 2) {
-                    if (commandSender instanceof Player) {
-                        Player player = (Player) commandSender;
+                    commandSender.sendMessage(ChatColor.RED
+                                              + "☠"
+                                              + ChatColor.DARK_GRAY
+                                              + " » "
+                                              + ChatColor.RESET
+                                              + ChatColor.RESET
+                                              + "/graves givetoken {player} {token}");
+                }
+                else if (args.length == 2) {
+                    if (commandSender instanceof Player player) {
                         ItemStack itemStack = plugin.getRecipeManager().getToken(args[1].toLowerCase());
 
                         if (itemStack != null) {
                             plugin.getEntityManager().sendMessage("message.give-token", player);
                             player.getInventory().addItem(itemStack);
-                        } else {
-                            player.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
-                                    + "Token " + args[1] + " not found.");
                         }
-                    } else {
-                        commandSender.sendMessage("Only players can run this command, " +
-                                "try /graves givetoken {name} {token}");
+                        else {
+                            player.sendMessage(ChatColor.RED
+                                               + "☠"
+                                               + ChatColor.DARK_GRAY
+                                               + " » "
+                                               + ChatColor.RESET
+                                               + "Token "
+                                               + args[1]
+                                               + " not found.");
+                        }
                     }
-                } else if (args.length == 3) {
+                    else {
+                        commandSender.sendMessage("Only players can run this command, "
+                                                  + "try /graves givetoken {name} {token}");
+                    }
+                }
+                else if (args.length == 3) {
                     Player player = plugin.getServer().getPlayer(args[1]);
 
                     if (player != null) {
@@ -97,15 +127,30 @@ public final class GravesCommand implements CommandExecutor, TabCompleter {
                         if (itemStack != null) {
                             plugin.getEntityManager().sendMessage("message.give-token", player);
                             player.getInventory().addItem(itemStack);
-                        } else {
-                            player.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
-                                    + "Token " + args[2] + " not found.");
                         }
-                    } else {
-                        commandSender.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
-                                + "Player " + args[1] + " not found.");
+                        else {
+                            player.sendMessage(ChatColor.RED
+                                               + "☠"
+                                               + ChatColor.DARK_GRAY
+                                               + " » "
+                                               + ChatColor.RESET
+                                               + "Token "
+                                               + args[2]
+                                               + " not found.");
+                        }
                     }
-                } else if (args.length == 4) {
+                    else {
+                        commandSender.sendMessage(ChatColor.RED
+                                                  + "☠"
+                                                  + ChatColor.DARK_GRAY
+                                                  + " » "
+                                                  + ChatColor.RESET
+                                                  + "Player "
+                                                  + args[1]
+                                                  + " not found.");
+                    }
+                }
+                else if (args.length == 4) {
                     Player player = plugin.getServer().getPlayer(args[1]);
 
                     if (player != null) {
@@ -120,40 +165,69 @@ public final class GravesCommand implements CommandExecutor, TabCompleter {
                                     player.getInventory().addItem(itemStack);
                                     count++;
                                 }
-                            } catch (NumberFormatException ignored) {
+                            }
+                            catch (NumberFormatException ignored) {
                                 player.getInventory().addItem(itemStack);
                             }
 
                             plugin.getEntityManager().sendMessage("message.give-token", player);
-                        } else {
-                            player.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
-                                    + "Token " + args[2] + " not found.");
                         }
-                    } else {
-                        commandSender.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
-                                + "Player " + args[1] + " not found.");
+                        else {
+                            player.sendMessage(ChatColor.RED
+                                               + "☠"
+                                               + ChatColor.DARK_GRAY
+                                               + " » "
+                                               + ChatColor.RESET
+                                               + "Token "
+                                               + args[2]
+                                               + " not found.");
+                        }
+                    }
+                    else {
+                        commandSender.sendMessage(ChatColor.RED
+                                                  + "☠"
+                                                  + ChatColor.DARK_GRAY
+                                                  + " » "
+                                                  + ChatColor.RESET
+                                                  + "Player "
+                                                  + args[1]
+                                                  + " not found.");
                     }
                 }
-            } else if (commandSender instanceof Player) {
+            }
+            else if (commandSender instanceof Player) {
                 plugin.getEntityManager().sendMessage("message.permission-denied", (Player) commandSender);
             }
-        } else if (args[0].equalsIgnoreCase("reload")) {
+        }
+        else if (args[0].equalsIgnoreCase("reload")) {
             if (commandSender.hasPermission("graves.reload")) {
                 plugin.reload();
-                commandSender.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
-                        + "Reloaded config file.");
-            } else if (commandSender instanceof Player) {
+                commandSender.sendMessage(ChatColor.RED
+                                          + "☠"
+                                          + ChatColor.DARK_GRAY
+                                          + " » "
+                                          + ChatColor.RESET
+                                          + "Reloaded config file.");
+            }
+            else if (commandSender instanceof Player) {
                 plugin.getEntityManager().sendMessage("message.permission-denied", (Player) commandSender);
             }
-        } else if (args[0].equalsIgnoreCase("dump")) {
+        }
+        else if (args[0].equalsIgnoreCase("dump")) {
             if (commandSender.hasPermission("graves.dump")) {
-                commandSender.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
-                        + "Running dump functions...");
+                commandSender.sendMessage(ChatColor.RED
+                                          + "☠"
+                                          + ChatColor.DARK_GRAY
+                                          + " » "
+                                          + ChatColor.RESET
+                                          + "Running dump functions...");
                 plugin.dumpServerInfo(commandSender);
-            } else if (commandSender instanceof Player) {
+            }
+            else if (commandSender instanceof Player) {
                 plugin.getEntityManager().sendMessage("message.permission-denied", (Player) commandSender);
             }
-        } else if (args[0].equalsIgnoreCase("debug")) {
+        }
+        else if (args[0].equalsIgnoreCase("debug")) {
             if (commandSender.hasPermission("graves.debug")) {
                 if (args.length > 1) {
                     try {
@@ -163,26 +237,52 @@ public final class GravesCommand implements CommandExecutor, TabCompleter {
                             List<String> stringList = plugin.getConfig().getStringList("settings.debug.user");
 
                             stringList.add(((Player) commandSender).getUniqueId().toString());
-                            commandSender.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
-                                    + ChatColor.RESET + "Debug level changed to: (" + args[1]
-                                    + "), User (" + commandSender.getName() + ") added, This won't persist "
-                                    + "across restarts or reloads.");
-                        } else {
-                            plugin.getLogger().info("Debug level changed to: (" + args[1]
-                                    + "), This won't persist across restarts or reloads.");
+                            commandSender.sendMessage(ChatColor.RED
+                                                      + "☠"
+                                                      + ChatColor.DARK_GRAY
+                                                      + " » "
+                                                      + ChatColor.RESET
+                                                      + ChatColor.RESET
+                                                      + "Debug level changed to: ("
+                                                      + args[1]
+                                                      + "), User ("
+                                                      + commandSender.getName()
+                                                      + ") added, This won't persist "
+                                                      + "across restarts or reloads.");
                         }
-                    } catch (NumberFormatException ignored) {
-                        commandSender.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
-                                + ChatColor.RESET + args[1] + " is not a valid int.");
+                        else {
+                            plugin.getLogger()
+                                  .info("Debug level changed to: ("
+                                        + args[1]
+                                        + "), This won't persist across restarts or reloads.");
+                        }
                     }
-                } else {
-                    commandSender.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
-                            + ChatColor.RESET + "/graves debug {level}");
+                    catch (NumberFormatException ignored) {
+                        commandSender.sendMessage(ChatColor.RED
+                                                  + "☠"
+                                                  + ChatColor.DARK_GRAY
+                                                  + " » "
+                                                  + ChatColor.RESET
+                                                  + ChatColor.RESET
+                                                  + args[1]
+                                                  + " is not a valid int.");
+                    }
                 }
-            } else if (commandSender instanceof Player) {
+                else {
+                    commandSender.sendMessage(ChatColor.RED
+                                              + "☠"
+                                              + ChatColor.DARK_GRAY
+                                              + " » "
+                                              + ChatColor.RESET
+                                              + ChatColor.RESET
+                                              + "/graves debug {level}");
+                }
+            }
+            else if (commandSender instanceof Player) {
                 plugin.getEntityManager().sendMessage("message.permission-denied", (Player) commandSender);
             }
-        } else if (args[0].equalsIgnoreCase("cleanup")) {
+        }
+        else if (args[0].equalsIgnoreCase("cleanup")) {
             if (commandSender.hasPermission("graves.cleanup")) {
                 List<Grave> graveList = new ArrayList<>(plugin.getCacheManager().getGraveMap().values());
 
@@ -190,12 +290,19 @@ public final class GravesCommand implements CommandExecutor, TabCompleter {
                     plugin.getGraveManager().removeGrave(grave);
                 }
 
-                commandSender.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » "
-                        + ChatColor.RESET + graveList.size() + " graves cleaned up.");
-            } else if (commandSender instanceof Player) {
+                commandSender.sendMessage(ChatColor.RED
+                                          + "☠"
+                                          + ChatColor.DARK_GRAY
+                                          + " » "
+                                          + ChatColor.RESET
+                                          + graveList.size()
+                                          + " graves cleaned up.");
+            }
+            else if (commandSender instanceof Player) {
                 plugin.getEntityManager().sendMessage("message.permission-denied", (Player) commandSender);
             }
-        } else if (args[0].equalsIgnoreCase("purge")) {
+        }
+        else if (args[0].equalsIgnoreCase("purge")) {
             if (commandSender.hasPermission("graves.purge")) {
                 if (args.length > 1 && !args[1].equalsIgnoreCase("graves") && !args[1].equalsIgnoreCase("grave")) {
                     if (args[1].equalsIgnoreCase("holograms") || args[1].equalsIgnoreCase("hologram")) {
@@ -210,28 +317,45 @@ public final class GravesCommand implements CommandExecutor, TabCompleter {
                             }
                         }
 
-                        commandSender.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » "
-                                + ChatColor.RESET + count + " holograms purged.");
+                        commandSender.sendMessage(ChatColor.RED
+                                                  + "☠"
+                                                  + ChatColor.DARK_GRAY
+                                                  + " » "
+                                                  + ChatColor.RESET
+                                                  + count
+                                                  + " holograms purged.");
                     }
-                } else {
+                }
+                else {
                     List<Grave> graveList = new ArrayList<>(plugin.getCacheManager().getGraveMap().values());
 
                     for (Grave grave : graveList) {
                         plugin.getGraveManager().removeGrave(grave);
                     }
 
-                    commandSender.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
-                            + graveList.size() + " graves purged.");
+                    commandSender.sendMessage(ChatColor.RED
+                                              + "☠"
+                                              + ChatColor.DARK_GRAY
+                                              + " » "
+                                              + ChatColor.RESET
+                                              + graveList.size()
+                                              + " graves purged.");
                 }
-            } else {
+            }
+            else {
                 plugin.getEntityManager().sendMessage("message.permission-denied", (Player) commandSender);
             }
-        } else if (args[0].equalsIgnoreCase("import")) {
+        }
+        else if (args[0].equalsIgnoreCase("import")) {
             if (commandSender.hasPermission("graves.import")) {
                 // Disable for everyone except Ranull, not ready for production.
                 if (!commandSender.getName().equals("Ranull")) {
-                    commandSender.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
-                            + "Import functionality not ready for production.");
+                    commandSender.sendMessage(ChatColor.RED
+                                              + "☠"
+                                              + ChatColor.DARK_GRAY
+                                              + " » "
+                                              + ChatColor.RESET
+                                              + "Import functionality not ready for production.");
 
                     return true;
                 }
@@ -243,9 +367,16 @@ public final class GravesCommand implements CommandExecutor, TabCompleter {
                     plugin.getGraveManager().placeGrave(grave.getLocationDeath(), grave);
                 }
 
-                commandSender.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
-                        + " Imported " + graveList.size() + " graves.");
-            } else {
+                commandSender.sendMessage(ChatColor.RED
+                                          + "☠"
+                                          + ChatColor.DARK_GRAY
+                                          + " » "
+                                          + ChatColor.RESET
+                                          + " Imported "
+                                          + graveList.size()
+                                          + " graves.");
+            }
+            else {
                 plugin.getEntityManager().sendMessage("message.permission-denied", (Player) commandSender);
             }
         }
@@ -254,54 +385,87 @@ public final class GravesCommand implements CommandExecutor, TabCompleter {
     }
 
     public void sendHelpMenu(CommandSender sender) {
-        sender.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RED + "Graves "
-                + ChatColor.DARK_GRAY + "v" + plugin.getVersion());
+        sender.sendMessage(ChatColor.RED
+                           + "☠"
+                           + ChatColor.DARK_GRAY
+                           + " » "
+                           + ChatColor.RED
+                           + "Graves "
+                           + ChatColor.DARK_GRAY
+                           + "v"
+                           + plugin.getVersion());
 
         if (sender.hasPermission("graves.gui")) {
-            sender.sendMessage(
-                    ChatColor.RED + "/graves " + ChatColor.DARK_GRAY + "-" + ChatColor.RESET + " Graves GUI");
+            sender.sendMessage(ChatColor.RED
+                               + "/graves "
+                               + ChatColor.DARK_GRAY
+                               + "-"
+                               + ChatColor.RESET
+                               + " Graves GUI");
         }
 
         if (sender.hasPermission("graves.gui")) {
             if (sender.hasPermission("graves.gui.other")) {
-                sender.sendMessage(
-                        ChatColor.RED + "/graves list {player} " + ChatColor.DARK_GRAY + "-" + ChatColor.RESET +
-                                " View player graves");
-            } else {
-                sender.sendMessage(
-                        ChatColor.RED + "/graves list " + ChatColor.DARK_GRAY + "-" + ChatColor.RESET +
-                                " Player graves");
+                sender.sendMessage(ChatColor.RED
+                                   + "/graves list {player} "
+                                   + ChatColor.DARK_GRAY
+                                   + "-"
+                                   + ChatColor.RESET
+                                   + " View player graves");
+            }
+            else {
+                sender.sendMessage(ChatColor.RED
+                                   + "/graves list "
+                                   + ChatColor.DARK_GRAY
+                                   + "-"
+                                   + ChatColor.RESET
+                                   + " Player graves");
             }
         }
 
         if (sender.hasPermission("graves.givetoken")) {
             if (plugin.getConfig().getBoolean("settings.token")) {
-                sender.sendMessage(ChatColor.RED + "/graves givetoken {player} {amount} " + ChatColor.DARK_GRAY + "-"
-                        + ChatColor.RESET + " Give grave token");
+                sender.sendMessage(ChatColor.RED
+                                   + "/graves givetoken {player} {amount} "
+                                   + ChatColor.DARK_GRAY
+                                   + "-"
+                                   + ChatColor.RESET
+                                   + " Give grave token");
             }
         }
 
         if (sender.hasPermission("graves.reload")) {
-            sender.sendMessage(ChatColor.RED + "/graves reload " + ChatColor.DARK_GRAY + "-" + ChatColor.RESET
-                    + " Reload plugin");
+            sender.sendMessage(ChatColor.RED
+                               + "/graves reload "
+                               + ChatColor.DARK_GRAY
+                               + "-"
+                               + ChatColor.RESET
+                               + " Reload plugin");
         }
 
         if (sender.hasPermission("graves.dump")) {
-            sender.sendMessage(ChatColor.RED + "/graves dump " + ChatColor.DARK_GRAY + "-" + ChatColor.RESET
-                    + " Dump server information");
+            sender.sendMessage(ChatColor.RED
+                               + "/graves dump "
+                               + ChatColor.DARK_GRAY
+                               + "-"
+                               + ChatColor.RESET
+                               + " Dump server information");
         }
 
         if (sender.hasPermission("graves.debug")) {
-            sender.sendMessage(ChatColor.RED + "/graves debug {level} " + ChatColor.DARK_GRAY + "-" + ChatColor.RESET
-                    + " Change debug level");
+            sender.sendMessage(ChatColor.RED
+                               + "/graves debug {level} "
+                               + ChatColor.DARK_GRAY
+                               + "-"
+                               + ChatColor.RESET
+                               + " Change debug level");
         }
 
         sender.sendMessage(ChatColor.DARK_GRAY + "Author: " + ChatColor.RED + "Ranull");
     }
 
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command,
-                                      @NotNull String string, @NotNull String @NotNull [] args) {
+    public List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String string, @NotNull String @NotNull [] args) {
         List<String> stringList = new ArrayList<>();
 
         if (args.length == 1) {
@@ -335,24 +499,30 @@ public final class GravesCommand implements CommandExecutor, TabCompleter {
             if (plugin.getRecipeManager() != null && commandSender.hasPermission("graves.givetoken")) {
                 stringList.add("givetoken");
             }
-        } else if (args.length > 1) {
+        }
+        else if (args.length > 1) {
             if ((args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("gui"))
-                    && commandSender.hasPermission("graves.gui.other")) {
+                && commandSender.hasPermission("graves.gui.other")) {
                 plugin.getServer().getOnlinePlayers().forEach((player -> stringList.add(player.getName())));
-            } else if (args[0].equals("debug") && commandSender.hasPermission("graves.debug")) {
+            }
+            else if (args[0].equals("debug") && commandSender.hasPermission("graves.debug")) {
                 stringList.add("0");
                 stringList.add("1");
                 stringList.add("2");
-            } else if (args[0].equals("purge") && commandSender.hasPermission("graves.purge")) {
+            }
+            else if (args[0].equals("purge") && commandSender.hasPermission("graves.purge")) {
                 if (args.length == 2) {
                     stringList.add("graves");
                     stringList.add("holograms");
                 }
-            } else if (plugin.getRecipeManager() != null && args[0].equalsIgnoreCase("givetoken")
-                    && commandSender.hasPermission("graves.givetoken")) {
+            }
+            else if (plugin.getRecipeManager() != null
+                     && args[0].equalsIgnoreCase("givetoken")
+                     && commandSender.hasPermission("graves.givetoken")) {
                 if (args.length == 2) {
                     plugin.getServer().getOnlinePlayers().forEach((player -> stringList.add(player.getName())));
-                } else if (args.length == 3) {
+                }
+                else if (args.length == 3) {
                     stringList.addAll(plugin.getRecipeManager().getTokenList());
                 }
             }
@@ -360,4 +530,5 @@ public final class GravesCommand implements CommandExecutor, TabCompleter {
 
         return stringList;
     }
+
 }

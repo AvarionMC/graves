@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.hanging.HangingBreakEvent;
 
 public class HangingBreakListener implements Listener {
+
     private final Graves plugin;
 
     public HangingBreakListener(Graves plugin) {
@@ -16,7 +17,8 @@ public class HangingBreakListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onHangingBreak(HangingBreakEvent event) {
-        event.setCancelled(event.getEntity() instanceof ItemFrame && plugin.getEntityDataManager()
-                .getGrave(event.getEntity()) != null);
+        event.setCancelled(event.getEntity() instanceof ItemFrame
+                           && plugin.getEntityDataManager().getGrave(event.getEntity()) != null);
     }
+
 }

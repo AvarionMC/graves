@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.hanging.HangingBreakEvent;
 
 public class HangingBreakListener implements Listener {
+
     private final Oraxen oraxen;
 
     public HangingBreakListener(Oraxen oraxen) {
@@ -18,4 +19,5 @@ public class HangingBreakListener implements Listener {
     public void onHangingBreak(HangingBreakEvent event) {
         event.setCancelled(event.getEntity() instanceof ItemFrame && oraxen.getGrave(event.getEntity()) != null);
     }
+
 }

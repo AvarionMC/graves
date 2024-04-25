@@ -7,6 +7,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 public class ProjectBreakListener implements Listener {
+
     private final FurnitureLib furnitureLib;
 
     public ProjectBreakListener(FurnitureLib furnitureLib) {
@@ -16,6 +17,7 @@ public class ProjectBreakListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onProjectBreak(ProjectBreakEvent event) {
         event.setCancelled(event.getID().getUUID() != null
-                && furnitureLib.getGrave(event.getLocation(), event.getID().getUUID()) != null);
+                           && furnitureLib.getGrave(event.getLocation(), event.getID().getUUID()) != null);
     }
+
 }

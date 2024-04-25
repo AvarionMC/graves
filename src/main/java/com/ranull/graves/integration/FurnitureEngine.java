@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 public final class FurnitureEngine extends EntityDataManager {
+
     private final Graves plugin;
     private final FurnitureAPI furnitureAPI;
     private final FurnitureInteractListener furnitureInteractListener;
@@ -53,23 +54,27 @@ public final class FurnitureEngine extends EntityDataManager {
     }
 
     public void createFurniture(Location location, Grave grave) {
-        if (plugin.getConfig("furnitureengine.enabled", grave)
-                .getBoolean("furnitureengine.enabled")) {
-            String name = plugin.getConfig("furnitureengine.name", grave)
-                    .getString("furnitureengine.name", "");
+        if (plugin.getConfig("furnitureengine.enabled", grave).getBoolean("furnitureengine.enabled")) {
+            String name = plugin.getConfig("furnitureengine.name", grave).getString("furnitureengine.name", "");
 
             location.getBlock().setType(Material.AIR);
 
-            if (placeFurniture(name, location, BlockFaceUtil.getBlockFaceRotation(BlockFaceUtil
-                    .getYawBlockFace(location.getYaw())))) {
+            if (placeFurniture(name, location, BlockFaceUtil.getBlockFaceRotation(BlockFaceUtil.getYawBlockFace(location.getYaw())))) {
                 ItemFrame itemFrame = getItemFrame(location);
 
                 if (itemFrame != null && location.getWorld() != null) {
-                    createEntityData(location, itemFrame.getUniqueId(), grave.getUUID(),
-                            EntityData.Type.FURNITUREENGINE);
-                    plugin.debugMessage("Placing FurnitureEngine furniture for " + grave.getUUID() + " at "
-                            + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
-                            + (location.getBlockY() + 0.5) + "y, " + (location.getBlockZ() + 0.5) + "z", 1);
+                    createEntityData(location, itemFrame.getUniqueId(), grave.getUUID(), EntityData.Type.FURNITUREENGINE);
+                    plugin.debugMessage("Placing FurnitureEngine furniture for "
+                                        + grave.getUUID()
+                                        + " at "
+                                        + location.getWorld().getName()
+                                        + ", "
+                                        + (location.getBlockX() + 0.5)
+                                        + "x, "
+                                        + (location.getBlockY() + 0.5)
+                                        + "y, "
+                                        + (location.getBlockZ() + 0.5)
+                                        + "z", 1);
                 }
             }
         }
@@ -114,7 +119,8 @@ public final class FurnitureEngine extends EntityDataManager {
             furnitureAPI.PlaceFurniture(name, location, rotation);
 
             return true;
-        } catch (NoSuchMethodError ignored) {
+        }
+        catch (NoSuchMethodError ignored) {
             plugin.warningMessage("FurnitureAPI.PlaceFurniture() not found.");
 
             return false;
@@ -124,8 +130,10 @@ public final class FurnitureEngine extends EntityDataManager {
     private void breakFurniture(Location location) {
         try {
             furnitureAPI.BreakFurniture(location);
-        } catch (NoSuchMethodError ignored) {
+        }
+        catch (NoSuchMethodError ignored) {
             plugin.warningMessage("FurnitureAPI.BreakFurniture() not found.");
         }
     }
+
 }

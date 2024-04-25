@@ -7,6 +7,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 public class GraveTestListener implements Listener {
+
     private final Graves plugin;
 
     public GraveTestListener(Graves plugin) {

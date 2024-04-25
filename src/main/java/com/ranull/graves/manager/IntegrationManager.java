@@ -8,6 +8,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 public final class IntegrationManager {
+
     private final Graves plugin;
     private MultiPaper multiPaper;
     private Vault vault;
@@ -226,9 +227,11 @@ public final class IntegrationManager {
                 multiPaper = new MultiPaper(plugin);
 
                 plugin.infoMessage("MultiPaper detected, enabling MultiLib.");
-            } catch (ClassNotFoundException ignored) {
             }
-        } else {
+            catch (ClassNotFoundException ignored) {
+            }
+        }
+        else {
             multiPaper = null;
         }
     }
@@ -238,17 +241,22 @@ public final class IntegrationManager {
             Plugin vaultPlugin = plugin.getServer().getPluginManager().getPlugin("Vault");
 
             if (vaultPlugin != null && vaultPlugin.isEnabled()) {
-                RegisteredServiceProvider<Economy> registeredServiceProvider = plugin.getServer().getServicesManager()
-                        .getRegistration(Economy.class);
+                RegisteredServiceProvider<Economy> registeredServiceProvider = plugin.getServer()
+                                                                                     .getServicesManager()
+                                                                                     .getRegistration(Economy.class);
 
                 if (registeredServiceProvider != null) {
                     vault = new Vault(registeredServiceProvider.getProvider());
 
-                    plugin.integrationMessage("Hooked into " + vaultPlugin.getName() + " "
-                            + vaultPlugin.getDescription().getVersion() + ".");
+                    plugin.integrationMessage("Hooked into "
+                                              + vaultPlugin.getName()
+                                              + " "
+                                              + vaultPlugin.getDescription().getVersion()
+                                              + ".");
                 }
             }
-        } else {
+        }
+        else {
             vault = null;
         }
     }
@@ -260,10 +268,14 @@ public final class IntegrationManager {
             if (protocolLibPlugin != null && protocolLibPlugin.isEnabled()) {
                 protocolLib = new ProtocolLib(plugin);
 
-                plugin.integrationMessage("Hooked into " + protocolLibPlugin.getName() + " "
-                        + protocolLibPlugin.getDescription().getVersion() + ".");
+                plugin.integrationMessage("Hooked into "
+                                          + protocolLibPlugin.getName()
+                                          + " "
+                                          + protocolLibPlugin.getDescription().getVersion()
+                                          + ".");
             }
-        } else {
+        }
+        else {
             protocolLib = null;
         }
     }
@@ -275,20 +287,26 @@ public final class IntegrationManager {
             if (worldGuardPlugin != null) {
                 try {
                     Class.forName("com.sk89q.worldguard.WorldGuard", false, getClass().getClassLoader());
-                    Class.forName("com.sk89q.worldguard.protection.flags.registry.FlagConflictException",
-                            false, getClass().getClassLoader());
+                    Class.forName("com.sk89q.worldguard.protection.flags.registry.FlagConflictException", false, getClass().getClassLoader());
 
                     worldGuard = new WorldGuard(plugin);
 
-                    plugin.integrationMessage("Hooked into " + worldGuardPlugin.getName() + " "
-                            + worldGuardPlugin.getDescription().getVersion() + ".");
-                } catch (ClassNotFoundException ignored) {
-                    plugin.integrationMessage(worldGuardPlugin.getName() + " "
-                            + worldGuardPlugin.getDescription().getVersion()
-                            + " detected, Only WorldGuard 6.2+ is supported. Disabling WorldGuard support.");
+                    plugin.integrationMessage("Hooked into "
+                                              + worldGuardPlugin.getName()
+                                              + " "
+                                              + worldGuardPlugin.getDescription().getVersion()
+                                              + ".");
+                }
+                catch (ClassNotFoundException ignored) {
+                    plugin.integrationMessage(worldGuardPlugin.getName()
+                                              + " "
+                                              + worldGuardPlugin.getDescription()
+                                                                .getVersion()
+                                              + " detected, Only WorldGuard 6.2+ is supported. Disabling WorldGuard support.");
                 }
             }
-        } else {
+        }
+        else {
             worldGuard = null;
         }
     }
@@ -300,10 +318,15 @@ public final class IntegrationManager {
             if (townyPlugin != null) {
                 towny = new Towny(plugin, townyPlugin);
 
-                plugin.integrationMessage("Hooked into " + townyPlugin.getName() + " "
-                        + townyPlugin.getDescription().getVersion() + ".");
+                plugin.integrationMessage("Hooked into "
+                                          + townyPlugin.getName()
+                                          + " "
+                                          + townyPlugin.getDescription()
+                                                       .getVersion()
+                                          + ".");
             }
-        } else {
+        }
+        else {
             towny = null;
         }
     }
@@ -314,20 +337,26 @@ public final class IntegrationManager {
 
             if (worldEditPlugin != null && worldEditPlugin.isEnabled()) {
                 try {
-                    Class.forName("com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats", false, getClass()
-                            .getClassLoader());
+                    Class.forName("com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats", false, getClass().getClassLoader());
 
                     worldEdit = new WorldEdit(plugin, worldEditPlugin);
 
-                    plugin.integrationMessage("Hooked into " + worldEditPlugin.getName() + " "
-                            + worldEditPlugin.getDescription().getVersion() + ".");
-                } catch (ClassNotFoundException ignored) {
-                    plugin.integrationMessage(worldEditPlugin.getName() + " "
-                            + worldEditPlugin.getDescription().getVersion()
-                            + " detected, Only WorldEdit 7+ is supported.Disabling WorldEdit support.");
+                    plugin.integrationMessage("Hooked into "
+                                              + worldEditPlugin.getName()
+                                              + " "
+                                              + worldEditPlugin.getDescription().getVersion()
+                                              + ".");
+                }
+                catch (ClassNotFoundException ignored) {
+                    plugin.integrationMessage(worldEditPlugin.getName()
+                                              + " "
+                                              + worldEditPlugin.getDescription()
+                                                               .getVersion()
+                                              + " detected, Only WorldEdit 7+ is supported.Disabling WorldEdit support.");
                 }
             }
-        } else {
+        }
+        else {
             worldEdit = null;
         }
     }
@@ -341,10 +370,14 @@ public final class IntegrationManager {
 
                 //griefDefender.registerFlag();
 
-                plugin.integrationMessage("Hooked into " + griefDefenderPlugin.getName() + " "
-                        + griefDefenderPlugin.getDescription().getVersion() + ".");
+                plugin.integrationMessage("Hooked into "
+                                          + griefDefenderPlugin.getName()
+                                          + " "
+                                          + griefDefenderPlugin.getDescription().getVersion()
+                                          + ".");
             }
-        } else {
+        }
+        else {
             griefDefender = null;
         }
     }
@@ -356,10 +389,14 @@ public final class IntegrationManager {
             if (furnitureLibPlugin != null && furnitureLibPlugin.isEnabled()) {
                 furnitureLib = new FurnitureLib(plugin);
 
-                plugin.integrationMessage("Hooked into " + furnitureLibPlugin.getName() + " "
-                        + furnitureLibPlugin.getDescription().getVersion() + ".");
+                plugin.integrationMessage("Hooked into "
+                                          + furnitureLibPlugin.getName()
+                                          + " "
+                                          + furnitureLibPlugin.getDescription().getVersion()
+                                          + ".");
             }
-        } else {
+        }
+        else {
             furnitureLib = null;
         }
     }
@@ -374,15 +411,22 @@ public final class IntegrationManager {
 
                     furnitureEngine = new FurnitureEngine(plugin);
 
-                    plugin.integrationMessage("Hooked into " + furnitureEnginePlugin.getName() + " "
-                            + furnitureEnginePlugin.getDescription().getVersion() + ".");
-                } catch (ClassNotFoundException ignored) {
-                    plugin.integrationMessage(furnitureEnginePlugin.getName() + " "
-                            + furnitureEnginePlugin.getDescription().getVersion() + " detected, but FurnitureAPI " +
-                            "class not found, disabling integration.");
+                    plugin.integrationMessage("Hooked into "
+                                              + furnitureEnginePlugin.getName()
+                                              + " "
+                                              + furnitureEnginePlugin.getDescription().getVersion()
+                                              + ".");
+                }
+                catch (ClassNotFoundException ignored) {
+                    plugin.integrationMessage(furnitureEnginePlugin.getName()
+                                              + " "
+                                              + furnitureEnginePlugin.getDescription().getVersion()
+                                              + " detected, but FurnitureAPI "
+                                              + "class not found, disabling integration.");
                 }
             }
-        } else {
+        }
+        else {
             furnitureEngine = null;
         }
     }
@@ -394,10 +438,14 @@ public final class IntegrationManager {
             if (protectionLibPlugin != null && protectionLibPlugin.isEnabled()) {
                 protectionLib = new ProtectionLib(plugin, protectionLibPlugin);
 
-                plugin.integrationMessage("Hooked into " + protectionLibPlugin.getName() + " "
-                        + protectionLibPlugin.getDescription().getVersion() + ".");
+                plugin.integrationMessage("Hooked into "
+                                          + protectionLibPlugin.getName()
+                                          + " "
+                                          + protectionLibPlugin.getDescription().getVersion()
+                                          + ".");
             }
-        } else {
+        }
+        else {
             protectionLib = null;
         }
     }
@@ -409,10 +457,14 @@ public final class IntegrationManager {
             if (itemsAdderPlugin != null && itemsAdderPlugin.isEnabled()) {
                 itemsAdder = new ItemsAdder(plugin, itemsAdderPlugin);
 
-                plugin.integrationMessage("Hooked into " + itemsAdderPlugin.getName() + " "
-                        + itemsAdderPlugin.getDescription().getVersion() + ".");
+                plugin.integrationMessage("Hooked into "
+                                          + itemsAdderPlugin.getName()
+                                          + " "
+                                          + itemsAdderPlugin.getDescription().getVersion()
+                                          + ".");
             }
-        } else {
+        }
+        else {
             itemsAdder = null;
         }
     }
@@ -424,10 +476,15 @@ public final class IntegrationManager {
             if (oraxenPlugin != null && oraxenPlugin.isEnabled()) {
                 oraxen = new Oraxen(plugin, oraxenPlugin);
 
-                plugin.integrationMessage("Hooked into " + oraxenPlugin.getName() + " "
-                        + oraxenPlugin.getDescription().getVersion() + ".");
+                plugin.integrationMessage("Hooked into "
+                                          + oraxenPlugin.getName()
+                                          + " "
+                                          + oraxenPlugin.getDescription()
+                                                        .getVersion()
+                                          + ".");
             }
-        } else {
+        }
+        else {
             oraxen = null;
         }
     }
@@ -435,17 +492,17 @@ public final class IntegrationManager {
     private void loadMiniMessage() {
         if (plugin.getConfig().getBoolean("settings.integration.minimessage.enabled")) {
             try {
-                Class.forName("net.kyori.adventure.text.minimessage.MiniMessage", false,
-                        getClass().getClassLoader());
-                Class.forName("net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer", false,
-                        getClass().getClassLoader());
+                Class.forName("net.kyori.adventure.text.minimessage.MiniMessage", false, getClass().getClassLoader());
+                Class.forName("net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer", false, getClass().getClassLoader());
 
                 miniMessage = new MiniMessage();
 
                 plugin.integrationMessage("Hooked into MiniMessage.");
-            } catch (ClassNotFoundException ignored) {
             }
-        } else {
+            catch (ClassNotFoundException ignored) {
+            }
+        }
+        else {
             miniMessage = null;
         }
     }
@@ -457,10 +514,14 @@ public final class IntegrationManager {
             if (mineDownPlugin != null && mineDownPlugin.isEnabled()) {
                 mineDown = new MineDown();
 
-                plugin.integrationMessage("Hooked into " + mineDownPlugin.getName() + " "
-                        + mineDownPlugin.getDescription().getVersion() + ".");
+                plugin.integrationMessage("Hooked into "
+                                          + mineDownPlugin.getName()
+                                          + " "
+                                          + mineDownPlugin.getDescription().getVersion()
+                                          + ".");
             }
-        } else {
+        }
+        else {
             mineDown = null;
         }
     }
@@ -472,10 +533,14 @@ public final class IntegrationManager {
             if (chestSortPlugin != null && chestSortPlugin.isEnabled()) {
                 chestSort = new ChestSort();
 
-                plugin.integrationMessage("Hooked into " + chestSortPlugin.getName() + " "
-                        + chestSortPlugin.getDescription().getVersion() + ".");
+                plugin.integrationMessage("Hooked into "
+                                          + chestSortPlugin.getName()
+                                          + " "
+                                          + chestSortPlugin.getDescription().getVersion()
+                                          + ".");
             }
-        } else {
+        }
+        else {
             chestSort = null;
         }
     }
@@ -487,10 +552,14 @@ public final class IntegrationManager {
             if (playerNPCPlugin != null && playerNPCPlugin.isEnabled()) {
                 playerNPC = new PlayerNPC(plugin);
 
-                plugin.integrationMessage("Hooked into " + playerNPCPlugin.getName() + " "
-                        + playerNPCPlugin.getDescription().getVersion() + ".");
+                plugin.integrationMessage("Hooked into "
+                                          + playerNPCPlugin.getName()
+                                          + " "
+                                          + playerNPCPlugin.getDescription().getVersion()
+                                          + ".");
             }
-        } else {
+        }
+        else {
             playerNPC = null;
         }
     }
@@ -504,10 +573,14 @@ public final class IntegrationManager {
                     itemBridge = new ItemBridge(plugin);
                 }
 
-                plugin.integrationMessage("Hooked into " + itemBridgePlugin.getName() + " "
-                        + itemBridgePlugin.getDescription().getVersion() + ".");
+                plugin.integrationMessage("Hooked into "
+                                          + itemBridgePlugin.getName()
+                                          + " "
+                                          + itemBridgePlugin.getDescription().getVersion()
+                                          + ".");
             }
-        } else {
+        }
+        else {
             itemBridge = null;
         }
     }
@@ -525,10 +598,14 @@ public final class IntegrationManager {
 
                 placeholderAPI.register();
 
-                plugin.integrationMessage("Hooked into " + placeholderAPIPlugin.getName() + " "
-                        + placeholderAPIPlugin.getDescription().getVersion() + ".");
+                plugin.integrationMessage("Hooked into "
+                                          + placeholderAPIPlugin.getName()
+                                          + " "
+                                          + placeholderAPIPlugin.getDescription().getVersion()
+                                          + ".");
             }
-        } else {
+        }
+        else {
             placeholderAPI = null;
         }
     }
@@ -538,8 +615,9 @@ public final class IntegrationManager {
         if (plugin.getConfig().getBoolean("settings.compatibility.warning")) {
             for (World world : plugin.getServer().getWorlds()) {
                 if (world.getGameRuleValue("keepInventory").equals("true")) {
-                    plugin.compatibilityMessage("World \"" + world.getName()
-                            + "\" has keepInventory set to true, Graves will not be created here.");
+                    plugin.compatibilityMessage("World \""
+                                                + world.getName()
+                                                + "\" has keepInventory set to true, Graves will not be created here.");
                 }
             }
 
@@ -547,15 +625,16 @@ public final class IntegrationManager {
 
             if (essentialsPlugin != null && essentialsPlugin.isEnabled()) {
                 plugin.compatibilityMessage(essentialsPlugin.getName()
-                        + " Detected, make sure you don't have the essentials.keepinv or essentials.keepxp permissions.");
+                                            + " Detected, make sure you don't have the essentials.keepinv or essentials.keepxp permissions.");
             }
 
             Plugin deluxeCombatPlugin = plugin.getServer().getPluginManager().getPlugin("DeluxeCombat");
 
             if (deluxeCombatPlugin != null && deluxeCombatPlugin.isEnabled()) {
                 plugin.compatibilityMessage(deluxeCombatPlugin.getName()
-                        + " Detected, in order to work with graves you need to set disable-drop-handling to true in " +
-                        deluxeCombatPlugin.getName() + "'s data.yml file.");
+                                            + " Detected, in order to work with graves you need to set disable-drop-handling to true in "
+                                            + deluxeCombatPlugin.getName()
+                                            + "'s data.yml file.");
             }
 
             similarPluginWarning("DeadChest");
@@ -570,9 +649,16 @@ public final class IntegrationManager {
         Plugin similarPlugin = plugin.getServer().getPluginManager().getPlugin(string);
 
         if (similarPlugin != null && similarPlugin.isEnabled()) {
-            plugin.compatibilityMessage(string + " Detected, Graves listens to the death event after " + string +
-                    ", and " + string + " clears the drop list. This means Graves will never be created for players " +
-                    "if " + string + " is enabled, only non-player entities will create Graves if configured to do so.");
+            plugin.compatibilityMessage(string
+                                        + " Detected, Graves listens to the death event after "
+                                        + string
+                                        + ", and "
+                                        + string
+                                        + " clears the drop list. This means Graves will never be created for players "
+                                        + "if "
+                                        + string
+                                        + " is enabled, only non-player entities will create Graves if configured to do so.");
         }
     }
+
 }

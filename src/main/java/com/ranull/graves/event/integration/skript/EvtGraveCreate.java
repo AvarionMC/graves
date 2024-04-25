@@ -7,6 +7,7 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.NotNull;
 
 public class EvtGraveCreate extends SkriptEvent {
+
     @Override
     public boolean init(Literal<?> @NotNull [] args, int matchedPattern, @NotNull SkriptParser.ParseResult parseResult) {
         return false;
@@ -22,4 +23,5 @@ public class EvtGraveCreate extends SkriptEvent {
     public String toString(Event event, boolean debug) {
         return "";
     }
+
 }

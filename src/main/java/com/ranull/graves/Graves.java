@@ -28,12 +28,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.Callable;
 
 
 public class Graves extends JavaPlugin {
-    private static boolean IS_TEST = false;
+    private static final boolean IS_TEST = false;
 
     private VersionManager versionManager;
     private IntegrationManager integrationManager;
@@ -101,17 +102,17 @@ public class Graves extends JavaPlugin {
             dataManager = null;
         }
 
-        if ( graveManager != null ) {
+        if (graveManager != null) {
             graveManager.unload();
             graveManager = null;
         }
 
-        if  ( graveyardManager != null ) {
+        if (graveyardManager != null) {
             graveyardManager.unload();
             graveyardManager = null;
         }
 
-        if ( integrationManager != null ) {
+        if (integrationManager != null) {
             integrationManager.unload();
             integrationManager = null;
         }
@@ -133,7 +134,8 @@ public class Graves extends JavaPlugin {
 
         if (!singleConfigFile.exists()) {
             fileConfiguration = getConfigFiles(getConfigFolder());
-        } else {
+        }
+        else {
             fileConfiguration = getConfigFile(singleConfigFile);
             loadResourceDefaults(fileConfiguration, singleConfigFile.getName());
         }
@@ -167,26 +169,26 @@ public class Graves extends JavaPlugin {
     }
 
     public void saveTextFiles() {
-        ResourceUtil.copyResources("data/text/readme.txt", getDataFolder().getPath()
-                + "/readme.txt", this);
-        ResourceUtil.copyResources("data/text/placeholders.txt", getDataFolder().getPath()
-                + "/placeholders.txt", this);
+        ResourceUtil.copyResources("data/text/readme.txt", getDataFolder().getPath() + "/readme.txt", this);
+        ResourceUtil.copyResources("data/text/placeholders.txt", getDataFolder().getPath() + "/placeholders.txt", this);
 
         if (integrationManager != null) {
             if (integrationManager.hasPlaceholderAPI()) {
                 ResourceUtil.copyResources("data/text/placeholderapi.txt", getDataFolder().getPath()
-                        + "/placeholderapi.txt", this);
+                                                                           + "/placeholderapi.txt", this);
             }
 
             if (integrationManager.hasFurnitureLib()) {
                 ResourceUtil.copyResources("data/text/furniturelib.txt", getDataFolder().getPath()
-                        + "/furniturelib.txt", this);
+                                                                         + "/furniturelib.txt", this);
             }
         }
     }
 
     private void registerMetrics() {
-        if ( IS_TEST ) return;
+        if (IS_TEST) {
+            return;
+        }
 
         Metrics metrics = new Metrics(this, getMetricsID());
 
@@ -279,11 +281,19 @@ public class Graves extends JavaPlugin {
                 }
 
                 if (player != null) {
-                    String debug = !integrationManager.hasMultiPaper() ? "Debug:" : "Debug ("
-                            + integrationManager.getMultiPaper().getLocalServerName() + "):";
+                    String debug = !integrationManager.hasMultiPaper()
+                                   ? "Debug:"
+                                   : "Debug (" + integrationManager.getMultiPaper().getLocalServerName() + "):";
 
-                    player.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RED + debug
-                            + ChatColor.RESET + " " + string);
+                    player.sendMessage(ChatColor.RED
+                                       + "☠"
+                                       + ChatColor.DARK_GRAY
+                                       + " » "
+                                       + ChatColor.RED
+                                       + debug
+                                       + ChatColor.RESET
+                                       + " "
+                                       + string);
                 }
             }
         }
@@ -325,12 +335,16 @@ public class Graves extends JavaPlugin {
 
             if (singleConfigFile.exists()) {
                 FileUtil.moveFile(singleConfigFile, "outdated/config.yml-" + configVersion);
-            } else {
+            }
+            else {
                 FileUtil.moveFile(folderConfigFile, "outdated/config-" + configVersion);
             }
 
-            warningMessage("Outdated config detected (v" + configVersion + "), current version is (v"
-                    + currentConfigVersion + "), renaming outdated config file.");
+            warningMessage("Outdated config detected (v"
+                           + configVersion
+                           + "), current version is (v"
+                           + currentConfigVersion
+                           + "), renaming outdated config file.");
             saveDefaultConfig();
             reloadConfig();
         }
@@ -347,15 +361,24 @@ public class Graves extends JavaPlugin {
                         double pluginVersionLatest = Double.parseDouble(latestVersion);
 
                         if (pluginVersion < pluginVersionLatest) {
-                            getLogger().info("Update: Outdated version detected " + pluginVersion
-                                    + ", latest version is " + pluginVersionLatest
-                                    + ", https://www.spigotmc.org/resources/" + getSpigotID() + "/");
+                            getLogger().info("Update: Outdated version detected "
+                                             + pluginVersion
+                                             + ", latest version is "
+                                             + pluginVersionLatest
+                                             + ", https://www.spigotmc.org/resources/"
+                                             + getSpigotID()
+                                             + "/");
                         }
-                    } catch (NumberFormatException exception) {
+                    }
+                    catch (NumberFormatException exception) {
                         if (!getDescription().getVersion().equalsIgnoreCase(latestVersion)) {
-                            getLogger().info("Update: Outdated version detected " + getDescription().getVersion()
-                                    + ", latest version is " + latestVersion + ", https://www.spigotmc.org/resources/"
-                                    + getSpigotID() + "/");
+                            getLogger().info("Update: Outdated version detected "
+                                             + getDescription().getVersion()
+                                             + ", latest version is "
+                                             + latestVersion
+                                             + ", https://www.spigotmc.org/resources/"
+                                             + getSpigotID()
+                                             + "/");
                         }
                     }
                 }
@@ -367,9 +390,9 @@ public class Graves extends JavaPlugin {
         compatibility = versionManager.hasBlockData() ? new CompatibilityBlockData() : new CompatibilityMaterialData();
 
         if (!versionManager.hasBlockData()) {
-            infoMessage("Legacy version detected, Graves will run but may have problems with material names, " +
-                    "the default config is setup for the latest version of the game, you can alter the config manually to fix " +
-                    "any issues you encounter, you will need to find the names of materials and sounds for your version.");
+            infoMessage("Legacy version detected, Graves will run but may have problems with material names, "
+                        + "the default config is setup for the latest version of the game, you can alter the config manually to fix "
+                        + "any issues you encounter, you will need to find the names of materials and sounds for your version.");
         }
 
         if (versionManager.isBukkit()) {
@@ -387,8 +410,7 @@ public class Graves extends JavaPlugin {
                 String serverDumpInfo = ServerUtil.getServerDumpInfo(this);
                 String message = serverDumpInfo;
 
-                if (getConfig().getString("settings.dump.method", "HASTEBIN")
-                        .equalsIgnoreCase("HASTEBIN")) {
+                if (getConfig().getString("settings.dump.method", "HASTEBIN").equalsIgnoreCase("HASTEBIN")) {
                     String response = HastebinUtil.postDataToHastebin(serverDumpInfo, true);
 
                     if (response != null) {
@@ -399,19 +421,25 @@ public class Graves extends JavaPlugin {
                 if (serverDumpInfo.equals(message)) {
                     try {
                         String name = "graves-dump-" + System.currentTimeMillis() + ".txt";
-                        PrintWriter printWriter = new PrintWriter(name, "UTF-8");
+                        PrintWriter printWriter = new PrintWriter(name, StandardCharsets.UTF_8);
 
                         printWriter.write(serverDumpInfo);
                         printWriter.close();
 
                         message = name;
-                    } catch (FileNotFoundException | UnsupportedEncodingException exception) {
+                    }
+                    catch (FileNotFoundException | UnsupportedEncodingException exception) {
                         exception.printStackTrace();
                     }
                 }
 
-                commandSender.sendMessage(ChatColor.RED + "☠" + ChatColor.DARK_GRAY + " » " + ChatColor.RESET
-                        + "Dumped: " + message);
+                commandSender.sendMessage(ChatColor.RED
+                                          + "☠"
+                                          + ChatColor.DARK_GRAY
+                                          + " » "
+                                          + ChatColor.RESET
+                                          + "Dumped: "
+                                          + message);
             });
         }
     }
@@ -501,8 +529,8 @@ public class Graves extends JavaPlugin {
                     ConfigurationSection configurationSection = getConfig().getConfigurationSection(section);
 
                     if (configurationSection != null && (versionManager.hasConfigContains()
-                            ? configurationSection.contains(config, true)
-                            : configurationSection.contains(config))) {
+                                                         ? configurationSection.contains(config, true)
+                                                         : configurationSection.contains(config))) {
                         return configurationSection;
                     }
                 }
@@ -516,8 +544,8 @@ public class Graves extends JavaPlugin {
                 ConfigurationSection configurationSection = getConfig().getConfigurationSection(section);
 
                 if (configurationSection != null && (versionManager.hasConfigContains()
-                        ? configurationSection.contains(config, true)
-                        : configurationSection.contains(config))) {
+                                                     ? configurationSection.contains(config, true)
+                                                     : configurationSection.contains(config))) {
                     return configurationSection;
                 }
             }
@@ -530,8 +558,7 @@ public class Graves extends JavaPlugin {
         InputStream inputStream = getResource(resource);
 
         if (inputStream != null) {
-            fileConfiguration.addDefaults(YamlConfiguration
-                    .loadConfiguration(new InputStreamReader(inputStream, Charsets.UTF_8)));
+            fileConfiguration.addDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(inputStream, Charsets.UTF_8)));
         }
     }
 
@@ -539,7 +566,8 @@ public class Graves extends JavaPlugin {
         try {
             fileConfiguration.options().copyDefaults(true);
             fileConfiguration.loadFromString(fileConfiguration.saveToString());
-        } catch (InvalidConfigurationException ignored) {
+        }
+        catch (InvalidConfigurationException ignored) {
         }
     }
 
@@ -547,13 +575,13 @@ public class Graves extends JavaPlugin {
         List<String> permissionList = new ArrayList<>();
         List<String> permissionListSorted = new ArrayList<>();
 
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+        if (entity instanceof Player player) {
 
             for (PermissionAttachmentInfo permissionAttachmentInfo : player.getEffectivePermissions()) {
                 if (permissionAttachmentInfo.getPermission().startsWith("graves.permission.")) {
                     String permission = permissionAttachmentInfo.getPermission()
-                            .replace("graves.permission.", "").toLowerCase();
+                                                                .replace("graves.permission.", "")
+                                                                .toLowerCase();
 
                     if (getConfig().isConfigurationSection("settings.permission." + permission)) {
                         permissionList.add(permission);
@@ -594,14 +622,16 @@ public class Graves extends JavaPlugin {
                 if (YAMLUtil.isValidYAML(file)) {
                     if (file.isDirectory()) {
                         fileConfiguration.addDefaults(getConfigFiles(file));
-                    } else {
+                    }
+                    else {
                         FileConfiguration savedFileConfiguration = getConfigFile(file);
 
                         if (savedFileConfiguration != null) {
                             fileConfiguration.addDefaults(savedFileConfiguration);
                             bakeDefaults(fileConfiguration);
                             loadResourceDefaults(fileConfiguration, "config" + File.separator + file.getName());
-                        } else {
+                        }
+                        else {
                             warningMessage("Unable to load config " + file.getName());
                         }
                     }
@@ -618,7 +648,8 @@ public class Graves extends JavaPlugin {
         if (YAMLUtil.isValidYAML(file)) {
             try {
                 fileConfiguration = YamlConfiguration.loadConfiguration(file);
-            } catch (IllegalArgumentException exception) {
+            }
+            catch (IllegalArgumentException exception) {
                 exception.printStackTrace();
             }
         }
@@ -642,7 +673,9 @@ public class Graves extends JavaPlugin {
         return UpdateUtil.getLatestVersion(getSpigotID());
     }
 
-    public final int getSpigotID() { return 116202; }
+    public final int getSpigotID() {
+        return 116202;
+    }
 
     public final int getMetricsID() {
         return 21607;

@@ -7,6 +7,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockFromToEvent;
 
 public class BlockFromToListener implements Listener {
+
     private final Graves plugin;
 
     public BlockFromToListener(Graves plugin) {
@@ -19,4 +20,5 @@ public class BlockFromToListener implements Listener {
             event.setCancelled(true);
         }
     }
+
 }

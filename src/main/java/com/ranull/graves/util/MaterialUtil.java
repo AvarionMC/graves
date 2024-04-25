@@ -3,6 +3,7 @@ package com.ranull.graves.util;
 import org.bukkit.Material;
 
 public final class MaterialUtil {
+
     public static boolean isAir(Material material) {
         return isAir(material.name());
     }
@@ -85,4 +86,5 @@ public final class MaterialUtil {
                 return false;
         }
     }
+
 }

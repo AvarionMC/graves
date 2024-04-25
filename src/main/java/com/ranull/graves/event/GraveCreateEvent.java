@@ -9,6 +9,7 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 public class GraveCreateEvent extends Event implements Cancellable {
+
     private static final HandlerList HANDLERS = new HandlerList();
     private final Entity entity;
     private final Grave grave;
@@ -51,4 +52,5 @@ public class GraveCreateEvent extends Event implements Cancellable {
     public void setCancelled(boolean cancel) {
         this.cancel = cancel;
     }
+
 }

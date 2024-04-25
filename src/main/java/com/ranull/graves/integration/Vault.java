@@ -4,6 +4,7 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.OfflinePlayer;
 
 public final class Vault {
+
     private final Economy economy;
 
     public Vault(Economy economy) {
@@ -21,4 +22,5 @@ public final class Vault {
     public boolean withdrawBalance(OfflinePlayer player, double balance) {
         return balance <= 0 || economy.withdrawPlayer(player, balance).transactionSuccess();
     }
+
 }

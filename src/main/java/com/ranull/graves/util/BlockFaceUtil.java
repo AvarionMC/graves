@@ -5,6 +5,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 
 public final class BlockFaceUtil {
+
     public static BlockFace getSimpleBlockFace(BlockFace blockFace) {
         switch (blockFace) {
             case EAST:
@@ -93,4 +94,5 @@ public final class BlockFaceUtil {
                 return 180;
         }
     }
+
 }

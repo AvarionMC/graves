@@ -8,6 +8,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class GraveBreakEvent extends BlockBreakEvent {
+
     private static final HandlerList HANDLERS = new HandlerList();
     private final Grave grave;
     private boolean dropItems;
@@ -45,4 +46,5 @@ public class GraveBreakEvent extends BlockBreakEvent {
     public HandlerList getHandlers() {
         return HANDLERS;
     }
+
 }

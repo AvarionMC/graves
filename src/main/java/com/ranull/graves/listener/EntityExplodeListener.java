@@ -13,6 +13,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import java.util.Iterator;
 
 public class EntityExplodeListener implements Listener {
+
     private final Graves plugin;
 
     public EntityExplodeListener(Graves plugin) {
@@ -32,7 +33,8 @@ public class EntityExplodeListener implements Listener {
 
                 if ((System.currentTimeMillis() - grave.getTimeCreation()) < 1000) {
                     iterator.remove();
-                } else if (plugin.getConfig("grave.explode", grave).getBoolean("grave.explode")) {
+                }
+                else if (plugin.getConfig("grave.explode", grave).getBoolean("grave.explode")) {
                     GraveExplodeEvent graveExplodeEvent = new GraveExplodeEvent(location, event.getEntity(), grave);
 
                     plugin.getServer().getPluginManager().callEvent(graveExplodeEvent);
@@ -40,24 +42,29 @@ public class EntityExplodeListener implements Listener {
                     if (!graveExplodeEvent.isCancelled()) {
                         if (plugin.getConfig("drop.explode", grave).getBoolean("drop.explode")) {
                             plugin.getGraveManager().breakGrave(location, grave);
-                        } else {
+                        }
+                        else {
                             plugin.getGraveManager().removeGrave(grave);
                         }
 
                         plugin.getGraveManager().closeGrave(grave);
                         plugin.getGraveManager().playEffect("effect.loot", location, grave);
-                        plugin.getEntityManager().runCommands("event.command.explode", event.getEntity(), location, grave);
+                        plugin.getEntityManager()
+                              .runCommands("event.command.explode", event.getEntity(), location, grave);
 
                         if (plugin.getConfig("zombie.explode", grave).getBoolean("zombie.explode")) {
                             plugin.getEntityManager().spawnZombie(location, grave);
                         }
-                    } else {
+                    }
+                    else {
                         iterator.remove();
                     }
-                } else {
+                }
+                else {
                     iterator.remove();
                 }
             }
         }
     }
+
 }

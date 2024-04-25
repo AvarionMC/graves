@@ -11,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 
 public class PlayerInteractEntityListener implements Listener {
+
     private final Graves plugin;
     private final Oraxen oraxen;
 
@@ -27,7 +28,8 @@ public class PlayerInteractEntityListener implements Listener {
             Grave grave = oraxen.getGrave(entity);
 
             event.setCancelled(grave != null && plugin.getGraveManager()
-                    .openGrave(event.getPlayer(), entity.getLocation(), grave));
+                                                      .openGrave(event.getPlayer(), entity.getLocation(), grave));
         }
     }
+
 }

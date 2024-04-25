@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public final class RecipeManager {
+
     private final Graves plugin;
     private final List<NamespacedKey> namespacedKeyList;
 
@@ -65,7 +66,9 @@ public final class RecipeManager {
     public ItemStack getToken(String token) {
         if (plugin.getConfig().isConfigurationSection("settings.token." + token)) {
             Material material = Material.matchMaterial(plugin.getConfig()
-                    .getString("settings.token." + token + ".material", "SUNFLOWER"));
+                                                             .getString("settings.token."
+                                                                        + token
+                                                                        + ".material", "SUNFLOWER"));
             ItemStack itemStack = new ItemStack(material != null ? material : Material.CHEST);
 
             setRecipeData(token, itemStack);
@@ -75,10 +78,11 @@ public final class RecipeManager {
 
                 if (itemMeta != null) {
                     String name = ChatColor.WHITE + StringUtil.parseString(plugin.getConfig()
-                            .getString("settings.token." + token + ".name"), plugin);
+                                                                                 .getString("settings.token."
+                                                                                            + token
+                                                                                            + ".name"), plugin);
                     List<String> loreList = new ArrayList<>();
-                    int customModelData = plugin.getConfig().getInt("settings.token." + token
-                            + ".model-data", -1);
+                    int customModelData = plugin.getConfig().getInt("settings.token." + token + ".model-data", -1);
 
                     for (String string : plugin.getConfig().getStringList("settings.token." + token + ".lore")) {
                         loreList.add(ChatColor.GRAY + StringUtil.parseString(string, plugin));
@@ -161,7 +165,8 @@ public final class RecipeManager {
             if (plugin.getServer().getRecipe(namespacedKey) == null) {
                 plugin.getServer().addRecipe(shapedRecipe);
                 namespacedKeyList.add(namespacedKey);
-            } else {
+            }
+            else {
                 plugin.debugMessage("Unable to add recipe " + namespacedKey.getKey(), 1);
             }
         }
@@ -182,8 +187,8 @@ public final class RecipeManager {
             ItemMeta itemMeta = itemStack.getItemMeta();
 
             if (itemMeta != null) {
-                itemMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, "token"),
-                        PersistentDataType.STRING, token);
+                itemMeta.getPersistentDataContainer()
+                        .set(new NamespacedKey(plugin, "token"), PersistentDataType.STRING, token);
                 itemStack.setItemMeta(itemMeta);
             }
         }
@@ -191,14 +196,17 @@ public final class RecipeManager {
 
     public boolean isToken(String token, ItemStack itemStack) {
         if (plugin.getVersionManager().hasPersistentData()) {
-            if (itemStack.getItemMeta() != null && itemStack.getItemMeta().getPersistentDataContainer()
-                    .has(new NamespacedKey(plugin, "token"), PersistentDataType.STRING)) {
-                String string = itemStack.getItemMeta().getPersistentDataContainer()
-                        .get(new NamespacedKey(plugin, "token"), PersistentDataType.STRING);
+            if (itemStack.getItemMeta() != null && itemStack.getItemMeta()
+                                                            .getPersistentDataContainer()
+                                                            .has(new NamespacedKey(plugin, "token"), PersistentDataType.STRING)) {
+                String string = itemStack.getItemMeta()
+                                         .getPersistentDataContainer()
+                                         .get(new NamespacedKey(plugin, "token"), PersistentDataType.STRING);
 
                 return string != null && string.equals(token);
             }
-        } else {
+        }
+        else {
             // TODO
             return false;
         }
@@ -208,10 +216,12 @@ public final class RecipeManager {
 
     public String getTokenName(ItemStack itemStack) {
         if (plugin.getVersionManager().hasPersistentData()) {
-            if (itemStack.getItemMeta() != null && itemStack.getItemMeta().getPersistentDataContainer()
-                    .has(new NamespacedKey(plugin, "token"), PersistentDataType.STRING)) {
-                return itemStack.getItemMeta().getPersistentDataContainer()
-                        .get(new NamespacedKey(plugin, "token"), PersistentDataType.STRING);
+            if (itemStack.getItemMeta() != null && itemStack.getItemMeta()
+                                                            .getPersistentDataContainer()
+                                                            .has(new NamespacedKey(plugin, "token"), PersistentDataType.STRING)) {
+                return itemStack.getItemMeta()
+                                .getPersistentDataContainer()
+                                .get(new NamespacedKey(plugin, "token"), PersistentDataType.STRING);
             }
         }
 
@@ -219,9 +229,11 @@ public final class RecipeManager {
     }
 
     public boolean isToken(ItemStack itemStack) {
-        return plugin.getVersionManager().hasPersistentData() && itemStack.getItemMeta() != null
-                && itemStack.getItemMeta().getPersistentDataContainer()
-                .has(new NamespacedKey(plugin, "token"), PersistentDataType.STRING);
+        return plugin.getVersionManager().hasPersistentData()
+               && itemStack.getItemMeta() != null
+               && itemStack.getItemMeta()
+                           .getPersistentDataContainer()
+                           .has(new NamespacedKey(plugin, "token"), PersistentDataType.STRING);
     }
 
     private char getChar(int count) {
@@ -248,4 +260,5 @@ public final class RecipeManager {
                 return '*';
         }
     }
+
 }

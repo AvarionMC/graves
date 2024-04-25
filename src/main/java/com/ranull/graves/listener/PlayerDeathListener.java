@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class PlayerDeathListener implements Listener {
+
     private final Graves plugin;
 
     public PlayerDeathListener(Graves plugin) {
@@ -28,13 +29,15 @@ public class PlayerDeathListener implements Listener {
 
             if (itemStack != null) {
                 if (plugin.getEntityManager().getGraveUUIDFromItemStack(itemStack) != null
-                        && plugin.getConfig("compass.destroy", event.getEntity()).getBoolean("compass.destroy")) {
+                    && plugin.getConfig("compass.destroy", event.getEntity()).getBoolean("compass.destroy")) {
                     iterator.remove();
                 }
             }
         }
 
-        plugin.getCacheManager().getRemovedItemStackMap()
-                .put(event.getEntity().getUniqueId(), new ArrayList<>(itemStackList));
+        plugin.getCacheManager()
+              .getRemovedItemStackMap()
+              .put(event.getEntity().getUniqueId(), new ArrayList<>(itemStackList));
     }
+
 }

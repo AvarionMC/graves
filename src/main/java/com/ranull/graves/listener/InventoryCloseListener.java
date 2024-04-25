@@ -10,6 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 
 public class InventoryCloseListener implements Listener {
+
     private final Graves plugin;
 
     public InventoryCloseListener(Graves plugin) {
@@ -18,9 +19,7 @@ public class InventoryCloseListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onInventoryClose(InventoryCloseEvent event) {
-        if (event.getInventory().getHolder() instanceof Grave && event.getPlayer() instanceof Player) {
-            Player player = (Player) event.getPlayer();
-            Grave grave = (Grave) event.getInventory().getHolder();
+        if (event.getInventory().getHolder() instanceof Grave grave && event.getPlayer() instanceof Player player) {
             GraveCloseEvent graveCloseEvent = new GraveCloseEvent(event.getView(), grave);
 
             plugin.getServer().getPluginManager().callEvent(graveCloseEvent);
@@ -37,4 +36,5 @@ public class InventoryCloseListener implements Listener {
             plugin.getEntityManager().playWorldSound("sound.close", player, grave);
         }
     }
+
 }

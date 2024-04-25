@@ -9,6 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public final class ProtectionLib {
+
     private final Graves plugin;
     private final Plugin protectionLibPlugin;
 
@@ -20,21 +21,26 @@ public final class ProtectionLib {
     public boolean canBuild(Location location, Player player) {
         if (plugin.getIntegrationManager().hasFurnitureLib()) {
             return plugin.getIntegrationManager().getFurnitureLib().canBuild(location, player);
-        } else {
+        }
+        else {
             try {
                 Object protectionLib = Class.forName("de.Ste3et_C0st.ProtectionLib.main.ProtectionLib")
-                        .cast(protectionLibPlugin);
-                Method canBuild = protectionLib.getClass().getMethod("canBuild", location.getClass(),
-                        Class.forName("org.bukkit.entity.Player"));
+                                            .cast(protectionLibPlugin);
+                Method canBuild = protectionLib.getClass()
+                                               .getMethod("canBuild", location.getClass(), Class.forName("org.bukkit.entity.Player"));
 
                 canBuild.setAccessible(true);
 
                 return (boolean) canBuild.invoke(protectionLib, location, player);
-            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException
-                     | ClassNotFoundException ignored) {
+            }
+            catch (NoSuchMethodException |
+                   IllegalAccessException |
+                   InvocationTargetException |
+                   ClassNotFoundException ignored) {
             }
         }
 
         return true;
     }
+
 }

@@ -3,6 +3,7 @@ package com.ranull.graves.util;
 import org.bukkit.Color;
 
 public final class ColorUtil {
+
     public static Color getColor(String string) {
         switch (string.toUpperCase()) {
             case "AQUA":
@@ -43,4 +44,5 @@ public final class ColorUtil {
                 return null;
         }
     }
+
 }

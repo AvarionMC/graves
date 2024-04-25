@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public final class CacheManager {
+
     private final Map<UUID, Grave> graveMap;
     private final Map<String, ChunkData> chunkMap;
     private final Map<UUID, Location> lastLocationMap;
@@ -38,4 +39,5 @@ public final class CacheManager {
     public Map<UUID, List<ItemStack>> getRemovedItemStackMap() {
         return removedItemStackMap;
     }
+
 }

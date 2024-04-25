@@ -9,6 +9,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public final class HastebinUtil {
+
     public static String postDataToHastebin(String data, boolean raw) {
         String urlString = "https://www.toptal.com/developers/hastebin/documents/";
         String pasteRawURLString = "https://www.toptal.com/developers/hastebin/raw/";
@@ -35,10 +36,12 @@ public final class HastebinUtil {
             }
 
             return !response.equals(urlString) ? response : null;
-        } catch (IOException exception) {
+        }
+        catch (IOException exception) {
             exception.printStackTrace();
         }
 
         return null;
     }
+
 }

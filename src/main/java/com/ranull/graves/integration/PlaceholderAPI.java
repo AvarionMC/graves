@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 public final class PlaceholderAPI extends PlaceholderExpansion implements Relational {
+
     private final Graves plugin;
 
     public PlaceholderAPI(Graves plugin) {
@@ -54,11 +55,14 @@ public final class PlaceholderAPI extends PlaceholderExpansion implements Relati
 
         if (identifier.equals("author")) {
             return getAuthor();
-        } else if (identifier.equals("version")) {
+        }
+        else if (identifier.equals("version")) {
             return getVersion();
-        } else if (identifier.equals("count_total")) {
+        }
+        else if (identifier.equals("count_total")) {
             return String.valueOf(plugin.getCacheManager().getGraveMap().size());
-        } else if (identifier.startsWith("owner_name_")) {
+        }
+        else if (identifier.startsWith("owner_name_")) {
             UUID uuid = UUIDUtil.getUUID(identifier.replace("owner_name_", ""));
 
             if (uuid != null && plugin.getCacheManager().getGraveMap().containsKey(uuid)) {
@@ -70,7 +74,8 @@ public final class PlaceholderAPI extends PlaceholderExpansion implements Relati
             }
 
             return "";
-        } else if (identifier.startsWith("owner_type_")) {
+        }
+        else if (identifier.startsWith("owner_type_")) {
             UUID uuid = UUIDUtil.getUUID(identifier.replace("owner_type_", ""));
 
             if (uuid != null && plugin.getCacheManager().getGraveMap().containsKey(uuid)) {
@@ -82,7 +87,8 @@ public final class PlaceholderAPI extends PlaceholderExpansion implements Relati
             }
 
             return "";
-        } else if (identifier.startsWith("owner_uuid_")) {
+        }
+        else if (identifier.startsWith("owner_uuid_")) {
             UUID uuid = UUIDUtil.getUUID(identifier.replace("owner_uuid_", ""));
 
             if (uuid != null && plugin.getCacheManager().getGraveMap().containsKey(uuid)) {
@@ -94,7 +100,8 @@ public final class PlaceholderAPI extends PlaceholderExpansion implements Relati
             }
 
             return "";
-        } else if (identifier.startsWith("killer_name_")) {
+        }
+        else if (identifier.startsWith("killer_name_")) {
             UUID uuid = UUIDUtil.getUUID(identifier.replace("killer_name_", ""));
 
             if (uuid != null && plugin.getCacheManager().getGraveMap().containsKey(uuid)) {
@@ -106,7 +113,8 @@ public final class PlaceholderAPI extends PlaceholderExpansion implements Relati
             }
 
             return "";
-        } else if (identifier.startsWith("killer_type_")) {
+        }
+        else if (identifier.startsWith("killer_type_")) {
             UUID uuid = UUIDUtil.getUUID(identifier.replace("killer_type_", ""));
 
             if (uuid != null && plugin.getCacheManager().getGraveMap().containsKey(uuid)) {
@@ -118,7 +126,8 @@ public final class PlaceholderAPI extends PlaceholderExpansion implements Relati
             }
 
             return "";
-        } else if (identifier.startsWith("killer_uuid_")) {
+        }
+        else if (identifier.startsWith("killer_uuid_")) {
             UUID uuid = UUIDUtil.getUUID(identifier.replace("killer_uuid_", ""));
 
             if (uuid != null && plugin.getCacheManager().getGraveMap().containsKey(uuid)) {
@@ -130,7 +139,8 @@ public final class PlaceholderAPI extends PlaceholderExpansion implements Relati
             }
 
             return "";
-        } else if (identifier.startsWith("item_")) {
+        }
+        else if (identifier.startsWith("item_")) {
             UUID uuid = UUIDUtil.getUUID(identifier.replace("item_", ""));
 
             if (uuid != null && plugin.getCacheManager().getGraveMap().containsKey(uuid)) {
@@ -138,7 +148,8 @@ public final class PlaceholderAPI extends PlaceholderExpansion implements Relati
             }
 
             return "";
-        } else if (identifier.startsWith("experience_")) {
+        }
+        else if (identifier.startsWith("experience_")) {
             UUID uuid = UUIDUtil.getUUID(identifier.replace("experience_", ""));
 
             if (uuid != null && plugin.getCacheManager().getGraveMap().containsKey(uuid)) {
@@ -146,74 +157,79 @@ public final class PlaceholderAPI extends PlaceholderExpansion implements Relati
             }
 
             return "";
-        } else if (identifier.startsWith("level_")) {
+        }
+        else if (identifier.startsWith("level_")) {
             UUID uuid = UUIDUtil.getUUID(identifier.replace("level_", ""));
 
             if (uuid != null && plugin.getCacheManager().getGraveMap().containsKey(uuid)) {
-                return String.valueOf(ExperienceUtil.getLevelFromExperience(plugin.getCacheManager().getGraveMap()
-                        .get(uuid).getExperience()));
+                return String.valueOf(ExperienceUtil.getLevelFromExperience(plugin.getCacheManager()
+                                                                                  .getGraveMap()
+                                                                                  .get(uuid)
+                                                                                  .getExperience()));
             }
 
             return "";
-        } else if (identifier.startsWith("time_creation_")) {
+        }
+        else if (identifier.startsWith("time_creation_")) {
             if (identifier.startsWith("time_creation_formatted")) {
-                UUID uuid = UUIDUtil.getUUID(identifier
-                        .replace("time_creation_formatted", ""));
+                UUID uuid = UUIDUtil.getUUID(identifier.replace("time_creation_formatted", ""));
 
                 if (uuid != null && plugin.getCacheManager().getGraveMap().containsKey(uuid)) {
                     Grave grave = plugin.getCacheManager().getGraveMap().get(uuid);
                     return StringUtil.getDateString(grave, grave.getTimeCreation(), plugin);
                 }
-            } else {
+            }
+            else {
                 UUID uuid = UUIDUtil.getUUID(identifier.replace("time_creation_", ""));
 
                 if (uuid != null && plugin.getCacheManager().getGraveMap().containsKey(uuid)) {
-                    return String.valueOf(plugin.getCacheManager().getGraveMap().get(uuid)
-                            .getTimeCreation() / 1000);
+                    return String.valueOf(plugin.getCacheManager().getGraveMap().get(uuid).getTimeCreation() / 1000);
                 }
             }
 
             return "";
-        } else if (identifier.startsWith("time_alive_remaining_")) {
+        }
+        else if (identifier.startsWith("time_alive_remaining_")) {
             if (identifier.startsWith("time_alive_remaining_formatted_")) {
-                UUID uuid = UUIDUtil.getUUID(identifier
-                        .replace("time_alive_remaining_formatted_", ""));
+                UUID uuid = UUIDUtil.getUUID(identifier.replace("time_alive_remaining_formatted_", ""));
 
                 if (uuid != null && plugin.getCacheManager().getGraveMap().containsKey(uuid)) {
                     Grave grave = plugin.getCacheManager().getGraveMap().get(uuid);
                     return StringUtil.getTimeString(grave, grave.getTimeAliveRemaining(), plugin);
                 }
-            } else {
+            }
+            else {
                 UUID uuid = UUIDUtil.getUUID(identifier.replace("time_alive_remaining_", ""));
 
                 if (uuid != null && plugin.getCacheManager().getGraveMap().containsKey(uuid)) {
-                    return String.valueOf(plugin.getCacheManager().getGraveMap().get(uuid)
-                            .getTimeAliveRemaining() / 1000);
+                    return String.valueOf(plugin.getCacheManager().getGraveMap().get(uuid).getTimeAliveRemaining()
+                                          / 1000);
                 }
             }
 
             return "";
-        } else if (identifier.startsWith("time_protection_remaining_")) {
+        }
+        else if (identifier.startsWith("time_protection_remaining_")) {
             if (identifier.startsWith("time_protection_remaining_formatted_")) {
-                UUID uuid = UUIDUtil.getUUID(identifier
-                        .replace("time_protection_remaining_formatted_", ""));
+                UUID uuid = UUIDUtil.getUUID(identifier.replace("time_protection_remaining_formatted_", ""));
 
                 if (uuid != null && plugin.getCacheManager().getGraveMap().containsKey(uuid)) {
                     Grave grave = plugin.getCacheManager().getGraveMap().get(uuid);
                     return StringUtil.getTimeString(grave, grave.getTimeProtectionRemaining(), plugin);
                 }
-            } else {
-                UUID uuid = UUIDUtil.getUUID(identifier
-                        .replace("time_protection_remaining_", ""));
+            }
+            else {
+                UUID uuid = UUIDUtil.getUUID(identifier.replace("time_protection_remaining_", ""));
 
                 if (uuid != null && plugin.getCacheManager().getGraveMap().containsKey(uuid)) {
-                    return String.valueOf(plugin.getCacheManager().getGraveMap().get(uuid)
-                            .getTimeProtectionRemaining() / 1000);
+                    return String.valueOf(plugin.getCacheManager().getGraveMap().get(uuid).getTimeProtectionRemaining()
+                                          / 1000);
                 }
             }
 
             return "";
-        } else if (identifier.startsWith("time_lived_")) {
+        }
+        else if (identifier.startsWith("time_lived_")) {
             if (identifier.startsWith("time_lived_formatted_")) {
                 UUID uuid = UUIDUtil.getUUID(identifier.replace("time_lived_formatted_", ""));
 
@@ -221,7 +237,8 @@ public final class PlaceholderAPI extends PlaceholderExpansion implements Relati
                     Grave grave = plugin.getCacheManager().getGraveMap().get(uuid);
                     return StringUtil.getTimeString(grave, grave.getLivedTime(), plugin);
                 }
-            } else {
+            }
+            else {
                 UUID uuid = UUIDUtil.getUUID(identifier.replace("time_lived_", ""));
 
                 if (uuid != null && plugin.getCacheManager().getGraveMap().containsKey(uuid)) {
@@ -245,4 +262,5 @@ public final class PlaceholderAPI extends PlaceholderExpansion implements Relati
     public String onPlaceholderRequest(Player playerOne, Player playerTwo, String identifier) {
         return onPlaceholderRequest(playerOne, identifier); // TODO
     }
+
 }

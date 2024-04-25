@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 public final class ItemsAdder extends EntityDataManager {
+
     private final Graves plugin;
     private final Plugin itemsAdderPlugin;
 
@@ -34,10 +35,16 @@ public final class ItemsAdder extends EntityDataManager {
 
     public void saveData() {
         if (plugin.getConfig().getBoolean("settings.integration.itemsadder.write")) {
-            ResourceUtil.copyResources("data/plugin/" + itemsAdderPlugin.getName().toLowerCase() + "/data",
-                    plugin.getPluginsFolder() + "/" + itemsAdderPlugin.getName() + "/data", plugin);
-            ResourceUtil.copyResources("data/model/grave.json", plugin.getPluginsFolder() + "/"
-                    + itemsAdderPlugin.getName() + "/data/resource_pack/assets/graves/models/graves/grave.json", plugin);
+            ResourceUtil.copyResources("data/plugin/"
+                                       + itemsAdderPlugin.getName().toLowerCase()
+                                       + "/data", plugin.getPluginsFolder()
+                                                  + "/"
+                                                  + itemsAdderPlugin.getName()
+                                                  + "/data", plugin);
+            ResourceUtil.copyResources("data/model/grave.json", plugin.getPluginsFolder()
+                                                                + "/"
+                                                                + itemsAdderPlugin.getName()
+                                                                + "/data/resource_pack/assets/graves/models/graves/grave.json", plugin);
             plugin.debugMessage("Saving " + itemsAdderPlugin.getName() + " data.", 1);
         }
     }
@@ -45,23 +52,33 @@ public final class ItemsAdder extends EntityDataManager {
     public void createFurniture(Location location, Grave grave) {
         location = LocationUtil.roundLocation(location).add(0.5, 0, 0.5);
 
-        location.setYaw(BlockFaceUtil.getBlockFaceYaw(BlockFaceUtil.getYawBlockFace(location.getYaw()).getOppositeFace()));
+        location.setYaw(BlockFaceUtil.getBlockFaceYaw(BlockFaceUtil.getYawBlockFace(location.getYaw())
+                                                                   .getOppositeFace()));
         location.setPitch(grave.getPitch());
 
-        if (plugin.getConfig("itemsadder.furniture.enabled", grave)
-                .getBoolean("itemsadder.furniture.enabled")) {
+        if (plugin.getConfig("itemsadder.furniture.enabled", grave).getBoolean("itemsadder.furniture.enabled")) {
             String name = plugin.getConfig("itemsadder.furniture.name", grave)
-                    .getString("itemsadder.furniture.name", "");
+                                .getString("itemsadder.furniture.name", "");
             location.getBlock().setType(Material.AIR);
             CustomFurniture customFurniture = createCustomFurniture(name, location);
 
             if (customFurniture != null && customFurniture.getArmorstand() != null) {
                 customFurniture.teleport(location);
                 createEntityData(customFurniture.getArmorstand(), grave, EntityData.Type.ITEMSADDER);
-                plugin.debugMessage("Placing ItemsAdder furniture for " + grave.getUUID() + " at "
-                        + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
-                        + (location.getBlockY() + 0.5) + "y, " + (location.getBlockZ() + 0.5) + "z", 1);
-            } else {
+                plugin.debugMessage("Placing ItemsAdder furniture for "
+                                    + grave.getUUID()
+                                    + " at "
+                                    + location.getWorld()
+                                              .getName()
+                                    + ", "
+                                    + (location.getBlockX() + 0.5)
+                                    + "x, "
+                                    + (location.getBlockY() + 0.5)
+                                    + "y, "
+                                    + (location.getBlockZ() + 0.5)
+                                    + "z", 1);
+            }
+            else {
                 plugin.debugMessage("Can't find ItemsAdder furniture " + name, 1);
             }
         }
@@ -88,17 +105,25 @@ public final class ItemsAdder extends EntityDataManager {
     }
 
     public void createBlock(Location location, Grave grave) {
-        if (plugin.getConfig("itemsadder.block.enabled", grave)
-                .getBoolean("itemsadder.block.enabled")) {
-            String name = plugin.getConfig("itemsadder.block.name", grave)
-                    .getString("itemsadder.block.name", "");
+        if (plugin.getConfig("itemsadder.block.enabled", grave).getBoolean("itemsadder.block.enabled")) {
+            String name = plugin.getConfig("itemsadder.block.name", grave).getString("itemsadder.block.name", "");
             CustomBlock customBlock = createCustomBlock(name, location);
 
             if (customBlock != null) {
-                plugin.debugMessage("Placing ItemsAdder block for " + grave.getUUID() + " at "
-                        + location.getWorld().getName() + ", " + (location.getBlockX() + 0.5) + "x, "
-                        + (location.getBlockY() + 0.5) + "y, " + (location.getBlockZ() + 0.5) + "z", 1);
-            } else {
+                plugin.debugMessage("Placing ItemsAdder block for "
+                                    + grave.getUUID()
+                                    + " at "
+                                    + location.getWorld()
+                                              .getName()
+                                    + ", "
+                                    + (location.getBlockX() + 0.5)
+                                    + "x, "
+                                    + (location.getBlockY() + 0.5)
+                                    + "y, "
+                                    + (location.getBlockZ() + 0.5)
+                                    + "z", 1);
+            }
+            else {
                 plugin.debugMessage("Can't find ItemsAdder block " + name, 1);
             }
         }
@@ -119,4 +144,5 @@ public final class ItemsAdder extends EntityDataManager {
     private CustomBlock createCustomBlock(String name, Location location) {
         return CustomBlock.place(name, location);
     }
+
 }

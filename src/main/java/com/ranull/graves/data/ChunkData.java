@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class ChunkData implements Serializable {
+
     private final World world;
     private final int x;
     private final int z;
@@ -70,4 +71,5 @@ public class ChunkData implements Serializable {
     public void removeEntityData(EntityData entityData) {
         entityDataMap.remove(entityData.getUUIDEntity());
     }
+
 }

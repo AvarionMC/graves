@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public final class GraveyardManager {
+
     private final Graves plugin;
     private final Map<String, Graveyard> graveyardMap;
     private final Map<UUID, Graveyard> modifyingGraveyardMap;
@@ -132,11 +133,13 @@ public final class GraveyardManager {
     public boolean isLocationInGraveyard(Location location, Graveyard graveyard) {
         switch (graveyard.getType()) {
             case WORLDGUARD:
-                return plugin.getIntegrationManager().getWorldGuard() != null
-                        && plugin.getIntegrationManager().getWorldGuard().isInsideRegion(location, graveyard.getName());
+                return plugin.getIntegrationManager().getWorldGuard() != null && plugin.getIntegrationManager()
+                                                                                       .getWorldGuard()
+                                                                                       .isInsideRegion(location, graveyard.getName());
             case TOWNY:
-                return plugin.getIntegrationManager().hasTowny()
-                        && plugin.getIntegrationManager().getTowny().isInsidePlot(location, graveyard.getName());
+                return plugin.getIntegrationManager().hasTowny() && plugin.getIntegrationManager()
+                                                                          .getTowny()
+                                                                          .isInsidePlot(location, graveyard.getName());
             default:
                 return false;
         }
@@ -149,19 +152,21 @@ public final class GraveyardManager {
             if (graveyard.getSpawnLocation() != null) {
                 switch (graveyard.getType()) {
                     case WORLDGUARD:
-                        if (graveyard.isPublic() || (!(entity instanceof Player)
-                                || (plugin.getIntegrationManager().getWorldGuard() != null
-                                && plugin.getIntegrationManager().getWorldGuard()
-                                .isMember(graveyard.getName(), (Player) entity)))) {
+                        if (graveyard.isPublic() || (!(entity instanceof Player) || (plugin.getIntegrationManager()
+                                                                                           .getWorldGuard() != null
+                                                                                     && plugin.getIntegrationManager()
+                                                                                              .getWorldGuard()
+                                                                                              .isMember(graveyard.getName(), (Player) entity)))) {
                             locationGraveyardMap.put(graveyard.getSpawnLocation(), graveyard);
                         }
 
                         break;
                     case TOWNY:
-                        if (graveyard.isPublic() || (!(entity instanceof Player)
-                                || (plugin.getIntegrationManager().hasTowny()
-                                && plugin.getIntegrationManager().getTowny()
-                                .isResident(graveyard.getName(), (Player) entity)))) {
+                        if (graveyard.isPublic() || (!(entity instanceof Player) || (plugin.getIntegrationManager()
+                                                                                           .hasTowny()
+                                                                                     && plugin.getIntegrationManager()
+                                                                                              .getTowny()
+                                                                                              .isResident(graveyard.getName(), (Player) entity)))) {
                             locationGraveyardMap.put(graveyard.getSpawnLocation(), graveyard);
                         }
 
@@ -170,8 +175,9 @@ public final class GraveyardManager {
             }
         }
 
-        return !locationGraveyardMap.isEmpty() ? locationGraveyardMap.get(LocationUtil
-                .getClosestLocation(location, new ArrayList<>(locationGraveyardMap.keySet()))) : null;
+        return !locationGraveyardMap.isEmpty()
+               ? locationGraveyardMap.get(LocationUtil.getClosestLocation(location, new ArrayList<>(locationGraveyardMap.keySet())))
+               : null;
     }
 
     private void previewLocation(Player player, Location location, BlockFace blockFace) {
@@ -185,4 +191,5 @@ public final class GraveyardManager {
             plugin.getIntegrationManager().getProtocolLib().refreshBlock(location.getBlock(), player);
         }
     }
+
 }

@@ -10,6 +10,7 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 public class GraveBlockPlaceEvent extends Event implements Cancellable {
+
     private static final HandlerList HANDLERS = new HandlerList();
     private final Grave grave;
     private Location location;
@@ -61,4 +62,5 @@ public class GraveBlockPlaceEvent extends Event implements Cancellable {
     public void setCancelled(boolean cancel) {
         this.cancel = cancel;
     }
+
 }

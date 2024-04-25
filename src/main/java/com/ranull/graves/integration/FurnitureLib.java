@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.UUID;
 
 public final class FurnitureLib extends EntityDataManager {
+
     private final Graves plugin;
     private final de.Ste3et_C0st.FurnitureLib.main.FurnitureLib furnitureLib;
     private final ProjectClickListener projectClickListener;
@@ -61,15 +62,13 @@ public final class FurnitureLib extends EntityDataManager {
     }
 
     public boolean canBuild(Location location, Player player) {
-        return furnitureLib.getPermManager().useProtectionLib()
-                && furnitureLib.getPermManager().canBuild(player, location);
+        return furnitureLib.getPermManager().useProtectionLib() && furnitureLib.getPermManager()
+                                                                               .canBuild(player, location);
     }
 
     public void createFurniture(Location location, Grave grave) {
-        if (plugin.getConfig("furniturelib.enabled", grave)
-                .getBoolean("furniturelib.enabled")) {
-            String name = plugin.getConfig("furniturelib.name", grave)
-                    .getString("furniturelib.name", "");
+        if (plugin.getConfig("furniturelib.enabled", grave).getBoolean("furniturelib.enabled")) {
+            String name = plugin.getConfig("furniturelib.name", grave).getString("furniturelib.name", "");
             Project project = furnitureLib.getFurnitureManager().getProject(name);
 
             if (project != null && project.haveModelSchematic()) {
@@ -77,25 +76,24 @@ public final class FurnitureLib extends EntityDataManager {
 
                 ObjectID objectID = new ObjectID(project.getName(), project.getPlugin().getName(), location);
 
-                location.setYaw(furnitureLib.getLocationUtil().FaceToYaw(LocationUtil.yawToFace(location.getYaw())
-                        .getOppositeFace()));
+                location.setYaw(furnitureLib.getLocationUtil()
+                                            .FaceToYaw(LocationUtil.yawToFace(location.getYaw()).getOppositeFace()));
                 furnitureLib.spawn(project, objectID);
                 objectID.setUUID(UUID.randomUUID());
-                objectID.getBlockList().stream()
+                objectID.getBlockList()
+                        .stream()
                         .filter(signLocation -> signLocation.getBlock().getType().name().contains("SIGN"))
-                        .forEach((signLocation) -> setSign(signLocation.getBlock(),
-                                plugin.getConfig("furniturelib.line", grave)
-                                        .getStringList("furniturelib.line"), grave));
+                        .forEach((signLocation) -> setSign(signLocation.getBlock(), plugin.getConfig("furniturelib.line", grave)
+                                                                                          .getStringList("furniturelib.line"), grave));
 
-                if (plugin.getConfig("furniturelib.head.replace", grave)
-                        .getBoolean("furniturelib.head.replace")) {
+                if (plugin.getConfig("furniturelib.head.replace", grave).getBoolean("furniturelib.head.replace")) {
                     objectID.getPacketList().forEach((fEntity) -> setSkull(fEntity, grave));
                 }
 
                 furnitureLib.getFurnitureManager().addObjectID(objectID);
-                createEntityData(objectID.getStartLocation(), objectID.getUUID(), grave.getUUID(),
-                        EntityData.Type.FURNITURELIB);
-            } else {
+                createEntityData(objectID.getStartLocation(), objectID.getUUID(), grave.getUUID(), EntityData.Type.FURNITURELIB);
+            }
+            else {
                 plugin.debugMessage("Can't find FurnitureLib furniture " + name, 1);
             }
         }
@@ -125,15 +123,15 @@ public final class FurnitureLib extends EntityDataManager {
     }
 
     private void setSign(Block block, List<String> stringList, Grave grave) {
-        if (block.getState() instanceof Sign) {
-            Sign sign = (Sign) block.getState();
+        if (block.getState() instanceof Sign sign) {
             int counter = 0;
 
             for (String string : stringList) {
                 if (counter <= 4) {
                     sign.setLine(counter, StringUtil.parseString(string, block.getLocation(), grave, plugin));
                     counter++;
-                } else {
+                }
+                else {
                     break;
                 }
             }
@@ -144,36 +142,42 @@ public final class FurnitureLib extends EntityDataManager {
 
     private void setSkull(fEntity fEntity, Grave grave) {
         List<String> materialList = plugin.getConfig("furniturelib.head.material", grave)
-                .getStringList("furniturelib.head.material");
+                                          .getStringList("furniturelib.head.material");
         ItemStack itemStack = plugin.getCompatibility().getSkullItemStack(grave, plugin);
 
-        if (fEntity.getItemInMainHand() != null && materialList.contains(fEntity.getItemInMainHand().getType().name())
-                && isSkullTextureBlank(fEntity.getItemInMainHand())) {
+        if (fEntity.getItemInMainHand() != null
+            && materialList.contains(fEntity.getItemInMainHand().getType().name())
+            && isSkullTextureBlank(fEntity.getItemInMainHand())) {
             fEntity.setItemInMainHand(itemStack);
         }
 
-        if (fEntity.getItemInOffHand() != null && materialList.contains(fEntity.getItemInOffHand().getType().name())
-                && isSkullTextureBlank(fEntity.getItemInOffHand())) {
+        if (fEntity.getItemInOffHand() != null
+            && materialList.contains(fEntity.getItemInOffHand().getType().name())
+            && isSkullTextureBlank(fEntity.getItemInOffHand())) {
             fEntity.setItemInOffHand(itemStack);
         }
 
-        if (fEntity.getHelmet() != null && materialList.contains(fEntity.getHelmet().getType().name())
-                && isSkullTextureBlank(fEntity.getHelmet())) {
+        if (fEntity.getHelmet() != null
+            && materialList.contains(fEntity.getHelmet().getType().name())
+            && isSkullTextureBlank(fEntity.getHelmet())) {
             fEntity.setHelmet(itemStack);
         }
 
-        if (fEntity.getChestPlate() != null && materialList.contains(fEntity.getChestPlate().getType().name())
-                && isSkullTextureBlank(fEntity.getChestPlate())) {
+        if (fEntity.getChestPlate() != null
+            && materialList.contains(fEntity.getChestPlate().getType().name())
+            && isSkullTextureBlank(fEntity.getChestPlate())) {
             fEntity.setChestPlate(itemStack);
         }
 
-        if (fEntity.getLeggings() != null && materialList.contains(fEntity.getLeggings().getType().name())
-                && isSkullTextureBlank(fEntity.getLeggings())) {
+        if (fEntity.getLeggings() != null
+            && materialList.contains(fEntity.getLeggings().getType().name())
+            && isSkullTextureBlank(fEntity.getLeggings())) {
             fEntity.setLeggings(itemStack);
         }
 
-        if (fEntity.getBoots() != null && materialList.contains(fEntity.getBoots().getType().name())
-                && isSkullTextureBlank(fEntity.getBoots())) {
+        if (fEntity.getBoots() != null
+            && materialList.contains(fEntity.getBoots().getType().name())
+            && isSkullTextureBlank(fEntity.getBoots())) {
             fEntity.setBoots(itemStack);
         }
     }
@@ -183,6 +187,7 @@ public final class FurnitureLib extends EntityDataManager {
     }
 
     public class Furniture extends FurniturePlugin {
+
         public Furniture(Plugin plugin) {
             super(plugin);
             register();
@@ -197,19 +202,25 @@ public final class FurnitureLib extends EntityDataManager {
                 new Project("Grave2", getPlugin(), getResource(path + File.separator + "Grave2.dModel"));
                 new Project("Grave3", getPlugin(), getResource(path + File.separator + "Grave3.dModel"));
                 new Project("Skull1", getPlugin(), getResource(path + File.separator + "Skull1.dModel"));
-            } catch (Exception exception) {
+            }
+            catch (Exception exception) {
                 plugin.warningMessage(exception.getMessage());
             }
         }
 
         @Override
         public void applyPluginFunctions() {
-            furnitureLib.getFurnitureManager().getProjects().stream().filter(project -> project.getPlugin().getName()
-                    .equals(getPlugin().getDescription().getName())).forEach(Project::applyFunction);
+            furnitureLib.getFurnitureManager()
+                        .getProjects()
+                        .stream()
+                        .filter(project -> project.getPlugin().getName().equals(getPlugin().getDescription().getName()))
+                        .forEach(Project::applyFunction);
         }
 
         @Override
         public void onFurnitureLateSpawn(ObjectID objectID) {
         }
+
     }
+
 }

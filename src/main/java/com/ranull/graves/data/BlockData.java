@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 public class BlockData implements Serializable {
+
     private final Location location;
     private final UUID graveUUID;
     private final String replaceMaterial;
@@ -35,8 +36,7 @@ public class BlockData implements Serializable {
     }
 
     public enum BlockType {
-        DEATH,
-        NORMAL,
-        GRAVEYARD
+        DEATH, NORMAL, GRAVEYARD
     }
+
 }

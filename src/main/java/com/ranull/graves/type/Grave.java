@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.util.*;
 
 public class Grave implements InventoryHolder, Serializable {
+
     private final UUID uuid;
     private transient Inventory inventory;
     private Map<EquipmentSlot, ItemStack> equipmentMap;
@@ -222,7 +223,8 @@ public class Grave implements InventoryHolder, Serializable {
     public long getTimeAliveRemaining() {
         if (timeAlive < 0) {
             return -1;
-        } else {
+        }
+        else {
             long timeAliveRemaining = (timeAlive + 1000) - (System.currentTimeMillis() - timeCreation);
 
             return timeAliveRemaining >= 0 ? timeAliveRemaining : 0;
@@ -232,7 +234,8 @@ public class Grave implements InventoryHolder, Serializable {
     public long getTimeProtectionRemaining() {
         if (timeProtection < 0) {
             return -1;
-        } else {
+        }
+        else {
             long timeProtectionRemaining = (timeProtection + 1000) - (System.currentTimeMillis() - timeCreation);
 
             return timeProtectionRemaining >= 0 ? timeProtectionRemaining : 0;
@@ -258,8 +261,7 @@ public class Grave implements InventoryHolder, Serializable {
     }
 
     public enum StorageMode {
-        EXACT,
-        COMPACT,
-        CHESTSORT
+        EXACT, COMPACT, CHESTSORT
     }
+
 }

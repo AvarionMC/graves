@@ -11,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
 public class BlockBreakListener implements Listener {
+
     private final Graves plugin;
 
     public BlockBreakListener(Graves plugin) {
@@ -37,16 +38,19 @@ public class BlockBreakListener implements Listener {
                             plugin.getGraveManager().autoLootGrave(player, block.getLocation(), grave);
 
                             if (graveBreakEvent.isDropItems() && plugin.getConfig("drop.auto-loot.break", grave)
-                                    .getBoolean("drop.auto-loot.break")) {
+                                                                       .getBoolean("drop.auto-loot.break")) {
                                 plugin.getGraveManager().breakGrave(block.getLocation(), grave);
-                            } else {
+                            }
+                            else {
                                 event.setCancelled(true);
 
                                 return;
                             }
-                        } else if (graveBreakEvent.isDropItems()) {
+                        }
+                        else if (graveBreakEvent.isDropItems()) {
                             plugin.getGraveManager().breakGrave(block.getLocation(), grave);
-                        } else {
+                        }
+                        else {
                             plugin.getGraveManager().removeGrave(grave);
                         }
 
@@ -57,17 +61,22 @@ public class BlockBreakListener implements Listener {
                         plugin.getGraveManager().closeGrave(grave);
                         plugin.getGraveManager().playEffect("effect.loot", block.getLocation(), grave);
                         plugin.getEntityManager().spawnZombie(block.getLocation(), player, player, grave);
-                        plugin.getEntityManager().runCommands("event.command.break", player, block.getLocation(), grave);
-                    } else {
+                        plugin.getEntityManager()
+                              .runCommands("event.command.break", player, block.getLocation(), grave);
+                    }
+                    else {
                         event.setCancelled(true);
                     }
-                } else {
+                }
+                else {
                     plugin.getEntityManager().sendMessage("message.protection", player, player.getLocation(), grave);
                     event.setCancelled(true);
                 }
-            } else {
+            }
+            else {
                 event.setCancelled(true);
             }
         }
     }
+
 }

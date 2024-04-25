@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 
 public class PlayerRespawnListener implements Listener {
+
     private final Graves plugin;
 
     public PlayerRespawnListener(Graves plugin) {
@@ -29,21 +30,22 @@ public class PlayerRespawnListener implements Listener {
             Grave grave = graveList.get(graveList.size() - 1);
 
             plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-                plugin.getEntityManager().runFunction(player, plugin
-                        .getConfig("respawn.function", player, permissionList)
-                        .getString("respawn.function", "none"), grave);
+                plugin.getEntityManager()
+                      .runFunction(player, plugin.getConfig("respawn.function", player, permissionList)
+                                                 .getString("respawn.function", "none"), grave);
             }, 1L);
 
             if (plugin.getVersionManager().hasCompassMeta()
-                    && plugin.getConfig("respawn.compass", player, permissionList)
-                    .getBoolean("respawn.compass")
-                    && grave.getLivedTime() <= plugin.getConfig("respawn.compass-time", player, permissionList)
-                    .getInt("respawn.compass-time") * 1000L) {
+                && plugin.getConfig("respawn.compass", player, permissionList).getBoolean("respawn.compass")
+                && grave.getLivedTime()
+                   <= plugin.getConfig("respawn.compass-time", player, permissionList).getInt("respawn.compass-time")
+                      * 1000L) {
                 List<Location> locationList = plugin.getGraveManager()
-                        .getGraveLocationList(event.getRespawnLocation(), grave);
+                                                    .getGraveLocationList(event.getRespawnLocation(), grave);
 
                 if (!locationList.isEmpty()) {
-                    ItemStack itemStack = plugin.getEntityManager().createGraveCompass(player, locationList.get(0), grave);
+                    ItemStack itemStack = plugin.getEntityManager()
+                                                .createGraveCompass(player, locationList.get(0), grave);
 
                     if (itemStack != null) {
                         player.getInventory().addItem(itemStack);
@@ -52,4 +54,5 @@ public class PlayerRespawnListener implements Listener {
             }
         }
     }
+
 }
