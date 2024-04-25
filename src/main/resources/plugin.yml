@@ -1,8 +1,8 @@
 name: ${project.name}
 description: ${project.description}
 version: ${project.version}
-main: com.ranull.graves.Graves
-api-version: 1.18
+main: org.avarion.graves.Graves
+api-version: 1.20.4
 author: Ranull, svaningelgem
 load: POSTWORLD
 
