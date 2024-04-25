@@ -17,6 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class StringUtil {
+    private static final Pattern hexColorPattern = Pattern.compile("&#[a-fA-F0-9]{6}");
 
     public static String format(String string) {
         return capitalizeFully(string.replace("_", " "));
@@ -147,16 +148,15 @@ public final class StringUtil {
             string = plugin.getIntegrationManager().getMineDown().parseString(string);
         }
 
-        Pattern pattern = Pattern.compile("&#[a-fA-f0-9]{6}");
-        Matcher matcher = pattern.matcher(string);
+        Matcher matcher = hexColorPattern.matcher(string);
 
         while (matcher.find()) {
             String colorHex = string.substring(matcher.start() + 1, matcher.end());
-            string = plugin.getVersionManager().hasHexColors()
+            string = plugin.getVersionManager().hasHexColors
                      ? string.replace("&" + colorHex, ChatColor.of(colorHex)
                                                                .toString())
                      : string.replace(colorHex, "");
-            matcher = pattern.matcher(string);
+            matcher = hexColorPattern.matcher(string);
         }
 
         if (plugin.getIntegrationManager().hasMiniMessage()) {

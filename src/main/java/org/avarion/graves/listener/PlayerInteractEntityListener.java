@@ -24,9 +24,9 @@ public class PlayerInteractEntityListener implements Listener {
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         Player player = event.getPlayer();
 
-        if ((!plugin.getVersionManager().hasSecondHand() || event.getHand() == EquipmentSlot.HAND)
+        if (event.getHand() == EquipmentSlot.HAND
             && event.getRightClicked() instanceof ItemFrame
-            && (plugin.getVersionManager().is_v1_7() || player.getGameMode() != GameMode.SPECTATOR)) {
+            && player.getGameMode() != GameMode.SPECTATOR) {
             Entity entity = event.getRightClicked();
             Grave grave = plugin.getEntityDataManager().getGrave(entity);
 

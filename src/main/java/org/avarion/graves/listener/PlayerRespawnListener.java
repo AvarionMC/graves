@@ -35,8 +35,7 @@ public class PlayerRespawnListener implements Listener {
                                                  .getString("respawn.function", "none"), grave);
             }, 1L);
 
-            if (plugin.getVersionManager().hasCompassMeta()
-                && plugin.getConfig("respawn.compass", player, permissionList).getBoolean("respawn.compass")
+            if (plugin.getConfig("respawn.compass", player, permissionList).getBoolean("respawn.compass")
                 && grave.getLivedTime()
                    <= plugin.getConfig("respawn.compass-time", player, permissionList).getInt("respawn.compass-time")
                       * 1000L) {

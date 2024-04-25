@@ -30,14 +30,8 @@ public final class ServerUtil {
                                                .map(Plugin::getName)
                                                .collect(Collectors.joining(", ")));
         stringList.add(plugin.getDescription().getName() + " Version: " + plugin.getDescription().getVersion());
-
-        if (plugin.getVersionManager().hasAPIVersion()) {
-            stringList.add(plugin.getDescription().getName() + " API Version: " + plugin.getDescription()
-                                                                                        .getAPIVersion());
-        }
-
+        stringList.add(plugin.getDescription().getName() + " API Version: " + plugin.getDescription().getAPIVersion());
         stringList.add(plugin.getDescription().getName() + " Config Version: " + plugin.getConfig()
-                                                                                       .getInt("config-version"));
         stringList.add(plugin.getDescription().getName() + " Config Base64: " + Base64.getEncoder()
                                                                                       .encodeToString(plugin.getConfig()
                                                                                                             .saveToString()

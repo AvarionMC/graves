@@ -169,9 +169,7 @@ public final class GraveManager {
     }
 
     public void graveParticle(Location location, Grave grave) {
-        if (plugin.getVersionManager().hasParticle()
-            && location.getWorld() != null
-            && plugin.getConfig("particle.enabled", grave).getBoolean("particle.enabled")) {
+        if (location.getWorld() != null && plugin.getConfig("particle.enabled", grave).getBoolean("particle.enabled")) {
             Particle particle = Particle.REDSTONE;
             String particleType = plugin.getConfig("particle.type", grave).getString("particle.type");
 
@@ -368,6 +366,8 @@ public final class GraveManager {
     }
 
     public Inventory createGraveInventory(InventoryHolder inventoryHolder, Location location, List<ItemStack> itemStackList, String title, Grave.StorageMode storageMode) {
+        itemStackList.removeIf(itemStack -> itemStack != null && itemStack.containsEnchantment(Enchantment.VANISHING_CURSE));
+
         if (storageMode == Grave.StorageMode.COMPACT || storageMode == Grave.StorageMode.CHESTSORT) {
             Inventory tempInventory = plugin.getServer().createInventory(null, 54);
             int counter = 0;
@@ -407,12 +407,8 @@ public final class GraveManager {
 
             return inventory;
         }
-        else if (storageMode == Grave.StorageMode.EXACT) {
-            if (plugin.getVersionManager().hasEnchantmentCurse()) {
-                itemStackList.removeIf(itemStack -> itemStack != null
-                                                    && itemStack.containsEnchantment(Enchantment.VANISHING_CURSE));
-            }
 
+        if (storageMode == Grave.StorageMode.EXACT) {
             ItemStack itemStackAir = new ItemStack(Material.AIR);
             Inventory inventory = plugin.getServer()
                                         .createInventory(inventoryHolder, InventoryUtil.getInventorySize(itemStackList.size()), title);

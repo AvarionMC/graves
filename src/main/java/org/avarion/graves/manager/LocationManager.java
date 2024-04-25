@@ -266,12 +266,7 @@ public final class LocationManager {
     }
 
     public boolean isInsideBorder(Location location) {
-        return plugin.getVersionManager().is_v1_7()
-               || plugin.getVersionManager().is_v1_8()
-               || plugin.getVersionManager().is_v1_9()
-               || plugin.getVersionManager().is_v1_10()
-               || plugin.getVersionManager().is_v1_11()
-               || (location.getWorld() != null && location.getWorld().getWorldBorder().isInside(location));
+        return (location.getWorld() != null && location.getWorld().getWorldBorder().isInside(location));
     }
 
     public boolean isVoid(Location location) {
@@ -280,8 +275,7 @@ public final class LocationManager {
     }
 
     public int getMinHeight(Location location) {
-        return location.getWorld() != null && plugin.getVersionManager().hasMinHeight() ? location.getWorld()
-                                                                                                  .getMinHeight() : 0;
+        return location.getWorld() != null ? location.getWorld().getMinHeight() : 0;
     }
 
 }

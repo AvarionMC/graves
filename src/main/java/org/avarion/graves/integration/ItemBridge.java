@@ -39,7 +39,7 @@ public final class ItemBridge implements ItemBridgeListener {
     public ItemStack fetchItemStack(@NotNull String string) {
         string = string.toLowerCase();
 
-        if (plugin.getVersionManager().hasPersistentData() && string.startsWith("token_")) {
+        if (string.startsWith("token_")) {
             string = string.replaceFirst("token_", "");
 
             return plugin.getConfig().isSet("settings.token." + string)
@@ -52,7 +52,7 @@ public final class ItemBridge implements ItemBridgeListener {
 
     @Override
     public String getItemName(@NotNull ItemStack itemStack) {
-        if (plugin.getVersionManager().hasPersistentData() && plugin.getRecipeManager().isToken(itemStack)) {
+        if (plugin.getRecipeManager().isToken(itemStack)) {
             return plugin.getRecipeManager().getTokenName(itemStack);
         }
 

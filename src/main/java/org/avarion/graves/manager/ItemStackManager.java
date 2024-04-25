@@ -48,17 +48,10 @@ public final class ItemStackManager extends EntityDataManager {
             if (plugin.getConfig("obituary.glow", grave).getBoolean("obituary.glow")) {
                 bookMeta.addEnchant(Enchantment.DURABILITY, 1, true);
 
-                if (!plugin.getVersionManager().is_v1_7()) {
-                    bookMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                }
+                bookMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
             }
 
-            if (!plugin.getVersionManager().is_v1_7()
-                && !plugin.getVersionManager().is_v1_8()
-                && !plugin.getVersionManager().is_v1_9()) {
-                bookMeta.setGeneration(null);
-            }
-
+            bookMeta.setGeneration(null);
             bookMeta.setPages(String.join("\n", lineList));
             bookMeta.setLore(loreList);
             bookMeta.setTitle(ChatColor.WHITE + StringUtil.parseString(plugin.getConfig("obituary.title", grave)
@@ -102,10 +95,6 @@ public final class ItemStackManager extends EntityDataManager {
 
         if (plugin.getConfig("gui.menu.list.item.block", grave).getBoolean("gui.menu.list.item.block")) {
             String materialString = plugin.getConfig("block.material", grave).getString("block.material", "CHEST");
-
-            if (materialString.equals("PLAYER_HEAD") && !plugin.getVersionManager().hasBlockData()) {
-                materialString = "SKULL_ITEM";
-            }
 
             material = Material.matchMaterial(materialString);
         }

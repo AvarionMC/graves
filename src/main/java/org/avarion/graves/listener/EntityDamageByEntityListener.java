@@ -21,7 +21,7 @@ public class EntityDamageByEntityListener implements Listener {
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         Entity entity = event.getEntity();
 
-        if (entity instanceof ItemFrame || (plugin.getVersionManager().is_v1_7() || entity instanceof ArmorStand)) {
+        if (entity instanceof ItemFrame || entity instanceof ArmorStand) {
             event.setCancelled(plugin.getEntityDataManager().getGrave(entity) != null);
         }
     }
