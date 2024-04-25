@@ -123,7 +123,8 @@ public final class FurnitureLib extends EntityDataManager {
     }
 
     private void setSign(Block block, List<String> stringList, Grave grave) {
-        if (block.getState() instanceof Sign sign) {
+        if (block.getState() instanceof Sign) {
+            Sign sign = (Sign) block.getState();
             int counter = 0;
 
             for (String string : stringList) {

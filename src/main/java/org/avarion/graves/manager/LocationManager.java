@@ -216,7 +216,8 @@ public final class LocationManager {
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean canBuild(LivingEntity livingEntity, Location location, List<String> permissionList) {
-        if (livingEntity instanceof Player player) {
+        if (livingEntity instanceof Player) {
+            Player player = (Player) livingEntity;
 
             return (!plugin.getConfig("placement.can-build", player, permissionList).getBoolean("placement.can-build")
                     || plugin.getCompatibility().canBuild(player, location, plugin)) && (!plugin.getIntegrationManager()

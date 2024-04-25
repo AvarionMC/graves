@@ -145,7 +145,8 @@ public final class Oraxen extends EntityDataManager {
 
     @SuppressWarnings("deprecation")
     public boolean isCustomBlock(Location location) {
-        if (location.getBlock().getBlockData() instanceof NoteBlock noteBlock) {
+        if (location.getBlock().getBlockData() instanceof NoteBlock) {
+            NoteBlock noteBlock = (NoteBlock) location.getBlock().getBlockData();
 
             return NoteBlockMechanicFactory.getBlockMechanic((int) (noteBlock.getInstrument().getType()) * 25
                                                              + (int) noteBlock.getNote().getId()

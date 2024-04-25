@@ -58,7 +58,8 @@ public final class EntityManager extends EntityDataManager {
             ItemMeta itemMeta = itemStack.getItemMeta();
 
             if (itemMeta != null) {
-                if (plugin.getVersionManager().hasCompassMeta() && itemMeta instanceof CompassMeta compassMeta) {
+                if (plugin.getVersionManager().hasCompassMeta() && itemMeta instanceof CompassMeta) {
+                    CompassMeta compassMeta = (CompassMeta) itemMeta;
 
                     compassMeta.setLodestoneTracked(false);
                     compassMeta.setLodestone(location);
@@ -160,7 +161,8 @@ public final class EntityManager extends EntityDataManager {
             }
 
             if (locationTeleport != null && locationTeleport.getWorld() != null) {
-                if (entity instanceof Player player) {
+                if (entity instanceof Player) {
+                    Player player = (Player) entity;
 
                     if (plugin.getIntegrationManager().hasVault()) {
                         double teleportCost = getTeleportCost(entity.getLocation(), locationTeleport, grave);
@@ -282,8 +284,10 @@ public final class EntityManager extends EntityDataManager {
         playPlayerSound(string, entity, location, permissionList, 1, 1);
     }
 
-    public void playPlayerSound(String string, Entity entity, Location location, List<String> permissionList, float volume, float pitch) {
-        if (entity instanceof Player player) {
+    public void playPlayerSound(String string, Entity entity, Location location, List<String> permissionList,
+                                float volume, float pitch) {
+        if (entity instanceof Player) {
+            Player player = (Player) entity;
             string = plugin.getConfig(string, entity, permissionList).getString(string);
 
             if (string != null && !string.equals("")) {
@@ -298,7 +302,8 @@ public final class EntityManager extends EntityDataManager {
     }
 
     public void sendMessage(String string, CommandSender commandSender) {
-        if (commandSender instanceof Player player) {
+        if (commandSender instanceof Player) {
+            Player player = (Player) commandSender;
 
             sendMessage(string, player, player.getLocation(), null, plugin.getPermissionList(player));
         }
@@ -329,7 +334,8 @@ public final class EntityManager extends EntityDataManager {
     }
 
     private void sendMessage(String string, Entity entity, String name, Location location, Grave grave, List<String> permissionList) {
-        if (entity instanceof Player player) {
+        if (entity instanceof Player) {
+            Player player = (Player) entity;
 
             if (grave != null) {
                 string = plugin.getConfig(string, grave).getString(string);
@@ -548,7 +554,8 @@ public final class EntityManager extends EntityDataManager {
 
             Entity entity = location.getWorld().spawnEntity(location, entityType);
 
-            if (entity instanceof LivingEntity livingEntity) {
+            if (entity instanceof LivingEntity) {
+                LivingEntity livingEntity = (LivingEntity) entity;
 
                 if (livingEntity.getEquipment() != null) {
                     if (plugin.getConfig("zombie.owner-head", grave).getBoolean("zombie.owner-head")) {
@@ -587,15 +594,14 @@ public final class EntityManager extends EntityDataManager {
                     setDataString(livingEntity, "gravePermissionList", String.join("|", grave.getPermissionList()));
                 }
 
-                if (livingEntity instanceof Mob
-                    && targetEntity != null
-                    && !targetEntity.isInvulnerable()
-                    && (!(targetEntity instanceof Player)
-                        || ((Player) targetEntity).getGameMode() != GameMode.CREATIVE)) {
+                if (livingEntity instanceof Mob && targetEntity != null && !targetEntity.isInvulnerable()
+                        && (!(targetEntity instanceof Player) || ((Player) targetEntity).getGameMode()
+                        != GameMode.CREATIVE)) {
                     ((Mob) livingEntity).setTarget(targetEntity);
                 }
 
-                if (livingEntity instanceof Zombie zombie) {
+                if (livingEntity instanceof Zombie) {
+                    Zombie zombie = (Zombie) livingEntity;
 
                     if (zombie.isBaby()) {
                         zombie.setBaby(false);
@@ -803,9 +809,8 @@ public final class EntityManager extends EntityDataManager {
     public String getEntityName(Entity entity) {
         if (entity != null) {
             if (entity instanceof Player) {
-                return entity.getName(); // Need redundancy for legacy support
-            }
-            else if (!plugin.getVersionManager().is_v1_7()) {
+                return ((Player) entity).getName(); // Need redundancy for legacy support
+            } else if (!plugin.getVersionManager().is_v1_7()) {
                 return entity.getName();
             }
 

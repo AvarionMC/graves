@@ -28,12 +28,11 @@ public class InventoryClickListener implements Listener {
             if (inventoryHolder instanceof Grave) {
                 Grave grave = (Grave) inventoryHolder;
 
-                plugin.getServer()
-                      .getScheduler()
-                      .runTaskLater(plugin, () -> plugin.getDataManager()
-                                                        .updateGrave(grave, "inventory", InventoryUtil.inventoryToString(grave.getInventory())), 1L);
-            }
-            else if (event.getWhoClicked() instanceof Player player) {
+                plugin.getServer().getScheduler().runTaskLater(plugin, () ->
+                        plugin.getDataManager().updateGrave(grave, "inventory",
+                                InventoryUtil.inventoryToString(grave.getInventory())), 1L);
+            } else if (event.getWhoClicked() instanceof Player) {
+                Player player = (Player) event.getWhoClicked();
 
                 if (inventoryHolder instanceof GraveList) {
                     GraveList graveList = (GraveList) event.getInventory().getHolder();
@@ -47,8 +46,7 @@ public class InventoryClickListener implements Listener {
                     }
 
                     event.setCancelled(true);
-                }
-                else if (inventoryHolder instanceof GraveMenu) {
+                } else if (inventoryHolder instanceof GraveMenu) {
                     GraveMenu graveMenu = (GraveMenu) event.getInventory().getHolder();
                     Grave grave = graveMenu.getGrave();
 

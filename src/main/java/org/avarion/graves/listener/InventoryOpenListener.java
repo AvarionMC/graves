@@ -18,7 +18,8 @@ public class InventoryOpenListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onInventoryOpen(InventoryOpenEvent event) {
-        if (event.getInventory().getHolder() instanceof Grave grave) {
+        if (event.getInventory().getHolder() instanceof Grave) {
+            Grave grave = (Grave) event.getInventory().getHolder();
             GraveOpenEvent graveOpenEvent = new GraveOpenEvent(event.getView(), grave);
 
             plugin.getServer().getPluginManager().callEvent(graveOpenEvent);

@@ -86,7 +86,8 @@ public final class GraveManager {
                     // Entity data
                     for (EntityData entityData : new ArrayList<>(chunkData.getEntityDataMap().values())) {
                         if (plugin.getCacheManager().getGraveMap().containsKey(entityData.getUUIDGrave())) {
-                            if (plugin.isEnabled() && entityData instanceof HologramData hologramData) {
+                            if (plugin.isEnabled() && entityData instanceof HologramData) {
+                                HologramData hologramData = (HologramData) entityData;
                                 Grave grave = plugin.getCacheManager().getGraveMap().get(hologramData.getUUIDGrave());
 
                                 if (grave != null) {
@@ -150,9 +151,8 @@ public final class GraveManager {
                 InventoryHolder inventoryHolder = player.getOpenInventory().getTopInventory().getHolder();
 
                 try {
-                    if (inventoryHolder instanceof Grave
-                        || inventoryHolder instanceof GraveList
-                        || inventoryHolder instanceof GraveMenu) {
+                    if (inventoryHolder instanceof Grave || inventoryHolder instanceof GraveList
+                            || inventoryHolder instanceof GraveMenu) {
                         player.closeInventory();
                     }
                 }
@@ -297,7 +297,8 @@ public final class GraveManager {
             if (player.getOpenInventory() != null) { // Mohist, might return null even when Bukkit shouldn't.
                 InventoryHolder inventoryHolder = player.getOpenInventory().getTopInventory().getHolder();
 
-                if (inventoryHolder instanceof GraveMenu graveMenu) {
+                if (inventoryHolder instanceof GraveMenu) {
+                    GraveMenu graveMenu = (GraveMenu) inventoryHolder;
 
                     if (graveMenu.getGrave().getUUID().equals(grave.getUUID())) {
                         player.closeInventory();
@@ -452,9 +453,9 @@ public final class GraveManager {
     public List<ItemStack> filterGraveItemStackList(List<ItemStack> itemStackList, List<ItemStack> removedItemStackList, LivingEntity livingEntity, List<String> permissionList) {
         itemStackList = new ArrayList<>(itemStackList);
 
-        if (livingEntity instanceof Player player
-            && getStorageMode(plugin.getConfig("storage.mode", livingEntity, permissionList).getString("storage.mode"))
-               == Grave.StorageMode.EXACT) {
+        if (livingEntity instanceof Player && getStorageMode(plugin.getConfig("storage.mode",
+                livingEntity, permissionList).getString("storage.mode")) == Grave.StorageMode.EXACT) {
+            Player player = (Player) livingEntity;
             List<ItemStack> playerInventoryContentList = Arrays.asList(player.getInventory().getContents());
 
             List<ItemStack> itemStackListNew = new ArrayList<>(playerInventoryContentList);
@@ -559,7 +560,8 @@ public final class GraveManager {
     }
 
     public boolean openGrave(Entity entity, Location location, Grave grave) {
-        if (entity instanceof Player player) {
+        if (entity instanceof Player) {
+            Player player = (Player) entity;
 
             plugin.getEntityManager().swingMainHand(player);
 
@@ -630,7 +632,8 @@ public final class GraveManager {
     }
 
     public void autoLootGrave(Entity entity, Location location, Grave grave) {
-        if (entity instanceof Player player) {
+        if (entity instanceof Player) {
+            Player player = (Player) entity;
             Grave.StorageMode storageMode = getStorageMode(plugin.getConfig("storage.mode", grave)
                                                                  .getString("storage.mode"));
 

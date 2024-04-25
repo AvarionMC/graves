@@ -323,7 +323,8 @@ public class EntityDeathListener implements Listener {
             float experiencePercent = (float) plugin.getConfig("experience.store", grave).getDouble("experience.store");
 
             if (experiencePercent >= 0) {
-                if (livingEntity instanceof Player player) {
+                if (livingEntity instanceof Player) {
+                    Player player = (Player) livingEntity;
 
                     if (player.hasPermission("graves.experience")) {
                         grave.setExperience(ExperienceUtil.getDropPercent(ExperienceUtil.getPlayerExperience(player), experiencePercent));
@@ -355,7 +356,8 @@ public class EntityDeathListener implements Listener {
                 EntityDamageEvent entityDamageEvent = livingEntity.getLastDamageCause();
 
                 if (entityDamageEvent.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK
-                    && entityDamageEvent instanceof EntityDamageByEntityEvent entityDamageByEntityEvent) {
+                        && entityDamageEvent instanceof EntityDamageByEntityEvent) {
+                    EntityDamageByEntityEvent entityDamageByEntityEvent = (EntityDamageByEntityEvent) entityDamageEvent;
 
                     grave.setKillerUUID(entityDamageByEntityEvent.getDamager().getUniqueId());
                     grave.setKillerType(entityDamageByEntityEvent.getDamager().getType());
@@ -507,11 +509,10 @@ public class EntityDeathListener implements Listener {
                                   .runCommands("event.command.block", livingEntity, graveBlockPlaceEvent.getLocation(), grave);
                         }
                     }
-                }
-                else {
-                    if (event instanceof PlayerDeathEvent playerDeathEvent
-                        && plugin.getConfig("placement.failure-keep-inventory", grave)
-                                 .getBoolean("placement.failure-keep-inventory")) {
+                } else {
+                    if (event instanceof PlayerDeathEvent && plugin.getConfig("placement.failure-keep-inventory", grave)
+                            .getBoolean("placement.failure-keep-inventory")) {
+                        PlayerDeathEvent playerDeathEvent = (PlayerDeathEvent) event;
 
                         try {
                             playerDeathEvent.setKeepLevel(true);

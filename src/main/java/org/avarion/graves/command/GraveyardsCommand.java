@@ -23,8 +23,10 @@ public final class GraveyardsCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String string, String[] args) {
-        if (commandSender instanceof Player player) {
+    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command,
+                             @NotNull String string, String[] args) {
+        if (commandSender instanceof Player) {
+            Player player = (Player) commandSender;
 
             // Disable for everyone except Ranull, not ready for production.
             if (!player.getName().equals("Ranull")) {

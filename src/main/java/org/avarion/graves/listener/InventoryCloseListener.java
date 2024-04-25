@@ -19,7 +19,10 @@ public class InventoryCloseListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onInventoryClose(InventoryCloseEvent event) {
-        if (event.getInventory().getHolder() instanceof Grave grave && event.getPlayer() instanceof Player player) {
+        if (event.getInventory().getHolder() instanceof Grave && event.getPlayer() instanceof Player) {
+            Grave grave = (Grave) event.getInventory().getHolder();
+            Player player = (Player) event.getPlayer();
+
             GraveCloseEvent graveCloseEvent = new GraveCloseEvent(event.getView(), grave);
 
             plugin.getServer().getPluginManager().callEvent(graveCloseEvent);

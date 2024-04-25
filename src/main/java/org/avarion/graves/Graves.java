@@ -428,7 +428,7 @@ public class Graves extends JavaPlugin {
 
                         message = name;
                     }
-                    catch (FileNotFoundException | UnsupportedEncodingException exception) {
+                    catch (IOException exception) {
                         exception.printStackTrace();
                     }
                 }
@@ -575,7 +575,8 @@ public class Graves extends JavaPlugin {
         List<String> permissionList = new ArrayList<>();
         List<String> permissionListSorted = new ArrayList<>();
 
-        if (entity instanceof Player player) {
+        if (entity instanceof Player) {
+            Player player = (Player) entity;
 
             for (PermissionAttachmentInfo permissionAttachmentInfo : player.getEffectivePermissions()) {
                 if (permissionAttachmentInfo.getPermission().startsWith("graves.permission.")) {

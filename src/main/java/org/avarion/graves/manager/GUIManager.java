@@ -46,12 +46,11 @@ public final class GUIManager {
                     Inventory inventory = player.getOpenInventory().getTopInventory();
 
                     if (inventory.getHolder() instanceof GraveList) {
-                        plugin.getGUIManager()
-                              .setGraveListItems(inventory, ((GraveList) inventory.getHolder()).getUUID());
-                    }
-                    else if (inventory.getHolder() instanceof GraveMenu) {
-                        plugin.getGUIManager()
-                              .setGraveMenuItems(inventory, ((GraveMenu) inventory.getHolder()).getGrave());
+                        plugin.getGUIManager().setGraveListItems(inventory,
+                                ((GraveList) inventory.getHolder()).getUUID());
+                    } else if (inventory.getHolder() instanceof GraveMenu) {
+                        plugin.getGUIManager().setGraveMenuItems(inventory,
+                                ((GraveMenu) inventory.getHolder()).getGrave());
                     }
                 }
             }
@@ -59,7 +58,8 @@ public final class GUIManager {
     }
 
     public void openGraveList(Entity entity, UUID uuid, boolean sound) {
-        if (entity instanceof Player player) {
+        if (entity instanceof Player) {
+            Player player = (Player) entity;
             List<String> permissionList = plugin.getPermissionList(player);
             List<Grave> playerGraveList = plugin.getGraveManager().getGraveList(uuid);
 
@@ -103,7 +103,8 @@ public final class GUIManager {
     }
 
     public void openGraveMenu(Entity entity, Grave grave, boolean sound) {
-        if (entity instanceof Player player) {
+        if (entity instanceof Player) {
+            Player player = (Player) entity;
             GraveMenu graveMenu = new GraveMenu(grave);
             String title = StringUtil.parseString(plugin.getConfig("gui.menu.grave.title", player, grave.getPermissionList())
                                                         .getString("gui.menu.grave.title", "Grave"), player, plugin);

@@ -234,13 +234,16 @@ public final class WorldEdit {
     private AffineTransform getYawTransform(float yaw) {
         AffineTransform affineTransform = new AffineTransform();
 
-        return switch (BlockFaceUtil.getSimpleBlockFace(BlockFaceUtil.getYawBlockFace(yaw))) {
-            case SOUTH -> affineTransform.rotateY(180);
-            case EAST -> affineTransform.rotateY(270);
-            case WEST -> affineTransform.rotateY(90);
-            default -> affineTransform;
-        };
+        switch (BlockFaceUtil.getSimpleBlockFace(BlockFaceUtil.getYawBlockFace(yaw))) {
+            case SOUTH:
+                return affineTransform.rotateY(180);
+            case EAST:
+                return affineTransform.rotateY(270);
+            case WEST:
+                return affineTransform.rotateY(90);
+        }
 
+        return affineTransform;
     }
 
     public BlockVector3 locationToBlockVector3(Location location) {
