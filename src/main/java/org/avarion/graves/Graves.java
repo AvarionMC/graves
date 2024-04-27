@@ -37,7 +37,6 @@ public class Graves extends JavaPlugin {
 
     private VersionManager versionManager;
     private IntegrationManager integrationManager;
-    private CacheManager cacheManager;
     private DataManager dataManager;
     private ImportManager importManager;
     private BlockManager blockManager;
@@ -68,7 +67,6 @@ public class Graves extends JavaPlugin {
         integrationManager.load();
 
         versionManager = new VersionManager();
-        cacheManager = new CacheManager();
         dataManager = new DataManager(this);
         importManager = new ImportManager(this);
         blockManager = new BlockManager(this);
@@ -194,7 +192,7 @@ public class Graves extends JavaPlugin {
         metrics.addCustomChart(new SingleLineChart("graves", new Callable<Integer>() {
             @Override
             public Integer call() throws Exception {
-                return cacheManager.getGraveMap().size();
+                return CacheManager.graveMap.size();
             }
         }));
     }
@@ -461,10 +459,6 @@ public class Graves extends JavaPlugin {
 
     public EntityDataManager getEntityDataManager() {
         return entityDataManager;
-    }
-
-    public CacheManager getCacheManager() {
-        return cacheManager;
     }
 
     public DataManager getDataManager() {

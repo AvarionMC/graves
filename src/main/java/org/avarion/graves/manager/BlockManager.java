@@ -36,8 +36,8 @@ public final class BlockManager {
     public Grave getGraveFromBlock(Block block) {
         BlockData blockData = getBlockData(block);
 
-        return blockData != null && plugin.getCacheManager().getGraveMap().containsKey(blockData.getGraveUUID())
-               ? plugin.getCacheManager().getGraveMap().get(blockData.getGraveUUID())
+        return blockData != null && CacheManager.graveMap.containsKey(blockData.getGraveUUID())
+               ? CacheManager.graveMap.get(blockData.getGraveUUID())
                : null;
     }
 
@@ -112,7 +112,7 @@ public final class BlockManager {
     public List<BlockData> getBlockDataList(Grave grave) {
         List<BlockData> blockDataList = new ArrayList<>();
 
-        for (Map.Entry<String, ChunkData> chunkDataEntry : plugin.getCacheManager().getChunkMap().entrySet()) {
+        for (Map.Entry<String, ChunkData> chunkDataEntry : CacheManager.allChunks.entrySet()) {
             for (BlockData blockData : new ArrayList<>(chunkDataEntry.getValue().getBlockDataMap().values())) {
                 if (grave.getUUID().equals(blockData.getGraveUUID())) {
                     blockDataList.add(blockData);
@@ -126,7 +126,7 @@ public final class BlockManager {
     public List<Location> getBlockList(Grave grave) {
         List<Location> locationList = new ArrayList<>();
 
-        for (Map.Entry<String, ChunkData> chunkDataEntry : plugin.getCacheManager().getChunkMap().entrySet()) {
+        for (Map.Entry<String, ChunkData> chunkDataEntry : CacheManager.allChunks.entrySet()) {
             for (BlockData blockData : new ArrayList<>(chunkDataEntry.getValue().getBlockDataMap().values())) {
                 if (grave.getUUID().equals(blockData.getGraveUUID())) {
                     locationList.add(blockData.getLocation());
@@ -138,7 +138,7 @@ public final class BlockManager {
     }
 
     public void removeBlock(Grave grave) {
-        for (ChunkData chunkData : plugin.getCacheManager().getChunkMap().values()) {
+        for (ChunkData chunkData : CacheManager.allChunks.values()) {
 
             if (chunkData.isLoaded()) {
                 for (BlockData blockData : new ArrayList<>(chunkData.getBlockDataMap().values())) {

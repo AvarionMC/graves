@@ -1,6 +1,7 @@
 package org.avarion.graves.listener;
 
 import org.avarion.graves.Graves;
+import org.avarion.graves.manager.CacheManager;
 import org.avarion.graves.type.Grave;
 import org.avarion.graves.type.Graveyard;
 import org.bukkit.GameMode;
@@ -103,8 +104,8 @@ public class PlayerInteractListener implements Listener {
                 UUID uuid = plugin.getEntityManager().getGraveUUIDFromItemStack(itemStack);
 
                 if (uuid != null) {
-                    if (plugin.getCacheManager().getGraveMap().containsKey(uuid)) {
-                        Grave grave = plugin.getCacheManager().getGraveMap().get(uuid);
+                    if (CacheManager.graveMap.containsKey(uuid)) {
+                        Grave grave = CacheManager.graveMap.get(uuid);
                         List<Location> locationList = plugin.getGraveManager()
                                                             .getGraveLocationList(player.getLocation(), grave);
 

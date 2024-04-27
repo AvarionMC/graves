@@ -42,7 +42,7 @@ public final class GraveManager {
             List<BlockData> blockDataRemoveList = new ArrayList<>();
 
             // Graves
-            for (Map.Entry<UUID, Grave> entry : plugin.getCacheManager().getGraveMap().entrySet()) {
+            for (Map.Entry<UUID, Grave> entry : CacheManager.graveMap.entrySet()) {
                 Grave grave = entry.getValue();
 
                 if (grave.getTimeAliveRemaining() >= 0 && grave.getTimeAliveRemaining() <= 1000) {
@@ -77,7 +77,7 @@ public final class GraveManager {
             }
 
             // Chunks
-            for (Map.Entry<String, ChunkData> entry : plugin.getCacheManager().getChunkMap().entrySet()) {
+            for (Map.Entry<String, ChunkData> entry : CacheManager.allChunks.entrySet()) {
                 ChunkData chunkData = entry.getValue();
 
                 if (chunkData.isLoaded()) {
@@ -86,9 +86,9 @@ public final class GraveManager {
 
                     // Entity data
                     for (EntityData entityData : new ArrayList<>(chunkData.getEntityDataMap().values())) {
-                        if (plugin.getCacheManager().getGraveMap().containsKey(entityData.getUUIDGrave())) {
+                        if (CacheManager.graveMap.containsKey(entityData.getUUIDGrave())) {
                             if (plugin.isEnabled() && entityData instanceof HologramData hologramData) {
-                                Grave grave = plugin.getCacheManager().getGraveMap().get(hologramData.getUUIDGrave());
+                                Grave grave = CacheManager.graveMap.get(hologramData.getUUIDGrave());
 
                                 if (grave != null) {
                                     List<String> lineList = plugin.getConfig("hologram.line", grave)
@@ -117,9 +117,8 @@ public final class GraveManager {
                     // Blocks
                     for (BlockData blockData : new ArrayList<>(chunkData.getBlockDataMap().values())) {
                         if (blockData.getLocation().getWorld() != null) {
-                            if (plugin.getCacheManager().getGraveMap().containsKey(blockData.getGraveUUID())) {
-                                graveParticle(blockData.getLocation(), plugin.getCacheManager()
-                                                                             .getGraveMap()
+                            if (CacheManager.graveMap.containsKey(blockData.getGraveUUID())) {
+                                graveParticle(blockData.getLocation(), CacheManager.graveMap
                                                                              .get(blockData.getGraveUUID()));
                             }
                             else {
@@ -374,7 +373,7 @@ public final class GraveManager {
                     continue;
                 }
 
-                if (curPos >= 36) { // armor & offhand
+                if (curPos >= 36 && curPos <= 40) { // armor & offhand
                     inventory.setItem(curPos, itemStack);
                 }
                 else {
@@ -404,10 +403,6 @@ public final class GraveManager {
         }
 
         return null;
-    }
-
-    public List<ItemStack> filterGraveItemStackList(List<ItemStack> itemStackList, LivingEntity livingEntity, List<String> permissionList) {
-        return filterGraveItemStackList(itemStackList, new ArrayList<>(), livingEntity, permissionList);
     }
 
     public List<ItemStack> filterGraveItemStackList(List<ItemStack> itemStackList, List<ItemStack> removedItemStackList, LivingEntity livingEntity, List<String> permissionList) {
@@ -448,10 +443,6 @@ public final class GraveManager {
         }
 
         return itemStackList;
-    }
-
-    public void breakGrave(Grave grave) {
-        breakGrave(grave.getLocationDeath(), grave);
     }
 
     public void breakGrave(Location location, Grave grave) {
@@ -506,7 +497,7 @@ public final class GraveManager {
     public List<Grave> getGraveList(UUID uuid) {
         List<Grave> graveList = new ArrayList<>();
 
-        plugin.getCacheManager().getGraveMap().forEach((key, value) -> {
+        CacheManager.graveMap.forEach((key, value) -> {
             if (value.getOwnerUUID() != null && value.getOwnerUUID().equals(uuid)) {
                 graveList.add(value);
             }

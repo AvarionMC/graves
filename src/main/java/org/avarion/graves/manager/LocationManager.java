@@ -22,11 +22,11 @@ public final class LocationManager {
     }
 
     public void setLastSolidLocation(Entity entity, Location location) {
-        plugin.getCacheManager().getLastLocationMap().put(entity.getUniqueId(), location);
+        CacheManager.lastLocations.put(entity.getUniqueId(), location);
     }
 
     public Location getLastSolidLocation(Entity entity) {
-        Location location = plugin.getCacheManager().getLastLocationMap().get(entity.getUniqueId());
+        Location location = CacheManager.lastLocations.get(entity.getUniqueId());
 
         return location != null
                && location.getWorld() != null
@@ -35,7 +35,7 @@ public final class LocationManager {
     }
 
     public void removeLastSolidLocation(Entity entity) {
-        plugin.getCacheManager().getLastLocationMap().remove(entity.getUniqueId());
+        CacheManager.lastLocations.remove(entity.getUniqueId());
     }
 
     public Location getSafeTeleportLocation(Entity entity, Location location, Grave grave, Graves plugin) {

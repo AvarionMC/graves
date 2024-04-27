@@ -6,6 +6,7 @@ import org.avarion.graves.Graves;
 import org.avarion.graves.data.ChunkData;
 import org.avarion.graves.data.EntityData;
 import org.avarion.graves.listener.integration.playernpc.NPCInteractListener;
+import org.avarion.graves.manager.CacheManager;
 import org.avarion.graves.manager.EntityDataManager;
 import org.avarion.graves.type.Grave;
 import org.bukkit.ChatColor;
@@ -49,11 +50,11 @@ public final class PlayerNPC extends EntityDataManager {
     }
 
     public void createCorpses() {
-        for (ChunkData chunkData : plugin.getCacheManager().getChunkMap().values()) {
+        for (ChunkData chunkData : CacheManager.allChunks.values()) {
             for (EntityData entityData : chunkData.getEntityDataMap().values()) {
                 if (entityData.getType() == EntityData.Type.PLAYERNPC) {
-                    if (plugin.getCacheManager().getGraveMap().containsKey(entityData.getUUIDGrave())) {
-                        Grave grave = plugin.getCacheManager().getGraveMap().get(entityData.getUUIDGrave());
+                    if (CacheManager.graveMap.containsKey(entityData.getUUIDGrave())) {
+                        Grave grave = CacheManager.graveMap.get(entityData.getUUIDGrave());
 
                         if (grave != null) {
                             plugin.getIntegrationManager()

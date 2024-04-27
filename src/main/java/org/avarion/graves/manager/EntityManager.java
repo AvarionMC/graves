@@ -20,6 +20,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.NumberConversions;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -120,13 +121,9 @@ public final class EntityManager extends EntityDataManager {
 
     public UUID getGraveUUIDFromItemStack(ItemStack itemStack) {
         if (itemStack != null && itemStack.getItemMeta() != null) {
-            if (itemStack.getItemMeta()
-                         .getPersistentDataContainer()
-                         .has(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING)) {
-                return UUIDUtil.getUUID(itemStack.getItemMeta()
-                                                 .getPersistentDataContainer()
-                                                 .get(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING));
-            }
+            return UUIDUtil.getUUID(itemStack.getItemMeta()
+                                             .getPersistentDataContainer()
+                                             .get(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING));
         }
 
         return null;
@@ -796,20 +793,8 @@ public final class EntityManager extends EntityDataManager {
         return equipmentSlotItemStackMap;
     }
 
-    @SuppressWarnings("redundant")
-    public String getEntityName(Entity entity) {
-        if (entity != null) {
-            if (entity instanceof Player) {
-                return entity.getName(); // Need redundancy for legacy support
-            }
-            else if (true) {
-                return entity.getName();
-            }
-
-            return StringUtil.format(entity.getType().toString());
-        }
-
-        return "null";
+    public @NotNull String getEntityName(Entity entity) {
+        return entity != null ? entity.getName() : "null";
     }
 
     public boolean hasDataString(Entity entity, String string) {
@@ -850,8 +835,7 @@ public final class EntityManager extends EntityDataManager {
     public Grave getGraveFromEntityData(Entity entity) {
         if (entity.getPersistentDataContainer()
                   .has(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING)) {
-            return plugin.getCacheManager()
-                         .getGraveMap()
+            return CacheManager.graveMap
                          .get(UUIDUtil.getUUID(entity.getPersistentDataContainer()
                                                      .get(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING)));
         }
@@ -859,7 +843,7 @@ public final class EntityManager extends EntityDataManager {
             List<MetadataValue> metadataValue = entity.getMetadata("graveUUID");
 
             if (!metadataValue.isEmpty()) {
-                return plugin.getCacheManager().getGraveMap().get(UUIDUtil.getUUID(metadataValue.get(0).asString()));
+                return CacheManager.graveMap.get(UUIDUtil.getUUID(metadataValue.get(0).asString()));
             }
         }
 

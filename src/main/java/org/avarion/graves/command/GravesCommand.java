@@ -1,6 +1,7 @@
 package org.avarion.graves.command;
 
 import org.avarion.graves.Graves;
+import org.avarion.graves.manager.CacheManager;
 import org.avarion.graves.type.Grave;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -285,7 +286,7 @@ public final class GravesCommand implements CommandExecutor, TabCompleter {
         }
         else if (args[0].equalsIgnoreCase("cleanup")) {
             if (commandSender.hasPermission("graves.cleanup")) {
-                List<Grave> graveList = new ArrayList<>(plugin.getCacheManager().getGraveMap().values());
+                List<Grave> graveList = new ArrayList<>(CacheManager.graveMap.values());
 
                 for (Grave grave : graveList) {
                     plugin.getGraveManager().removeGrave(grave);
@@ -328,7 +329,7 @@ public final class GravesCommand implements CommandExecutor, TabCompleter {
                     }
                 }
                 else {
-                    List<Grave> graveList = new ArrayList<>(plugin.getCacheManager().getGraveMap().values());
+                    List<Grave> graveList = new ArrayList<>(CacheManager.graveMap.values());
 
                     for (Grave grave : graveList) {
                         plugin.getGraveManager().removeGrave(grave);

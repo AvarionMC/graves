@@ -4,6 +4,7 @@ import org.avarion.graves.Graves;
 import org.avarion.graves.data.BlockData;
 import org.avarion.graves.event.GraveBlockPlaceEvent;
 import org.avarion.graves.event.GraveCreateEvent;
+import org.avarion.graves.manager.CacheManager;
 import org.avarion.graves.type.Grave;
 import org.avarion.graves.type.Graveyard;
 import org.avarion.graves.util.*;
@@ -21,6 +22,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -32,30 +34,139 @@ public class EntityDeathListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onEntityDeath(EntityDeathEvent event) {
-        LivingEntity livingEntity = event.getEntity();
-        String entityName = plugin.getEntityManager().getEntityName(livingEntity);
-        Location location = LocationUtil.roundLocation(livingEntity.getLocation());
-        List<String> permissionList = livingEntity instanceof Player ? plugin.getPermissionList(livingEntity) : null;
-        List<String> worldList = plugin.getConfig("world", livingEntity, permissionList).getStringList("world");
-        List<ItemStack> removedItemStackList = new ArrayList<>();
+    // [11:59:33 INFO]: [MaterialLogger] onPlayerDeathEvent: LOW
+    // [11:59:33 INFO]: [MaterialLogger] onEntityDeath: LOW
+    // [11:59:33 INFO]: [MaterialLogger] onPlayerDeathEvent: NORMAL
+    // [11:59:33 INFO]: [MaterialLogger] onEntityDeath: NORMAL
+    // [11:59:33 INFO]: [MaterialLogger] onPlayerDeathEvent: HIGH
+    // [11:59:33 INFO]: [MaterialLogger] onEntityDeath: HIGH
+    // [11:59:33 INFO]: [MaterialLogger] onPlayerDeathEvent: HIGHEST
+    // [11:59:33 INFO]: [MaterialLogger] onEntityDeath: HIGHEST
+    // [11:59:33 INFO]: [MaterialLogger] onPlayerDeathEvent: MONITOR
+    // [11:59:33 INFO]: [MaterialLogger] onEntityDeath: MONITOR
 
-        // Removed items
-        if (plugin.getCacheManager().getRemovedItemStackMap().containsKey(livingEntity.getUniqueId())) {
-            removedItemStackList.addAll(plugin.getCacheManager()
-                                              .getRemovedItemStackMap()
-                                              .get(livingEntity.getUniqueId()));
-            plugin.getCacheManager().getRemovedItemStackMap().remove(livingEntity.getUniqueId());
+
+    private void onPlayerDeath(@NotNull PlayerDeathEvent event) {
+        Player player = event.getEntity();
+        String playerName = player.getName();
+
+        if (plugin.getGraveyardManager().isModifyingGraveyard(player)) {
+            plugin.getGraveyardManager().stopModifyingGraveyard(player);
         }
 
-        // Mohist
-        if (event.getEntityType() == EntityType.PLAYER && !(event instanceof PlayerDeathEvent)) {
-            event.getDrops().clear();
-            event.setDroppedExp(0);
+        if (!player.hasPermission("graves.place")) {
+            plugin.debugMessage("Grave not created for "
+                                + playerName
+                                + " because they don't have permission to place graves", 2);
 
             return;
         }
+        else if (player.hasPermission("essentials.keepinv")) {
+            plugin.debugMessage(playerName + " has essentials.keepinv", 2);
+        }
+
+        if (event.getKeepInventory()) {
+            plugin.debugMessage("Grave not created for " + playerName + " because they had keep inventory", 2);
+            return;
+        }
+
+        // Rework our inventory now
+        ItemStack[] inv = player.getInventory().getContents().clone();
+        if (shouldRemoveCompass(player)) {
+            removeCompass(inv);
+        }
+        removeItemsWhichArentInDrops(inv, event.getDrops());
+
+
+        // Empty inventory
+        if (event.getDrops().isEmpty()) {
+            plugin.debugMessage("Grave not created for " + playerName + " because they had an empty inventory", 2);
+            return;
+        }
+
+    }
+
+    private boolean shouldRemoveCompass(@NotNull Player player) {
+        return plugin.getConfig("compass.destroy", player).getBoolean("compass.destroy");
+    }
+
+    private void removeCompass(ItemStack @NotNull [] inventory) {
+        for (int i = 0, total = inventory.length; i < total; i++) {
+            ItemStack item = inventory[i];
+
+            if (plugin.getEntityManager().getGraveUUIDFromItemStack(item) != null) {
+                inventory[i] = null;
+            }
+        }
+    }
+
+    private void removeItemsWhichArentInDrops(ItemStack @NotNull [] inventory, List<ItemStack> drops) {
+        for (int i = 0, total = inventory.length; i < total; i++) {
+            ItemStack item = inventory[i];
+            if (item == null) {
+                continue;
+            }
+
+            if (!drops.remove(item)) {
+                inventory[i] = null;  // Item wasn't in the drops!
+            }
+        }
+    }
+
+    private boolean areGravesAllowedOnThisWorld(LivingEntity entity, List<String> permissionList) {
+        List<String> worldList = plugin.getConfig("world", entity, permissionList).getStringList("world");
+
+        // World
+        if (!worldList.contains("ALL") && !worldList.contains(entity.getWorld().getName())) {
+            plugin.debugMessage("Grave not created for "
+                                + entity.getName()
+                                + " because they are not in a valid world", 2);
+
+            return false;
+        }
+        return true;
+    }
+
+    private boolean areGravesEnabledForPlayer(LivingEntity livingEntity, List<String> permissionList) {
+        return plugin.getConfig("grave.enabled", livingEntity, permissionList).getBoolean("grave.enabled");
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onEntityDeath(@NotNull EntityDeathEvent event) {
+        LivingEntity entity = event.getEntity();
+        List<String> permissionList = entity instanceof Player ? plugin.getPermissionList(entity) : null;
+
+        if (!areGravesAllowedOnThisWorld(entity, permissionList)) {
+            return;
+        }
+        if (!areGravesEnabledForPlayer(entity, permissionList)) {
+            if (entity instanceof Player player) {
+                plugin.debugMessage("Grave not created for "
+                                    + player.getName()
+                                    + " because they have graves disabled", 2);
+            }
+            return;
+        }
+
+        if (event.getEntityType() == EntityType.PLAYER) {
+            if (event instanceof PlayerDeathEvent) {
+                onPlayerDeath((PlayerDeathEvent) event);
+            }
+            else {
+                // Mohist
+                event.getDrops().clear();
+                event.setDroppedExp(0);
+            }
+            return;
+        }
+        else if (entity instanceof Creature && onCreatureDeath(entity, permissionList)) {
+            return;
+        }
+
+
+        /////////////////////////////// IN REWORK ---v
+        LivingEntity livingEntity = event.getEntity();
+        Location location = LocationUtil.roundLocation(livingEntity.getLocation());
 
         // Grave zombie
         if (plugin.getEntityManager().hasDataByte(livingEntity, "graveZombie")) {
@@ -79,76 +190,8 @@ public class EntityDeathListener implements Listener {
             return;
         }
 
-        // Player
-        if (livingEntity instanceof Player) {
-            Player player = (Player) livingEntity;
-
-            if (plugin.getGraveyardManager().isModifyingGraveyard(player)) {
-                plugin.getGraveyardManager().stopModifyingGraveyard(player);
-            }
-
-            if (!player.hasPermission("graves.place")) {
-                plugin.debugMessage("Grave not created for "
-                                    + entityName
-                                    + " because they don't have permission to place graves", 2);
-
-                return;
-            }
-            else if (player.hasPermission("essentials.keepinv")) {
-                plugin.debugMessage(entityName + " has essentials.keepinv", 2);
-            }
-        }
-
-        // Enabled
-        if (!plugin.getConfig("grave.enabled", livingEntity, permissionList).getBoolean("grave.enabled")) {
-            if (livingEntity instanceof Player) {
-                plugin.debugMessage("Grave not created for " + entityName + " because they have graves disabled", 2);
-            }
-
-            return;
-        }
-
-        // Keep inventory
-        if (event instanceof PlayerDeathEvent) {
-            try {
-                if (((PlayerDeathEvent) event).getKeepInventory()) {
-                    plugin.debugMessage("Grave not created for " + entityName + " because they had keep inventory", 2);
-
-                    return;
-                }
-            }
-            catch (NoSuchMethodError ignored) {
-            }
-        }
-
-        // Empty inventory
-        if (event.getDrops().size() <= 0) {
-            plugin.debugMessage("Grave not created for " + entityName + " because they had an empty inventory", 2);
-
-            return;
-        }
-
         // Creature spawn reason
         if (livingEntity instanceof Creature) {
-            List<String> spawnReasonList = plugin.getConfig("spawn.reason", livingEntity, permissionList)
-                                                 .getStringList("spawn.reason");
-
-            if (plugin.getEntityManager().hasDataString(livingEntity, "spawnReason")
-                && (!spawnReasonList.contains("ALL") && !spawnReasonList.contains(plugin.getEntityManager()
-                                                                                        .getDataString(livingEntity, "spawnReason")))) {
-                plugin.debugMessage("Grave not created for "
-                                    + entityName
-                                    + " because they had an invalid spawn reason", 2);
-
-                return;
-            }
-        }
-
-        // World
-        if (!worldList.contains("ALL") && !worldList.contains(livingEntity.getWorld().getName())) {
-            plugin.debugMessage("Grave not created for " + entityName + " because they are not in a valid world", 2);
-
-            return;
         }
 
         // Ignore
@@ -527,6 +570,23 @@ public class EntityDeathListener implements Listener {
         else {
             plugin.debugMessage("Grave not created for " + entityName + " because they had no drops", 2);
         }
+    }
+
+    private boolean onCreatureDeath(LivingEntity entity, List<String> permissionList) {
+        List<String> spawnReasonList = plugin.getConfig("spawn.reason", entity, permissionList)
+                                             .getStringList("spawn.reason");
+
+        if (plugin.getEntityManager().hasDataString(entity, "spawnReason") && (!spawnReasonList.contains("ALL")
+                                                                               && !spawnReasonList.contains(plugin.getEntityManager()
+                                                                                                                  .getDataString(entity, "spawnReason")))) {
+            plugin.debugMessage("Grave not created for "
+                                + entity.getName()
+                                + " because they had an invalid spawn reason", 2);
+
+            return true;
+        }
+
+        return false;
     }
 
 }

@@ -141,27 +141,27 @@ public final class DataManager {
     }
 
     public boolean hasChunkData(Location location) {
-        return plugin.getCacheManager().getChunkMap().containsKey(LocationUtil.chunkToString(location));
+        return CacheManager.allChunks.containsKey(LocationUtil.chunkToString(location));
     }
 
     public ChunkData getChunkData(Location location) {
         String chunkString = LocationUtil.chunkToString(location);
         ChunkData chunkData;
 
-        if (plugin.getCacheManager().getChunkMap().containsKey(chunkString)) {
-            chunkData = plugin.getCacheManager().getChunkMap().get(chunkString);
+        if (CacheManager.allChunks.containsKey(chunkString)) {
+            chunkData = CacheManager.allChunks.get(chunkString);
         }
         else {
             chunkData = new ChunkData(location);
 
-            plugin.getCacheManager().getChunkMap().put(chunkString, chunkData);
+            CacheManager.allChunks.put(chunkString, chunkData);
         }
 
         return chunkData;
     }
 
     public void removeChunkData(ChunkData chunkData) {
-        plugin.getCacheManager().getChunkMap().remove(LocationUtil.chunkToString(chunkData.getLocation()));
+        CacheManager.allChunks.remove(LocationUtil.chunkToString(chunkData.getLocation()));
     }
 
     public List<String> getColumnList(String tableName) {
@@ -290,7 +290,7 @@ public final class DataManager {
     }
 
     private void loadGraveMap() {
-        plugin.getCacheManager().getGraveMap().clear();
+        CacheManager.graveMap.clear();
 
         ResultSet resultSet = executeQuery("SELECT * FROM grave;");
 
@@ -300,7 +300,7 @@ public final class DataManager {
                     Grave grave = resultSetToGrave(resultSet);
 
                     if (grave != null) {
-                        plugin.getCacheManager().getGraveMap().put(grave.getUUID(), grave);
+                        CacheManager.graveMap.put(grave.getUUID(), grave);
                     }
                 }
             }
@@ -540,7 +540,7 @@ public final class DataManager {
     }
 
     public void addGrave(Grave grave) {
-        plugin.getCacheManager().getGraveMap().put(grave.getUUID(), grave);
+        CacheManager.graveMap.put(grave.getUUID(), grave);
 
         String uuid = grave.getUUID() != null ? "'" + grave.getUUID() + "'" : "NULL";
         String ownerType = grave.getOwnerType() != null ? "'" + grave.getOwnerType() + "'" : "NULL";
@@ -636,7 +636,7 @@ public final class DataManager {
     }
 
     public void removeGrave(UUID uuid) {
-        plugin.getCacheManager().getGraveMap().remove(uuid);
+        CacheManager.graveMap.remove(uuid);
 
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
             executeUpdate("DELETE FROM grave WHERE uuid = '" + uuid + "';");
