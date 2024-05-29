@@ -8,13 +8,10 @@ public final class MaterialUtil {
     }
 
     public static boolean isLava(String string) {
-        switch (string) {
-            case "LAVA":
-            case "STATIONARY_LAVA":
-                return true;
-            default:
-                return false;
-        }
+        return switch (string) {
+            case "LAVA", "STATIONARY_LAVA" -> true;
+            default -> false;
+        };
     }
 
     public static boolean isSafeNotSolid(Material material) {
@@ -34,13 +31,10 @@ public final class MaterialUtil {
     }
 
     private static boolean isSafe(String string) {
-        switch (string) {
-            case "SCAFFOLDING":
-            case "POWDER_SNOW":
-                return true;
-            default:
-                return false;
-        }
+        return switch (string) {
+            case "SCAFFOLDING", "POWDER_SNOW" -> true;
+            default -> false;
+        };
     }
 
     public static boolean isWater(Material material) {
@@ -48,27 +42,17 @@ public final class MaterialUtil {
     }
 
     public static boolean isWater(String string) {
-        switch (string) {
-            case "WATER":
-            case "STATIONARY_WATER":
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    public static boolean isPlayerHead(Material material) {
-        return isPlayerHead(material.name());
+        return switch (string) {
+            case "WATER", "STATIONARY_WATER" -> true;
+            default -> false;
+        };
     }
 
     public static boolean isPlayerHead(String string) {
-        switch (string) {
-            case "PLAYER_HEAD":
-            case "SKULL":
-                return true;
-            default:
-                return false;
-        }
+        return switch (string) {
+            case "PLAYER_HEAD", "SKULL" -> true;
+            default -> false;
+        };
     }
 
 }

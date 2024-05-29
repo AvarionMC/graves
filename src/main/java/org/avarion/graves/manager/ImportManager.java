@@ -30,11 +30,7 @@ public final class ImportManager {
     }
 
     public List<Grave> importExternalPluginGraves() {
-        List<Grave> graveList = new ArrayList<>();
-
-        graveList.addAll(importAngelChest());
-
-        return graveList;
+        return new ArrayList<>(importAngelChest());
     }
 
     private List<Grave> importAngelChest() {
