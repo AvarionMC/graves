@@ -371,7 +371,7 @@ public final class GraveManager {
 
             for (ItemStack itemStack : itemStackList) {
                 if (getItemStacksSize(tempInventory.getContents()) < tempInventory.getSize()) {
-                    if (itemStack != null && !MaterialUtil.isAir(itemStack.getType())) {
+                    if (itemStack != null && !itemStack.getType().isAir()) {
                         tempInventory.addItem(itemStack);
                         counter++;
                     }
@@ -440,10 +440,6 @@ public final class GraveManager {
         return counter;
     }
 
-    public List<ItemStack> filterGraveItemStackList(List<ItemStack> itemStackList, LivingEntity livingEntity, List<String> permissionList) {
-        return filterGraveItemStackList(itemStackList, new ArrayList<>(), livingEntity, permissionList);
-    }
-
     public List<ItemStack> filterGraveItemStackList(List<ItemStack> itemStackList, List<ItemStack> removedItemStackList, LivingEntity livingEntity, List<String> permissionList) {
         itemStackList = new ArrayList<>(itemStackList);
 
@@ -483,10 +479,6 @@ public final class GraveManager {
         }
 
         return itemStackList;
-    }
-
-    public void breakGrave(Grave grave) {
-        breakGrave(grave.getLocationDeath(), grave);
     }
 
     public void breakGrave(Location location, Grave grave) {

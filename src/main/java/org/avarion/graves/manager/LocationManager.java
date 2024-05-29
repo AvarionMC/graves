@@ -75,7 +75,7 @@ public final class LocationManager {
                     return getLavaTop(location, livingEntity, grave);
                 }
                 else {
-                    Location graveLocation = (MaterialUtil.isAir(block.getType())
+                    Location graveLocation = (block.getType().isAir()
                                               || MaterialUtil.isWater(block.getType())) ? (
                             plugin.getConfigBool("placement.ground", grave)
                             ? getGround(location, livingEntity, grave)
@@ -197,7 +197,7 @@ public final class LocationManager {
                 while (counter <= location.getWorld().getMaxHeight()) {
                     Block block = location.getBlock();
 
-                    if (MaterialUtil.isAir(block.getType())
+                    if (block.getType().isAir()
                         && !plugin.getCompatibility().hasTitleData(block)
                         && !MaterialUtil.isLava(block.getType())) {
                         return location;
@@ -236,8 +236,7 @@ public final class LocationManager {
             Block blockBelow = block.getRelative(BlockFace.DOWN);
 
             return !block.getType().isSolid()
-                   && !MaterialUtil.isLava(blockAbove.getType())
-                   && !MaterialUtil.isAir(blockBelow.getType())
+                   && !MaterialUtil.isLava(blockAbove.getType()) && !blockBelow.getType().isAir()
                    && !MaterialUtil.isLava(blockBelow.getType());
         }
 

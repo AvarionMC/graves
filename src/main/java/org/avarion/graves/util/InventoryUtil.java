@@ -70,7 +70,7 @@ public final class InventoryUtil {
         List<ItemStack> itemStackList = new ArrayList<>();
 
         for (ItemStack itemStack : inventory.getContents().clone()) {
-            if (itemStack != null && !MaterialUtil.isAir(itemStack.getType())) {
+            if (itemStack != null && !itemStack.getType().isAir()) {
                 itemStackList.add(itemStack);
             }
         }

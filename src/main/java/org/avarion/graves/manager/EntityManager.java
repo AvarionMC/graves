@@ -614,7 +614,7 @@ public final class EntityManager extends EntityDataManager {
             if (location.getWorld() != null) {
                 Material material = Material.matchMaterial(plugin.getConfigString("armor-stand.material", grave, "AIR"));
 
-                if (material != null && !MaterialUtil.isAir(material)) {
+                if (material != null && !material.isAir()) {
                     ItemStack itemStack = new ItemStack(material, 1);
                     ItemMeta itemMeta = itemStack.getItemMeta();
                     int customModelData = plugin.getConfigInt("armor-stand.model-data", grave, -1);
@@ -677,7 +677,7 @@ public final class EntityManager extends EntityDataManager {
             if (location.getWorld() != null) {
                 Material material = Material.matchMaterial(plugin.getConfigString("item-frame.material", grave, "AIR"));
 
-                if (material != null && !MaterialUtil.isAir(material)) {
+                if (material != null && !material.isAir()) {
                     ItemStack itemStack = new ItemStack(material, 1);
                     ItemMeta itemMeta = itemStack.getItemMeta();
                     int customModelData = plugin.getConfigInt("item-frame.model-data", grave, -1);
