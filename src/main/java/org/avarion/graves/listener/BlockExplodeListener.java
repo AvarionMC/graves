@@ -34,13 +34,13 @@ public class BlockExplodeListener implements Listener {
                 if ((System.currentTimeMillis() - grave.getTimeCreation()) < 1000) {
                     iterator.remove();
                 }
-                else if (plugin.getConfig("explode", grave).getBoolean("explode")) {
+                else if (plugin.getConfigBool("explode", grave)) {
                     GraveExplodeEvent graveExplodeEvent = new GraveExplodeEvent(location, null, grave);
 
                     plugin.getServer().getPluginManager().callEvent(graveExplodeEvent);
 
                     if (!graveExplodeEvent.isCancelled()) {
-                        if (plugin.getConfig("drop.explode", grave).getBoolean("drop.explode")) {
+                        if (plugin.getConfigBool("drop.explode", grave)) {
                             plugin.getGraveManager().breakGrave(location, grave);
                         }
                         else {
@@ -52,7 +52,7 @@ public class BlockExplodeListener implements Listener {
                         plugin.getEntityManager()
                               .runCommands("event.command.explode", event.getBlock().getType().name(), location, grave);
 
-                        if (plugin.getConfig("zombie.explode", grave).getBoolean("zombie.explode")) {
+                        if (plugin.getConfigBool("zombie.explode", grave)) {
                             plugin.getEntityManager().spawnZombie(location, grave);
                         }
                     }

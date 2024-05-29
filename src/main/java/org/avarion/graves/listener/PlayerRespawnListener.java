@@ -31,13 +31,11 @@ public class PlayerRespawnListener implements Listener {
 
             plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
                 plugin.getEntityManager()
-                      .runFunction(player, plugin.getConfig("respawn.function", player, permissionList)
-                                                 .getString("respawn.function", "none"), grave);
+                      .runFunction(player, plugin.getConfigString("respawn.function", player, permissionList, "none"), grave);
             }, 1L);
 
-            if (plugin.getConfig("respawn.compass", player, permissionList).getBoolean("respawn.compass")
-                && grave.getLivedTime()
-                   <= plugin.getConfig("respawn.compass-time", player, permissionList).getInt("respawn.compass-time")
+            if (plugin.getConfigBool("respawn.compass", player, permissionList)
+                && grave.getLivedTime() <= plugin.getConfigInt("respawn.compass-time", player, permissionList)
                       * 1000L) {
                 List<Location> locationList = plugin.getGraveManager()
                                                     .getGraveLocationList(event.getRespawnLocation(), grave);

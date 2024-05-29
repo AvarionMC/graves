@@ -38,7 +38,7 @@ public class EntityDeathListener implements Listener {
         String entityName = plugin.getEntityManager().getEntityName(livingEntity);
         Location location = LocationUtil.roundLocation(livingEntity.getLocation());
         List<String> permissionList = livingEntity instanceof Player ? plugin.getPermissionList(livingEntity) : null;
-        List<String> worldList = plugin.getConfig("world", livingEntity, permissionList).getStringList("world");
+        List<String> worldList = plugin.getConfigStringList("world", livingEntity, permissionList);
         List<ItemStack> removedItemStackList = new ArrayList<>();
 
         // Removed items
@@ -70,8 +70,7 @@ public class EntityDeathListener implements Listener {
                                                                            .split("\\|"))
                                                      : null;
 
-            if (!plugin.getConfig("zombie.drop", zombieGraveEntityType, zombieGravePermissionList)
-                       .getBoolean("zombie.drop")) {
+            if (!plugin.getConfigBool("zombie.drop", zombieGraveEntityType, zombieGravePermissionList)) {
                 event.getDrops().clear();
                 event.setDroppedExp(0);
             }
@@ -100,7 +99,7 @@ public class EntityDeathListener implements Listener {
         }
 
         // Enabled
-        if (!plugin.getConfig("grave.enabled", livingEntity, permissionList).getBoolean("grave.enabled")) {
+        if (!plugin.getConfigBool("grave.enabled", livingEntity, permissionList)) {
             if (livingEntity instanceof Player) {
                 plugin.debugMessage("Grave not created for " + entityName + " because they have graves disabled", 2);
             }
@@ -130,8 +129,7 @@ public class EntityDeathListener implements Listener {
 
         // Creature spawn reason
         if (livingEntity instanceof Creature) {
-            List<String> spawnReasonList = plugin.getConfig("spawn.reason", livingEntity, permissionList)
-                                                 .getStringList("spawn.reason");
+            List<String> spawnReasonList = plugin.getConfigStringList("spawn.reason", livingEntity, permissionList);
 
             if (plugin.getEntityManager().hasDataString(livingEntity, "spawnReason")
                 && (!spawnReasonList.contains("ALL") && !spawnReasonList.contains(plugin.getEntityManager()
@@ -206,23 +204,19 @@ public class EntityDeathListener implements Listener {
         // PvP, PvE, Environmental
         if (livingEntity.getLastDamageCause() != null) {
             EntityDamageEvent.DamageCause damageCause = livingEntity.getLastDamageCause().getCause();
-            List<String> damageCauseList = plugin.getConfig("death.reason", livingEntity, permissionList)
-                                                 .getStringList("death.reason");
+            List<String> damageCauseList = plugin.getConfigStringList("death.reason", livingEntity, permissionList);
 
             if (!damageCauseList.contains("ALL") && !damageCauseList.contains(damageCause.name()) && (damageCause
                                                                                                       == EntityDamageEvent.DamageCause.ENTITY_ATTACK
                                                                                                       && ((livingEntity.getKiller()
                                                                                                            != null
-                                                                                                           && !plugin.getConfig("death.player", livingEntity, permissionList)
-                                                                                                                     .getBoolean("death.player"))
+                                                                                                           && !plugin.getConfigBool("death.player", livingEntity, permissionList))
                                                                                                           || (livingEntity.getKiller()
                                                                                                               == null
-                                                                                                              && !plugin.getConfig("death.entity", livingEntity, permissionList)
-                                                                                                                        .getBoolean("death.entity")))
+                                                                                                              && !plugin.getConfigBool("death.entity", livingEntity, permissionList)))
                                                                                                       || (damageCause
                                                                                                           != EntityDamageEvent.DamageCause.ENTITY_ATTACK
-                                                                                                          && !plugin.getConfig("death.environmental", livingEntity, permissionList)
-                                                                                                                    .getBoolean("death.environmental")))) {
+                                                                                                          && !plugin.getConfigBool("death.environmental", livingEntity, permissionList)))) {
                 plugin.debugMessage("Grave not created for "
                                     + entityName
                                     + " because they died to an invalid damage cause", 2);
@@ -233,7 +227,7 @@ public class EntityDeathListener implements Listener {
 
         // Max
         if (plugin.getGraveManager().getGraveList(livingEntity).size()
-            >= plugin.getConfig("grave.max", livingEntity, permissionList).getInt("grave.max")) {
+            >= plugin.getConfigInt("grave.max", livingEntity, permissionList)) {
             plugin.getEntityManager()
                   .sendMessage("message.max", livingEntity, livingEntity.getLocation(), permissionList);
             plugin.debugMessage("Grave not created for " + entityName + " because they reached maximum graves", 2);
@@ -242,8 +236,8 @@ public class EntityDeathListener implements Listener {
         }
 
         // Token
-        if (plugin.getConfig("token.enabled", livingEntity, permissionList).getBoolean("token.enabled")) {
-            String name = plugin.getConfig("token.name", livingEntity).getString("token.name", "basic");
+        if (plugin.getConfigBool("token.enabled", livingEntity, permissionList)) {
+            String name = plugin.getConfigString("token.name", livingEntity, "basic");
 
             if (plugin.getConfig().isConfigurationSection("settings.token." + name)) {
                 ItemStack itemStack = plugin.getRecipeManager().getGraveTokenFromPlayer(name, event.getDrops());
@@ -277,15 +271,13 @@ public class EntityDeathListener implements Listener {
             if (itemStack != null) {
                 // Ignore compass
                 if (plugin.getEntityManager().getGraveUUIDFromItemStack(itemStack) != null) {
-                    if (plugin.getConfig("compass.destroy", livingEntity, permissionList)
-                              .getBoolean("compass.destroy")) {
+                    if (plugin.getConfigBool("compass.destroy", livingEntity, permissionList)) {
                         dropItemStackListIterator.remove();
                         event.getDrops().remove(itemStack);
 
                         continue;
                     }
-                    else if (plugin.getConfig("compass.ignore", livingEntity, permissionList)
-                                   .getBoolean("compass.ignore")) {
+                    else if (plugin.getConfigBool("compass.ignore", livingEntity, permissionList)) {
                         continue;
                     }
                 }

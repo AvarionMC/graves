@@ -54,8 +54,8 @@ public final class FurnitureEngine extends EntityDataManager {
     }
 
     public void createFurniture(Location location, Grave grave) {
-        if (plugin.getConfig("furnitureengine.enabled", grave).getBoolean("furnitureengine.enabled")) {
-            String name = plugin.getConfig("furnitureengine.name", grave).getString("furnitureengine.name", "");
+        if (plugin.getConfigBool("furnitureengine.enabled", grave)) {
+            String name = plugin.getConfigString("furnitureengine.name", grave, "");
 
             location.getBlock().setType(Material.AIR);
 

@@ -25,6 +25,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -495,29 +496,93 @@ public class Graves extends JavaPlugin {
         return compatibility;
     }
 
+    /// startregion: getConfig*
+    public boolean getConfigBool(String config, Grave grave) {
+        return getConfig(config, grave.getOwnerType(), grave.getPermissionList()).getBoolean(config);
+    }
+
+    public int getConfigInt(String config, Grave grave) {
+        return getConfig(config, grave.getOwnerType(), grave.getPermissionList()).getInt(config);
+    }
+
+    public int getConfigInt(String config, Grave grave, int defaultValue) {
+        return getConfig(config, grave.getOwnerType(), grave.getPermissionList()).getInt(config, defaultValue);
+    }
+
+    public String getConfigString(String config, Grave grave, String defaultValue) {
+        return getConfig(config, grave.getOwnerType(), grave.getPermissionList()).getString(config, defaultValue);
+    }
+
+    public String getConfigString(String config, Entity entity, String defaultValue) {
+        return getConfig(config, entity.getType(), getPermissionList(entity)).getString(config, defaultValue);
+    }
+
+    public String getConfigString(String config, Grave grave) {
+        return getConfig(config, grave.getOwnerType(), grave.getPermissionList()).getString(config);
+    }
+
+    public List<String> getConfigStringList(String config, Grave grave) {
+        return getConfig(config, grave.getOwnerType(), grave.getPermissionList()).getStringList(config);
+    }
+
+    public double getConfigDbl(String config, Grave grave) {
+        return getConfig(config, grave.getOwnerType(), grave.getPermissionList()).getDouble(config);
+    }
+
+    public boolean getConfigBool(String config, @NotNull Entity entity) {
+        return getConfig(config, entity.getType(), getPermissionList(entity)).getBoolean(config);
+    }
+
+    public boolean getConfigBool(String config, Entity entity, @Nullable List<String> permissionList) {
+        return getConfig(config, entity.getType(), permissionList).getBoolean(config);
+    }
+
+    public boolean getConfigBool(String config, EntityType entityType, @Nullable List<String> permissionList) {
+        return getConfig(config, entityType, permissionList).getBoolean(config);
+    }
+
+    public int getConfigInt(String config, Entity entity, @Nullable List<String> permissionList) {
+        return getConfig(config, entity.getType(), permissionList).getInt(config);
+    }
+
+    public String getConfigString(String config, Entity entity, @Nullable List<String> permissionList) {
+        return getConfig(config, entity.getType(), permissionList).getString(config);
+    }
+
+    public String getConfigString(String config, Entity entity, @Nullable List<String> permissionList, String defaultValue) {
+        return getConfig(config, entity.getType(), permissionList).getString(config, defaultValue);
+    }
+
+    public String getConfigString(String config, EntityType entityType, @Nullable List<String> permissionList) {
+        return getConfig(config, entityType, permissionList).getString(config);
+    }
+
+    public List<String> getConfigStringList(String config, Entity entity, @Nullable List<String> permissionList) {
+        return getConfig(config, entity.getType(), permissionList).getStringList(config);
+    }
+    /// endregion: getConfig*
+
+    /// startregion: getConfig
     public ConfigurationSection getConfig(String config, Grave grave) {
         return getConfig(config, grave.getOwnerType(), grave.getPermissionList());
     }
 
-    public ConfigurationSection getConfig(String config, Entity entity) {
-        return getConfig(config, entity.getType(), getPermissionList(entity));
-    }
-
-    public ConfigurationSection getConfig(String config, Entity entity, List<String> permissionList) {
+    private ConfigurationSection getConfig(String config, Entity entity, @Nullable List<String> permissionList) {
         return getConfig(config, entity.getType(), permissionList);
     }
 
-    public ConfigurationSection getConfig(String config, EntityType entityType, List<String> permissionList) {
+    private ConfigurationSection getConfig(String config, @NotNull Entity entity) {
+        return getConfig(config, entity.getType(), getPermissionList(entity));
+    }
+
+    private ConfigurationSection getConfig(String config, EntityType entityType, List<String> permissionList) {
         if (permissionList != null && !permissionList.isEmpty()) {
             for (String permission : permissionList) {
                 String section = "settings.permission." + permission;
 
-                if (getConfig().isConfigurationSection(section)) {
-                    ConfigurationSection configurationSection = getConfig().getConfigurationSection(section);
-
-                    if (configurationSection != null && configurationSection.contains(config, true)) {
-                        return configurationSection;
-                    }
+                ConfigurationSection configurationSection = getConfig().getConfigurationSection(section);
+                if (configurationSection != null && configurationSection.contains(config, true)) {
+                    return configurationSection;
                 }
             }
         }
@@ -525,17 +590,15 @@ public class Graves extends JavaPlugin {
         if (entityType != null) {
             String section = "settings.entity." + entityType.name();
 
-            if (getConfig().isConfigurationSection(section)) {
-                ConfigurationSection configurationSection = getConfig().getConfigurationSection(section);
-
-                if (configurationSection != null && configurationSection.contains(config, true)) {
-                    return configurationSection;
-                }
+            ConfigurationSection configurationSection = getConfig().getConfigurationSection(section);
+            if (configurationSection != null && configurationSection.contains(config, true)) {
+                return configurationSection;
             }
         }
 
         return getConfig().getConfigurationSection("settings.default.default");
     }
+    /// endregion
 
     private void loadResourceDefaults(FileConfiguration fileConfiguration, String resource) {
         InputStream inputStream = getResource(resource);

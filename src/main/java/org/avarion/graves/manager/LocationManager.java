@@ -40,11 +40,11 @@ public final class LocationManager {
 
     public Location getSafeTeleportLocation(Entity entity, Location location, Grave grave, Graves plugin) {
         if (location.getWorld() != null) {
-            if (plugin.getConfig("teleport.unsafe", grave).getBoolean("teleport.unsafe")
+            if (plugin.getConfigBool("teleport.unsafe", grave)
                 || isLocationSafePlayer(location)) {
                 return location;
             }
-            else if (plugin.getConfig("teleport.top", grave).getBoolean("teleport.top")) {
+            else if (plugin.getConfigBool("teleport.top", grave)) {
                 Location topLocation = getTop(location, entity, grave);
 
                 if (topLocation != null && isLocationSafePlayer(topLocation) && topLocation.getWorld() != null) {
@@ -75,13 +75,10 @@ public final class LocationManager {
                     return getLavaTop(location, livingEntity, grave);
                 }
                 else {
-                    Location graveLocation = (MaterialUtil.isAir(block.getType())
-                                              || MaterialUtil.isWater(block.getType()))
-                                             ? (plugin.getConfig("placement.ground", grave)
-                                                      .getBoolean("placement.ground")
-                                                ? getGround(location, livingEntity, grave)
-                                                : null)
-                                             : getRoof(location, livingEntity, grave);
+                    Location graveLocation = (block.getType().isAir() || MaterialUtil.isWater(block.getType())) ? (
+                            plugin.getConfigBool("placement.ground", grave)
+                            ? getGround(location, livingEntity, grave)
+                            : null) : getRoof(location, livingEntity, grave);
 
                     if (graveLocation != null) {
                         return graveLocation;
@@ -154,10 +151,10 @@ public final class LocationManager {
     }
 
     public Location getVoid(Location location, Entity entity, Grave grave) {
-        if (plugin.getConfig("placement.void", grave).getBoolean("placement.void")) {
+        if (plugin.getConfigBool("placement.void", grave)) {
             location = location.clone();
 
-            if (plugin.getConfig("placement.void-smart", grave).getBoolean("placement.void-smart")) {
+            if (plugin.getConfigBool("placement.void-smart", grave)) {
                 Location solidLocation = plugin.getLocationManager().getLastSolidLocation(entity);
 
                 if (solidLocation != null) {
@@ -182,7 +179,7 @@ public final class LocationManager {
     }
 
     public Location getLavaTop(Location location, Entity entity, Grave grave) {
-        if (plugin.getConfig("placement.lava-smart", grave).getBoolean("placement.lava-smart")) {
+        if (plugin.getConfigBool("placement.lava-smart", grave)) {
             Location solidLocation = plugin.getLocationManager().getLastSolidLocation(entity);
 
             if (solidLocation != null) {
@@ -190,7 +187,7 @@ public final class LocationManager {
             }
         }
 
-        if (plugin.getConfig("placement.lava-top", grave).getBoolean("placement.lava-top")) {
+        if (plugin.getConfigBool("placement.lava-top", grave)) {
             location = location.clone();
 
             if (location.getWorld() != null) {
@@ -199,7 +196,7 @@ public final class LocationManager {
                 while (counter <= location.getWorld().getMaxHeight()) {
                     Block block = location.getBlock();
 
-                    if ((MaterialUtil.isAir(block.getType()))
+                    if (block.getType().isAir()
                         && !plugin.getCompatibility().hasTitleData(block)
                         && !MaterialUtil.isLava(block.getType())) {
                         return location;
@@ -216,14 +213,12 @@ public final class LocationManager {
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean canBuild(LivingEntity livingEntity, Location location, List<String> permissionList) {
-        if (livingEntity instanceof Player) {
-            Player player = (Player) livingEntity;
+        if (livingEntity instanceof Player player) {
 
-            return (!plugin.getConfig("placement.can-build", player, permissionList).getBoolean("placement.can-build")
+            return (!plugin.getConfigBool("placement.can-build", player, permissionList)
                     || plugin.getCompatibility().canBuild(player, location, plugin)) && (!plugin.getIntegrationManager()
                                                                                                 .hasProtectionLib() || (
-                                                                                                 !plugin.getConfig("placement.can-build-protectionlib", player, permissionList)
-                                                                                                        .getBoolean("placement.can-build-protectionlib")
+                    !plugin.getConfigBool("placement.can-build-protectionlib", player, permissionList)
                                                                                                  || plugin.getIntegrationManager()
                                                                                                           .getProtectionLib()
                                                                                                           .canBuild(location, player)));
@@ -239,9 +234,8 @@ public final class LocationManager {
             Block blockAbove = block.getRelative(BlockFace.UP);
             Block blockBelow = block.getRelative(BlockFace.DOWN);
 
-            return !block.getType().isSolid()
-                   && !MaterialUtil.isLava(blockAbove.getType())
-                   && !MaterialUtil.isAir(blockBelow.getType())
+            return !block.getType().isSolid() && !MaterialUtil.isLava(blockAbove.getType()) && !blockBelow.getType()
+                                                                                                          .isAir()
                    && !MaterialUtil.isLava(blockBelow.getType());
         }
 

@@ -79,9 +79,9 @@ public final class Oraxen extends EntityDataManager {
     }
 
     public void createFurniture(Location location, Grave grave) {
-        if (plugin.getConfig("oraxen.furniture.enabled", grave).getBoolean("oraxen.furniture.enabled")) {
+        if (plugin.getConfigBool("oraxen.furniture.enabled", grave)) {
             try {
-                String name = plugin.getConfig("oraxen.furniture.name", grave).getString("oraxen.furniture.name", "");
+                String name = plugin.getConfigString("oraxen.furniture.name", grave, "");
                 FurnitureMechanic furnitureMechanic = getFurnitureMechanic(name);
 
                 if (furnitureMechanic != null && location.getWorld() != null) {
@@ -120,8 +120,8 @@ public final class Oraxen extends EntityDataManager {
     }
 
     public void createBlock(Location location, Grave grave) {
-        if (plugin.getConfig("oraxen.block.enabled", grave).getBoolean("oraxen.block.enabled")) {
-            String name = plugin.getConfig("oraxen.block.name", grave).getString("oraxen.block.name", "");
+        if (plugin.getConfigBool("oraxen.block.enabled", grave)) {
+            String name = plugin.getConfigString("oraxen.block.name", grave, "");
             NoteBlockMechanic noteBlockMechanic = getNoteBlockMechanic(name);
 
             if (noteBlockMechanic != null && location.getWorld() != null) {

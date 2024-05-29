@@ -23,15 +23,15 @@ public final class HologramManager extends EntityDataManager {
     }
 
     public void createHologram(Location location, Grave grave) {
-        if (plugin.getConfig("hologram.enabled", grave).getBoolean("hologram.enabled")) {
-            double offsetX = plugin.getConfig("hologram.offset.x", grave).getDouble("hologram.offset.x");
-            double offsetY = plugin.getConfig("hologram.offset.y", grave).getDouble("hologram.offset.y");
-            double offsetZ = plugin.getConfig("hologram.offset.z", grave).getDouble("hologram.offset.z");
-            boolean marker = plugin.getConfig("hologram.marker", grave).getBoolean("hologram.marker");
+        if (plugin.getConfigBool("hologram.enabled", grave)) {
+            double offsetX = plugin.getConfigDbl("hologram.offset.x", grave);
+            double offsetY = plugin.getConfigDbl("hologram.offset.y", grave);
+            double offsetZ = plugin.getConfigDbl("hologram.offset.z", grave);
+            boolean marker = plugin.getConfigBool("hologram.marker", grave);
             location = LocationUtil.roundLocation(location)
                                    .add(offsetX + 0.5, offsetY + (marker ? 0.49 : -0.49), offsetZ + 0.5);
-            List<String> lineList = plugin.getConfig("hologram.line", grave).getStringList("hologram.line");
-            double lineHeight = plugin.getConfig("hologram.height-line", grave).getDouble("hologram.height-line");
+            List<String> lineList = plugin.getConfigStringList("hologram.line", grave);
+            double lineHeight = plugin.getConfigDbl("hologram.height-line", grave);
             int lineNumber = 0;
 
             Collections.reverse(lineList);
