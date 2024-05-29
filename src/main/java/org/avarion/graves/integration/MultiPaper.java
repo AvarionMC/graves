@@ -58,11 +58,9 @@ public final class MultiPaper {
             List<ItemStack> itemStackList = (List<ItemStack>) Base64Util.base64ToObject(dataSplit[1]);
 
             if (grave != null && itemStackList != null) {
-                String title = StringUtil.parseString(plugin.getConfig("gui.grave.title", grave)
-                                                            .getString("gui.grave.title"), grave.getLocationDeath(), grave, plugin);
+                String title = StringUtil.parseString(plugin.getConfigString("gui.grave.title", grave), grave.getLocationDeath(), grave, plugin);
                 Grave.StorageMode storageMode = plugin.getGraveManager()
-                                                      .getStorageMode(plugin.getConfig("storage.mode", grave)
-                                                                            .getString("storage.mode"));
+                                                      .getStorageMode(plugin.getConfigString("storage.mode", grave));
 
                 grave.setInventory(plugin.getGraveManager()
                                          .createGraveInventory(grave, grave.getLocationDeath(), itemStackList, title, storageMode));

@@ -47,7 +47,7 @@ public final class ExperienceUtil {
         return (long) (Math.round(result * 100.) / 100.);
     }
 
-    public static int getDropPercent(int experience, float percent) {
+    public static int getDropPercent(int experience, double percent) {
         return experience > 0 ? (int) (experience * percent) : 0;
     }
 

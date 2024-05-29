@@ -88,9 +88,9 @@ public final class CompatibilityBlockData implements Compatibility {
 
     @SuppressWarnings("deprecation")
     private void updateSkullBlock(Block block, Grave grave, Graves plugin) {
-        int headType = plugin.getConfig("block.head.type", grave).getInt("block.head.type");
-        String headBase64 = plugin.getConfig("block.head.base64", grave).getString("block.head.base64");
-        String headName = plugin.getConfig("block.head.name", grave).getString("block.head.name");
+        int headType = plugin.getConfigInt("block.head.type", grave);
+        String headBase64 = plugin.getConfigString("block.head.base64", grave);
+        String headName = plugin.getConfigString("block.head.name", grave);
         Skull skull = (Skull) block.getState();
         Rotatable skullRotate = (Rotatable) block.getBlockData();
 
@@ -104,11 +104,11 @@ public final class CompatibilityBlockData implements Compatibility {
             else if (grave.getOwnerTexture() != null) {
                 SkinUtil.setSkullBlockTexture(skull, grave.getOwnerName(), grave.getOwnerTexture());
             }
-            else if (headBase64 != null && !headBase64.equals("")) {
+            else if (headBase64 != null && !headBase64.isEmpty()) {
                 SkinUtil.setSkullBlockTexture(skull, grave.getOwnerName(), headBase64);
             }
         }
-        else if (headType == 1 && headBase64 != null && !headBase64.equals("")) {
+        else if (headType == 1 && headBase64 != null && !headBase64.isEmpty()) {
             SkinUtil.setSkullBlockTexture(skull, grave.getOwnerName(), headBase64);
         }
         else if (headType == 2 && headName != null && headName.length() <= 16) {

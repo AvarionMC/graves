@@ -103,7 +103,7 @@ public final class ImportManager {
             //grave.setTimeCreation(angelChest.getLong("created", System.currentTimeMillis()));
             grave.setTimeCreation(System.currentTimeMillis());
             //grave.setTimeAlive(angelChest.getInt("secondsLeft", 0) * 10000L);
-            grave.setTimeAlive(plugin.getConfig("grave.time", grave).getInt("grave.time") * 1000L);
+            grave.setTimeAlive(plugin.getConfigInt("grave.time", grave) * 1000L);
             grave.setProtection(angelChest.getBoolean("isProtected", false));
             grave.setExperience(angelChest.getInt("experience", 0));
 
@@ -132,11 +132,9 @@ public final class ImportManager {
             }
 
             if (!itemStackList.isEmpty()) {
-                String title = StringUtil.parseString(plugin.getConfig("gui.grave.title", grave)
-                                                            .getString("gui.grave.title"), grave.getLocationDeath(), grave, plugin);
+                String title = StringUtil.parseString(plugin.getConfigString("gui.grave.title", grave), grave.getLocationDeath(), grave, plugin);
                 Grave.StorageMode storageMode = plugin.getGraveManager()
-                                                      .getStorageMode(plugin.getConfig("storage.mode", grave)
-                                                                            .getString("storage.mode"));
+                                                      .getStorageMode(plugin.getConfigString("storage.mode", grave));
 
                 Inventory inventory = plugin.getGraveManager()
                                             .createGraveInventory(grave, grave.getLocationDeath(), itemStackList, title, storageMode);

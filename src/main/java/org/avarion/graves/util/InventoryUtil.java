@@ -169,7 +169,7 @@ public final class InventoryUtil {
     public static Inventory stringToInventory(InventoryHolder inventoryHolder, String string, String title, Graves plugin) {
         String[] strings = string.split("\\|");
 
-        if (strings.length > 0 && !strings[0].equals("")) {
+        if (strings.length > 0 && !strings[0].isEmpty()) {
             Inventory inventory = plugin.getServer()
                                         .createInventory(inventoryHolder, InventoryUtil.getInventorySize(strings.length), title);
 

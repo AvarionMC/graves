@@ -22,6 +22,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -50,8 +51,7 @@ public final class GraveManager {
                     plugin.getServer().getPluginManager().callEvent(graveTimeoutEvent);
 
                     if (!graveTimeoutEvent.isCancelled()) {
-                        if (graveTimeoutEvent.getLocation() != null && plugin.getConfig("drop.timeout", grave)
-                                                                             .getBoolean("drop.timeout")) {
+                        if (graveTimeoutEvent.getLocation() != null && plugin.getConfigBool("drop.timeout", grave)) {
                             dropGraveItems(graveTimeoutEvent.getLocation(), grave);
                             dropGraveExperience(graveTimeoutEvent.getLocation(), grave);
                         }
@@ -91,8 +91,7 @@ public final class GraveManager {
                                 Grave grave = plugin.getCacheManager().getGraveMap().get(hologramData.getUUIDGrave());
 
                                 if (grave != null) {
-                                    List<String> lineList = plugin.getConfig("hologram.line", grave)
-                                                                  .getStringList("hologram.line");
+                                    List<String> lineList = plugin.getConfigStringList("hologram.line", grave);
 
                                     Collections.reverse(lineList);
 
@@ -169,31 +168,30 @@ public final class GraveManager {
     }
 
     public void graveParticle(Location location, Grave grave) {
-        if (location.getWorld() != null && plugin.getConfig("particle.enabled", grave).getBoolean("particle.enabled")) {
+        if (location.getWorld() != null && plugin.getConfigBool("particle.enabled", grave)) {
             Particle particle = Particle.REDSTONE;
-            String particleType = plugin.getConfig("particle.type", grave).getString("particle.type");
+            String particleType = plugin.getConfigString("particle.type", grave);
 
-            if (particleType != null && !particleType.equals("")) {
+            if (particleType != null && !particleType.isEmpty()) {
                 try {
-                    particle = Particle.valueOf(plugin.getConfig("particle.type", grave).getString("particle.type"));
+                    particle = Particle.valueOf(plugin.getConfigString("particle.type", grave));
                 }
                 catch (IllegalArgumentException ignored) {
                     plugin.debugMessage(particleType + " is not a Particle ENUM", 1);
                 }
             }
 
-            int count = plugin.getConfig("particle.count", grave).getInt("particle.count");
-            double offsetX = plugin.getConfig("particle.offset.x", grave).getDouble("particle.offset.x");
-            double offsetY = plugin.getConfig("particle.offset.y", grave).getDouble("particle.offset.y");
-            double offsetZ = plugin.getConfig("particle.offset.z", grave).getDouble("particle.offset.z");
+            int count = plugin.getConfigInt("particle.count", grave);
+            double offsetX = plugin.getConfigDbl("particle.offset.x", grave);
+            double offsetY = plugin.getConfigDbl("particle.offset.y", grave);
+            double offsetZ = plugin.getConfigDbl("particle.offset.z", grave);
             location = location.clone().add(offsetX + 0.5, offsetY + 0.5, offsetZ + 0.5);
 
             if (location.getWorld() != null) {
                 switch (particle.name()) {
                     case "REDSTONE":
-                        int size = plugin.getConfig("particle.dust-size", grave).getInt("particle.dust-size");
-                        Color color = ColorUtil.getColor(plugin.getConfig("particle.dust-color", grave)
-                                                               .getString("particle.dust-color", "RED"));
+                        int size = plugin.getConfigInt("particle.dust-size", grave);
+                        Color color = ColorUtil.getColor(plugin.getConfigString("particle.dust-color", grave, "RED"));
 
                         if (color == null) {
                             color = Color.RED;
@@ -356,10 +354,8 @@ public final class GraveManager {
 
     public Inventory getGraveInventory(Grave grave, LivingEntity livingEntity, List<ItemStack> graveItemStackList, List<ItemStack> removedItemStackList, List<String> permissionList) {
         List<ItemStack> filterGraveItemStackList = filterGraveItemStackList(graveItemStackList, removedItemStackList, livingEntity, permissionList);
-        String title = StringUtil.parseString(plugin.getConfig("gui.grave.title", grave)
-                                                    .getString("gui.grave.title"), livingEntity, grave.getLocationDeath(), grave, plugin);
-        Grave.StorageMode storageMode = getStorageMode(plugin.getConfig("storage.mode", grave)
-                                                             .getString("storage.mode"));
+        String title = StringUtil.parseString(plugin.getConfigString("gui.grave.title", grave), livingEntity, grave.getLocationDeath(), grave, plugin);
+        Grave.StorageMode storageMode = getStorageMode(plugin.getConfigString("storage.mode", grave));
 
         return plugin.getGraveManager()
                      .createGraveInventory(grave, grave.getLocationDeath(), filterGraveItemStackList, title, storageMode);
@@ -452,7 +448,7 @@ public final class GraveManager {
         itemStackList = new ArrayList<>(itemStackList);
 
         if (livingEntity instanceof Player
-            && getStorageMode(plugin.getConfig("storage.mode", livingEntity, permissionList).getString("storage.mode"))
+            && getStorageMode(plugin.getConfigString("storage.mode", livingEntity, permissionList))
                == Grave.StorageMode.EXACT) {
             Player player = (Player) livingEntity;
             List<ItemStack> playerInventoryContentList = Arrays.asList(player.getInventory().getContents());
@@ -633,8 +629,7 @@ public final class GraveManager {
     public void autoLootGrave(Entity entity, Location location, Grave grave) {
         if (entity instanceof Player) {
             Player player = (Player) entity;
-            Grave.StorageMode storageMode = getStorageMode(plugin.getConfig("storage.mode", grave)
-                                                                 .getString("storage.mode"));
+            Grave.StorageMode storageMode = getStorageMode(plugin.getConfigString("storage.mode", grave));
 
             if (storageMode == Grave.StorageMode.EXACT) {
                 List<ItemStack> itemStackListLeftOver = new ArrayList<>();
@@ -708,12 +703,8 @@ public final class GraveManager {
     }
 
     public String getDamageReason(EntityDamageEvent.DamageCause damageCause, Grave grave) {
-        return plugin.getConfig("message.death-reason." + damageCause.name(), grave)
-                     .getString("message.death-reason." + damageCause.name(), StringUtil.format(damageCause.name()));
-    }
-
-    public void playEffect(String string, Location location) {
-        playEffect(string, location, null);
+        return plugin.getConfigString("message.death-reason."
+                                      + damageCause.name(), grave, StringUtil.format(damageCause.name()));
     }
 
     public void playEffect(String string, Location location, Grave grave) {
@@ -723,10 +714,10 @@ public final class GraveManager {
     public void playEffect(String string, Location location, int data, Grave grave) {
         if (location.getWorld() != null) {
             if (grave != null) {
-                string = plugin.getConfig(string, grave).getString(string);
+                string = plugin.getConfigString(string, grave);
             }
 
-            if (string != null && !string.equals("")) {
+            if (string != null && !string.isEmpty()) {
                 try {
                     location.getWorld().playEffect(location, Effect.valueOf(string.toUpperCase()), data);
                 }
@@ -737,13 +728,8 @@ public final class GraveManager {
         }
     }
 
-    public boolean shouldIgnoreItemStack(ItemStack itemStack, Entity entity, Grave grave) {
-        return shouldIgnoreItemStack(itemStack, entity, grave.getPermissionList());
-    }
-
-    public boolean shouldIgnoreItemStack(ItemStack itemStack, Entity entity, List<String> permissionList) {
-        if (plugin.getConfig("ignore.item.material", entity, permissionList)
-                  .getStringList("ignore.item.material")
+    public boolean shouldIgnoreItemStack(@NotNull ItemStack itemStack, Entity entity, List<String> permissionList) {
+        if (plugin.getConfigStringList("ignore.item.material", entity, permissionList)
                   .contains(itemStack.getType().name())) {
             return true;
         }
@@ -753,17 +739,15 @@ public final class GraveManager {
 
             if (itemMeta != null) {
                 if (itemMeta.hasDisplayName()) {
-                    for (String string : plugin.getConfig("ignore.item.name", entity, permissionList)
-                                               .getStringList("ignore.item.name")) {
-                        if (!string.equals("") && itemMeta.getDisplayName()
+                    for (String string : plugin.getConfigStringList("ignore.item.name", entity, permissionList)) {
+                        if (!string.isEmpty() && itemMeta.getDisplayName()
                                                           .equals(StringUtil.parseString(string, plugin))) {
                             return true;
                         }
                     }
 
-                    for (String string : plugin.getConfig("ignore.item.name-contains", entity, permissionList)
-                                               .getStringList("ignore.item.name-contains")) {
-                        if (!string.equals("") && itemMeta.getDisplayName()
+                    for (String string : plugin.getConfigStringList("ignore.item.name-contains", entity, permissionList)) {
+                        if (!string.isEmpty() && itemMeta.getDisplayName()
                                                           .contains(StringUtil.parseString(string, plugin))) {
                             return true;
                         }
@@ -771,9 +755,8 @@ public final class GraveManager {
                 }
 
                 if (itemMeta.hasLore() && itemMeta.getLore() != null) {
-                    for (String string : plugin.getConfig("ignore.item.lore", entity, permissionList)
-                                               .getStringList("ignore.item.lore")) {
-                        if (!string.equals("")) {
+                    for (String string : plugin.getConfigStringList("ignore.item.lore", entity, permissionList)) {
+                        if (!string.isEmpty()) {
                             for (String lore : itemMeta.getLore()) {
                                 if (lore.equals(StringUtil.parseString(string, plugin))) {
                                     return true;
@@ -782,9 +765,8 @@ public final class GraveManager {
                         }
                     }
 
-                    for (String string : plugin.getConfig("ignore.item.lore-contains", entity, permissionList)
-                                               .getStringList("ignore.item.lore-contains")) {
-                        if (!string.equals("")) {
+                    for (String string : plugin.getConfigStringList("ignore.item.lore-contains", entity, permissionList)) {
+                        if (!string.isEmpty()) {
                             for (String lore : itemMeta.getLore()) {
                                 if (lore.contains(StringUtil.parseString(string, plugin))) {
                                     return true;
@@ -804,11 +786,10 @@ public final class GraveManager {
     }
 
     public boolean shouldIgnoreBlock(Block block, Entity entity, List<String> permissionList) {
-        List<String> stringList = plugin.getConfig("ignore.block.material", entity, permissionList)
-                                        .getStringList("ignore.block.material");
+        List<String> stringList = plugin.getConfigStringList("ignore.block.material", entity, permissionList);
 
         for (String string : stringList) {
-            if (!string.equals("") && string.equals(block.getType().name())) {
+            if (!string.isEmpty() && string.equals(block.getType().name())) {
                 return true;
             }
         }

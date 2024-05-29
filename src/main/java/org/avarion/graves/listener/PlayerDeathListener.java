@@ -29,7 +29,7 @@ public class PlayerDeathListener implements Listener {
 
             if (itemStack != null) {
                 if (plugin.getEntityManager().getGraveUUIDFromItemStack(itemStack) != null
-                    && plugin.getConfig("compass.destroy", event.getEntity()).getBoolean("compass.destroy")) {
+                    && plugin.getConfigBool("compass.destroy", event.getEntity())) {
                     iterator.remove();
                 }
             }

@@ -67,8 +67,7 @@ public final class GUIManager {
             if (!playerGraveList.isEmpty()) {
                 GraveList graveList = new GraveList(uuid, playerGraveList);
                 Inventory inventory = plugin.getServer()
-                                            .createInventory(graveList, InventoryUtil.getInventorySize(playerGraveList.size()), StringUtil.parseString(plugin.getConfig("gui.menu.list.title", player, permissionList)
-                                                                                                                                                             .getString("gui.menu.list.title", "Graves Main Menu"), player, plugin));
+                                            .createInventory(graveList, InventoryUtil.getInventorySize(playerGraveList.size()), StringUtil.parseString(plugin.getConfigString("gui.menu.list.title", player, permissionList, "Graves Main Menu"), player, plugin));
 
                 setGraveListItems(inventory, playerGraveList);
                 graveList.setInventory(inventory);
@@ -107,8 +106,7 @@ public final class GUIManager {
         if (entity instanceof Player) {
             Player player = (Player) entity;
             GraveMenu graveMenu = new GraveMenu(grave);
-            String title = StringUtil.parseString(plugin.getConfig("gui.menu.grave.title", player, grave.getPermissionList())
-                                                        .getString("gui.menu.grave.title", "Grave"), player, plugin);
+            String title = StringUtil.parseString(plugin.getConfigString("gui.menu.grave.title", player, grave.getPermissionList(), "Grave"), player, plugin);
             Inventory inventory = plugin.getServer()
                                         .createInventory(graveMenu, InventoryUtil.getInventorySize(5), title);
 
@@ -125,8 +123,7 @@ public final class GUIManager {
     public void setGraveMenuItems(Inventory inventory, Grave grave) {
         inventory.clear();
 
-        ConfigurationSection configurationSection = plugin.getConfig("gui.menu.grave.slot", grave)
-                                                          .getConfigurationSection("gui.menu.grave.slot");
+        ConfigurationSection configurationSection = plugin.getConfigSection("gui.menu.grave.slot", grave);
 
         if (configurationSection != null) {
             for (String string : configurationSection.getKeys(false)) {

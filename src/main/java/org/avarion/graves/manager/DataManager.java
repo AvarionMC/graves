@@ -692,8 +692,7 @@ public final class DataManager {
             grave.setPermissionList(resultSet.getString("permissions") != null
                                     ? new ArrayList<>(Arrays.asList(resultSet.getString("permissions").split("\\|")))
                                     : null);
-            grave.setInventory(InventoryUtil.stringToInventory(grave, resultSet.getString("inventory"), StringUtil.parseString(plugin.getConfig("gui.grave.title", grave.getOwnerType(), grave.getPermissionList())
-                                                                                                                                     .getString("gui.grave.title"), grave.getLocationDeath(), grave, plugin), plugin));
+            grave.setInventory(InventoryUtil.stringToInventory(grave, resultSet.getString("inventory"), StringUtil.parseString(plugin.getConfigString("gui.grave.title", grave), grave.getLocationDeath(), grave, plugin), plugin));
 
             if (resultSet.getString("equipment") != null) {
                 Map<EquipmentSlot, ItemStack> equipmentMap = (Map<EquipmentSlot, ItemStack>) Base64Util.base64ToObject(resultSet.getString("equipment"));

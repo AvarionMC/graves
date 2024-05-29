@@ -25,20 +25,19 @@ public class BlockBreakListener implements Listener {
         Grave grave = plugin.getBlockManager().getGraveFromBlock(block);
 
         if (grave != null) {
-            if (plugin.getConfig("grave.break", grave).getBoolean("grave.break")) {
+            if (plugin.getConfigBool("grave.break", grave)) {
                 if (plugin.getEntityManager().canOpenGrave(player, grave)) {
                     GraveBreakEvent graveBreakEvent = new GraveBreakEvent(block, player, grave);
 
-                    graveBreakEvent.setDropItems(plugin.getConfig("drop.break", grave).getBoolean("drop.break"));
+                    graveBreakEvent.setDropItems(plugin.getConfigBool("drop.break", grave));
                     plugin.getServer().getPluginManager().callEvent(graveBreakEvent);
 
                     if (!graveBreakEvent.isCancelled()) {
-                        if (plugin.getConfig("drop.auto-loot.enabled", grave).getBoolean("drop.auto-loot.enabled")) {
+                        if (plugin.getConfigBool("drop.auto-loot.enabled", grave)) {
                             player.sendMessage("here");
                             plugin.getGraveManager().autoLootGrave(player, block.getLocation(), grave);
 
-                            if (graveBreakEvent.isDropItems() && plugin.getConfig("drop.auto-loot.break", grave)
-                                                                       .getBoolean("drop.auto-loot.break")) {
+                            if (graveBreakEvent.isDropItems() && plugin.getConfigBool("drop.auto-loot.break", grave)) {
                                 plugin.getGraveManager().breakGrave(block.getLocation(), grave);
                             }
                             else {

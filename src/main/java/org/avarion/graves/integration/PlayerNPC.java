@@ -72,7 +72,7 @@ public final class PlayerNPC extends EntityDataManager {
 
     public void createCorpse(UUID uuid, Location location, Grave grave, boolean createEntityData) {
         plugin.getServer().getScheduler().runTask(plugin, () -> {
-            if (plugin.getConfig("playernpc.corpse.enabled", grave).getBoolean("playernpc.corpse.enabled")
+            if (plugin.getConfigBool("playernpc.corpse.enabled", grave)
                 && grave.getOwnerType() == EntityType.PLAYER) {
                 Player player = plugin.getServer().getPlayer(grave.getOwnerUUID());
                 Location npcLocation = location.clone();
@@ -84,8 +84,7 @@ public final class PlayerNPC extends EntityDataManager {
                     NPC.Pose pose = NPC.Pose.SWIMMING;
 
                     try {
-                        pose = NPC.Pose.valueOf(plugin.getConfig("playernpc.corpse.pose", grave)
-                                                      .getString("playernpc.corpse.pose"));
+                        pose = NPC.Pose.valueOf(plugin.getConfigString("playernpc.corpse.pose", grave));
                     }
                     catch (IllegalArgumentException ignored) {
                     }
@@ -111,10 +110,9 @@ public final class PlayerNPC extends EntityDataManager {
                     npc.setAutoShow(true);
                     npc.setCustomData("grave_uuid", grave.getUUID().toString());
 
-                    npc.setCollidable(plugin.getConfig("playernpc.corpse.collide", grave)
-                                            .getBoolean("playernpc.corpse.collide"));
+                    npc.setCollidable(plugin.getConfigBool("playernpc.corpse.collide", grave));
 
-                    if (plugin.getConfig("playernpc.corpse.armor", grave).getBoolean("playernpc.corpse.armor")) {
+                    if (plugin.getConfigBool("playernpc.corpse.armor", grave)) {
                         if (grave.getEquipmentMap().containsKey(EquipmentSlot.HEAD)) {
                             npc.setHelmet(grave.getEquipmentMap().get(EquipmentSlot.HEAD));
                         }
@@ -132,7 +130,7 @@ public final class PlayerNPC extends EntityDataManager {
                         }
                     }
 
-                    if (plugin.getConfig("playernpc.corpse.hand", grave).getBoolean("playernpc.corpse.hand")) {
+                    if (plugin.getConfigBool("playernpc.corpse.hand", grave)) {
                         if (grave.getEquipmentMap().containsKey(EquipmentSlot.HAND)) {
                             npc.setItemInRightHand(grave.getEquipmentMap().get(EquipmentSlot.HAND));
                         }
@@ -142,11 +140,9 @@ public final class PlayerNPC extends EntityDataManager {
                         }
                     }
 
-                    if (plugin.getConfig("playernpc.corpse.glow.enabled", grave)
-                              .getBoolean("playernpc.corpse.glow.enabled")) {
+                    if (plugin.getConfigBool("playernpc.corpse.glow.enabled", grave)) {
                         try {
-                            npc.setGlowing(true, ChatColor.valueOf(plugin.getConfig("playernpc.corpse.glow.color", grave)
-                                                                         .getString("playernpc.corpse.glow.color")));
+                            npc.setGlowing(true, ChatColor.valueOf(plugin.getConfigString("playernpc.corpse.glow.color", grave)));
                         }
                         catch (IllegalArgumentException ignored) {
                             npc.setGlowing(true);

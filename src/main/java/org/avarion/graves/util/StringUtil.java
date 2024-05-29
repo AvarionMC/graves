@@ -97,10 +97,8 @@ public final class StringUtil {
                                                                                     > 0
                                                                                     || grave.getTimeProtectionRemaining()
                                                                                        < 0)
-                                                          ? plugin.getConfig("protection.state.protected", grave)
-                                                                  .getString("protection.state.protected", "Protected")
-                                                          : plugin.getConfig("protection.state.unprotected", grave)
-                                                                  .getString("protection.state.unprotected", "Unprotected"))
+                                                          ? plugin.getConfigString("protection.state.protected", grave, "Protected")
+                                                          : plugin.getConfigString("protection.state.unprotected", grave, "Unprotected"))
                            .replace("%item%", String.valueOf(grave.getItemAmount()));
             if (grave.getExperience() > 0) {
                 string = string.replace("%level%", String.valueOf(ExperienceUtil.getLevelFromExperience(grave.getExperience())))
@@ -117,15 +115,9 @@ public final class StringUtil {
         }
 
         if (location != null && location.getWorld() != null && grave != null) {
-            string = string.replace("%world_formatted%", location.getWorld() != null
-                                                         ? plugin.getConfig("message.world."
-                                                                            + location.getWorld()
-                                                                                      .getName(), grave)
-                                                                 .getString("message.world."
-                                                                            + location.getWorld()
-                                                                                      .getName(), StringUtil.format(location.getWorld()
-                                                                                                                            .getName()))
-                                                         : "");
+            string = string.replace("%world_formatted%", location.getWorld() != null ? plugin.getConfigString(
+                    "message.world."
+                    + location.getWorld().getName(), grave, StringUtil.format(location.getWorld().getName())) : "");
         }
         else {
             string = string.replace("%world_formatted%", "");
@@ -195,11 +187,10 @@ public final class StringUtil {
 
     public static String getDateString(Grave grave, long time, Graves plugin) {
         if (time > 0) {
-            return new SimpleDateFormat(plugin.getConfig("time.date", grave)
-                                              .getString("time.date", "dd-MM-yyyy")).format(new Date(time));
+            return new SimpleDateFormat(plugin.getConfigString("time.date", grave, "dd-MM-yyyy")).format(new Date(time));
         }
 
-        return plugin.getConfig("time.infinite", grave).getString("time.infinite");
+        return plugin.getConfigString("time.infinite", grave);
     }
 
     public static String getTimeString(Grave grave, long time, Graves plugin) {
@@ -216,33 +207,25 @@ public final class StringUtil {
             String timeSecond = "";
 
             if (day > 0) {
-                timeDay = plugin.getConfig("time.day", grave)
-                                .getString("time.day")
-                                .replace("%day%", String.valueOf(day));
+                timeDay = plugin.getConfigString("time.day", grave).replace("%day%", String.valueOf(day));
             }
 
             if (hour > 0) {
-                timeHour = plugin.getConfig("time.hour", grave)
-                                 .getString("time.hour")
-                                 .replace("%hour%", String.valueOf(hour));
+                timeHour = plugin.getConfigString("time.hour", grave).replace("%hour%", String.valueOf(hour));
             }
 
             if (minute > 0) {
-                timeMinute = plugin.getConfig("time.minute", grave)
-                                   .getString("time.minute")
-                                   .replace("%minute%", String.valueOf(minute));
+                timeMinute = plugin.getConfigString("time.minute", grave).replace("%minute%", String.valueOf(minute));
             }
 
             if (second > 0) {
-                timeSecond = plugin.getConfig("time.second", grave)
-                                   .getString("time.second")
-                                   .replace("%second%", String.valueOf(second));
+                timeSecond = plugin.getConfigString("time.second", grave).replace("%second%", String.valueOf(second));
             }
 
             return normalizeSpace(timeDay + timeHour + timeMinute + timeSecond);
         }
 
-        return plugin.getConfig("time.infinite", grave).getString("time.infinite");
+        return plugin.getConfigString("time.infinite", grave);
     }
 
     private static String normalizeSpace(String string) {

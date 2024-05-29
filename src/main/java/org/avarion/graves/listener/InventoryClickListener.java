@@ -42,8 +42,7 @@ public class InventoryClickListener implements Listener {
 
                     if (grave != null) {
                         plugin.getEntityManager()
-                              .runFunction(player, plugin.getConfig("gui.menu.list.function", grave)
-                                                         .getString("gui.menu.list.function", "menu"), grave);
+                              .runFunction(player, plugin.getConfigString("gui.menu.list.function", grave, "menu"), grave);
                         plugin.getGUIManager().setGraveListItems(graveList.getInventory(), graveList.getUUID());
                     }
 
@@ -55,12 +54,9 @@ public class InventoryClickListener implements Listener {
 
                     if (grave != null) {
                         plugin.getEntityManager()
-                              .runFunction(player, plugin.getConfig("gui.menu.grave.slot."
-                                                                    + event.getSlot()
-                                                                    + ".function", grave)
-                                                         .getString("gui.menu.grave.slot."
-                                                                    + event.getSlot()
-                                                                    + ".function", "none"), grave);
+                              .runFunction(player, plugin.getConfigString("gui.menu.grave.slot."
+                                                                          + event.getSlot()
+                                                                          + ".function", grave, "none"), grave);
                         plugin.getGUIManager().setGraveMenuItems(graveMenu.getInventory(), grave);
                     }
 

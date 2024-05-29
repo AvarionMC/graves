@@ -56,9 +56,8 @@ public final class ItemsAdder extends EntityDataManager {
                                                                    .getOppositeFace()));
         location.setPitch(grave.getPitch());
 
-        if (plugin.getConfig("itemsadder.furniture.enabled", grave).getBoolean("itemsadder.furniture.enabled")) {
-            String name = plugin.getConfig("itemsadder.furniture.name", grave)
-                                .getString("itemsadder.furniture.name", "");
+        if (plugin.getConfigBool("itemsadder.furniture.enabled", grave)) {
+            String name = plugin.getConfigString("itemsadder.furniture.name", grave, "");
             location.getBlock().setType(Material.AIR);
             CustomFurniture customFurniture = createCustomFurniture(name, location);
 
@@ -105,8 +104,8 @@ public final class ItemsAdder extends EntityDataManager {
     }
 
     public void createBlock(Location location, Grave grave) {
-        if (plugin.getConfig("itemsadder.block.enabled", grave).getBoolean("itemsadder.block.enabled")) {
-            String name = plugin.getConfig("itemsadder.block.name", grave).getString("itemsadder.block.name", "");
+        if (plugin.getConfigBool("itemsadder.block.enabled", grave)) {
+            String name = plugin.getConfigString("itemsadder.block.name", grave, "");
             CustomBlock customBlock = createCustomBlock(name, location);
 
             if (customBlock != null) {

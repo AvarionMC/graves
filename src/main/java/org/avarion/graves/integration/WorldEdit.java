@@ -84,14 +84,13 @@ public final class WorldEdit {
     }
 
     public void createSchematic(Location location, Grave grave) {
-        if (location.getWorld() != null && plugin.getConfig("schematic.enabled", grave)
-                                                 .getBoolean("schematic.enabled")) {
-            String schematicName = plugin.getConfig("schematic.name", grave).getString("schematic.name");
+        if (location.getWorld() != null && plugin.getConfigBool("schematic.enabled", grave)) {
+            String schematicName = plugin.getConfigString("schematic.name", grave);
 
-            if (schematicName != null && !schematicName.equals("") && hasSchematic(schematicName)) {
-                int offsetX = plugin.getConfig("schematic.offset.x", grave).getInt("schematic.offset.x");
-                int offsetY = plugin.getConfig("schematic.offset.y", grave).getInt("schematic.offset.y");
-                int offsetZ = plugin.getConfig("schematic.offset.z", grave).getInt("schematic.offset.z");
+            if (schematicName != null && !schematicName.isEmpty() && hasSchematic(schematicName)) {
+                int offsetX = plugin.getConfigInt("schematic.offset.x", grave);
+                int offsetY = plugin.getConfigInt("schematic.offset.y", grave);
+                int offsetZ = plugin.getConfigInt("schematic.offset.z", grave);
 
 
                 pasteSchematic(location.clone().add(offsetX, offsetY, offsetZ), location.getYaw(), schematicName);

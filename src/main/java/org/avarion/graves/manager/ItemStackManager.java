@@ -31,21 +31,21 @@ public final class ItemStackManager extends EntityDataManager {
             List<String> lineList = new ArrayList<>();
             List<String> loreList = new ArrayList<>();
 
-            for (String lore : plugin.getConfig("obituary.line", grave).getStringList("obituary.line")) {
+            for (String lore : plugin.getConfigStringList("obituary.line", grave)) {
                 lineList.add(StringUtil.parseString(lore, grave.getLocationDeath(), grave, plugin));
             }
 
-            for (String string : plugin.getConfig("obituary.lore", grave).getStringList("obituary.lore")) {
+            for (String string : plugin.getConfigStringList("obituary.lore", grave)) {
                 loreList.add(ChatColor.GRAY + StringUtil.parseString(string, grave.getLocationDeath(), grave, plugin));
             }
 
-            int customModelData = plugin.getConfig("obituary.model-data", grave).getInt("obituary.model-data", -1);
+            int customModelData = plugin.getConfigInt("obituary.model-data", grave, -1);
 
             if (customModelData > -1) {
                 bookMeta.setCustomModelData(customModelData);
             }
 
-            if (plugin.getConfig("obituary.glow", grave).getBoolean("obituary.glow")) {
+            if (plugin.getConfigBool("obituary.glow", grave)) {
                 bookMeta.addEnchant(Enchantment.DURABILITY, 1, true);
 
                 bookMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
@@ -54,10 +54,9 @@ public final class ItemStackManager extends EntityDataManager {
             bookMeta.setGeneration(null);
             bookMeta.setPages(String.join("\n", lineList));
             bookMeta.setLore(loreList);
-            bookMeta.setTitle(ChatColor.WHITE + StringUtil.parseString(plugin.getConfig("obituary.title", grave)
-                                                                             .getString("obituary.title"), grave, plugin));
-            bookMeta.setAuthor(StringUtil.parseString(plugin.getConfig("obituary.author", grave)
-                                                            .getString("obituary.author"), grave, plugin));
+            bookMeta.setTitle(ChatColor.WHITE
+                              + StringUtil.parseString(plugin.getConfigString("obituary.title", grave), grave, plugin));
+            bookMeta.setAuthor(StringUtil.parseString(plugin.getConfigString("obituary.author", grave), grave, plugin));
             itemStack.setItemMeta(bookMeta);
         }
 
@@ -71,19 +70,19 @@ public final class ItemStackManager extends EntityDataManager {
         if (itemMeta != null) {
             List<String> loreList = new ArrayList<>();
 
-            for (String string : plugin.getConfig("head.lore", grave).getStringList("head.lore")) {
+            for (String string : plugin.getConfigStringList("head.lore", grave)) {
                 loreList.add(ChatColor.GRAY + StringUtil.parseString(string, grave.getLocationDeath(), grave, plugin));
             }
 
-            int customModelData = plugin.getConfig("head.model-data", grave).getInt("head.model-data", -1);
+            int customModelData = plugin.getConfigInt("head.model-data", grave, -1);
 
             if (customModelData > -1) {
                 itemMeta.setCustomModelData(customModelData);
             }
 
             itemMeta.setLore(loreList);
-            itemMeta.setDisplayName(ChatColor.WHITE + StringUtil.parseString(plugin.getConfig("head.name", grave)
-                                                                                   .getString("head.name"), grave, plugin));
+            itemMeta.setDisplayName(ChatColor.WHITE
+                                    + StringUtil.parseString(plugin.getConfigString("head.name", grave), grave, plugin));
             itemStack.setItemMeta(itemMeta);
         }
 
@@ -93,8 +92,8 @@ public final class ItemStackManager extends EntityDataManager {
     public ItemStack createGraveListItemStack(int number, Grave grave) {
         Material material;
 
-        if (plugin.getConfig("gui.menu.list.item.block", grave).getBoolean("gui.menu.list.item.block")) {
-            String materialString = plugin.getConfig("block.material", grave).getString("block.material", "CHEST");
+        if (plugin.getConfigBool("gui.menu.list.item.block", grave)) {
+            String materialString = plugin.getConfigString("block.material", grave, "CHEST");
 
             material = Material.matchMaterial(materialString);
         }
@@ -115,14 +114,13 @@ public final class ItemStackManager extends EntityDataManager {
 
         if (itemStack.getItemMeta() != null) {
             ItemMeta itemMeta = itemStack.getItemMeta();
-            String name = ChatColor.WHITE + StringUtil.parseString(plugin.getConfig("gui.menu.list.name", grave)
-                                                                         .getString("gui.menu.list.name"), grave, plugin)
+            String name = ChatColor.WHITE
+                          + StringUtil.parseString(plugin.getConfigString("gui.menu.list.name", grave), grave, plugin)
                                                       .replace("%number%", String.valueOf(number));
             List<String> loreList = new ArrayList<>();
-            int customModelData = plugin.getConfig("gui.menu.list.model-data", grave)
-                                        .getInt("gui.menu.list.model-data", -1);
+            int customModelData = plugin.getConfigInt("gui.menu.list.model-data", grave, -1);
 
-            for (String string : plugin.getConfig("gui.menu.list.lore", grave).getStringList("gui.menu.list.lore")) {
+            for (String string : plugin.getConfigStringList("gui.menu.list.lore", grave)) {
                 loreList.add(ChatColor.GRAY + StringUtil.parseString(string, grave.getLocationDeath(), grave, plugin));
             }
 
@@ -144,8 +142,7 @@ public final class ItemStackManager extends EntityDataManager {
     }
 
     public ItemStack createGraveMenuItemStack(int slot, Grave grave) {
-        String materialString = plugin.getConfig("gui.menu.grave.slot." + slot + ".material", grave)
-                                      .getString("gui.menu.grave.slot." + slot + ".material", "PAPER");
+        String materialString = plugin.getConfigString("gui.menu.grave.slot." + slot + ".material", grave, "PAPER");
         Material material = Material.matchMaterial(materialString);
 
         if (material == null) {
@@ -158,18 +155,13 @@ public final class ItemStackManager extends EntityDataManager {
 
         if (itemStack.getItemMeta() != null) {
             ItemMeta itemMeta = itemStack.getItemMeta();
-            String name = ChatColor.WHITE + StringUtil.parseString(plugin.getConfig("gui.menu.grave.slot."
+            String name = ChatColor.WHITE + StringUtil.parseString(plugin.getConfigString("gui.menu.grave.slot."
                                                                                     + slot
-                                                                                    + ".name", grave)
-                                                                         .getString("gui.menu.grave.slot."
-                                                                                    + slot
-                                                                                    + ".name"), grave, plugin);
+                                                                                          + ".name", grave), grave, plugin);
             List<String> loreList = new ArrayList<>();
-            int customModelData = plugin.getConfig("gui.menu.grave.slot." + slot + ".model-data", grave)
-                                        .getInt("gui.menu.grave.slot." + slot + ".model-data", -1);
+            int customModelData = plugin.getConfigInt("gui.menu.grave.slot." + slot + ".model-data", grave, -1);
 
-            for (String string : plugin.getConfig("gui.menu.grave.slot." + slot + ".lore", grave)
-                                       .getStringList("gui.menu.grave.slot." + slot + ".lore")) {
+            for (String string : plugin.getConfigStringList("gui.menu.grave.slot." + slot + ".lore", grave)) {
                 loreList.add(ChatColor.GRAY + StringUtil.parseString(string, grave.getLocationDeath(), grave, plugin));
             }
 

@@ -38,7 +38,7 @@ public class EntityDeathListener implements Listener {
         String entityName = plugin.getEntityManager().getEntityName(livingEntity);
         Location location = LocationUtil.roundLocation(livingEntity.getLocation());
         List<String> permissionList = livingEntity instanceof Player ? plugin.getPermissionList(livingEntity) : null;
-        List<String> worldList = plugin.getConfig("world", livingEntity, permissionList).getStringList("world");
+        List<String> worldList = plugin.getConfigStringList("world", livingEntity, permissionList);
         List<ItemStack> removedItemStackList = new ArrayList<>();
 
         // Removed items
@@ -70,8 +70,7 @@ public class EntityDeathListener implements Listener {
                                                                            .split("\\|"))
                                                      : null;
 
-            if (!plugin.getConfig("zombie.drop", zombieGraveEntityType, zombieGravePermissionList)
-                       .getBoolean("zombie.drop")) {
+            if (!plugin.getConfigBool("zombie.drop", zombieGraveEntityType, zombieGravePermissionList)) {
                 event.getDrops().clear();
                 event.setDroppedExp(0);
             }
@@ -100,7 +99,7 @@ public class EntityDeathListener implements Listener {
         }
 
         // Enabled
-        if (!plugin.getConfig("grave.enabled", livingEntity, permissionList).getBoolean("grave.enabled")) {
+        if (!plugin.getConfigBool("grave.enabled", livingEntity, permissionList)) {
             if (livingEntity instanceof Player) {
                 plugin.debugMessage("Grave not created for " + entityName + " because they have graves disabled", 2);
             }
@@ -130,8 +129,7 @@ public class EntityDeathListener implements Listener {
 
         // Creature spawn reason
         if (livingEntity instanceof Creature) {
-            List<String> spawnReasonList = plugin.getConfig("spawn.reason", livingEntity, permissionList)
-                                                 .getStringList("spawn.reason");
+            List<String> spawnReasonList = plugin.getConfigStringList("spawn.reason", livingEntity, permissionList);
 
             if (plugin.getEntityManager().hasDataString(livingEntity, "spawnReason")
                 && (!spawnReasonList.contains("ALL") && !spawnReasonList.contains(plugin.getEntityManager()
@@ -206,23 +204,19 @@ public class EntityDeathListener implements Listener {
         // PvP, PvE, Environmental
         if (livingEntity.getLastDamageCause() != null) {
             EntityDamageEvent.DamageCause damageCause = livingEntity.getLastDamageCause().getCause();
-            List<String> damageCauseList = plugin.getConfig("death.reason", livingEntity, permissionList)
-                                                 .getStringList("death.reason");
+            List<String> damageCauseList = plugin.getConfigStringList("death.reason", livingEntity, permissionList);
 
             if (!damageCauseList.contains("ALL") && !damageCauseList.contains(damageCause.name()) && (damageCause
                                                                                                       == EntityDamageEvent.DamageCause.ENTITY_ATTACK
                                                                                                       && ((livingEntity.getKiller()
                                                                                                            != null
-                                                                                                           && !plugin.getConfig("death.player", livingEntity, permissionList)
-                                                                                                                     .getBoolean("death.player"))
+                                                                                                           && !plugin.getConfigBool("death.player", livingEntity, permissionList))
                                                                                                           || (livingEntity.getKiller()
                                                                                                               == null
-                                                                                                              && !plugin.getConfig("death.entity", livingEntity, permissionList)
-                                                                                                                        .getBoolean("death.entity")))
+                                                                                                              && !plugin.getConfigBool("death.entity", livingEntity, permissionList)))
                                                                                                       || (damageCause
                                                                                                           != EntityDamageEvent.DamageCause.ENTITY_ATTACK
-                                                                                                          && !plugin.getConfig("death.environmental", livingEntity, permissionList)
-                                                                                                                    .getBoolean("death.environmental")))) {
+                                                                                                          && !plugin.getConfigBool("death.environmental", livingEntity, permissionList)))) {
                 plugin.debugMessage("Grave not created for "
                                     + entityName
                                     + " because they died to an invalid damage cause", 2);
@@ -233,7 +227,7 @@ public class EntityDeathListener implements Listener {
 
         // Max
         if (plugin.getGraveManager().getGraveList(livingEntity).size()
-            >= plugin.getConfig("grave.max", livingEntity, permissionList).getInt("grave.max")) {
+            >= plugin.getConfigInt("grave.max", livingEntity, permissionList)) {
             plugin.getEntityManager()
                   .sendMessage("message.max", livingEntity, livingEntity.getLocation(), permissionList);
             plugin.debugMessage("Grave not created for " + entityName + " because they reached maximum graves", 2);
@@ -242,8 +236,8 @@ public class EntityDeathListener implements Listener {
         }
 
         // Token
-        if (plugin.getConfig("token.enabled", livingEntity, permissionList).getBoolean("token.enabled")) {
-            String name = plugin.getConfig("token.name", livingEntity).getString("token.name", "basic");
+        if (plugin.getConfigBool("token.enabled", livingEntity, permissionList)) {
+            String name = plugin.getConfigString("token.name", livingEntity, "basic");
 
             if (plugin.getConfig().isConfigurationSection("settings.token." + name)) {
                 ItemStack itemStack = plugin.getRecipeManager().getGraveTokenFromPlayer(name, event.getDrops());
@@ -277,15 +271,13 @@ public class EntityDeathListener implements Listener {
             if (itemStack != null) {
                 // Ignore compass
                 if (plugin.getEntityManager().getGraveUUIDFromItemStack(itemStack) != null) {
-                    if (plugin.getConfig("compass.destroy", livingEntity, permissionList)
-                              .getBoolean("compass.destroy")) {
+                    if (plugin.getConfigBool("compass.destroy", livingEntity, permissionList)) {
                         dropItemStackListIterator.remove();
                         event.getDrops().remove(itemStack);
 
                         continue;
                     }
-                    else if (plugin.getConfig("compass.ignore", livingEntity, permissionList)
-                                   .getBoolean("compass.ignore")) {
+                    else if (plugin.getConfigBool("compass.ignore", livingEntity, permissionList)) {
                         continue;
                     }
                 }
@@ -310,14 +302,14 @@ public class EntityDeathListener implements Listener {
             grave.setPermissionList(permissionList);
             grave.setYaw(livingEntity.getLocation().getYaw());
             grave.setPitch(livingEntity.getLocation().getPitch());
-            grave.setTimeAlive(plugin.getConfig("grave.time", grave).getInt("grave.time") * 1000L);
+            grave.setTimeAlive(plugin.getConfigInt("grave.time", grave) * 1000L);
 
             // Skin
             grave.setOwnerTexture(SkinUtil.getTexture(livingEntity));
             grave.setOwnerTextureSignature(SkinUtil.getSignature(livingEntity));
 
             // Experience
-            float experiencePercent = (float) plugin.getConfig("experience.store", grave).getDouble("experience.store");
+            double experiencePercent = plugin.getConfigDbl("experience.store", grave);
 
             if (experiencePercent >= 0) {
                 if (livingEntity instanceof Player) {
@@ -371,9 +363,9 @@ public class EntityDeathListener implements Listener {
             }
 
             // Protection
-            if (plugin.getConfig("protection.enabled", grave).getBoolean("protection.enabled")) {
+            if (plugin.getConfigBool("protection.enabled", grave)) {
                 grave.setProtection(true);
-                grave.setTimeProtection(plugin.getConfig("protection.time", grave).getInt("protection.time") * 1000L);
+                grave.setTimeProtection(plugin.getConfigInt("protection.time", grave) * 1000L);
             }
 
             GraveCreateEvent graveCreateEvent = new GraveCreateEvent(livingEntity, grave);
@@ -393,7 +385,7 @@ public class EntityDeathListener implements Listener {
                 grave.getLocationDeath().setPitch(grave.getPitch());
 
                 // Graveyard
-                if (plugin.getConfig("graveyard.enabled", grave).getBoolean("graveyard.enabled")) {
+                if (plugin.getConfigBool("graveyard.enabled", grave)) {
                     Graveyard graveyard = plugin.getGraveyardManager()
                                                 .getClosestGraveyard(grave.getLocationDeath(), livingEntity);
 
@@ -402,7 +394,7 @@ public class EntityDeathListener implements Listener {
                                                                              .getGraveyardFreeSpaces(graveyard);
 
                         if (!graveyardFreeSpaces.isEmpty()) {
-                            if (plugin.getConfig("graveyard.death", grave).getBoolean("graveyard.death")) {
+                            if (plugin.getConfigBool("graveyard.death", grave)) {
                                 locationMap.put(grave.getLocationDeath(), BlockData.BlockType.DEATH);
                             }
 
@@ -428,13 +420,13 @@ public class EntityDeathListener implements Listener {
                 }
 
                 // Obituary
-                if (plugin.getConfig("obituary.enabled", grave).getBoolean("obituary.enabled")) {
+                if (plugin.getConfigBool("obituary.enabled", grave)) {
                     graveItemStackList.add(plugin.getItemStackManager().getGraveObituary(grave));
                 }
 
                 // Skull
-                if (plugin.getConfig("head.enabled", grave).getBoolean("head.enabled")
-                    && Math.random() < plugin.getConfig("head.percent", grave).getDouble("head.percent")
+                if (plugin.getConfigBool("head.enabled", grave)
+                    && Math.random() < plugin.getConfigDbl("head.percent", grave)
                     && grave.getOwnerTexture() != null
                     && grave.getOwnerTextureSignature() != null) {
                     graveItemStackList.add(plugin.getItemStackManager().getGraveHead(grave));
@@ -474,19 +466,18 @@ public class EntityDeathListener implements Listener {
 
                         switch (entry.getValue()) {
                             case DEATH:
-
                                 break;
+
                             case NORMAL:
-                                offsetX = plugin.getConfig("placement.offset.x", grave).getInt("placement.offset.x");
-                                offsetY = plugin.getConfig("placement.offset.y", grave).getInt("placement.offset.y");
-                                offsetZ = plugin.getConfig("placement.offset.z", grave).getInt("placement.offset.z");
-
+                                offsetX = plugin.getConfigInt("placement.offset.x", grave);
+                                offsetY = plugin.getConfigInt("placement.offset.y", grave);
+                                offsetZ = plugin.getConfigInt("placement.offset.z", grave);
                                 break;
+
                             case GRAVEYARD:
                                 offsetX = plugin.getConfig().getInt("settings.graveyard.offset.x");
                                 offsetY = plugin.getConfig().getInt("settings.graveyard.offset.y");
                                 offsetZ = plugin.getConfig().getInt("settings.graveyard.offset.z");
-
                                 break;
                         }
 
@@ -505,8 +496,8 @@ public class EntityDeathListener implements Listener {
                     }
                 }
                 else {
-                    if (event instanceof PlayerDeathEvent && plugin.getConfig("placement.failure-keep-inventory", grave)
-                                                                   .getBoolean("placement.failure-keep-inventory")) {
+                    if (event instanceof PlayerDeathEvent
+                        && plugin.getConfigBool("placement.failure-keep-inventory", grave)) {
                         PlayerDeathEvent playerDeathEvent = (PlayerDeathEvent) event;
 
                         try {

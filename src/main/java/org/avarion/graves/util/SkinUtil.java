@@ -96,7 +96,7 @@ public final class SkinUtil {
             try {
                 String base64 = SkullTextureAPI.getTexture(entity);
 
-                if (base64 != null && !base64.equals("")) {
+                if (base64 != null && !base64.isEmpty()) {
                     return base64;
                 }
             }
@@ -119,7 +119,7 @@ public final class SkinUtil {
                 findGameProfileMethod(playerObject);
             }
 
-            if (GAMEPROFILE_METHOD != null && !GAMEPROFILE_METHOD.equals("")) {
+            if (GAMEPROFILE_METHOD != null && !GAMEPROFILE_METHOD.isEmpty()) {
                 Method gameProfile = playerObject.getClass().getMethod(GAMEPROFILE_METHOD);
 
                 gameProfile.setAccessible(true);
