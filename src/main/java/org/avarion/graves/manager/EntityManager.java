@@ -39,78 +39,74 @@ public final class EntityManager extends EntityDataManager {
     }
 
     public ItemStack createGraveCompass(Player player, Location location, Grave grave) {
-        if (true) {
-            Material material = Material.COMPASS;
+        Material material = Material.COMPASS;
 
-            if (plugin.getConfigBool("compass.recovery", grave)) {
-                try {
-                    material = Material.valueOf("RECOVERY_COMPASS");
-                }
-                catch (IllegalArgumentException ignored) {
-                }
+        if (plugin.getConfigBool("compass.recovery", grave)) {
+            try {
+                material = Material.valueOf("RECOVERY_COMPASS");
             }
-
-            ItemStack itemStack = new ItemStack(material);
-            ItemMeta itemMeta = itemStack.getItemMeta();
-
-            if (itemMeta != null) {
-                if (itemMeta instanceof CompassMeta) {
-                    CompassMeta compassMeta = (CompassMeta) itemMeta;
-
-                    compassMeta.setLodestoneTracked(false);
-                    compassMeta.setLodestone(location);
-                }
-                else if (itemStack.getType().name().equals("RECOVERY_COMPASS")) {
-                    try {
-                        // Not known in 1.18 yet...
-                        Method setLastDeathLocationMethod = player.getClass().getMethod("setLastDeathLocation", Location.class);
-                        setLastDeathLocationMethod.invoke(player, location);                    }
-                    catch (Exception ignored) {
-                    }
-                }
-
-                List<String> loreList = new ArrayList<>();
-                int customModelData = plugin.getConfigInt("compass.model-data", grave, -1);
-
-                if (customModelData > -1) {
-                    itemMeta.setCustomModelData(customModelData);
-                }
-
-                if (plugin.getConfigBool("compass.glow", grave)) {
-                    itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
-                    itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                }
-
-                itemMeta.setDisplayName(ChatColor.WHITE
-                                        + StringUtil.parseString(plugin.getConfigString("compass.name", grave), grave, plugin));
-                itemMeta.getPersistentDataContainer()
-                        .set(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING, grave.getUUID()
-                                                                                                     .toString());
-
-                for (String string : plugin.getConfigStringList("compass.lore", grave)) {
-                    loreList.add(ChatColor.GRAY + StringUtil.parseString(string, location, grave, plugin));
-                }
-
-                itemMeta.setLore(loreList);
-                itemStack.setItemMeta(itemMeta);
+            catch (IllegalArgumentException ignored) {
             }
-
-            return itemStack;
         }
 
-        return null;
+        ItemStack itemStack = new ItemStack(material);
+        ItemMeta itemMeta = itemStack.getItemMeta();
+
+        if (itemMeta != null) {
+            if (itemMeta instanceof CompassMeta) {
+                CompassMeta compassMeta = (CompassMeta) itemMeta;
+
+                compassMeta.setLodestoneTracked(false);
+                compassMeta.setLodestone(location);
+            }
+            else if (itemStack.getType().name().equals("RECOVERY_COMPASS")) {
+                try {
+                    // Not known in 1.18 yet...
+                    Method setLastDeathLocationMethod = player.getClass()
+                                                              .getMethod("setLastDeathLocation", Location.class);
+                    setLastDeathLocationMethod.invoke(player, location);
+                }
+                catch (Exception ignored) {
+                }
+            }
+
+            List<String> loreList = new ArrayList<>();
+            int customModelData = plugin.getConfigInt("compass.model-data", grave, -1);
+
+            if (customModelData > -1) {
+                itemMeta.setCustomModelData(customModelData);
+            }
+
+            if (plugin.getConfigBool("compass.glow", grave)) {
+                itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
+                itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            }
+
+            itemMeta.setDisplayName(ChatColor.WHITE
+                                    + StringUtil.parseString(plugin.getConfigString("compass.name", grave), grave, plugin));
+            itemMeta.getPersistentDataContainer()
+                    .set(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING, grave.getUUID().toString());
+
+            for (String string : plugin.getConfigStringList("compass.lore", grave)) {
+                loreList.add(ChatColor.GRAY + StringUtil.parseString(string, location, grave, plugin));
+            }
+
+            itemMeta.setLore(loreList);
+            itemStack.setItemMeta(itemMeta);
+        }
+
+        return itemStack;
+
     }
 
     public Map<ItemStack, UUID> getCompassesFromInventory(HumanEntity player) {
         Map<ItemStack, UUID> itemStackUUIDMap = new HashMap<>();
 
-        if (true) {
-            for (ItemStack itemStack : player.getInventory().getContents()) {
-                UUID uuid = getGraveUUIDFromItemStack(itemStack);
+        for (ItemStack itemStack : player.getInventory().getContents()) {
+            UUID uuid = getGraveUUIDFromItemStack(itemStack);
 
-                if (uuid != null) {
-                    itemStackUUIDMap.put(itemStack, uuid);
-                }
+            if (uuid != null) {
+                itemStackUUIDMap.put(itemStack, uuid);
             }
         }
 
@@ -635,22 +631,16 @@ public final class EntityManager extends EntityDataManager {
 
                         createEntityData(location, armorStand.getUniqueId(), grave.getUUID(), EntityData.Type.ARMOR_STAND);
 
-                        if (true) {
-                            try {
-                                armorStand.setMarker(marker);
-                            }
-                            catch (NoSuchMethodError ignored) {
-                            }
+                        try {
+                            armorStand.setMarker(marker);
+                        }
+                        catch (NoSuchMethodError ignored) {
                         }
 
-                        if (true) {
-                            armorStand.setInvulnerable(true);
-                        }
+                        armorStand.setInvulnerable(true);
 
-                        if (true) {
-                            armorStand.getScoreboardTags().add("graveArmorStand");
-                            armorStand.getScoreboardTags().add("graveArmorStandUUID:" + grave.getUUID());
-                        }
+                        armorStand.getScoreboardTags().add("graveArmorStand");
+                        armorStand.getScoreboardTags().add("graveArmorStandUUID:" + grave.getUUID());
 
                         armorStand.setVisible(false);
                         armorStand.setGravity(false);
@@ -709,14 +699,10 @@ public final class EntityManager extends EntityDataManager {
                         itemFrame.setCustomNameVisible(false);
                         itemFrame.setItem(itemStack);
 
-                        if (true) {
-                            itemFrame.setInvulnerable(true);
-                        }
+                        itemFrame.setInvulnerable(true);
 
-                        if (true) {
-                            itemFrame.getScoreboardTags().add("graveItemFrame");
-                            itemFrame.getScoreboardTags().add("graveItemFrameUUID:" + grave.getUUID());
-                        }
+                        itemFrame.getScoreboardTags().add("graveItemFrame");
+                        itemFrame.getScoreboardTags().add("graveItemFrameUUID:" + grave.getUUID());
 
                         createEntityData(location, itemFrame.getUniqueId(), grave.getUUID(), EntityData.Type.ITEM_FRAME);
                     }
@@ -767,22 +753,14 @@ public final class EntityManager extends EntityDataManager {
                 equipmentSlotItemStackMap.put(EquipmentSlot.FEET, entityEquipment.getBoots());
             }
 
-            if (true) {
-                if (entityEquipment.getItemInMainHand().getType() != Material.AIR && grave.getInventory()
-                                                                                          .contains(entityEquipment.getItemInMainHand())) {
-                    equipmentSlotItemStackMap.put(EquipmentSlot.HAND, entityEquipment.getItemInMainHand());
-                }
-
-                if (entityEquipment.getItemInOffHand().getType() != Material.AIR && grave.getInventory()
-                                                                                         .contains(entityEquipment.getItemInOffHand())) {
-                    equipmentSlotItemStackMap.put(EquipmentSlot.OFF_HAND, entityEquipment.getItemInOffHand());
-                }
+            if (entityEquipment.getItemInMainHand().getType() != Material.AIR && grave.getInventory()
+                                                                                      .contains(entityEquipment.getItemInMainHand())) {
+                equipmentSlotItemStackMap.put(EquipmentSlot.HAND, entityEquipment.getItemInMainHand());
             }
-            else {
-                if (entityEquipment.getItemInMainHand().getType() != Material.AIR && grave.getInventory()
-                                                                                          .contains(entityEquipment.getItemInMainHand())) {
-                    equipmentSlotItemStackMap.put(EquipmentSlot.HAND, entityEquipment.getItemInMainHand());
-                }
+
+            if (entityEquipment.getItemInOffHand().getType() != Material.AIR && grave.getInventory()
+                                                                                     .contains(entityEquipment.getItemInOffHand())) {
+                equipmentSlotItemStackMap.put(EquipmentSlot.OFF_HAND, entityEquipment.getItemInOffHand());
             }
         }
 
@@ -795,11 +773,10 @@ public final class EntityManager extends EntityDataManager {
             if (entity instanceof Player) {
                 return entity.getName(); // Need redundancy for legacy support
             }
-            else if (true) {
+            else {
                 return entity.getName();
             }
 
-            return StringUtil.format(entity.getType().toString());
         }
 
         return "null";
@@ -823,21 +800,11 @@ public final class EntityManager extends EntityDataManager {
     }
 
     public void setDataString(Entity entity, String key, String string) {
-        if (true) {
-            entity.getPersistentDataContainer().set(new NamespacedKey(plugin, key), PersistentDataType.STRING, string);
-        }
-        else {
-            entity.setMetadata(key, new FixedMetadataValue(plugin, string));
-        }
+        entity.getPersistentDataContainer().set(new NamespacedKey(plugin, key), PersistentDataType.STRING, string);
     }
 
     public void setDataByte(Entity entity, String key) {
-        if (true) {
-            entity.getPersistentDataContainer().set(new NamespacedKey(plugin, key), PersistentDataType.BYTE, (byte) 1);
-        }
-        else {
-            entity.setMetadata(key, new FixedMetadataValue(plugin, (byte) 1));
-        }
+        entity.getPersistentDataContainer().set(new NamespacedKey(plugin, key), PersistentDataType.BYTE, (byte) 1);
     }
 
     public Grave getGraveFromEntityData(Entity entity) {
