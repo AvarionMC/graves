@@ -10,6 +10,8 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -21,11 +23,11 @@ public final class LocationManager {
         this.plugin = plugin;
     }
 
-    public void setLastSolidLocation(Entity entity, Location location) {
+    public void setLastSolidLocation(@NotNull Entity entity, Location location) {
         CacheManager.lastLocationMap.put(entity.getUniqueId(), location);
     }
 
-    public Location getLastSolidLocation(Entity entity) {
+    public @Nullable Location getLastSolidLocation(@NotNull Entity entity) {
         Location location = CacheManager.lastLocationMap.get(entity.getUniqueId());
 
         return location != null
@@ -34,11 +36,11 @@ public final class LocationManager {
                && location.getBlock().getRelative(BlockFace.DOWN).getType().isSolid() ? location : null;
     }
 
-    public void removeLastSolidLocation(Entity entity) {
+    public void removeLastSolidLocation(@NotNull Entity entity) {
         CacheManager.lastLocationMap.remove(entity.getUniqueId());
     }
 
-    public Location getSafeTeleportLocation(Entity entity, Location location, Grave grave, Graves plugin) {
+    public @Nullable Location getSafeTeleportLocation(Entity entity, @NotNull Location location, Grave grave, Graves plugin) {
         if (location.getWorld() != null) {
             if (plugin.getConfigBool("teleport.unsafe", grave)
                 || isLocationSafePlayer(location)) {
@@ -105,7 +107,7 @@ public final class LocationManager {
         return findLocationDownFromY(location, entity, location.getBlockY(), grave);
     }
 
-    private Location findLocationDownFromY(Location location, Entity entity, int y, Grave grave) {
+    private @Nullable Location findLocationDownFromY(Location location, Entity entity, int y, Grave grave) {
         location = location.clone();
         int counter = 0;
 
@@ -128,7 +130,7 @@ public final class LocationManager {
         return null;
     }
 
-    private Location findLocationUpFromY(Location location, Entity entity, int y, Grave grave) {
+    private @Nullable Location findLocationUpFromY(Location location, Entity entity, int y, Grave grave) {
         location = location.clone();
         int counter = 0;
 
@@ -151,7 +153,7 @@ public final class LocationManager {
         return null;
     }
 
-    public Location getVoid(Location location, Entity entity, Grave grave) {
+    public @Nullable Location getVoid(Location location, Entity entity, Grave grave) {
         if (plugin.getConfigBool("placement.void", grave)) {
             location = location.clone();
 
@@ -179,7 +181,7 @@ public final class LocationManager {
         return null;
     }
 
-    public Location getLavaTop(Location location, Entity entity, Grave grave) {
+    public @Nullable Location getLavaTop(Location location, Entity entity, Grave grave) {
         if (plugin.getConfigBool("placement.lava-smart", grave)) {
             Location solidLocation = plugin.getLocationManager().getLastSolidLocation(entity);
 
@@ -228,7 +230,7 @@ public final class LocationManager {
         return true;
     }
 
-    public boolean isLocationSafePlayer(Location location) {
+    public boolean isLocationSafePlayer(@NotNull Location location) {
         Block block = location.getBlock();
 
         if (isInsideBorder(location) && !block.getType().isSolid() && !MaterialUtil.isLava(block.getType())) {
@@ -260,16 +262,16 @@ public final class LocationManager {
                                                                        .containsKey(location);
     }
 
-    public boolean isInsideBorder(Location location) {
+    public boolean isInsideBorder(@NotNull Location location) {
         return (location.getWorld() != null && location.getWorld().getWorldBorder().isInside(location));
     }
 
-    public boolean isVoid(Location location) {
+    public boolean isVoid(@NotNull Location location) {
         return location.getWorld() != null && (location.getY() < getMinHeight(location)
                                                || location.getY() > location.getWorld().getMaxHeight());
     }
 
-    public int getMinHeight(Location location) {
+    public int getMinHeight(@NotNull Location location) {
         return location.getWorld() != null ? location.getWorld().getMinHeight() : 0;
     }
 
