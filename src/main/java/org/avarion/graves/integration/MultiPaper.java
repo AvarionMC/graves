@@ -5,6 +5,7 @@ import org.avarion.graves.Graves;
 import org.avarion.graves.data.BlockData;
 import org.avarion.graves.data.EntityData;
 import org.avarion.graves.data.HologramData;
+import org.avarion.graves.manager.CacheManager;
 import org.avarion.graves.type.Grave;
 import org.avarion.graves.util.Base64Util;
 import org.avarion.graves.util.StringUtil;
@@ -113,7 +114,7 @@ public final class MultiPaper {
             UUID uuid = UUIDUtil.getUUID(data);
 
             if (uuid != null) {
-                if (plugin.getCacheManager().getGraveMap().containsKey(uuid)) {
+                if (CacheManager.graveMap.containsKey(uuid)) {
                     plugin.getDataManager().removeGrave(uuid);
                     plugin.debugMessage("MultiLib, removing grave " + uuid, 2);
                 }

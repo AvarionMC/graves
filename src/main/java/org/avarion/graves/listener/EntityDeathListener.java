@@ -4,6 +4,7 @@ import org.avarion.graves.Graves;
 import org.avarion.graves.data.BlockData;
 import org.avarion.graves.event.GraveBlockPlaceEvent;
 import org.avarion.graves.event.GraveCreateEvent;
+import org.avarion.graves.manager.CacheManager;
 import org.avarion.graves.type.Grave;
 import org.avarion.graves.type.Graveyard;
 import org.avarion.graves.util.*;
@@ -42,11 +43,10 @@ public class EntityDeathListener implements Listener {
         List<ItemStack> removedItemStackList = new ArrayList<>();
 
         // Removed items
-        if (plugin.getCacheManager().getRemovedItemStackMap().containsKey(livingEntity.getUniqueId())) {
-            removedItemStackList.addAll(plugin.getCacheManager()
-                                              .getRemovedItemStackMap()
+        if (CacheManager.removedItemStackMap.containsKey(livingEntity.getUniqueId())) {
+            removedItemStackList.addAll(CacheManager.removedItemStackMap
                                               .get(livingEntity.getUniqueId()));
-            plugin.getCacheManager().getRemovedItemStackMap().remove(livingEntity.getUniqueId());
+            CacheManager.removedItemStackMap.remove(livingEntity.getUniqueId());
         }
 
         // Mohist

@@ -46,8 +46,8 @@ public class EntityDataManager {
     public Grave getGrave(Location location, UUID uuid) {
         EntityData entityData = getEntityData(location, uuid);
 
-        return entityData != null && plugin.getCacheManager().getGraveMap().containsKey(entityData.getUUIDGrave())
-               ? plugin.getCacheManager().getGraveMap().get(entityData.getUUIDGrave())
+        return entityData != null && CacheManager.graveMap.containsKey(entityData.getUUIDGrave())
+               ? CacheManager.graveMap.get(entityData.getUUIDGrave())
                : null;
     }
 
@@ -62,7 +62,7 @@ public class EntityDataManager {
     public List<EntityData> getLoadedEntityDataList(Grave grave) {
         List<EntityData> entityDataList = new ArrayList<>();
 
-        for (Map.Entry<String, ChunkData> chunkDataEntry : plugin.getCacheManager().getChunkMap().entrySet()) {
+        for (Map.Entry<String, ChunkData> chunkDataEntry : CacheManager.chunkMap.entrySet()) {
             ChunkData chunkData = chunkDataEntry.getValue();
 
             if (chunkDataEntry.getValue().isLoaded()) {

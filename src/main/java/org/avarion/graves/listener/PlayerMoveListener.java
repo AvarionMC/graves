@@ -3,6 +3,7 @@ package org.avarion.graves.listener;
 import org.avarion.graves.Graves;
 import org.avarion.graves.data.BlockData;
 import org.avarion.graves.data.ChunkData;
+import org.avarion.graves.manager.CacheManager;
 import org.avarion.graves.type.Grave;
 import org.avarion.graves.util.LocationUtil;
 import org.bukkit.GameMode;
@@ -55,10 +56,9 @@ public class PlayerMoveListener implements Listener {
                         blockData = chunkData.getBlockDataMap().get(location.clone().subtract(0, 1, 0));
                     }
 
-                    if (blockData != null && plugin.getCacheManager()
-                                                   .getGraveMap()
+                    if (blockData != null && CacheManager.graveMap
                                                    .containsKey(blockData.getGraveUUID())) {
-                        Grave grave = plugin.getCacheManager().getGraveMap().get(blockData.getGraveUUID());
+                        Grave grave = CacheManager.graveMap.get(blockData.getGraveUUID());
 
                         if (grave != null && plugin.getConfigBool("block.walk-over", grave)
                             && plugin.getEntityManager().canOpenGrave(player, grave)) {

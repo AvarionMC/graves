@@ -1,6 +1,7 @@
 package org.avarion.graves.listener;
 
 import org.avarion.graves.Graves;
+import org.avarion.graves.manager.CacheManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -35,8 +36,7 @@ public class PlayerDeathListener implements Listener {
             }
         }
 
-        plugin.getCacheManager()
-              .getRemovedItemStackMap()
+        CacheManager.removedItemStackMap
               .put(event.getEntity().getUniqueId(), new ArrayList<>(itemStackList));
     }
 

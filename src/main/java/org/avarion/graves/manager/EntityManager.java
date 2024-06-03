@@ -810,8 +810,7 @@ public final class EntityManager extends EntityDataManager {
     public Grave getGraveFromEntityData(Entity entity) {
         if (entity.getPersistentDataContainer()
                   .has(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING)) {
-            return plugin.getCacheManager()
-                         .getGraveMap()
+            return CacheManager.graveMap
                          .get(UUIDUtil.getUUID(entity.getPersistentDataContainer()
                                                      .get(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING)));
         }
@@ -819,7 +818,7 @@ public final class EntityManager extends EntityDataManager {
             List<MetadataValue> metadataValue = entity.getMetadata("graveUUID");
 
             if (!metadataValue.isEmpty()) {
-                return plugin.getCacheManager().getGraveMap().get(UUIDUtil.getUUID(metadataValue.get(0).asString()));
+                return CacheManager.graveMap.get(UUIDUtil.getUUID(metadataValue.get(0).asString()));
             }
         }
 
