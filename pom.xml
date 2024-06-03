@@ -54,10 +54,6 @@
                             <pattern>com.github.puregero.multilib</pattern>
                             <shadedPattern>${project.groupId}.${project.artifactId}.multilib</shadedPattern>
                         </relocation>
-                        <relocation>
-                            <pattern>de.tr7zw.changeme.nbtapi</pattern>
-                            <shadedPattern>${project.groupId}.${project.artifactId}.nbtapi</shadedPattern>
-                        </relocation>
                     </relocations>
                 </configuration>
                 <executions>
@@ -200,11 +196,6 @@
             <id>oraxen-releases</id>
             <name>Oraxen Repository</name>
             <url>https://repo.oraxen.com/releases/</url>
-        </repository>
-        <repository>
-            <id>codemc-repo</id>
-            <url>https://repo.codemc.io/repository/maven-public/</url>
-            <layout>default</layout>
         </repository>
     </repositories>
 
@@ -375,11 +366,6 @@
             <artifactId>annotations</artifactId>
             <version>24.1.0</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>de.tr7zw</groupId>
-            <artifactId>item-nbt-api</artifactId>
-            <version>2.12.4</version>
         </dependency>
     </dependencies>
 
