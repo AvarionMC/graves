@@ -14,11 +14,9 @@ import org.bukkit.entity.Player;
 
 public final class ProtocolLib {
 
-    private final Graves plugin;
     private final ProtocolManager protocolManager;
 
-    public ProtocolLib(Graves plugin) {
-        this.plugin = plugin;
+    public ProtocolLib() {
         this.protocolManager = ProtocolLibrary.getProtocolManager();
     }
 

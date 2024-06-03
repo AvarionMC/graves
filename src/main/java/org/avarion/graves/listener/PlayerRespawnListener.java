@@ -29,10 +29,10 @@ public class PlayerRespawnListener implements Listener {
         if (!graveList.isEmpty()) {
             Grave grave = graveList.get(graveList.size() - 1);
 
-            plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-                plugin.getEntityManager()
-                      .runFunction(player, plugin.getConfigString("respawn.function", player, permissionList, "none"), grave);
-            }, 1L);
+            plugin.getServer()
+                  .getScheduler()
+                  .runTaskLater(plugin, () -> plugin.getEntityManager()
+                                                    .runFunction(player, plugin.getConfigString("respawn.function", player, permissionList, "none"), grave), 1L);
 
             if (plugin.getConfigBool("respawn.compass", player, permissionList)
                 && grave.getLivedTime() <= plugin.getConfigInt("respawn.compass-time", player, permissionList)

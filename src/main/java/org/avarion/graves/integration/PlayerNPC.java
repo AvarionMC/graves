@@ -30,7 +30,7 @@ public final class PlayerNPC extends EntityDataManager {
 
         this.plugin = plugin;
         this.npcLib = NPCLib.getInstance();
-        this.npcInteractListener = new NPCInteractListener(plugin, this);
+        this.npcInteractListener = new NPCInteractListener(plugin);
 
         if (!NPCLib.getInstance().isRegistered(plugin)) {
             NPCLib.getInstance().registerPlugin(plugin);

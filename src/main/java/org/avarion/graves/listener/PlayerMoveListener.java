@@ -56,9 +56,8 @@ public class PlayerMoveListener implements Listener {
                         blockData = chunkData.getBlockDataMap().get(location.clone().subtract(0, 1, 0));
                     }
 
-                    if (blockData != null && CacheManager.graveMap
-                                                   .containsKey(blockData.getGraveUUID())) {
-                        Grave grave = CacheManager.graveMap.get(blockData.getGraveUUID());
+                    if (blockData != null && CacheManager.graveMap.containsKey(blockData.graveUUID())) {
+                        Grave grave = CacheManager.graveMap.get(blockData.graveUUID());
 
                         if (grave != null && plugin.getConfigBool("block.walk-over", grave)
                             && plugin.getEntityManager().canOpenGrave(player, grave)) {

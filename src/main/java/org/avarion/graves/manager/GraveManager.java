@@ -11,7 +11,6 @@ import org.avarion.graves.inventory.GraveMenu;
 import org.avarion.graves.type.Grave;
 import org.avarion.graves.util.ColorUtil;
 import org.avarion.graves.util.InventoryUtil;
-import org.avarion.graves.util.MaterialUtil;
 import org.avarion.graves.util.StringUtil;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -86,8 +85,7 @@ public final class GraveManager {
                     // Entity data
                     for (EntityData entityData : new ArrayList<>(chunkData.getEntityDataMap().values())) {
                         if (CacheManager.graveMap.containsKey(entityData.getUUIDGrave())) {
-                            if (plugin.isEnabled() && entityData instanceof HologramData) {
-                                HologramData hologramData = (HologramData) entityData;
+                            if (plugin.isEnabled() && entityData instanceof HologramData hologramData) {
                                 Grave grave = CacheManager.graveMap.get(hologramData.getUUIDGrave());
 
                                 if (grave != null) {
@@ -115,10 +113,9 @@ public final class GraveManager {
 
                     // Blocks
                     for (BlockData blockData : new ArrayList<>(chunkData.getBlockDataMap().values())) {
-                        if (blockData.getLocation().getWorld() != null) {
-                            if (CacheManager.graveMap.containsKey(blockData.getGraveUUID())) {
-                                graveParticle(blockData.getLocation(), CacheManager.graveMap
-                                                                             .get(blockData.getGraveUUID()));
+                        if (blockData.location().getWorld() != null) {
+                            if (CacheManager.graveMap.containsKey(blockData.graveUUID())) {
+                                graveParticle(blockData.location(), CacheManager.graveMap.get(blockData.graveUUID()));
                             }
                             else {
                                 blockDataRemoveList.add(blockData);
@@ -188,23 +185,17 @@ public final class GraveManager {
 
             if (location.getWorld() != null) {
                 switch (particle.name()) {
-                    case "REDSTONE":
+                    case "REDSTONE" -> {
                         int size = plugin.getConfigInt("particle.dust-size", grave);
                         Color color = ColorUtil.getColor(plugin.getConfigString("particle.dust-color", grave, "RED"));
-
                         if (color == null) {
                             color = Color.RED;
                         }
-
                         location.getWorld()
                                 .spawnParticle(particle, location, count, new Particle.DustOptions(color, size));
-                        break;
-                    case "SHRIEK":
-                        location.getWorld().spawnParticle(particle, location, count, 1);
-                        break;
-                    default:
-                        location.getWorld().spawnParticle(particle, location, count);
-                        break;
+                    }
+                    case "SHRIEK" -> location.getWorld().spawnParticle(particle, location, count, 1);
+                    default -> location.getWorld().spawnParticle(particle, location, count);
                 }
             }
         }
@@ -247,34 +238,25 @@ public final class GraveManager {
 
     public void removeEntityData(EntityData entityData) {
         switch (entityData.getType()) {
-            case HOLOGRAM: {
+            case HOLOGRAM -> {
                 plugin.getHologramManager().removeHologram(entityData);
 
-                break;
             }
-
-            case FURNITURELIB: {
+            case FURNITURELIB -> {
                 plugin.getIntegrationManager().getFurnitureLib().removeEntityData(entityData);
 
-                break;
             }
-
-            case FURNITUREENGINE: {
+            case FURNITUREENGINE -> {
                 plugin.getIntegrationManager().getFurnitureEngine().removeEntityData(entityData);
 
-                break;
             }
-
-            case ITEMSADDER: {
+            case ITEMSADDER -> {
                 plugin.getIntegrationManager().getItemsAdder().removeEntityData(entityData);
 
-                break;
             }
-
-            case ORAXEN: {
+            case ORAXEN -> {
                 plugin.getIntegrationManager().getOraxen().removeEntityData(entityData);
 
-                break;
             }
         }
     }
@@ -293,8 +275,7 @@ public final class GraveManager {
             if (player.getOpenInventory() != null) { // Mohist, might return null even when Bukkit shouldn't.
                 InventoryHolder inventoryHolder = player.getOpenInventory().getTopInventory().getHolder();
 
-                if (inventoryHolder instanceof GraveMenu) {
-                    GraveMenu graveMenu = (GraveMenu) inventoryHolder;
+                if (inventoryHolder instanceof GraveMenu graveMenu) {
 
                     if (graveMenu.getGrave().getUUID().equals(grave.getUUID())) {
                         player.closeInventory();
@@ -442,10 +423,9 @@ public final class GraveManager {
     public List<ItemStack> filterGraveItemStackList(List<ItemStack> itemStackList, List<ItemStack> removedItemStackList, LivingEntity livingEntity, List<String> permissionList) {
         itemStackList = new ArrayList<>(itemStackList);
 
-        if (livingEntity instanceof Player
+        if (livingEntity instanceof Player player
             && getStorageMode(plugin.getConfigString("storage.mode", livingEntity, permissionList))
                == Grave.StorageMode.EXACT) {
-            Player player = (Player) livingEntity;
             List<ItemStack> playerInventoryContentList = Arrays.asList(player.getInventory().getContents());
 
             List<ItemStack> itemStackListNew = new ArrayList<>(playerInventoryContentList);
@@ -546,8 +526,7 @@ public final class GraveManager {
     }
 
     public boolean openGrave(Entity entity, Location location, Grave grave) {
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+        if (entity instanceof Player player) {
 
             plugin.getEntityManager().swingMainHand(player);
 
@@ -618,8 +597,7 @@ public final class GraveManager {
     }
 
     public void autoLootGrave(Entity entity, Location location, Grave grave) {
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+        if (entity instanceof Player player) {
             Grave.StorageMode storageMode = getStorageMode(plugin.getConfigString("storage.mode", grave));
 
             if (storageMode == Grave.StorageMode.EXACT) {

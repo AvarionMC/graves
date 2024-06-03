@@ -8,12 +8,12 @@ import java.util.UUID;
 
 public class LocationData implements Serializable {
 
-    UUID uuid;
-    float yaw;
-    float pitch;
-    double x;
-    double y;
-    double z;
+    final UUID uuid;
+    final float yaw;
+    final float pitch;
+    final double x;
+    final double y;
+    final double z;
 
     public LocationData(Location location) {
         uuid = location.getWorld() != null ? location.getWorld().getUID() : null;

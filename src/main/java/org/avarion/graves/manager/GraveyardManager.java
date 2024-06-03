@@ -131,18 +131,15 @@ public final class GraveyardManager {
     }
 
     public boolean isLocationInGraveyard(Location location, Graveyard graveyard) {
-        switch (graveyard.getType()) {
-            case WORLDGUARD:
-                return plugin.getIntegrationManager().getWorldGuard() != null && plugin.getIntegrationManager()
-                                                                                       .getWorldGuard()
-                                                                                       .isInsideRegion(location, graveyard.getName());
-            case TOWNY:
-                return plugin.getIntegrationManager().hasTowny() && plugin.getIntegrationManager()
-                                                                          .getTowny()
-                                                                          .isInsidePlot(location, graveyard.getName());
-            default:
-                return false;
-        }
+        return switch (graveyard.getType()) {
+            case WORLDGUARD -> plugin.getIntegrationManager().getWorldGuard() != null && plugin.getIntegrationManager()
+                                                                                               .getWorldGuard()
+                                                                                               .isInsideRegion(location, graveyard.getName());
+            case TOWNY -> plugin.getIntegrationManager().hasTowny() && plugin.getIntegrationManager()
+                                                                             .getTowny()
+                                                                             .isInsidePlot(location, graveyard.getName());
+            default -> false;
+        };
     }
 
     public Graveyard getClosestGraveyard(Location location, Entity entity) {
@@ -151,7 +148,7 @@ public final class GraveyardManager {
         for (Graveyard graveyard : graveyardMap.values()) {
             if (graveyard.getSpawnLocation() != null) {
                 switch (graveyard.getType()) {
-                    case WORLDGUARD:
+                    case WORLDGUARD -> {
                         if (graveyard.isPublic() || (!(entity instanceof Player) || (plugin.getIntegrationManager()
                                                                                            .getWorldGuard() != null
                                                                                      && plugin.getIntegrationManager()
@@ -159,9 +156,8 @@ public final class GraveyardManager {
                                                                                               .isMember(graveyard.getName(), (Player) entity)))) {
                             locationGraveyardMap.put(graveyard.getSpawnLocation(), graveyard);
                         }
-
-                        break;
-                    case TOWNY:
+                    }
+                    case TOWNY -> {
                         if (graveyard.isPublic() || (!(entity instanceof Player) || (plugin.getIntegrationManager()
                                                                                            .hasTowny()
                                                                                      && plugin.getIntegrationManager()
@@ -169,8 +165,7 @@ public final class GraveyardManager {
                                                                                               .isResident(graveyard.getName(), (Player) entity)))) {
                             locationGraveyardMap.put(graveyard.getSpawnLocation(), graveyard);
                         }
-
-                        break;
+                    }
                 }
             }
         }

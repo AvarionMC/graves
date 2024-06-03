@@ -123,6 +123,7 @@ public final class Towny {
         return townBlockList;
     }
 
+    @SuppressWarnings("SameReturnValue")
     public boolean isResident(String region, Player player) {
         return true; // TODO
     }

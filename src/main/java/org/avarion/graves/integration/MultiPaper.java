@@ -78,7 +78,7 @@ public final class MultiPaper {
 
             if (blockData != null) {
                 plugin.getDataManager().addBlockData(blockData);
-                plugin.debugMessage("MultiLib, importing block for grave " + blockData.getGraveUUID().toString(), 2);
+                plugin.debugMessage("MultiLib, importing block for grave " + blockData.graveUUID().toString(), 2);
             }
             else {
                 plugin.debugMessage("MultiLib, ERROR block_create is malformed ", 2);

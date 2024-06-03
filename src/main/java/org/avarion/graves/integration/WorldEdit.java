@@ -22,6 +22,9 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -83,7 +86,7 @@ public final class WorldEdit {
         }
     }
 
-    public void createSchematic(Location location, Grave grave) {
+    public void createSchematic(@NotNull Location location, Grave grave) {
         if (location.getWorld() != null && plugin.getConfigBool("schematic.enabled", grave)) {
             String schematicName = plugin.getConfigString("schematic.name", grave);
 
@@ -114,7 +117,8 @@ public final class WorldEdit {
         }
     }
 
-    public boolean canBuildSchematic(Location location, BlockFace blockFace, String name) {
+    @SuppressWarnings("SameReturnValue")
+    public boolean canBuildSchematic(@NotNull Location location, BlockFace blockFace, String name) {
         if (location.getWorld() != null) {
             if (stringClipboardMap.containsKey(name)) {
                 Clipboard clipboard = stringClipboardMap.get(name);
@@ -154,7 +158,7 @@ public final class WorldEdit {
         return false;
     }
 
-    public boolean hasSchematic(String string) {
+    public boolean hasSchematic(@NotNull String string) {
         return stringClipboardMap.containsKey(string.toLowerCase().replace(".schem", ""));
     }
 
@@ -170,7 +174,7 @@ public final class WorldEdit {
         return pasteSchematic(location, yaw, name, true);
     }
 
-    private Clipboard pasteSchematic(Location location, float yaw, String name, boolean ignoreAirBlocks) {
+    private @Nullable Clipboard pasteSchematic(@NotNull Location location, float yaw, String name, @SuppressWarnings("SameParameterValue") boolean ignoreAirBlocks) {
         if (location.getWorld() != null) {
             if (stringClipboardMap.containsKey(name)) {
                 Clipboard clipboard = stringClipboardMap.get(name);
@@ -202,7 +206,7 @@ public final class WorldEdit {
         return getSchematic(location, yaw, name, true);
     }
 
-    private PasteBuilder getSchematic(Location location, float yaw, String name, boolean ignoreAirBlocks) {
+    private @Nullable PasteBuilder getSchematic(@NotNull Location location, float yaw, String name, @SuppressWarnings("SameParameterValue") boolean ignoreAirBlocks) {
         if (location.getWorld() != null) {
             if (stringClipboardMap.containsKey(name)) {
                 Clipboard clipboard = stringClipboardMap.get(name);
@@ -221,7 +225,7 @@ public final class WorldEdit {
         return null;
     }
 
-    public void buildSchematic(PasteBuilder pasteBuilder) {
+    public void buildSchematic(@NotNull PasteBuilder pasteBuilder) {
         try {
             Operations.complete(pasteBuilder.build());
         }
@@ -230,30 +234,29 @@ public final class WorldEdit {
         }
     }
 
-    private AffineTransform getYawTransform(float yaw) {
+    private @NotNull AffineTransform getYawTransform(float yaw) {
         AffineTransform affineTransform = new AffineTransform();
 
-        switch (BlockFaceUtil.getSimpleBlockFace(BlockFaceUtil.getYawBlockFace(yaw))) {
-            case SOUTH:
-                return affineTransform.rotateY(180);
-            case EAST:
-                return affineTransform.rotateY(270);
-            case WEST:
-                return affineTransform.rotateY(90);
-        }
+        return switch (BlockFaceUtil.getSimpleBlockFace(BlockFaceUtil.getYawBlockFace(yaw))) {
+            case SOUTH -> affineTransform.rotateY(180);
+            case EAST -> affineTransform.rotateY(270);
+            case WEST -> affineTransform.rotateY(90);
+            default -> affineTransform;
+        };
 
-        return affineTransform;
     }
 
-    public BlockVector3 locationToBlockVector3(Location location) {
+    public BlockVector3 locationToBlockVector3(@NotNull Location location) {
         return BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
-    private Location blockVector3ToLocation(World world, BlockVector3 blockVector3) {
+    @Contract("_, _ -> new")
+    private @NotNull Location blockVector3ToLocation(World world, @NotNull BlockVector3 blockVector3) {
         return new Location(world, blockVector3.x(), blockVector3.y(), blockVector3.z());
     }
 
-    private EditSession getEditSession(World world) {
+    @Contract("_ -> new")
+    private @NotNull EditSession getEditSession(World world) {
         return worldEdit.newEditSession(BukkitAdapter.adapt(world));
     }
 }

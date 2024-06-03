@@ -53,7 +53,7 @@ public class ChunkData implements Serializable {
     }
 
     public void addBlockData(BlockData blockData) {
-        blockDataMap.put(blockData.getLocation(), blockData);
+        blockDataMap.put(blockData.location(), blockData);
     }
 
     public void removeBlockData(Location location) {

@@ -390,14 +390,13 @@ public final class DataManager {
     }
 
     public void addBlockData(BlockData blockData) {
-        getChunkData(blockData.getLocation()).addBlockData(blockData);
+        getChunkData(blockData.location()).addBlockData(blockData);
 
-        String uuidGrave = blockData.getGraveUUID() != null ? "'" + blockData.getGraveUUID() + "'" : "NULL";
-        String location = "'" + LocationUtil.locationToString(blockData.getLocation()) + "'";
-        String replaceMaterial = blockData.getReplaceMaterial() != null
-                                 ? "'" + blockData.getReplaceMaterial() + "'"
+        String uuidGrave = blockData.graveUUID() != null ? "'" + blockData.graveUUID() + "'" : "NULL";
+        String location = "'" + LocationUtil.locationToString(blockData.location()) + "'";
+        String replaceMaterial = blockData.replaceMaterial() != null ? "'" + blockData.replaceMaterial() + "'"
                                  : "NULL";
-        String replaceData = blockData.getReplaceData() != null ? "'" + blockData.getReplaceData() + "'" : "NULL";
+        String replaceData = blockData.replaceData() != null ? "'" + blockData.replaceData() + "'" : "NULL";
 
         plugin.getServer()
               .getScheduler()
@@ -517,26 +516,17 @@ public final class DataManager {
     }
 
     public String entityDataTypeTable(EntityData.Type type) {
-        switch (type) {
-            case ARMOR_STAND:
-                return "armorstand";
-            case ITEM_FRAME:
-                return "itemframe";
-            case HOLOGRAM:
-                return "hologram";
-            case FURNITURELIB:
-                return "furniturelib";
-            case FURNITUREENGINE:
-                return "furnitureengine";
-            case ITEMSADDER:
-                return "itemsadder";
-            case ORAXEN:
-                return "oraxen";
-            case PLAYERNPC:
-                return "playernpc";
-            default:
-                return type.name().toLowerCase().replace("_", "");
-        }
+        return switch (type) {
+            case ARMOR_STAND -> "armorstand";
+            case ITEM_FRAME -> "itemframe";
+            case HOLOGRAM -> "hologram";
+            case FURNITURELIB -> "furniturelib";
+            case FURNITUREENGINE -> "furnitureengine";
+            case ITEMSADDER -> "itemsadder";
+            case ORAXEN -> "oraxen";
+            case PLAYERNPC -> "playernpc";
+            default -> type.name().toLowerCase().replace("_", "");
+        };
     }
 
     public void addGrave(Grave grave) {
@@ -638,15 +628,21 @@ public final class DataManager {
     public void removeGrave(UUID uuid) {
         CacheManager.graveMap.remove(uuid);
 
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-            executeUpdate("DELETE FROM grave WHERE uuid = '" + uuid + "';");
-        });
+        plugin.getServer()
+              .getScheduler()
+              .runTaskAsynchronously(plugin, () -> executeUpdate("DELETE FROM grave WHERE uuid = '" + uuid + "';"));
     }
 
     public void updateGrave(Grave grave, String column, String string) {
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-            executeUpdate("UPDATE grave SET " + column + " = '" + string + "' WHERE uuid = '" + grave.getUUID() + "';");
-        });
+        plugin.getServer()
+              .getScheduler()
+              .runTaskAsynchronously(plugin, () -> executeUpdate("UPDATE grave SET "
+                                                                 + column
+                                                                 + " = '"
+                                                                 + string
+                                                                 + "' WHERE uuid = '"
+                                                                 + grave.getUUID()
+                                                                 + "';"));
     }
 
     public Grave resultSetToGrave(ResultSet resultSet) {

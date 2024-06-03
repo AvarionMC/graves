@@ -190,12 +190,7 @@ public class Graves extends JavaPlugin {
 
         Metrics metrics = new Metrics(this, getMetricsID());
 
-        metrics.addCustomChart(new SingleLineChart("graves", new Callable<Integer>() {
-            @Override
-            public Integer call() throws Exception {
-                return CacheManager.graveMap.size();
-            }
-        }));
+        metrics.addCustomChart(new SingleLineChart("graves", () -> CacheManager.graveMap.size()));
     }
 
     public void registerListeners() {
@@ -619,8 +614,7 @@ public class Graves extends JavaPlugin {
         List<String> permissionList = new ArrayList<>();
         List<String> permissionListSorted = new ArrayList<>();
 
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+        if (entity instanceof Player player) {
 
             for (PermissionAttachmentInfo permissionAttachmentInfo : player.getEffectivePermissions()) {
                 if (permissionAttachmentInfo.getPermission().startsWith("graves.permission.")) {
@@ -718,10 +712,12 @@ public class Graves extends JavaPlugin {
         return UpdateUtil.getLatestVersion(getSpigotID());
     }
 
+    @SuppressWarnings("SameReturnValue")
     public final int getSpigotID() {
         return 116202;
     }
 
+    @SuppressWarnings("SameReturnValue")
     public final int getMetricsID() {
         return 21607;
     }

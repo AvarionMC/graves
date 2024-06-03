@@ -15,11 +15,9 @@ import java.util.UUID;
 public class NPCInteractListener implements Listener {
 
     private final Graves plugin;
-    private final PlayerNPC playerNPC;
 
-    public NPCInteractListener(Graves plugin, PlayerNPC playerNPC) {
+    public NPCInteractListener(Graves plugin) {
         this.plugin = plugin;
-        this.playerNPC = playerNPC;
     }
 
     @EventHandler(priority = EventPriority.LOW)

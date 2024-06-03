@@ -16,7 +16,6 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.NumberConversions;
@@ -53,8 +52,7 @@ public final class EntityManager extends EntityDataManager {
         ItemMeta itemMeta = itemStack.getItemMeta();
 
         if (itemMeta != null) {
-            if (itemMeta instanceof CompassMeta) {
-                CompassMeta compassMeta = (CompassMeta) itemMeta;
+            if (itemMeta instanceof CompassMeta compassMeta) {
 
                 compassMeta.setLodestoneTracked(false);
                 compassMeta.setLodestone(location);
@@ -154,8 +152,7 @@ public final class EntityManager extends EntityDataManager {
             }
 
             if (locationTeleport != null && locationTeleport.getWorld() != null) {
-                if (entity instanceof Player) {
-                    Player player = (Player) entity;
+                if (entity instanceof Player player) {
 
                     if (plugin.getIntegrationManager().hasVault()) {
                         double teleportCost = getTeleportCost(entity.getLocation(), locationTeleport, grave);
@@ -276,8 +273,7 @@ public final class EntityManager extends EntityDataManager {
     }
 
     public void playPlayerSound(String string, Entity entity, Location location, List<String> permissionList, float volume, float pitch) {
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+        if (entity instanceof Player player) {
             string = plugin.getConfigString(string, entity, permissionList);
 
             if (string != null && !string.isEmpty()) {
@@ -292,8 +288,7 @@ public final class EntityManager extends EntityDataManager {
     }
 
     public void sendMessage(String string, CommandSender commandSender) {
-        if (commandSender instanceof Player) {
-            Player player = (Player) commandSender;
+        if (commandSender instanceof Player player) {
 
             sendMessage(string, player, player.getLocation(), null, plugin.getPermissionList(player));
         }
@@ -324,8 +319,7 @@ public final class EntityManager extends EntityDataManager {
     }
 
     private void sendMessage(String string, Entity entity, String name, Location location, Grave grave, List<String> permissionList) {
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+        if (entity instanceof Player player) {
 
             if (grave != null) {
                 string = plugin.getConfigString(string, grave);
@@ -385,18 +379,17 @@ public final class EntityManager extends EntityDataManager {
 
     public boolean runFunction(Entity entity, String function, Grave grave) {
         switch (function.toLowerCase()) {
-            case "list": {
+            case "list" -> {
                 plugin.getGUIManager().openGraveList(entity);
 
                 return true;
             }
-            case "menu": {
+            case "menu" -> {
                 plugin.getGUIManager().openGraveMenu(entity, grave);
 
                 return true;
             }
-            case "teleport":
-            case "teleportation": {
+            case "teleport", "teleportation" -> {
                 if (plugin.getConfigBool("teleport.enabled", grave)
                     && (EntityUtil.hasPermission(entity, "graves.teleport")
                         || EntityUtil.hasPermission(entity, "graves.bypass"))) {
@@ -412,8 +405,7 @@ public final class EntityManager extends EntityDataManager {
 
                 return true;
             }
-            case "protect":
-            case "protection": {
+            case "protect", "protection" -> {
                 if (grave.getTimeProtectionRemaining() > 0 || grave.getTimeProtectionRemaining() < 0) {
                     plugin.getGraveManager().toggleGraveProtection(grave);
                     playPlayerSound("sound.protection-change", entity, grave);
@@ -422,7 +414,7 @@ public final class EntityManager extends EntityDataManager {
 
                 return true;
             }
-            case "distance": {
+            case "distance" -> {
                 Location location = plugin.getGraveManager().getGraveLocation(entity.getLocation(), grave);
 
                 if (location != null) {
@@ -436,9 +428,7 @@ public final class EntityManager extends EntityDataManager {
 
                 return true;
             }
-            case "open":
-            case "loot":
-            case "virtual": {
+            case "open", "loot", "virtual" -> {
                 double distance = plugin.getConfigDbl("virtual.distance", grave);
 
                 if (distance < 0) {
@@ -459,7 +449,7 @@ public final class EntityManager extends EntityDataManager {
 
                 return true;
             }
-            case "autoloot": {
+            case "autoloot" -> {
                 plugin.getGraveManager().autoLootGrave(entity, entity.getLocation(), grave);
 
                 return true;
@@ -540,8 +530,7 @@ public final class EntityManager extends EntityDataManager {
 
             Entity entity = location.getWorld().spawnEntity(location, entityType);
 
-            if (entity instanceof LivingEntity) {
-                LivingEntity livingEntity = (LivingEntity) entity;
+            if (entity instanceof LivingEntity livingEntity) {
 
                 if (livingEntity.getEquipment() != null) {
                     if (plugin.getConfigBool("zombie.owner-head", grave)) {
@@ -587,8 +576,7 @@ public final class EntityManager extends EntityDataManager {
                     ((Mob) livingEntity).setTarget(targetEntity);
                 }
 
-                if (livingEntity instanceof Zombie) {
-                    Zombie zombie = (Zombie) livingEntity;
+                if (livingEntity instanceof Zombie zombie) {
 
                     if (zombie.isBaby()) {
                         zombie.setBaby(false);

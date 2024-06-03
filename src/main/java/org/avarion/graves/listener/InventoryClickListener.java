@@ -33,8 +33,7 @@ public class InventoryClickListener implements Listener {
                       .runTaskLater(plugin, () -> plugin.getDataManager()
                                                         .updateGrave(grave, "inventory", InventoryUtil.inventoryToString(grave.getInventory())), 1L);
             }
-            else if (event.getWhoClicked() instanceof Player) {
-                Player player = (Player) event.getWhoClicked();
+            else if (event.getWhoClicked() instanceof Player player) {
 
                 if (inventoryHolder instanceof GraveList) {
                     GraveList graveList = (GraveList) event.getInventory().getHolder();
