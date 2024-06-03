@@ -2,6 +2,7 @@ package org.avarion.graves.util;
 
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,7 +10,7 @@ import java.util.List;
 
 public final class PermissionUtil {
 
-    public static int getHighestInt(Player player, String permission) {
+    public static int getHighestInt(@NotNull Player player, String permission) {
         List<Integer> gravePermissions = new ArrayList<>();
 
         for (PermissionAttachmentInfo perm : player.getEffectivePermissions()) {
@@ -29,7 +30,7 @@ public final class PermissionUtil {
         return 0;
     }
 
-    public static double getHighestDouble(Player player, String permission) {
+    public static double getHighestDouble(@NotNull Player player, String permission) {
         List<Double> gravePermissions = new ArrayList<>();
 
         for (PermissionAttachmentInfo perm : player.getEffectivePermissions()) {

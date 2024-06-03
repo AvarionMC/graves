@@ -6,6 +6,7 @@ import org.avarion.graves.Graves;
 import org.avarion.graves.data.ChunkData;
 import org.avarion.graves.data.EntityData;
 import org.avarion.graves.listener.integration.playernpc.NPCInteractListener;
+import org.avarion.graves.manager.CacheManager;
 import org.avarion.graves.manager.EntityDataManager;
 import org.avarion.graves.type.Grave;
 import org.bukkit.ChatColor;
@@ -15,6 +16,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.EquipmentSlot;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -29,7 +31,7 @@ public final class PlayerNPC extends EntityDataManager {
 
         this.plugin = plugin;
         this.npcLib = NPCLib.getInstance();
-        this.npcInteractListener = new NPCInteractListener(plugin, this);
+        this.npcInteractListener = new NPCInteractListener(plugin);
 
         if (!NPCLib.getInstance().isRegistered(plugin)) {
             NPCLib.getInstance().registerPlugin(plugin);
@@ -49,11 +51,11 @@ public final class PlayerNPC extends EntityDataManager {
     }
 
     public void createCorpses() {
-        for (ChunkData chunkData : plugin.getCacheManager().getChunkMap().values()) {
+        for (ChunkData chunkData : CacheManager.chunkMap.values()) {
             for (EntityData entityData : chunkData.getEntityDataMap().values()) {
                 if (entityData.getType() == EntityData.Type.PLAYERNPC) {
-                    if (plugin.getCacheManager().getGraveMap().containsKey(entityData.getUUIDGrave())) {
-                        Grave grave = plugin.getCacheManager().getGraveMap().get(entityData.getUUIDGrave());
+                    if (CacheManager.graveMap.containsKey(entityData.getUUIDGrave())) {
+                        Grave grave = CacheManager.graveMap.get(entityData.getUUIDGrave());
 
                         if (grave != null) {
                             plugin.getIntegrationManager()
@@ -178,7 +180,7 @@ public final class PlayerNPC extends EntityDataManager {
         removeCorpse(getEntityDataNPCMap(Collections.singletonList(entityData)));
     }
 
-    public void removeCorpse(Map<EntityData, NPC.Global> entityDataMap) {
+    public void removeCorpse(@NotNull Map<EntityData, NPC.Global> entityDataMap) {
         List<EntityData> entityDataList = new ArrayList<>();
 
         for (Map.Entry<EntityData, NPC.Global> entry : entityDataMap.entrySet()) {
@@ -189,7 +191,7 @@ public final class PlayerNPC extends EntityDataManager {
         plugin.getDataManager().removeEntityData(entityDataList);
     }
 
-    private Map<EntityData, NPC.Global> getEntityDataNPCMap(List<EntityData> entityDataList) {
+    private @NotNull Map<EntityData, NPC.Global> getEntityDataNPCMap(@NotNull List<EntityData> entityDataList) {
         Map<EntityData, NPC.Global> entityDataMap = new HashMap<>();
 
         for (EntityData entityData : entityDataList) {

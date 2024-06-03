@@ -8,6 +8,8 @@ import org.avarion.graves.util.LocationUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +23,7 @@ public final class BlockManager {
         this.plugin = plugin;
     }
 
-    public BlockData getBlockData(Block block) {
+    public @Nullable BlockData getBlockData(@NotNull Block block) {
         if (plugin.getDataManager().hasChunkData(block.getLocation())) {
             ChunkData chunkData = plugin.getDataManager().getChunkData(block.getLocation());
 
@@ -33,11 +35,11 @@ public final class BlockManager {
         return null;
     }
 
-    public Grave getGraveFromBlock(Block block) {
+    public @Nullable Grave getGraveFromBlock(Block block) {
         BlockData blockData = getBlockData(block);
 
-        return blockData != null && plugin.getCacheManager().getGraveMap().containsKey(blockData.getGraveUUID())
-               ? plugin.getCacheManager().getGraveMap().get(blockData.getGraveUUID())
+        return blockData != null && CacheManager.graveMap.containsKey(blockData.graveUUID())
+               ? CacheManager.graveMap.get(blockData.graveUUID())
                : null;
     }
 
@@ -109,27 +111,13 @@ public final class BlockManager {
         }
     }
 
-    public List<BlockData> getBlockDataList(Grave grave) {
-        List<BlockData> blockDataList = new ArrayList<>();
-
-        for (Map.Entry<String, ChunkData> chunkDataEntry : plugin.getCacheManager().getChunkMap().entrySet()) {
-            for (BlockData blockData : new ArrayList<>(chunkDataEntry.getValue().getBlockDataMap().values())) {
-                if (grave.getUUID().equals(blockData.getGraveUUID())) {
-                    blockDataList.add(blockData);
-                }
-            }
-        }
-
-        return blockDataList;
-    }
-
-    public List<Location> getBlockList(Grave grave) {
+    public @NotNull List<Location> getBlockList(Grave grave) {
         List<Location> locationList = new ArrayList<>();
 
-        for (Map.Entry<String, ChunkData> chunkDataEntry : plugin.getCacheManager().getChunkMap().entrySet()) {
+        for (Map.Entry<String, ChunkData> chunkDataEntry : CacheManager.chunkMap.entrySet()) {
             for (BlockData blockData : new ArrayList<>(chunkDataEntry.getValue().getBlockDataMap().values())) {
-                if (grave.getUUID().equals(blockData.getGraveUUID())) {
-                    locationList.add(blockData.getLocation());
+                if (grave.getUUID().equals(blockData.graveUUID())) {
+                    locationList.add(blockData.location());
                 }
             }
         }
@@ -138,11 +126,11 @@ public final class BlockManager {
     }
 
     public void removeBlock(Grave grave) {
-        for (ChunkData chunkData : plugin.getCacheManager().getChunkMap().values()) {
+        for (ChunkData chunkData : CacheManager.chunkMap.values()) {
 
             if (chunkData.isLoaded()) {
                 for (BlockData blockData : new ArrayList<>(chunkData.getBlockDataMap().values())) {
-                    if (grave.getUUID().equals(blockData.getGraveUUID())) {
+                    if (grave.getUUID().equals(blockData.graveUUID())) {
                         removeBlock(blockData);
                     }
                 }
@@ -150,8 +138,8 @@ public final class BlockManager {
         }
     }
 
-    public void removeBlock(BlockData blockData) {
-        Location location = blockData.getLocation();
+    public void removeBlock(@NotNull BlockData blockData) {
+        Location location = blockData.location();
 
         if (plugin.getIntegrationManager().hasItemsAdder() && plugin.getIntegrationManager()
                                                                     .getItemsAdder()
@@ -166,26 +154,24 @@ public final class BlockManager {
         }
 
         if (location.getWorld() != null) {
-            if (blockData.getReplaceMaterial() != null) {
-                Material material = Material.matchMaterial(blockData.getReplaceMaterial());
+            if (blockData.replaceMaterial() != null) {
+                Material material = Material.matchMaterial(blockData.replaceMaterial());
 
                 if (material != null) {
-                    blockData.getLocation().getBlock().setType(material);
+                    blockData.location().getBlock().setType(material);
                 }
             }
             else {
-                blockData.getLocation().getBlock().setType(Material.AIR);
+                blockData.location().getBlock().setType(Material.AIR);
             }
 
-            if (blockData.getReplaceData() != null) {
-                blockData.getLocation()
-                         .getBlock()
-                         .setBlockData(plugin.getServer().createBlockData(blockData.getReplaceData()));
+            if (blockData.replaceData() != null) {
+                blockData.location()
+                         .getBlock().setBlockData(plugin.getServer().createBlockData(blockData.replaceData()));
             }
 
             plugin.getDataManager().removeBlockData(location);
-            plugin.debugMessage("Replacing grave block for "
-                                + blockData.getGraveUUID()
+            plugin.debugMessage("Replacing grave block for " + blockData.graveUUID()
                                 + " at "
                                 + location.getWorld()
                                           .getName()

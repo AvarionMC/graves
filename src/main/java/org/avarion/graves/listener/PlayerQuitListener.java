@@ -6,6 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class PlayerQuitListener implements Listener {
 
@@ -16,7 +17,7 @@ public class PlayerQuitListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerQuit(PlayerQuitEvent event) {
+    public void onPlayerQuit(@NotNull PlayerQuitEvent event) {
         Player player = event.getPlayer();
 
         plugin.getLocationManager().removeLastSolidLocation(player);

@@ -13,6 +13,8 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -63,7 +65,7 @@ public final class RecipeManager {
         }
     }
 
-    public ItemStack getToken(String token) {
+    public @Nullable ItemStack getToken(String token) {
         if (plugin.getConfig().isConfigurationSection("settings.token." + token)) {
             Material material = Material.matchMaterial(plugin.getConfig()
                                                              .getString("settings.token."
@@ -109,7 +111,7 @@ public final class RecipeManager {
         return null;
     }
 
-    public List<String> getTokenList() {
+    public @NotNull List<String> getTokenList() {
         List<String> stringList = new ArrayList<>();
         ConfigurationSection configurationSection = plugin.getConfig().getConfigurationSection("settings.token");
 
@@ -172,7 +174,7 @@ public final class RecipeManager {
         }
     }
 
-    public ItemStack getGraveTokenFromPlayer(String token, List<ItemStack> itemStackList) {
+    public @Nullable ItemStack getGraveTokenFromPlayer(String token, @NotNull List<ItemStack> itemStackList) {
         for (ItemStack itemStack : itemStackList) {
             if (itemStack != null && isToken(token, itemStack)) {
                 return itemStack;
@@ -182,7 +184,7 @@ public final class RecipeManager {
         return null;
     }
 
-    public void setRecipeData(String token, ItemStack itemStack) {
+    public void setRecipeData(String token, @NotNull ItemStack itemStack) {
         ItemMeta itemMeta = itemStack.getItemMeta();
 
         if (itemMeta != null) {
@@ -192,7 +194,7 @@ public final class RecipeManager {
         }
     }
 
-    public boolean isToken(String token, ItemStack itemStack) {
+    public boolean isToken(String token, @NotNull ItemStack itemStack) {
         if (itemStack.getItemMeta() != null && itemStack.getItemMeta()
                                                         .getPersistentDataContainer()
                                                         .has(new NamespacedKey(plugin, "token"), PersistentDataType.STRING)) {
@@ -206,7 +208,7 @@ public final class RecipeManager {
         return false;
     }
 
-    public String getTokenName(ItemStack itemStack) {
+    public @Nullable String getTokenName(@NotNull ItemStack itemStack) {
         if (itemStack.getItemMeta() != null && itemStack.getItemMeta()
                                                         .getPersistentDataContainer()
                                                         .has(new NamespacedKey(plugin, "token"), PersistentDataType.STRING)) {
@@ -218,35 +220,25 @@ public final class RecipeManager {
         return null;
     }
 
-    public boolean isToken(ItemStack itemStack) {
+    public boolean isToken(@NotNull ItemStack itemStack) {
         return itemStack.getItemMeta() != null && itemStack.getItemMeta()
                                                            .getPersistentDataContainer()
                                                            .has(new NamespacedKey(plugin, "token"), PersistentDataType.STRING);
     }
 
     private char getChar(int count) {
-        switch (count) {
-            case 1:
-                return 'A';
-            case 2:
-                return 'B';
-            case 3:
-                return 'C';
-            case 4:
-                return 'D';
-            case 5:
-                return 'E';
-            case 6:
-                return 'F';
-            case 7:
-                return 'G';
-            case 8:
-                return 'H';
-            case 9:
-                return 'I';
-            default:
-                return '*';
-        }
+        return switch (count) {
+            case 1 -> 'A';
+            case 2 -> 'B';
+            case 3 -> 'C';
+            case 4 -> 'D';
+            case 5 -> 'E';
+            case 6 -> 'F';
+            case 7 -> 'G';
+            case 8 -> 'H';
+            case 9 -> 'I';
+            default -> '*';
+        };
     }
 
 }

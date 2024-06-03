@@ -5,11 +5,13 @@ import org.avarion.graves.Graves;
 import org.avarion.graves.data.BlockData;
 import org.avarion.graves.data.EntityData;
 import org.avarion.graves.data.HologramData;
+import org.avarion.graves.manager.CacheManager;
 import org.avarion.graves.type.Grave;
 import org.avarion.graves.util.Base64Util;
 import org.avarion.graves.util.StringUtil;
 import org.avarion.graves.util.UUIDUtil;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,7 +26,7 @@ public final class MultiPaper {
         registerListeners();
     }
 
-    public String getLocalServerName() {
+    public @NotNull String getLocalServerName() {
         return MultiLib.getLocalServerName();
     }
 
@@ -34,7 +36,7 @@ public final class MultiPaper {
                                                + Base64Util.objectToBase64(grave.getInventoryItemStack()));
     }
 
-    public void notifyGraveRemoval(Grave grave) {
+    public void notifyGraveRemoval(@NotNull Grave grave) {
         MultiLib.notify("graves:grave_remove", grave.getUUID().toString());
     }
 
@@ -77,7 +79,7 @@ public final class MultiPaper {
 
             if (blockData != null) {
                 plugin.getDataManager().addBlockData(blockData);
-                plugin.debugMessage("MultiLib, importing block for grave " + blockData.getGraveUUID().toString(), 2);
+                plugin.debugMessage("MultiLib, importing block for grave " + blockData.graveUUID().toString(), 2);
             }
             else {
                 plugin.debugMessage("MultiLib, ERROR block_create is malformed ", 2);
@@ -113,7 +115,7 @@ public final class MultiPaper {
             UUID uuid = UUIDUtil.getUUID(data);
 
             if (uuid != null) {
-                if (plugin.getCacheManager().getGraveMap().containsKey(uuid)) {
+                if (CacheManager.graveMap.containsKey(uuid)) {
                     plugin.getDataManager().removeGrave(uuid);
                     plugin.debugMessage("MultiLib, removing grave " + uuid, 2);
                 }

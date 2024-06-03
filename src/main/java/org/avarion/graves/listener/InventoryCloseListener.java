@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class InventoryCloseListener implements Listener {
 
@@ -18,10 +19,8 @@ public class InventoryCloseListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onInventoryClose(InventoryCloseEvent event) {
-        if (event.getInventory().getHolder() instanceof Grave && event.getPlayer() instanceof Player) {
-            Grave grave = (Grave) event.getInventory().getHolder();
-            Player player = (Player) event.getPlayer();
+    public void onInventoryClose(@NotNull InventoryCloseEvent event) {
+        if (event.getInventory().getHolder() instanceof Grave grave && event.getPlayer() instanceof Player player) {
 
             GraveCloseEvent graveCloseEvent = new GraveCloseEvent(event.getView(), grave);
 

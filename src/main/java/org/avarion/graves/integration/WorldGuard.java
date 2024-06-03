@@ -16,6 +16,8 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +36,7 @@ public final class WorldGuard {
         this.teleportFlag = getFlag("graves-teleport");
     }
 
-    private StateFlag getFlag(String string) {
+    private @Nullable StateFlag getFlag(String string) {
         if (plugin.getServer().getPluginManager().isPluginEnabled("WorldGuard")) {
             Flag<?> flag = worldGuard.getFlagRegistry().get(string);
 
@@ -62,7 +64,7 @@ public final class WorldGuard {
         return null;
     }
 
-    public boolean hasCreateGrave(Location location) {
+    public boolean hasCreateGrave(@NotNull Location location) {
         if (location.getWorld() != null && createFlag != null) {
             RegionManager regionManager = worldGuard.getPlatform()
                                                     .getRegionContainer()
@@ -112,7 +114,7 @@ public final class WorldGuard {
                                                .testState(BukkitAdapter.adapt(location), (RegionAssociable) null, teleportFlag);
     }
 
-    public World getRegionWorld(String region) {
+    public @Nullable World getRegionWorld(String region) {
         for (RegionManager regionManager : worldGuard.getPlatform().getRegionContainer().getLoaded()) {
             if (regionManager.getRegions().containsKey(region)) {
                 return plugin.getServer().getWorld(regionManager.getName());
@@ -136,7 +138,7 @@ public final class WorldGuard {
         return false;
     }
 
-    public boolean isInsideRegion(Location location, String region) {
+    public boolean isInsideRegion(@NotNull Location location, String region) {
         if (location.getWorld() != null) {
             RegionManager regionManager = worldGuard.getPlatform()
                                                     .getRegionContainer()
@@ -156,7 +158,7 @@ public final class WorldGuard {
         return false;
     }
 
-    public Location calculateRoughLocation(Graveyard graveyard) {
+    public @Nullable Location calculateRoughLocation(@NotNull Graveyard graveyard) {
         RegionManager regionManager = worldGuard.getPlatform()
                                                 .getRegionContainer()
                                                 .get(BukkitAdapter.adapt(graveyard.getWorld()));
@@ -179,7 +181,7 @@ public final class WorldGuard {
         return null;
     }
 
-    public List<String> getRegionKeyList(Location location) {
+    public @NotNull List<String> getRegionKeyList(@NotNull Location location) {
         List<String> regionNameList = new ArrayList<>();
 
         if (location.getWorld() != null) {

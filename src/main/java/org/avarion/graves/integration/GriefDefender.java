@@ -12,6 +12,7 @@ import com.griefdefender.api.registry.CatalogRegistryModule;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -20,17 +21,15 @@ import java.util.Set;
 public final class GriefDefender {
 
     private final Core core;
-    private final Registry registry;
     private final PermissionManager permissionManager;
     private final Flag createFlag;
-    private final Flag teleportFlag;
 
     public GriefDefender() {
         core = com.griefdefender.api.GriefDefender.getCore();
-        registry = com.griefdefender.api.GriefDefender.getRegistry();
+        Registry registry = com.griefdefender.api.GriefDefender.getRegistry();
         permissionManager = com.griefdefender.api.GriefDefender.getPermissionManager();
         createFlag = buildCreateFlag();
-        teleportFlag = buildTeleportFlag();
+        Flag teleportFlag = buildTeleportFlag();
         Optional<CatalogRegistryModule<Flag>> catalogRegistryModule = registry.getRegistryModuleFor(Flag.class);
 
         if (catalogRegistryModule.isPresent()) {
@@ -55,7 +54,7 @@ public final class GriefDefender {
                    .build();
     }
 
-    public boolean canCreateGrave(Player player, Location location) {
+    public boolean canCreateGrave(Player player, @NotNull Location location) {
         if (location.getWorld() != null) {
             PlayerData playerData = core.getPlayerData(location.getWorld().getUID(), player.getUniqueId());
 
@@ -95,6 +94,7 @@ public final class GriefDefender {
     }
      */
 
+    @SuppressWarnings("SameReturnValue")
     public boolean canTeleport(Entity entity, Location location) {
         return true; // TODO
     }

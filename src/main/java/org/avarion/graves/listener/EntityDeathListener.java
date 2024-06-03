@@ -4,6 +4,7 @@ import org.avarion.graves.Graves;
 import org.avarion.graves.data.BlockData;
 import org.avarion.graves.event.GraveBlockPlaceEvent;
 import org.avarion.graves.event.GraveCreateEvent;
+import org.avarion.graves.manager.CacheManager;
 import org.avarion.graves.type.Grave;
 import org.avarion.graves.type.Graveyard;
 import org.avarion.graves.util.*;
@@ -21,6 +22,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -33,7 +35,7 @@ public class EntityDeathListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onEntityDeath(EntityDeathEvent event) {
+    public void onEntityDeath(@NotNull EntityDeathEvent event) {
         LivingEntity livingEntity = event.getEntity();
         String entityName = plugin.getEntityManager().getEntityName(livingEntity);
         Location location = LocationUtil.roundLocation(livingEntity.getLocation());
@@ -42,11 +44,10 @@ public class EntityDeathListener implements Listener {
         List<ItemStack> removedItemStackList = new ArrayList<>();
 
         // Removed items
-        if (plugin.getCacheManager().getRemovedItemStackMap().containsKey(livingEntity.getUniqueId())) {
-            removedItemStackList.addAll(plugin.getCacheManager()
-                                              .getRemovedItemStackMap()
+        if (CacheManager.removedItemStackMap.containsKey(livingEntity.getUniqueId())) {
+            removedItemStackList.addAll(CacheManager.removedItemStackMap
                                               .get(livingEntity.getUniqueId()));
-            plugin.getCacheManager().getRemovedItemStackMap().remove(livingEntity.getUniqueId());
+            CacheManager.removedItemStackMap.remove(livingEntity.getUniqueId());
         }
 
         // Mohist
@@ -312,8 +313,7 @@ public class EntityDeathListener implements Listener {
             double experiencePercent = plugin.getConfigDbl("experience.store", grave);
 
             if (experiencePercent >= 0) {
-                if (livingEntity instanceof Player) {
-                    Player player = (Player) livingEntity;
+                if (livingEntity instanceof Player player) {
 
                     if (player.hasPermission("graves.experience")) {
                         grave.setExperience(ExperienceUtil.getDropPercent(ExperienceUtil.getPlayerExperience(player), experiencePercent));
@@ -345,8 +345,7 @@ public class EntityDeathListener implements Listener {
                 EntityDamageEvent entityDamageEvent = livingEntity.getLastDamageCause();
 
                 if (entityDamageEvent.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK
-                    && entityDamageEvent instanceof EntityDamageByEntityEvent) {
-                    EntityDamageByEntityEvent entityDamageByEntityEvent = (EntityDamageByEntityEvent) entityDamageEvent;
+                    && entityDamageEvent instanceof EntityDamageByEntityEvent entityDamageByEntityEvent) {
 
                     grave.setKillerUUID(entityDamageByEntityEvent.getDamager().getUniqueId());
                     grave.setKillerType(entityDamageByEntityEvent.getDamager().getType());
@@ -465,20 +464,18 @@ public class EntityDeathListener implements Listener {
                         int offsetZ = 0;
 
                         switch (entry.getValue()) {
-                            case DEATH:
-                                break;
-
-                            case NORMAL:
+                            case DEATH -> {
+                            }
+                            case NORMAL -> {
                                 offsetX = plugin.getConfigInt("placement.offset.x", grave);
                                 offsetY = plugin.getConfigInt("placement.offset.y", grave);
                                 offsetZ = plugin.getConfigInt("placement.offset.z", grave);
-                                break;
-
-                            case GRAVEYARD:
+                            }
+                            case GRAVEYARD -> {
                                 offsetX = plugin.getConfig().getInt("settings.graveyard.offset.x");
                                 offsetY = plugin.getConfig().getInt("settings.graveyard.offset.y");
                                 offsetZ = plugin.getConfig().getInt("settings.graveyard.offset.z");
-                                break;
+                            }
                         }
 
                         location.add(offsetX, offsetY, offsetZ);
@@ -496,9 +493,8 @@ public class EntityDeathListener implements Listener {
                     }
                 }
                 else {
-                    if (event instanceof PlayerDeathEvent
+                    if (event instanceof PlayerDeathEvent playerDeathEvent
                         && plugin.getConfigBool("placement.failure-keep-inventory", grave)) {
-                        PlayerDeathEvent playerDeathEvent = (PlayerDeathEvent) event;
 
                         try {
                             playerDeathEvent.setKeepLevel(true);

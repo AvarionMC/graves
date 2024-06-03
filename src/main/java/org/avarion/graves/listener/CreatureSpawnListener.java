@@ -5,6 +5,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class CreatureSpawnListener implements Listener {
 
@@ -15,7 +16,7 @@ public class CreatureSpawnListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onCreatureSpawn(CreatureSpawnEvent event) {
+    public void onCreatureSpawn(@NotNull CreatureSpawnEvent event) {
         if (!event.getEntity().isDead()) {
             plugin.getEntityManager().setDataString(event.getEntity(), "spawnReason", event.getSpawnReason().name());
         }

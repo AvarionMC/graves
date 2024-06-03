@@ -3,6 +3,7 @@ package org.avarion.graves.listener;
 import org.avarion.graves.Graves;
 import org.avarion.graves.data.BlockData;
 import org.avarion.graves.data.ChunkData;
+import org.avarion.graves.manager.CacheManager;
 import org.avarion.graves.type.Grave;
 import org.avarion.graves.util.LocationUtil;
 import org.bukkit.GameMode;
@@ -13,6 +14,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class PlayerMoveListener implements Listener {
 
@@ -23,7 +25,7 @@ public class PlayerMoveListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onPlayerMove(PlayerMoveEvent event) {
+    public void onPlayerMove(@NotNull PlayerMoveEvent event) {
         Player player = event.getPlayer();
 
         if (player.getGameMode() != GameMode.SPECTATOR) {
@@ -55,10 +57,8 @@ public class PlayerMoveListener implements Listener {
                         blockData = chunkData.getBlockDataMap().get(location.clone().subtract(0, 1, 0));
                     }
 
-                    if (blockData != null && plugin.getCacheManager()
-                                                   .getGraveMap()
-                                                   .containsKey(blockData.getGraveUUID())) {
-                        Grave grave = plugin.getCacheManager().getGraveMap().get(blockData.getGraveUUID());
+                    if (blockData != null && CacheManager.graveMap.containsKey(blockData.graveUUID())) {
+                        Grave grave = CacheManager.graveMap.get(blockData.graveUUID());
 
                         if (grave != null && plugin.getConfigBool("block.walk-over", grave)
                             && plugin.getEntityManager().canOpenGrave(player, grave)) {

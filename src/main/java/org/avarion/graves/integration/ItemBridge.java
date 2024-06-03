@@ -5,6 +5,7 @@ import com.jojodmo.itembridge.ItemBridgeListenerPriority;
 import org.avarion.graves.Graves;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public final class ItemBridge implements ItemBridgeListener {
 
@@ -36,7 +37,7 @@ public final class ItemBridge implements ItemBridgeListener {
     }
 
     @Override
-    public ItemStack fetchItemStack(@NotNull String string) {
+    public @Nullable ItemStack fetchItemStack(@NotNull String string) {
         string = string.toLowerCase();
 
         if (string.startsWith("token_")) {
@@ -51,7 +52,7 @@ public final class ItemBridge implements ItemBridgeListener {
     }
 
     @Override
-    public String getItemName(@NotNull ItemStack itemStack) {
+    public @Nullable String getItemName(@NotNull ItemStack itemStack) {
         if (plugin.getRecipeManager().isToken(itemStack)) {
             return plugin.getRecipeManager().getTokenName(itemStack);
         }

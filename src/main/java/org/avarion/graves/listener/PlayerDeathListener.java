@@ -1,11 +1,13 @@
 package org.avarion.graves.listener;
 
 import org.avarion.graves.Graves;
+import org.avarion.graves.manager.CacheManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -20,7 +22,7 @@ public class PlayerDeathListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerDeathEvent(PlayerDeathEvent event) {
+    public void onPlayerDeathEvent(@NotNull PlayerDeathEvent event) {
         List<ItemStack> itemStackList = event.getDrops();
         Iterator<ItemStack> iterator = itemStackList.iterator();
 
@@ -35,8 +37,7 @@ public class PlayerDeathListener implements Listener {
             }
         }
 
-        plugin.getCacheManager()
-              .getRemovedItemStackMap()
+        CacheManager.removedItemStackMap
               .put(event.getEntity().getUniqueId(), new ArrayList<>(itemStackList));
     }
 

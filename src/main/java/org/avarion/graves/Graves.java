@@ -24,6 +24,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,7 +39,6 @@ public class Graves extends JavaPlugin {
 
     private VersionManager versionManager;
     private IntegrationManager integrationManager;
-    private CacheManager cacheManager;
     private DataManager dataManager;
     private ImportManager importManager;
     private BlockManager blockManager;
@@ -69,7 +69,6 @@ public class Graves extends JavaPlugin {
         integrationManager.load();
 
         versionManager = new VersionManager();
-        cacheManager = new CacheManager();
         dataManager = new DataManager(this);
         importManager = new ImportManager(this);
         blockManager = new BlockManager(this);
@@ -192,12 +191,7 @@ public class Graves extends JavaPlugin {
 
         Metrics metrics = new Metrics(this, getMetricsID());
 
-        metrics.addCustomChart(new SingleLineChart("graves", new Callable<Integer>() {
-            @Override
-            public Integer call() throws Exception {
-                return cacheManager.getGraveMap().size();
-            }
-        }));
+        metrics.addCustomChart(new SingleLineChart("graves", () -> CacheManager.graveMap.size()));
     }
 
     public void registerListeners() {
@@ -464,10 +458,6 @@ public class Graves extends JavaPlugin {
         return entityDataManager;
     }
 
-    public CacheManager getCacheManager() {
-        return cacheManager;
-    }
-
     public DataManager getDataManager() {
         return dataManager;
     }
@@ -497,35 +487,35 @@ public class Graves extends JavaPlugin {
     }
 
     /// startregion: getConfig*
-    public boolean getConfigBool(String config, Grave grave) {
+    public boolean getConfigBool(String config, @NotNull Grave grave) {
         return getConfig(config, grave.getOwnerType(), grave.getPermissionList()).getBoolean(config);
     }
 
-    public int getConfigInt(String config, Grave grave) {
+    public int getConfigInt(String config, @NotNull Grave grave) {
         return getConfig(config, grave.getOwnerType(), grave.getPermissionList()).getInt(config);
     }
 
-    public int getConfigInt(String config, Grave grave, int defaultValue) {
+    public int getConfigInt(String config, @NotNull Grave grave, int defaultValue) {
         return getConfig(config, grave.getOwnerType(), grave.getPermissionList()).getInt(config, defaultValue);
     }
 
-    public String getConfigString(String config, Grave grave, String defaultValue) {
+    public String getConfigString(String config, @NotNull Grave grave, String defaultValue) {
         return getConfig(config, grave.getOwnerType(), grave.getPermissionList()).getString(config, defaultValue);
     }
 
-    public String getConfigString(String config, Entity entity, String defaultValue) {
+    public String getConfigString(String config, @NotNull Entity entity, String defaultValue) {
         return getConfig(config, entity.getType(), getPermissionList(entity)).getString(config, defaultValue);
     }
 
-    public String getConfigString(String config, Grave grave) {
+    public String getConfigString(String config, @NotNull Grave grave) {
         return getConfig(config, grave.getOwnerType(), grave.getPermissionList()).getString(config);
     }
 
-    public List<String> getConfigStringList(String config, Grave grave) {
+    public List<String> getConfigStringList(String config, @NotNull Grave grave) {
         return getConfig(config, grave.getOwnerType(), grave.getPermissionList()).getStringList(config);
     }
 
-    public double getConfigDbl(String config, Grave grave) {
+    public double getConfigDbl(String config, @NotNull Grave grave) {
         return getConfig(config, grave.getOwnerType(), grave.getPermissionList()).getDouble(config);
     }
 
@@ -533,7 +523,7 @@ public class Graves extends JavaPlugin {
         return getConfig(config, entity.getType(), getPermissionList(entity)).getBoolean(config);
     }
 
-    public boolean getConfigBool(String config, Entity entity, @Nullable List<String> permissionList) {
+    public boolean getConfigBool(String config, @NotNull Entity entity, @Nullable List<String> permissionList) {
         return getConfig(config, entity.getType(), permissionList).getBoolean(config);
     }
 
@@ -541,15 +531,15 @@ public class Graves extends JavaPlugin {
         return getConfig(config, entityType, permissionList).getBoolean(config);
     }
 
-    public int getConfigInt(String config, Entity entity, @Nullable List<String> permissionList) {
+    public int getConfigInt(String config, @NotNull Entity entity, @Nullable List<String> permissionList) {
         return getConfig(config, entity.getType(), permissionList).getInt(config);
     }
 
-    public String getConfigString(String config, Entity entity, @Nullable List<String> permissionList) {
+    public String getConfigString(String config, @NotNull Entity entity, @Nullable List<String> permissionList) {
         return getConfig(config, entity.getType(), permissionList).getString(config);
     }
 
-    public String getConfigString(String config, Entity entity, @Nullable List<String> permissionList, String defaultValue) {
+    public String getConfigString(String config, @NotNull Entity entity, @Nullable List<String> permissionList, String defaultValue) {
         return getConfig(config, entity.getType(), permissionList).getString(config, defaultValue);
     }
 
@@ -557,7 +547,7 @@ public class Graves extends JavaPlugin {
         return getConfig(config, entityType, permissionList).getString(config);
     }
 
-    public List<String> getConfigStringList(String config, Entity entity, @Nullable List<String> permissionList) {
+    public List<String> getConfigStringList(String config, @NotNull Entity entity, @Nullable List<String> permissionList) {
         return getConfig(config, entity.getType(), permissionList).getStringList(config);
     }
 
@@ -567,11 +557,11 @@ public class Graves extends JavaPlugin {
     /// endregion: getConfig*
 
     /// startregion: getConfig
-    public ConfigurationSection getConfig(String config, Grave grave) {
+    public ConfigurationSection getConfig(String config, @NotNull Grave grave) {
         return getConfig(config, grave.getOwnerType(), grave.getPermissionList());
     }
 
-    private ConfigurationSection getConfig(String config, Entity entity, @Nullable List<String> permissionList) {
+    private ConfigurationSection getConfig(String config, @NotNull Entity entity, @Nullable List<String> permissionList) {
         return getConfig(config, entity.getType(), permissionList);
     }
 
@@ -612,7 +602,7 @@ public class Graves extends JavaPlugin {
         }
     }
 
-    private void bakeDefaults(FileConfiguration fileConfiguration) {
+    private void bakeDefaults(@NotNull FileConfiguration fileConfiguration) {
         try {
             fileConfiguration.options().copyDefaults(true);
             fileConfiguration.loadFromString(fileConfiguration.saveToString());
@@ -625,8 +615,7 @@ public class Graves extends JavaPlugin {
         List<String> permissionList = new ArrayList<>();
         List<String> permissionListSorted = new ArrayList<>();
 
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+        if (entity instanceof Player player) {
 
             for (PermissionAttachmentInfo permissionAttachmentInfo : player.getEffectivePermissions()) {
                 if (permissionAttachmentInfo.getPermission().startsWith("graves.permission.")) {
@@ -654,7 +643,7 @@ public class Graves extends JavaPlugin {
         return permissionListSorted;
     }
 
-    private FileConfiguration getConfigFiles(File folder) {
+    private @NotNull FileConfiguration getConfigFiles(@NotNull File folder) {
         FileConfiguration fileConfiguration = new YamlConfiguration();
         File[] files = folder.listFiles();
 
@@ -708,7 +697,8 @@ public class Graves extends JavaPlugin {
         return fileConfiguration;
     }
 
-    public final File getConfigFolder() {
+    @Contract(" -> new")
+    public final @NotNull File getConfigFolder() {
         return new File(getDataFolder(), "config");
     }
 
@@ -724,10 +714,12 @@ public class Graves extends JavaPlugin {
         return UpdateUtil.getLatestVersion(getSpigotID());
     }
 
+    @SuppressWarnings("SameReturnValue")
     public final int getSpigotID() {
         return 116202;
     }
 
+    @SuppressWarnings("SameReturnValue")
     public final int getMetricsID() {
         return 21607;
     }

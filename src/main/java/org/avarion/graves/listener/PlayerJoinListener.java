@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class PlayerJoinListener implements Listener {
 
@@ -17,7 +18,7 @@ public class PlayerJoinListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerJoin(PlayerJoinEvent event) {
+    public void onPlayerJoin(@NotNull PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
         if (plugin.getConfig().getBoolean("settings.update.check") && player.hasPermission("graves.update.notify")) {

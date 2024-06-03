@@ -16,10 +16,11 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.NumberConversions;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -34,11 +35,11 @@ public final class EntityManager extends EntityDataManager {
         this.plugin = plugin;
     }
 
-    public void swingMainHand(Player player) {
+    public void swingMainHand(@NotNull Player player) {
         player.swingMainHand();
     }
 
-    public ItemStack createGraveCompass(Player player, Location location, Grave grave) {
+    public @NotNull ItemStack createGraveCompass(Player player, Location location, Grave grave) {
         Material material = Material.COMPASS;
 
         if (plugin.getConfigBool("compass.recovery", grave)) {
@@ -53,8 +54,7 @@ public final class EntityManager extends EntityDataManager {
         ItemMeta itemMeta = itemStack.getItemMeta();
 
         if (itemMeta != null) {
-            if (itemMeta instanceof CompassMeta) {
-                CompassMeta compassMeta = (CompassMeta) itemMeta;
+            if (itemMeta instanceof CompassMeta compassMeta) {
 
                 compassMeta.setLodestoneTracked(false);
                 compassMeta.setLodestone(location);
@@ -99,7 +99,7 @@ public final class EntityManager extends EntityDataManager {
 
     }
 
-    public Map<ItemStack, UUID> getCompassesFromInventory(HumanEntity player) {
+    public @NotNull Map<ItemStack, UUID> getCompassesFromInventory(@NotNull HumanEntity player) {
         Map<ItemStack, UUID> itemStackUUIDMap = new HashMap<>();
 
         for (ItemStack itemStack : player.getInventory().getContents()) {
@@ -154,8 +154,7 @@ public final class EntityManager extends EntityDataManager {
             }
 
             if (locationTeleport != null && locationTeleport.getWorld() != null) {
-                if (entity instanceof Player) {
-                    Player player = (Player) entity;
+                if (entity instanceof Player player) {
 
                     if (plugin.getIntegrationManager().hasVault()) {
                         double teleportCost = getTeleportCost(entity.getLocation(), locationTeleport, grave);
@@ -230,11 +229,11 @@ public final class EntityManager extends EntityDataManager {
                                                                                .canTeleport(entity, location));
     }
 
-    public void playWorldSound(String string, Player player) {
+    public void playWorldSound(String string, @NotNull Player player) {
         playWorldSound(string, player.getLocation(), null);
     }
 
-    public void playWorldSound(String string, Player player, Grave grave) {
+    public void playWorldSound(String string, @NotNull Player player, Grave grave) {
         playWorldSound(string, player.getLocation(), grave);
     }
 
@@ -244,7 +243,7 @@ public final class EntityManager extends EntityDataManager {
                                                                                       : null, 1, 1);
     }
 
-    public void playWorldSound(String string, Location location, EntityType entityType, List<String> permissionList, float volume, float pitch) {
+    public void playWorldSound(String string, @NotNull Location location, EntityType entityType, List<String> permissionList, float volume, float pitch) {
         if (location.getWorld() != null) {
             string = plugin.getConfigString(string, entityType, permissionList);
 
@@ -259,11 +258,11 @@ public final class EntityManager extends EntityDataManager {
         }
     }
 
-    public void playPlayerSound(String string, Entity entity, Grave grave) {
+    public void playPlayerSound(String string, Entity entity, @NotNull Grave grave) {
         playPlayerSound(string, entity, entity.getLocation(), grave.getPermissionList(), 1, 1);
     }
 
-    public void playPlayerSound(String string, Entity entity, Location location, Grave grave) {
+    public void playPlayerSound(String string, Entity entity, Location location, @NotNull Grave grave) {
         playPlayerSound(string, entity, location, grave.getPermissionList(), 1, 1);
     }
 
@@ -276,8 +275,7 @@ public final class EntityManager extends EntityDataManager {
     }
 
     public void playPlayerSound(String string, Entity entity, Location location, List<String> permissionList, float volume, float pitch) {
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+        if (entity instanceof Player player) {
             string = plugin.getConfigString(string, entity, permissionList);
 
             if (string != null && !string.isEmpty()) {
@@ -292,8 +290,7 @@ public final class EntityManager extends EntityDataManager {
     }
 
     public void sendMessage(String string, CommandSender commandSender) {
-        if (commandSender instanceof Player) {
-            Player player = (Player) commandSender;
+        if (commandSender instanceof Player player) {
 
             sendMessage(string, player, player.getLocation(), null, plugin.getPermissionList(player));
         }
@@ -324,8 +321,7 @@ public final class EntityManager extends EntityDataManager {
     }
 
     private void sendMessage(String string, Entity entity, String name, Location location, Grave grave, List<String> permissionList) {
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+        if (entity instanceof Player player) {
 
             if (grave != null) {
                 string = plugin.getConfigString(string, grave);
@@ -383,20 +379,19 @@ public final class EntityManager extends EntityDataManager {
         return runFunction(entity, function, null);
     }
 
-    public boolean runFunction(Entity entity, String function, Grave grave) {
+    public boolean runFunction(Entity entity, @NotNull String function, Grave grave) {
         switch (function.toLowerCase()) {
-            case "list": {
+            case "list" -> {
                 plugin.getGUIManager().openGraveList(entity);
 
                 return true;
             }
-            case "menu": {
+            case "menu" -> {
                 plugin.getGUIManager().openGraveMenu(entity, grave);
 
                 return true;
             }
-            case "teleport":
-            case "teleportation": {
+            case "teleport", "teleportation" -> {
                 if (plugin.getConfigBool("teleport.enabled", grave)
                     && (EntityUtil.hasPermission(entity, "graves.teleport")
                         || EntityUtil.hasPermission(entity, "graves.bypass"))) {
@@ -412,8 +407,7 @@ public final class EntityManager extends EntityDataManager {
 
                 return true;
             }
-            case "protect":
-            case "protection": {
+            case "protect", "protection" -> {
                 if (grave.getTimeProtectionRemaining() > 0 || grave.getTimeProtectionRemaining() < 0) {
                     plugin.getGraveManager().toggleGraveProtection(grave);
                     playPlayerSound("sound.protection-change", entity, grave);
@@ -422,7 +416,7 @@ public final class EntityManager extends EntityDataManager {
 
                 return true;
             }
-            case "distance": {
+            case "distance" -> {
                 Location location = plugin.getGraveManager().getGraveLocation(entity.getLocation(), grave);
 
                 if (location != null) {
@@ -436,9 +430,7 @@ public final class EntityManager extends EntityDataManager {
 
                 return true;
             }
-            case "open":
-            case "loot":
-            case "virtual": {
+            case "open", "loot", "virtual" -> {
                 double distance = plugin.getConfigDbl("virtual.distance", grave);
 
                 if (distance < 0) {
@@ -459,7 +451,7 @@ public final class EntityManager extends EntityDataManager {
 
                 return true;
             }
-            case "autoloot": {
+            case "autoloot" -> {
                 plugin.getGraveManager().autoLootGrave(entity, entity.getLocation(), grave);
 
                 return true;
@@ -469,7 +461,7 @@ public final class EntityManager extends EntityDataManager {
         return false;
     }
 
-    public boolean canOpenGrave(Player player, Grave grave) {
+    public boolean canOpenGrave(Player player, @NotNull Grave grave) {
         if (grave.getTimeProtectionRemaining() == 0 || player.hasPermission("graves.bypass")) {
             return true;
         }
@@ -540,8 +532,7 @@ public final class EntityManager extends EntityDataManager {
 
             Entity entity = location.getWorld().spawnEntity(location, entityType);
 
-            if (entity instanceof LivingEntity) {
-                LivingEntity livingEntity = (LivingEntity) entity;
+            if (entity instanceof LivingEntity livingEntity) {
 
                 if (livingEntity.getEquipment() != null) {
                     if (plugin.getConfigBool("zombie.owner-head", grave)) {
@@ -587,8 +578,7 @@ public final class EntityManager extends EntityDataManager {
                     ((Mob) livingEntity).setTarget(targetEntity);
                 }
 
-                if (livingEntity instanceof Zombie) {
-                    Zombie zombie = (Zombie) livingEntity;
+                if (livingEntity instanceof Zombie zombie) {
 
                     if (zombie.isBaby()) {
                         zombie.setBaby(false);
@@ -614,7 +604,7 @@ public final class EntityManager extends EntityDataManager {
             if (location.getWorld() != null) {
                 Material material = Material.matchMaterial(plugin.getConfigString("armor-stand.material", grave, "AIR"));
 
-                if (material != null && !MaterialUtil.isAir(material)) {
+                if (material != null && !material.isAir()) {
                     ItemStack itemStack = new ItemStack(material, 1);
                     ItemMeta itemMeta = itemStack.getItemMeta();
                     int customModelData = plugin.getConfigInt("armor-stand.model-data", grave, -1);
@@ -677,7 +667,7 @@ public final class EntityManager extends EntityDataManager {
             if (location.getWorld() != null) {
                 Material material = Material.matchMaterial(plugin.getConfigString("item-frame.material", grave, "AIR"));
 
-                if (material != null && !MaterialUtil.isAir(material)) {
+                if (material != null && !material.isAir()) {
                     ItemStack itemStack = new ItemStack(material, 1);
                     ItemMeta itemMeta = itemStack.getItemMeta();
                     int customModelData = plugin.getConfigInt("item-frame.model-data", grave, -1);
@@ -715,7 +705,7 @@ public final class EntityManager extends EntityDataManager {
         removeEntity(getEntityDataMap(getLoadedEntityDataList(grave)));
     }
 
-    public void removeEntity(Map<EntityData, Entity> entityDataMap) {
+    public void removeEntity(@NotNull Map<EntityData, Entity> entityDataMap) {
         List<EntityData> entityDataList = new ArrayList<>();
 
         for (Map.Entry<EntityData, Entity> entry : entityDataMap.entrySet()) {
@@ -730,7 +720,7 @@ public final class EntityManager extends EntityDataManager {
         plugin.getDataManager().removeEntityData(entityDataList);
     }
 
-    public Map<EquipmentSlot, ItemStack> getEquipmentMap(LivingEntity livingEntity, Grave grave) {
+    public @NotNull Map<EquipmentSlot, ItemStack> getEquipmentMap(@NotNull LivingEntity livingEntity, Grave grave) {
         Map<EquipmentSlot, ItemStack> equipmentSlotItemStackMap = new HashMap<>();
 
         if (livingEntity.getEquipment() != null) {
@@ -768,7 +758,7 @@ public final class EntityManager extends EntityDataManager {
     }
 
     @SuppressWarnings("redundant")
-    public String getEntityName(Entity entity) {
+    public @NotNull String getEntityName(Entity entity) {
         if (entity != null) {
             if (entity instanceof Player) {
                 return entity.getName(); // Need redundancy for legacy support
@@ -782,15 +772,15 @@ public final class EntityManager extends EntityDataManager {
         return "null";
     }
 
-    public boolean hasDataString(Entity entity, String string) {
+    public boolean hasDataString(@NotNull Entity entity, String string) {
         return entity.getPersistentDataContainer().has(new NamespacedKey(plugin, string), PersistentDataType.STRING);
     }
 
-    public boolean hasDataByte(Entity entity, String string) {
+    public boolean hasDataByte(@NotNull Entity entity, String string) {
         return entity.getPersistentDataContainer().has(new NamespacedKey(plugin, string), PersistentDataType.BYTE);
     }
 
-    public String getDataString(Entity entity, String key) {
+    public String getDataString(@NotNull Entity entity, String key) {
         if (entity.getPersistentDataContainer().has(new NamespacedKey(plugin, key), PersistentDataType.STRING)) {
             return entity.getPersistentDataContainer().get(new NamespacedKey(plugin, key), PersistentDataType.STRING);
         }
@@ -799,19 +789,18 @@ public final class EntityManager extends EntityDataManager {
         }
     }
 
-    public void setDataString(Entity entity, String key, String string) {
+    public void setDataString(@NotNull Entity entity, String key, String string) {
         entity.getPersistentDataContainer().set(new NamespacedKey(plugin, key), PersistentDataType.STRING, string);
     }
 
-    public void setDataByte(Entity entity, String key) {
+    public void setDataByte(@NotNull Entity entity, String key) {
         entity.getPersistentDataContainer().set(new NamespacedKey(plugin, key), PersistentDataType.BYTE, (byte) 1);
     }
 
-    public Grave getGraveFromEntityData(Entity entity) {
+    public @Nullable Grave getGraveFromEntityData(@NotNull Entity entity) {
         if (entity.getPersistentDataContainer()
                   .has(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING)) {
-            return plugin.getCacheManager()
-                         .getGraveMap()
+            return CacheManager.graveMap
                          .get(UUIDUtil.getUUID(entity.getPersistentDataContainer()
                                                      .get(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING)));
         }
@@ -819,7 +808,7 @@ public final class EntityManager extends EntityDataManager {
             List<MetadataValue> metadataValue = entity.getMetadata("graveUUID");
 
             if (!metadataValue.isEmpty()) {
-                return plugin.getCacheManager().getGraveMap().get(UUIDUtil.getUUID(metadataValue.get(0).asString()));
+                return CacheManager.graveMap.get(UUIDUtil.getUUID(metadataValue.get(0).asString()));
             }
         }
 

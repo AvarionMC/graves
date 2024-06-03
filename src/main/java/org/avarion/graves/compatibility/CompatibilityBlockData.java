@@ -22,10 +22,14 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public final class CompatibilityBlockData implements Compatibility {
+    @Contract("_, null, _, _ -> new")
     @Override
-    public BlockData setBlockData(Location location, Material material, Grave grave, Graves plugin) {
+    public @NotNull BlockData setBlockData(Location location, Material material, Grave grave, Graves plugin) {
         if (material != null) {
             Block block = location.getBlock();
             String originalMaterial = block.getType().name();
@@ -33,8 +37,7 @@ public final class CompatibilityBlockData implements Compatibility {
             String replaceData = location.getBlock().getBlockData().clone().getAsString(true);
 
             // Levelled
-            if (block.getBlockData() instanceof Levelled) {
-                Levelled leveled = (Levelled) block.getBlockData();
+            if (block.getBlockData() instanceof Levelled leveled) {
 
                 if (leveled.getLevel() != 0) {
                     replaceMaterial = null;
@@ -52,8 +55,7 @@ public final class CompatibilityBlockData implements Compatibility {
             location.getBlock().setType(material);
 
             // Waterlogged
-            if (block.getBlockData() instanceof Waterlogged) {
-                Waterlogged waterlogged = (Waterlogged) block.getBlockData();
+            if (block.getBlockData() instanceof Waterlogged waterlogged) {
 
                 waterlogged.setWaterlogged(MaterialUtil.isWater(originalMaterial));
                 block.setBlockData(waterlogged);
@@ -71,7 +73,7 @@ public final class CompatibilityBlockData implements Compatibility {
     }
 
     @Override
-    public boolean canBuild(Player player, Location location, Graves plugin) {
+    public boolean canBuild(Player player, @NotNull Location location, @NotNull Graves plugin) {
         BlockPlaceEvent blockPlaceEvent = new BlockPlaceEvent(location.getBlock(), location.getBlock()
                                                                                            .getState(), location.getBlock(), player.getInventory()
                                                                                                                                    .getItemInMainHand(), player, true, EquipmentSlot.HAND);
@@ -82,12 +84,12 @@ public final class CompatibilityBlockData implements Compatibility {
     }
 
     @Override
-    public boolean hasTitleData(Block block) {
+    public boolean hasTitleData(@NotNull Block block) {
         return block.getState() instanceof TileState;
     }
 
     @SuppressWarnings("deprecation")
-    private void updateSkullBlock(Block block, Grave grave, Graves plugin) {
+    private void updateSkullBlock(@NotNull Block block, Grave grave, @NotNull Graves plugin) {
         int headType = plugin.getConfigInt("block.head.type", grave);
         String headBase64 = plugin.getConfigString("block.head.base64", grave);
         String headName = plugin.getConfigString("block.head.name", grave);
@@ -119,7 +121,7 @@ public final class CompatibilityBlockData implements Compatibility {
     }
 
     @Override
-    public ItemStack getSkullItemStack(Grave grave, Graves plugin) {
+    public @NotNull ItemStack getSkullItemStack(Grave grave, Graves plugin) {
         ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
 
         if (itemStack.getItemMeta() != null) {
@@ -139,7 +141,7 @@ public final class CompatibilityBlockData implements Compatibility {
     }
 
     @Override
-    public String getSkullTexture(ItemStack itemStack) {
+    public @Nullable String getSkullTexture(@NotNull ItemStack itemStack) {
         if (itemStack.getType() == Material.PLAYER_HEAD) {
             return getSkullMetaData(itemStack);
         }

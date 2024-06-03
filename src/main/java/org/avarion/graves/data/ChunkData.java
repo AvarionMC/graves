@@ -2,6 +2,7 @@ package org.avarion.graves.data;
 
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -16,7 +17,7 @@ public class ChunkData implements Serializable {
     private final Map<Location, BlockData> blockDataMap;
     private final Map<UUID, EntityData> entityDataMap;
 
-    public ChunkData(Location location) {
+    public ChunkData(@NotNull Location location) {
         this.world = location.getWorld();
         this.x = location.getBlockX() >> 4;
         this.z = location.getBlockZ() >> 4;
@@ -53,7 +54,7 @@ public class ChunkData implements Serializable {
     }
 
     public void addBlockData(BlockData blockData) {
-        blockDataMap.put(blockData.getLocation(), blockData);
+        blockDataMap.put(blockData.location(), blockData);
     }
 
     public void removeBlockData(Location location) {
@@ -68,7 +69,7 @@ public class ChunkData implements Serializable {
         entityDataMap.put(entityData.getUUIDEntity(), entityData);
     }
 
-    public void removeEntityData(EntityData entityData) {
+    public void removeEntityData(@NotNull EntityData entityData) {
         entityDataMap.remove(entityData.getUUIDEntity());
     }
 

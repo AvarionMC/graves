@@ -3,6 +3,7 @@ package org.avarion.graves.util;
 import org.avarion.graves.Graves;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
 
 public final class ServerUtil {
 
-    public static String getServerDumpInfo(Graves plugin) {
+    public static @NotNull String getServerDumpInfo(@NotNull Graves plugin) {
         List<String> stringList = new ArrayList<>();
 
         stringList.add("Implementation Name: " + plugin.getServer().getName());

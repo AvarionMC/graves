@@ -13,6 +13,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,7 +51,7 @@ public final class ItemsAdder extends EntityDataManager {
         }
     }
 
-    public void createFurniture(Location location, Grave grave) {
+    public void createFurniture(Location location, @NotNull Grave grave) {
         location = LocationUtil.roundLocation(location).add(0.5, 0, 0.5);
 
         location.setYaw(BlockFaceUtil.getBlockFaceYaw(BlockFaceUtil.getYawBlockFace(location.getYaw())
@@ -91,7 +93,7 @@ public final class ItemsAdder extends EntityDataManager {
         removeFurniture(getEntityDataMap(Collections.singletonList(entityData)));
     }
 
-    public void removeFurniture(Map<EntityData, Entity> entityDataMap) {
+    public void removeFurniture(@NotNull Map<EntityData, Entity> entityDataMap) {
         List<EntityData> entityDataList = new ArrayList<>();
 
         for (Map.Entry<EntityData, Entity> entry : entityDataMap.entrySet()) {
@@ -128,7 +130,7 @@ public final class ItemsAdder extends EntityDataManager {
         }
     }
 
-    public boolean isCustomBlock(Location location) {
+    public boolean isCustomBlock(@NotNull Location location) {
         return CustomBlock.byAlreadyPlaced(location.getBlock()) != null;
     }
 
@@ -136,7 +138,8 @@ public final class ItemsAdder extends EntityDataManager {
         CustomBlock.remove(location);
     }
 
-    private CustomFurniture createCustomFurniture(String name, Location location) {
+    @Contract("_, _ -> fail")
+    private CustomFurniture createCustomFurniture(String name, @NotNull Location location) {
         return CustomFurniture.spawn(name, location.getBlock());
     }
 

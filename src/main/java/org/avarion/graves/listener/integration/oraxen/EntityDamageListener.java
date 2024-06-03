@@ -6,6 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class EntityDamageListener implements Listener {
 
@@ -16,7 +17,7 @@ public class EntityDamageListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOW)
-    public void onEntityDamage(EntityDamageEvent event) {
+    public void onEntityDamage(@NotNull EntityDamageEvent event) {
         event.setCancelled(event.getEntity() instanceof ItemFrame && oraxen.getGrave(event.getEntity()) != null);
     }
 

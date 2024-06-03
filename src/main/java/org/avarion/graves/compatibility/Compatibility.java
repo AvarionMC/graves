@@ -11,6 +11,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -27,7 +28,7 @@ public interface Compatibility {
 
     String getSkullTexture(ItemStack itemStack);
 
-    default String getSkullMetaData(ItemStack itemStack) {
+    default String getSkullMetaData(@NotNull ItemStack itemStack) {
         SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
         if (skullMeta == null) {
             return null;

@@ -11,6 +11,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.InventoryHolder;
+import org.jetbrains.annotations.NotNull;
 
 public class InventoryClickListener implements Listener {
 
@@ -21,7 +22,7 @@ public class InventoryClickListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onInventoryClick(InventoryClickEvent event) {
+    public void onInventoryClick(@NotNull InventoryClickEvent event) {
         InventoryHolder inventoryHolder = event.getInventory().getHolder();
 
         if (inventoryHolder != null) {
@@ -33,8 +34,7 @@ public class InventoryClickListener implements Listener {
                       .runTaskLater(plugin, () -> plugin.getDataManager()
                                                         .updateGrave(grave, "inventory", InventoryUtil.inventoryToString(grave.getInventory())), 1L);
             }
-            else if (event.getWhoClicked() instanceof Player) {
-                Player player = (Player) event.getWhoClicked();
+            else if (event.getWhoClicked() instanceof Player player) {
 
                 if (inventoryHolder instanceof GraveList) {
                     GraveList graveList = (GraveList) event.getInventory().getHolder();

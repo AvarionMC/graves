@@ -2,6 +2,7 @@ package org.avarion.graves.util;
 
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -10,7 +11,7 @@ import java.util.Base64;
 
 public final class Base64Util {
 
-    public static String objectToBase64(Object object) {
+    public static @Nullable String objectToBase64(Object object) {
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             BukkitObjectOutputStream bukkitObjectOutputStream = new BukkitObjectOutputStream(byteArrayOutputStream);
@@ -26,7 +27,7 @@ public final class Base64Util {
         return null;
     }
 
-    public static Object base64ToObject(String string) {
+    public static @Nullable Object base64ToObject(String string) {
         try {
             return new BukkitObjectInputStream(new ByteArrayInputStream(Base64.getDecoder()
                                                                               .decode(string))).readObject();

@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class InventoryOpenListener implements Listener {
 
@@ -17,9 +18,8 @@ public class InventoryOpenListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onInventoryOpen(InventoryOpenEvent event) {
-        if (event.getInventory().getHolder() instanceof Grave) {
-            Grave grave = (Grave) event.getInventory().getHolder();
+    public void onInventoryOpen(@NotNull InventoryOpenEvent event) {
+        if (event.getInventory().getHolder() instanceof Grave grave) {
             GraveOpenEvent graveOpenEvent = new GraveOpenEvent(event.getView(), grave);
 
             plugin.getServer().getPluginManager().callEvent(graveOpenEvent);

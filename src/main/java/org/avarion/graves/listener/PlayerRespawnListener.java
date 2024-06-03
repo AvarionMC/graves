@@ -9,6 +9,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class PlayerRespawnListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerRespawn(PlayerRespawnEvent event) {
+    public void onPlayerRespawn(@NotNull PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         List<String> permissionList = plugin.getPermissionList(player);
         List<Grave> graveList = plugin.getGraveManager().getGraveList(player);
@@ -29,10 +30,10 @@ public class PlayerRespawnListener implements Listener {
         if (!graveList.isEmpty()) {
             Grave grave = graveList.get(graveList.size() - 1);
 
-            plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-                plugin.getEntityManager()
-                      .runFunction(player, plugin.getConfigString("respawn.function", player, permissionList, "none"), grave);
-            }, 1L);
+            plugin.getServer()
+                  .getScheduler()
+                  .runTaskLater(plugin, () -> plugin.getEntityManager()
+                                                    .runFunction(player, plugin.getConfigString("respawn.function", player, permissionList, "none"), grave), 1L);
 
             if (plugin.getConfigBool("respawn.compass", player, permissionList)
                 && grave.getLivedTime() <= plugin.getConfigInt("respawn.compass-time", player, permissionList)

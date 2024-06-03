@@ -266,7 +266,7 @@ public final class IntegrationManager {
             Plugin protocolLibPlugin = plugin.getServer().getPluginManager().getPlugin("ProtocolLib");
 
             if (protocolLibPlugin != null && protocolLibPlugin.isEnabled()) {
-                protocolLib = new ProtocolLib(plugin);
+                protocolLib = new ProtocolLib();
 
                 plugin.integrationMessage("Hooked into "
                                           + protocolLibPlugin.getName()

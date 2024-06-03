@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class BlockPlaceListener implements Listener {
 
@@ -17,7 +18,7 @@ public class BlockPlaceListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onBlockPlace(BlockPlaceEvent event) {
+    public void onBlockPlace(@NotNull BlockPlaceEvent event) {
         Block block = event.getBlock();
         Grave grave = plugin.getBlockManager().getGraveFromBlock(block);
 

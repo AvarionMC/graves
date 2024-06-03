@@ -6,6 +6,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public class PlayerDropItemListener implements Listener {
 
@@ -16,7 +17,7 @@ public class PlayerDropItemListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onPlayerDropItem(PlayerDropItemEvent event) {
+    public void onPlayerDropItem(@NotNull PlayerDropItemEvent event) {
         ItemStack itemStack = event.getItemDrop().getItemStack();
 
         if (plugin.getEntityManager().getGraveUUIDFromItemStack(itemStack) != null) {

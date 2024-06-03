@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockExplodeEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 
@@ -21,7 +22,7 @@ public class BlockExplodeListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onBlockExplode(BlockExplodeEvent event) {
+    public void onBlockExplode(@NotNull BlockExplodeEvent event) {
         Iterator<Block> iterator = event.blockList().iterator();
 
         while (iterator.hasNext()) {

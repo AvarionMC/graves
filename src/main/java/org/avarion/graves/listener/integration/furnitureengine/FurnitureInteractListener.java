@@ -7,6 +7,7 @@ import org.avarion.graves.type.Grave;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.jetbrains.annotations.NotNull;
 
 public class FurnitureInteractListener implements Listener {
 
@@ -19,7 +20,7 @@ public class FurnitureInteractListener implements Listener {
     }
 
     @EventHandler
-    public void onFurnitureBreak(FurnitureInteractEvent event) {
+    public void onFurnitureBreak(@NotNull FurnitureInteractEvent event) {
         ItemFrame itemFrame = furnitureEngine.getItemFrame(event.getFurnitureLocation());
 
         if (itemFrame != null) {

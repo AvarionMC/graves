@@ -10,6 +10,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,7 +31,7 @@ public final class GUIManager {
         openGraveList(entity, entity.getUniqueId(), sound);
     }
 
-    public void openGraveList(Entity entity, Entity entity2) {
+    public void openGraveList(Entity entity, @NotNull Entity entity2) {
         openGraveList(entity, entity2.getUniqueId(), true);
     }
 
@@ -59,8 +60,7 @@ public final class GUIManager {
     }
 
     public void openGraveList(Entity entity, UUID uuid, boolean sound) {
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+        if (entity instanceof Player player) {
             List<String> permissionList = plugin.getPermissionList(player);
             List<Grave> playerGraveList = plugin.getGraveManager().getGraveList(uuid);
 
@@ -87,7 +87,7 @@ public final class GUIManager {
         setGraveListItems(inventory, plugin.getGraveManager().getGraveList(uuid));
     }
 
-    public void setGraveListItems(Inventory inventory, List<Grave> graveList) {
+    public void setGraveListItems(@NotNull Inventory inventory, @NotNull List<Grave> graveList) {
         inventory.clear();
 
         int count = 1;
@@ -103,8 +103,7 @@ public final class GUIManager {
     }
 
     public void openGraveMenu(Entity entity, Grave grave, boolean sound) {
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+        if (entity instanceof Player player) {
             GraveMenu graveMenu = new GraveMenu(grave);
             String title = StringUtil.parseString(plugin.getConfigString("gui.menu.grave.title", player, grave.getPermissionList(), "Grave"), player, plugin);
             Inventory inventory = plugin.getServer()
@@ -120,7 +119,7 @@ public final class GUIManager {
         }
     }
 
-    public void setGraveMenuItems(Inventory inventory, Grave grave) {
+    public void setGraveMenuItems(@NotNull Inventory inventory, Grave grave) {
         inventory.clear();
 
         ConfigurationSection configurationSection = plugin.getConfigSection("gui.menu.grave.slot", grave);

@@ -11,33 +11,8 @@ import java.util.Map;
 import java.util.UUID;
 
 public final class CacheManager {
-
-    private final Map<UUID, Grave> graveMap;
-    private final Map<String, ChunkData> chunkMap;
-    private final Map<UUID, Location> lastLocationMap;
-    private final Map<UUID, List<ItemStack>> removedItemStackMap;
-
-    public CacheManager() {
-        this.graveMap = new HashMap<>();
-        this.chunkMap = new HashMap<>();
-        this.lastLocationMap = new HashMap<>();
-        this.removedItemStackMap = new HashMap<>();
-    }
-
-    public Map<UUID, Grave> getGraveMap() {
-        return graveMap;
-    }
-
-    public Map<String, ChunkData> getChunkMap() {
-        return chunkMap;
-    }
-
-    public Map<UUID, Location> getLastLocationMap() {
-        return lastLocationMap;
-    }
-
-    public Map<UUID, List<ItemStack>> getRemovedItemStackMap() {
-        return removedItemStackMap;
-    }
-
+    static public final Map<UUID, Grave> graveMap = new HashMap<>();
+    static public final Map<String, ChunkData> chunkMap = new HashMap<>();
+    static public final Map<UUID, Location> lastLocationMap = new HashMap<>();
+    static public final Map<UUID, List<ItemStack>> removedItemStackMap = new HashMap<>();
 }

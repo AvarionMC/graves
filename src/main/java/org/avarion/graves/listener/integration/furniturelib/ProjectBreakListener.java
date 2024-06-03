@@ -5,6 +5,7 @@ import org.avarion.graves.integration.FurnitureLib;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.jetbrains.annotations.NotNull;
 
 public class ProjectBreakListener implements Listener {
 
@@ -15,7 +16,7 @@ public class ProjectBreakListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onProjectBreak(ProjectBreakEvent event) {
+    public void onProjectBreak(@NotNull ProjectBreakEvent event) {
         event.setCancelled(event.getID().getUUID() != null
                            && furnitureLib.getGrave(event.getLocation(), event.getID().getUUID()) != null);
     }

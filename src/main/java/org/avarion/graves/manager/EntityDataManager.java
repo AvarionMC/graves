@@ -6,6 +6,7 @@ import org.avarion.graves.data.EntityData;
 import org.avarion.graves.type.Grave;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -17,11 +18,11 @@ public class EntityDataManager {
         this.plugin = plugin;
     }
 
-    public void createEntityData(Entity entity, Grave grave, EntityData.Type type) {
+    public void createEntityData(@NotNull Entity entity, @NotNull Grave grave, EntityData.Type type) {
         createEntityData(entity.getLocation(), entity.getUniqueId(), grave.getUUID(), type);
     }
 
-    public void createEntityData(Location location, UUID entityUUID, UUID graveUUID, EntityData.Type type) {
+    public void createEntityData(@NotNull Location location, UUID entityUUID, UUID graveUUID, EntityData.Type type) {
         EntityData entityData = new EntityData(location.clone(), entityUUID, graveUUID, type);
 
         plugin.getDataManager().addEntityData(entityData);
@@ -46,12 +47,12 @@ public class EntityDataManager {
     public Grave getGrave(Location location, UUID uuid) {
         EntityData entityData = getEntityData(location, uuid);
 
-        return entityData != null && plugin.getCacheManager().getGraveMap().containsKey(entityData.getUUIDGrave())
-               ? plugin.getCacheManager().getGraveMap().get(entityData.getUUIDGrave())
+        return entityData != null && CacheManager.graveMap.containsKey(entityData.getUUIDGrave())
+               ? CacheManager.graveMap.get(entityData.getUUIDGrave())
                : null;
     }
 
-    public Grave getGrave(Entity entity) {
+    public Grave getGrave(@NotNull Entity entity) {
         return getGrave(entity.getLocation(), entity.getUniqueId());
     }
 
@@ -62,7 +63,7 @@ public class EntityDataManager {
     public List<EntityData> getLoadedEntityDataList(Grave grave) {
         List<EntityData> entityDataList = new ArrayList<>();
 
-        for (Map.Entry<String, ChunkData> chunkDataEntry : plugin.getCacheManager().getChunkMap().entrySet()) {
+        for (Map.Entry<String, ChunkData> chunkDataEntry : CacheManager.chunkMap.entrySet()) {
             ChunkData chunkData = chunkDataEntry.getValue();
 
             if (chunkDataEntry.getValue().isLoaded()) {
@@ -77,7 +78,7 @@ public class EntityDataManager {
         return entityDataList;
     }
 
-    public Map<EntityData, Entity> getEntityDataMap(List<EntityData> entityDataList) {
+    public Map<EntityData, Entity> getEntityDataMap(@NotNull List<EntityData> entityDataList) {
         Map<EntityData, Entity> entityDataMap = new HashMap<>();
 
         for (EntityData entityData : entityDataList) {
@@ -91,7 +92,7 @@ public class EntityDataManager {
         return entityDataMap;
     }
 
-    public void removeEntries(Map<EntityData, Entity> entityDataMap) {
+    public void removeEntries(@NotNull Map<EntityData, Entity> entityDataMap) {
         List<EntityData> entityDataList = new ArrayList<>();
 
         for (Map.Entry<EntityData, Entity> entry : entityDataMap.entrySet()) {
@@ -102,7 +103,7 @@ public class EntityDataManager {
         plugin.getDataManager().removeEntityData(entityDataList);
     }
 
-    public void removeEntityData(List<EntityData> entityDataList) {
+    public void removeEntityData(@NotNull List<EntityData> entityDataList) {
         List<EntityData> removedEntityDataList = new ArrayList<>();
 
         for (EntityData entityData : entityDataList) {

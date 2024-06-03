@@ -5,6 +5,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockFromToEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class BlockFromToListener implements Listener {
 
@@ -15,7 +16,7 @@ public class BlockFromToListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onBlockFromTo(BlockFromToEvent event) {
+    public void onBlockFromTo(@NotNull BlockFromToEvent event) {
         if (plugin.getBlockManager().getGraveFromBlock(event.getToBlock()) != null) {
             event.setCancelled(true);
         }
