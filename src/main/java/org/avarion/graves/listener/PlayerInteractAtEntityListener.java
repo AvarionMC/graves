@@ -11,6 +11,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.jetbrains.annotations.NotNull;
 
 public class PlayerInteractAtEntityListener implements Listener {
 
@@ -21,7 +22,7 @@ public class PlayerInteractAtEntityListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event) {
+    public void onPlayerInteractAtEntity(@NotNull PlayerInteractAtEntityEvent event) {
         Player player = event.getPlayer();
 
         if (event.getHand() == EquipmentSlot.HAND

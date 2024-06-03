@@ -9,6 +9,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class PlayerRespawnListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerRespawn(PlayerRespawnEvent event) {
+    public void onPlayerRespawn(@NotNull PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         List<String> permissionList = plugin.getPermissionList(player);
         List<Grave> graveList = plugin.getGraveManager().getGraveList(player);

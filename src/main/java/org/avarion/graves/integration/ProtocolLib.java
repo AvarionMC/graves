@@ -11,6 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public final class ProtocolLib {
 
@@ -30,7 +31,7 @@ public final class ProtocolLib {
         sendServerPacket(player, createBlockChangePacket(block, WrappedBlockData.createData(block.getBlockData())));
     }
 
-    private PacketContainer createBlockChangePacket(Block block, WrappedBlockData wrappedBlockData) {
+    private @NotNull PacketContainer createBlockChangePacket(@NotNull Block block, WrappedBlockData wrappedBlockData) {
         Location location = block.getLocation();
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         PacketContainer packetContainer = protocolManager.createPacket(PacketType.Play.Server.BLOCK_CHANGE);

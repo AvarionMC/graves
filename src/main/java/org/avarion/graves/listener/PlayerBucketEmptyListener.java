@@ -6,6 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class PlayerBucketEmptyListener implements Listener {
 
@@ -16,7 +17,7 @@ public class PlayerBucketEmptyListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
+    public void onPlayerBucketEmpty(@NotNull PlayerBucketEmptyEvent event) {
         Block block = event.getBlockClicked().getRelative(event.getBlockFace());
 
         if (plugin.getBlockManager().getGraveFromBlock(block) != null) {

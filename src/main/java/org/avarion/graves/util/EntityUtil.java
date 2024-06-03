@@ -1,10 +1,11 @@
 package org.avarion.graves.util;
 
 import org.bukkit.entity.Entity;
+import org.jetbrains.annotations.NotNull;
 
 public final class EntityUtil {
 
-    public static boolean hasPermission(Entity entity, String permission) {
+    public static boolean hasPermission(@NotNull Entity entity, String permission) {
         try {
             return entity.hasPermission(permission);
         }

@@ -20,6 +20,8 @@ import org.bukkit.block.data.type.NoteBlock;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public final class Oraxen extends EntityDataManager {
 
@@ -144,7 +146,7 @@ public final class Oraxen extends EntityDataManager {
     }
 
     @SuppressWarnings("deprecation")
-    public boolean isCustomBlock(Location location) {
+    public boolean isCustomBlock(@NotNull Location location) {
         if (location.getBlock().getBlockData() instanceof NoteBlock noteBlock) {
 
             return NoteBlockMechanicFactory.getBlockMechanic((int) (noteBlock.getInstrument().getType()) * 25
@@ -155,17 +157,17 @@ public final class Oraxen extends EntityDataManager {
         return false;
     }
 
-    public void removeBlock(Location location) {
+    public void removeBlock(@NotNull Location location) {
         location.getBlock().setType(Material.AIR);
     }
 
-    public FurnitureMechanic getFurnitureMechanic(String string) {
+    public @Nullable FurnitureMechanic getFurnitureMechanic(String string) {
         MechanicFactory mechanicFactory = MechanicsManager.getMechanicFactory("furniture");
 
         return mechanicFactory != null ? (FurnitureMechanic) mechanicFactory.getMechanic(string) : null;
     }
 
-    public NoteBlockMechanic getNoteBlockMechanic(String string) {
+    public @Nullable NoteBlockMechanic getNoteBlockMechanic(String string) {
         MechanicFactory mechanicFactory = MechanicsManager.getMechanicFactory("noteblock");
 
         return mechanicFactory != null ? (NoteBlockMechanic) mechanicFactory.getMechanic(string) : null;

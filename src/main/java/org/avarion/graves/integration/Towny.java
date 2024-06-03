@@ -10,6 +10,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +88,7 @@ public final class Towny {
         return false;
     }
 
-    public TownBlock getGraveyardTownBlock(Location location) {
+    public @Nullable TownBlock getGraveyardTownBlock(Location location) {
         TownBlock townBlock = townyAPI.getTownBlock(location);
 
         return townBlock != null && townBlock.getType() == graveyardBlockType ? townBlock : null;
@@ -96,7 +98,7 @@ public final class Towny {
         return !getTownPlotsByName(player, name).isEmpty();
     }
 
-    public List<TownBlock> getTownPlotsByName(Player player, String name) {
+    public @NotNull List<TownBlock> getTownPlotsByName(Player player, String name) {
         Resident resident = townyAPI.getResident(player);
 
         return resident != null && resident.getTownOrNull() != null
@@ -105,13 +107,13 @@ public final class Towny {
     }
 
 
-    public List<TownBlock> getTownPlotsByName(Location location, String name) {
+    public @NotNull List<TownBlock> getTownPlotsByName(Location location, String name) {
         Town town = townyAPI.getTown(location);
 
         return town != null ? getTownPlotsByName(town, name) : new ArrayList<>();
     }
 
-    public List<TownBlock> getTownPlotsByName(Town town, String name) {
+    public @NotNull List<TownBlock> getTownPlotsByName(@NotNull Town town, String name) {
         List<TownBlock> townBlockList = new ArrayList<>();
 
         for (TownBlock townBlock : town.getTownBlocks()) {

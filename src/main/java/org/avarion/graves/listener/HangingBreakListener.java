@@ -6,6 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.hanging.HangingBreakEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class HangingBreakListener implements Listener {
 
@@ -16,7 +17,7 @@ public class HangingBreakListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOW)
-    public void onHangingBreak(HangingBreakEvent event) {
+    public void onHangingBreak(@NotNull HangingBreakEvent event) {
         event.setCancelled(event.getEntity() instanceof ItemFrame
                            && plugin.getEntityDataManager().getGrave(event.getEntity()) != null);
     }

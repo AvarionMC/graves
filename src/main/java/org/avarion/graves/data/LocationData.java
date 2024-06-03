@@ -2,6 +2,7 @@ package org.avarion.graves.data;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -15,7 +16,7 @@ public class LocationData implements Serializable {
     final double y;
     final double z;
 
-    public LocationData(Location location) {
+    public LocationData(@NotNull Location location) {
         uuid = location.getWorld() != null ? location.getWorld().getUID() : null;
         yaw = location.getYaw();
         pitch = location.getPitch();

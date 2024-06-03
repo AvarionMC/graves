@@ -20,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -106,7 +107,7 @@ public final class FurnitureLib extends EntityDataManager {
         removeFurniture(Collections.singletonList(entityData));
     }
 
-    public void removeFurniture(List<EntityData> entityDataList) {
+    public void removeFurniture(@NotNull List<EntityData> entityDataList) {
         List<EntityData> removeEntityDataList = new ArrayList<>();
 
         for (EntityData entityData : entityDataList) {
@@ -121,7 +122,7 @@ public final class FurnitureLib extends EntityDataManager {
         plugin.getDataManager().removeEntityData(removeEntityDataList);
     }
 
-    private void setSign(Block block, List<String> stringList, Grave grave) {
+    private void setSign(@NotNull Block block, List<String> stringList, Grave grave) {
         if (block.getState() instanceof Sign sign) {
             int counter = 0;
 
@@ -139,7 +140,7 @@ public final class FurnitureLib extends EntityDataManager {
         }
     }
 
-    private void setSkull(fEntity fEntity, Grave grave) {
+    private void setSkull(@NotNull fEntity fEntity, Grave grave) {
         List<String> materialList = plugin.getConfigStringList("furniturelib.head.material", grave);
         ItemStack itemStack = plugin.getCompatibility().getSkullItemStack(grave, plugin);
 

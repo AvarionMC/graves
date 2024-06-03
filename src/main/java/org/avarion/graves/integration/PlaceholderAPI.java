@@ -11,6 +11,7 @@ import org.avarion.graves.util.UUIDUtil;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -51,7 +52,7 @@ public final class PlaceholderAPI extends PlaceholderExpansion implements Relati
     }
 
     @Override
-    public String onPlaceholderRequest(Player player, @NotNull String identifier) {
+    public @Nullable String onPlaceholderRequest(Player player, @NotNull String identifier) {
         identifier = identifier.toLowerCase();
 
         if (identifier.equals("author")) {

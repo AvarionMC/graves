@@ -9,6 +9,7 @@ import org.avarion.graves.util.UUIDUtil;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
@@ -21,7 +22,7 @@ public class NPCInteractListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOW)
-    public void onNPCInteract(NPC.Events.Interact event) {
+    public void onNPCInteract(NPC.Events.@NotNull Interact event) {
         if (event.getClickType() == NPC.Interact.ClickType.RIGHT_CLICK) {
             NPC.Personal npcPersonal = event.getNPC();
 

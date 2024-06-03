@@ -5,6 +5,7 @@ import org.avarion.graves.integration.FurnitureEngine;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.jetbrains.annotations.NotNull;
 
 public class FurnitureBreakListener implements Listener {
 
@@ -15,7 +16,7 @@ public class FurnitureBreakListener implements Listener {
     }
 
     @EventHandler
-    public void onFurnitureBreak(FurnitureBreakEvent event) {
+    public void onFurnitureBreak(@NotNull FurnitureBreakEvent event) {
         ItemFrame itemFrame = furnitureEngine.getItemFrame(event.getFurnitureLocation());
 
         if (itemFrame != null) {

@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ public final class ItemStackManager extends EntityDataManager {
         this.plugin = plugin;
     }
 
-    public ItemStack getGraveObituary(Grave grave) {
+    public @NotNull ItemStack getGraveObituary(Grave grave) {
         ItemStack itemStack = new ItemStack(Material.WRITTEN_BOOK, 1);
         BookMeta bookMeta = (BookMeta) itemStack.getItemMeta();
 
@@ -63,7 +64,7 @@ public final class ItemStackManager extends EntityDataManager {
         return itemStack;
     }
 
-    public ItemStack getGraveHead(Grave grave) {
+    public @NotNull ItemStack getGraveHead(Grave grave) {
         ItemStack itemStack = plugin.getCompatibility().getSkullItemStack(grave, plugin);
         ItemMeta itemMeta = itemStack.getItemMeta();
 
@@ -89,7 +90,7 @@ public final class ItemStackManager extends EntityDataManager {
         return itemStack;
     }
 
-    public ItemStack createGraveListItemStack(int number, Grave grave) {
+    public @NotNull ItemStack createGraveListItemStack(int number, Grave grave) {
         Material material;
 
         if (plugin.getConfigBool("gui.menu.list.item.block", grave)) {
@@ -141,7 +142,7 @@ public final class ItemStackManager extends EntityDataManager {
         return itemStack;
     }
 
-    public ItemStack createGraveMenuItemStack(int slot, Grave grave) {
+    public @NotNull ItemStack createGraveMenuItemStack(int slot, Grave grave) {
         String materialString = plugin.getConfigString("gui.menu.grave.slot." + slot + ".material", grave, "PAPER");
         Material material = Material.matchMaterial(materialString);
 

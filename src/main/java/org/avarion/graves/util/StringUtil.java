@@ -9,6 +9,7 @@ import org.avarion.graves.type.Grave;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,35 +20,35 @@ import java.util.regex.Pattern;
 public final class StringUtil {
     private static final Pattern hexColorPattern = Pattern.compile("&#[a-fA-F0-9]{6}");
 
-    public static String format(String string) {
+    public static String format(@NotNull String string) {
         return capitalizeFully(string.replace("_", " "));
     }
 
-    public static String parseString(String string, Graves plugin) {
+    public static @NotNull String parseString(String string, Graves plugin) {
         return parseString(string, null, null, null, null, plugin);
     }
 
-    public static String parseString(String string, Entity entity, Graves plugin) {
+    public static @NotNull String parseString(String string, Entity entity, Graves plugin) {
         return parseString(string, entity, null, null, null, plugin);
     }
 
-    public static String parseString(String string, String name, Graves plugin) {
+    public static @NotNull String parseString(String string, String name, Graves plugin) {
         return parseString(string, null, name, null, null, plugin);
     }
 
-    public static String parseString(String string, Grave grave, Graves plugin) {
+    public static @NotNull String parseString(String string, Grave grave, Graves plugin) {
         return parseString(string, null, null, null, grave, plugin);
     }
 
-    public static String parseString(String string, Location location, Grave grave, Graves plugin) {
+    public static @NotNull String parseString(String string, Location location, Grave grave, Graves plugin) {
         return parseString(string, null, null, location, grave, plugin);
     }
 
-    public static String parseString(String string, Entity entity, Location location, Grave grave, Graves plugin) {
+    public static @NotNull String parseString(String string, Entity entity, Location location, Grave grave, Graves plugin) {
         return parseString(string, entity, plugin.getEntityManager().getEntityName(entity), location, grave, plugin);
     }
 
-    public static String parseString(String string, Entity entity, String name, Location location, Grave grave, Graves plugin) {
+    public static @NotNull String parseString(String string, Entity entity, String name, Location location, Grave grave, Graves plugin) {
         if (location != null) {
             string = string.replace("%world%", location.getWorld() != null ? location.getWorld().getName() : "")
                            .replace("%x%", String.valueOf(location.getBlockX() + 0.5))
@@ -159,7 +160,7 @@ public final class StringUtil {
         return string.replace("&", "§");
     }
 
-    public static String parseTime(String string, Grave grave) {
+    public static String parseTime(String string, @NotNull Grave grave) {
         long time = grave.getTimeCreation() - grave.getTimeAlive();
         int day = (int) TimeUnit.SECONDS.toDays(time);
         long hour = TimeUnit.SECONDS.toHours(time) - (day * 24L);

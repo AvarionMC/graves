@@ -14,6 +14,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class PlayerMoveListener implements Listener {
 
@@ -24,7 +25,7 @@ public class PlayerMoveListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onPlayerMove(PlayerMoveEvent event) {
+    public void onPlayerMove(@NotNull PlayerMoveEvent event) {
         Player player = event.getPlayer();
 
         if (player.getGameMode() != GameMode.SPECTATOR) {

@@ -22,6 +22,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -34,7 +35,7 @@ public class EntityDeathListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onEntityDeath(EntityDeathEvent event) {
+    public void onEntityDeath(@NotNull EntityDeathEvent event) {
         LivingEntity livingEntity = event.getEntity();
         String entityName = plugin.getEntityManager().getEntityName(livingEntity);
         Location location = LocationUtil.roundLocation(livingEntity.getLocation());

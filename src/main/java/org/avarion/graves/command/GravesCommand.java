@@ -28,7 +28,7 @@ public final class GravesCommand implements CommandExecutor, TabCompleter {
 
     @SuppressWarnings("deprecation")
     @Override
-    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String string, String[] args) {
+    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String string, String @NotNull [] args) {
         if (args.length < 1) {
             if (commandSender instanceof Player) {
                 if (commandSender.hasPermission("graves.gui")) {
@@ -386,7 +386,7 @@ public final class GravesCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
-    public void sendHelpMenu(CommandSender sender) {
+    public void sendHelpMenu(@NotNull CommandSender sender) {
         sender.sendMessage(ChatColor.RED
                            + "☠"
                            + ChatColor.DARK_GRAY
@@ -467,7 +467,7 @@ public final class GravesCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String string, @NotNull String @NotNull [] args) {
+    public @NotNull List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String string, @NotNull String @NotNull [] args) {
         List<String> stringList = new ArrayList<>();
 
         if (args.length == 1) {

@@ -1,6 +1,7 @@
 package org.avarion.graves.data;
 
 import org.bukkit.Location;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -9,7 +10,7 @@ public record BlockData(Location location, UUID graveUUID, String replaceMateria
                         String replaceData) implements Serializable {
 
     @Override
-    public Location location() {
+    public @NotNull Location location() {
         return location.clone();
     }
 

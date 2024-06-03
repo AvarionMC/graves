@@ -1,10 +1,13 @@
 package org.avarion.graves.util;
 
 import org.bukkit.Color;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 public final class ColorUtil {
 
-    public static Color getColor(String string) {
+    @Contract(pure = true)
+    public static Color getColor(@NotNull String string) {
         return switch (string.toUpperCase()) {
             case "AQUA" -> Color.AQUA;
             case "BLACK" -> Color.BLACK;

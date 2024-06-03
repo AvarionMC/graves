@@ -16,6 +16,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.EquipmentSlot;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -179,7 +180,7 @@ public final class PlayerNPC extends EntityDataManager {
         removeCorpse(getEntityDataNPCMap(Collections.singletonList(entityData)));
     }
 
-    public void removeCorpse(Map<EntityData, NPC.Global> entityDataMap) {
+    public void removeCorpse(@NotNull Map<EntityData, NPC.Global> entityDataMap) {
         List<EntityData> entityDataList = new ArrayList<>();
 
         for (Map.Entry<EntityData, NPC.Global> entry : entityDataMap.entrySet()) {
@@ -190,7 +191,7 @@ public final class PlayerNPC extends EntityDataManager {
         plugin.getDataManager().removeEntityData(entityDataList);
     }
 
-    private Map<EntityData, NPC.Global> getEntityDataNPCMap(List<EntityData> entityDataList) {
+    private @NotNull Map<EntityData, NPC.Global> getEntityDataNPCMap(@NotNull List<EntityData> entityDataList) {
         Map<EntityData, NPC.Global> entityDataMap = new HashMap<>();
 
         for (EntityData entityData : entityDataList) {

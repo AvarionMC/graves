@@ -11,6 +11,7 @@ import org.avarion.graves.util.Base64Util;
 import org.avarion.graves.util.StringUtil;
 import org.avarion.graves.util.UUIDUtil;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.UUID;
@@ -25,7 +26,7 @@ public final class MultiPaper {
         registerListeners();
     }
 
-    public String getLocalServerName() {
+    public @NotNull String getLocalServerName() {
         return MultiLib.getLocalServerName();
     }
 
@@ -35,7 +36,7 @@ public final class MultiPaper {
                                                + Base64Util.objectToBase64(grave.getInventoryItemStack()));
     }
 
-    public void notifyGraveRemoval(Grave grave) {
+    public void notifyGraveRemoval(@NotNull Grave grave) {
         MultiLib.notify("graves:grave_remove", grave.getUUID().toString());
     }
 

@@ -14,7 +14,7 @@ public class GraveTimeoutEvent extends Event implements Cancellable {
     private Location location;
     private boolean cancel;
 
-    public GraveTimeoutEvent(Grave grave) {
+    public GraveTimeoutEvent(@NotNull Grave grave) {
         this.grave = grave;
         this.location = grave.getLocationDeath();
     }

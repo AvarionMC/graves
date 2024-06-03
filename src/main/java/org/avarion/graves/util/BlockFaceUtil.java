@@ -3,10 +3,13 @@ package org.avarion.graves.util;
 import org.bukkit.Rotation;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 public final class BlockFaceUtil {
 
-    public static BlockFace getSimpleBlockFace(BlockFace blockFace) {
+    @Contract(pure = true)
+    public static BlockFace getSimpleBlockFace(@NotNull BlockFace blockFace) {
         return switch (blockFace) {
             case EAST, NORTH_EAST -> BlockFace.EAST;
             case SOUTH, SOUTH_EAST -> BlockFace.SOUTH;
@@ -15,11 +18,12 @@ public final class BlockFaceUtil {
         };
     }
 
-    public static BlockFace getEntityYawBlockFace(LivingEntity livingEntity) {
+    public static BlockFace getEntityYawBlockFace(@NotNull LivingEntity livingEntity) {
         return getYawBlockFace(livingEntity.getLocation().getYaw());
     }
 
-    public static Rotation getBlockFaceRotation(BlockFace blockFace) {
+    @Contract(pure = true)
+    public static Rotation getBlockFaceRotation(@NotNull BlockFace blockFace) {
         return switch (blockFace) {
             case SOUTH -> Rotation.NONE;
             case SOUTH_WEST -> Rotation.CLOCKWISE;
@@ -51,7 +55,8 @@ public final class BlockFaceUtil {
         };
     }
 
-    public static int getBlockFaceYaw(BlockFace blockFace) {
+    @Contract(pure = true)
+    public static int getBlockFaceYaw(@NotNull BlockFace blockFace) {
         return switch (blockFace) {
             case SOUTH -> 0;
             case SOUTH_WEST -> 45;

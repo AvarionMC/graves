@@ -21,7 +21,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -158,12 +160,12 @@ public final class GraveManager {
         }
     }
 
-    public void toggleGraveProtection(Grave grave) {
+    public void toggleGraveProtection(@NotNull Grave grave) {
         grave.setProtection(!grave.getProtection());
         plugin.getDataManager().updateGrave(grave, "protection", String.valueOf(grave.getProtection() ? 1 : 0));
     }
 
-    public void graveParticle(Location location, Grave grave) {
+    public void graveParticle(@NotNull Location location, Grave grave) {
         if (location.getWorld() != null && plugin.getConfigBool("particle.enabled", grave)) {
             Particle particle = Particle.REDSTONE;
             String particleType = plugin.getConfigString("particle.type", grave);
@@ -236,7 +238,7 @@ public final class GraveManager {
         plugin.debugMessage("Removing grave " + grave.getUUID(), 1);
     }
 
-    public void removeEntityData(EntityData entityData) {
+    public void removeEntityData(@NotNull EntityData entityData) {
         switch (entityData.getType()) {
             case HOLOGRAM -> {
                 plugin.getHologramManager().removeHologram(entityData);
@@ -262,7 +264,7 @@ public final class GraveManager {
     }
 
     @SuppressWarnings("ConstantConditions")
-    public void closeGrave(Grave grave) {
+    public void closeGrave(@NotNull Grave grave) {
         List<HumanEntity> inventoryViewers = grave.getInventory().getViewers();
 
         for (HumanEntity humanEntity : new ArrayList<>(inventoryViewers)) {
@@ -341,7 +343,7 @@ public final class GraveManager {
                      .createGraveInventory(grave, grave.getLocationDeath(), filterGraveItemStackList, title, storageMode);
     }
 
-    public Inventory createGraveInventory(InventoryHolder inventoryHolder, Location location, List<ItemStack> itemStackList, String title, Grave.StorageMode storageMode) {
+    public @Nullable Inventory createGraveInventory(InventoryHolder inventoryHolder, Location location, @NotNull List<ItemStack> itemStackList, String title, Grave.StorageMode storageMode) {
         itemStackList.removeIf(itemStack -> itemStack != null
                                             && itemStack.containsEnchantment(Enchantment.VANISHING_CURSE));
 
@@ -408,7 +410,8 @@ public final class GraveManager {
         return null;
     }
 
-    public int getItemStacksSize(ItemStack[] itemStacks) {
+    @Contract(pure = true)
+    public int getItemStacksSize(ItemStack @NotNull [] itemStacks) {
         int counter = 0;
 
         for (ItemStack itemStack : itemStacks) {
@@ -420,7 +423,7 @@ public final class GraveManager {
         return counter;
     }
 
-    public List<ItemStack> filterGraveItemStackList(List<ItemStack> itemStackList, List<ItemStack> removedItemStackList, LivingEntity livingEntity, List<String> permissionList) {
+    public @NotNull List<ItemStack> filterGraveItemStackList(List<ItemStack> itemStackList, List<ItemStack> removedItemStackList, LivingEntity livingEntity, List<String> permissionList) {
         itemStackList = new ArrayList<>(itemStackList);
 
         if (livingEntity instanceof Player player
@@ -479,7 +482,7 @@ public final class GraveManager {
         }
     }
 
-    public void giveGraveExperience(Player player, Grave grave) {
+    public void giveGraveExperience(Player player, @NotNull Grave grave) {
         if (grave.getExperience() > 0) {
             player.giveExp(grave.getExperience());
             grave.setExperience(0);
@@ -487,7 +490,7 @@ public final class GraveManager {
         }
     }
 
-    public void dropGraveExperience(Location location, Grave grave) {
+    public void dropGraveExperience(Location location, @NotNull Grave grave) {
         if (grave.getExperience() > 0 && location.getWorld() != null) {
             ExperienceOrb experienceOrb = (ExperienceOrb) location.getWorld()
                                                                   .spawnEntity(location, EntityType.EXPERIENCE_ORB);
@@ -497,19 +500,19 @@ public final class GraveManager {
         }
     }
 
-    public List<Grave> getGraveList(Player player) {
+    public @NotNull List<Grave> getGraveList(@NotNull Player player) {
         return getGraveList(player.getUniqueId());
     }
 
-    public List<Grave> getGraveList(OfflinePlayer player) {
+    public @NotNull List<Grave> getGraveList(@NotNull OfflinePlayer player) {
         return getGraveList(player.getUniqueId());
     }
 
-    public List<Grave> getGraveList(Entity entity) {
+    public @NotNull List<Grave> getGraveList(@NotNull Entity entity) {
         return getGraveList(entity.getUniqueId());
     }
 
-    public List<Grave> getGraveList(UUID uuid) {
+    public @NotNull List<Grave> getGraveList(UUID uuid) {
         List<Grave> graveList = new ArrayList<>();
 
         CacheManager.graveMap.forEach((key, value) -> {
@@ -563,7 +566,7 @@ public final class GraveManager {
         }
     }
 
-    public List<Location> getGraveLocationList(Location baseLocation, Grave grave) {
+    public List<Location> getGraveLocationList(@NotNull Location baseLocation, Grave grave) {
         List<Location> locationList = new ArrayList<>(plugin.getBlockManager().getBlockList(grave));
         Map<Double, Location> locationMap = new HashMap<>();
         List<Location> otherWorldLocationList = new ArrayList<>();
@@ -590,7 +593,7 @@ public final class GraveManager {
         return locationList;
     }
 
-    public Location getGraveLocation(Location location, Grave grave) {
+    public @Nullable Location getGraveLocation(Location location, Grave grave) {
         List<Location> locationList = plugin.getGraveManager().getGraveLocationList(location, grave);
 
         return !locationList.isEmpty() ? locationList.get(0) : null;
@@ -671,7 +674,7 @@ public final class GraveManager {
         }
     }
 
-    public String getDamageReason(EntityDamageEvent.DamageCause damageCause, Grave grave) {
+    public String getDamageReason(EntityDamageEvent.@NotNull DamageCause damageCause, Grave grave) {
         return plugin.getConfigString("message.death-reason."
                                       + damageCause.name(), grave, StringUtil.format(damageCause.name()));
     }
@@ -680,7 +683,7 @@ public final class GraveManager {
         playEffect(string, location, 0, grave);
     }
 
-    public void playEffect(String string, Location location, int data, Grave grave) {
+    public void playEffect(String string, @NotNull Location location, int data, Grave grave) {
         if (location.getWorld() != null) {
             if (grave != null) {
                 string = plugin.getConfigString(string, grave);
@@ -750,7 +753,7 @@ public final class GraveManager {
         return false;
     }
 
-    public boolean shouldIgnoreBlock(Block block, Entity entity, Grave grave) {
+    public boolean shouldIgnoreBlock(Block block, Entity entity, @NotNull Grave grave) {
         return shouldIgnoreBlock(block, entity, grave.getPermissionList());
     }
 

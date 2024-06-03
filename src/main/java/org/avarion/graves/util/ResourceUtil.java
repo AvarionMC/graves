@@ -1,6 +1,9 @@
 package org.avarion.graves.util;
 
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.net.JarURLConnection;
@@ -25,7 +28,7 @@ public final class ResourceUtil {
         saveResources(getResources(inputPath, plugin), inputPath, outputPath, overwrite);
     }
 
-    private static Map<String, InputStream> getResources(String path, JavaPlugin plugin) {
+    private static @Nullable Map<String, InputStream> getResources(String path, @NotNull JavaPlugin plugin) {
         Map<String, InputStream> inputStreamHashMap = new HashMap<>();
         URL url = plugin.getClass().getClassLoader().getResource(path);
 
@@ -75,7 +78,7 @@ public final class ResourceUtil {
         return inputStreamHashMap;
     }
 
-    private static void saveResources(Map<String, InputStream> inputStreamMap, String inputPath, String outputPath, boolean overwrite) {
+    private static void saveResources(@NotNull Map<String, InputStream> inputStreamMap, String inputPath, String outputPath, boolean overwrite) {
         for (Map.Entry<String, InputStream> entry : inputStreamMap.entrySet()) {
             String path = entry.getKey();
             InputStream inputStream = entry.getValue();
@@ -101,13 +104,14 @@ public final class ResourceUtil {
         }
     }
 
-    private static boolean createDirectories(File file) {
+    private static boolean createDirectories(@NotNull File file) {
         File parentFile = file.getParentFile();
 
         return parentFile != null && (parentFile.exists() || parentFile.mkdirs());
     }
 
-    private static String formatString(String string) {
+    @Contract(pure = true)
+    private static @NotNull String formatString(@NotNull String string) {
         return string.replace("/", File.separator);
     }
 }

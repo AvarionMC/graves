@@ -14,6 +14,8 @@ import org.bukkit.Rotation;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -88,7 +90,7 @@ public final class FurnitureEngine extends EntityDataManager {
         removeFurniture(getEntityDataMap(Collections.singletonList(entityData)));
     }
 
-    public void removeFurniture(Map<EntityData, Entity> entityDataMap) {
+    public void removeFurniture(@NotNull Map<EntityData, Entity> entityDataMap) {
         List<EntityData> entityDataList = new ArrayList<>();
 
         for (Map.Entry<EntityData, Entity> entry : entityDataMap.entrySet()) {
@@ -100,7 +102,7 @@ public final class FurnitureEngine extends EntityDataManager {
         plugin.getDataManager().removeEntityData(entityDataList);
     }
 
-    public ItemFrame getItemFrame(Location location) {
+    public @Nullable ItemFrame getItemFrame(Location location) {
         location = location.clone().add(0.0D, 1.0D, 0.0D);
 
         if (location.getWorld() != null) {

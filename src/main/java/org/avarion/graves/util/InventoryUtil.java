@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -33,7 +34,7 @@ public final class InventoryUtil {
         }
     }
 
-    public static void equipArmor(Inventory inventory, Player player) {
+    public static void equipArmor(@NotNull Inventory inventory, Player player) {
         List<ItemStack> itemList = Arrays.asList(inventory.getContents());
         Collections.reverse(itemList);
 
@@ -66,7 +67,7 @@ public final class InventoryUtil {
         }
     }
 
-    public static void equipItems(Inventory inventory, Player player) {
+    public static void equipItems(@NotNull Inventory inventory, Player player) {
         List<ItemStack> itemStackList = new ArrayList<>();
 
         for (ItemStack itemStack : inventory.getContents().clone()) {
@@ -85,7 +86,7 @@ public final class InventoryUtil {
         }
     }
 
-    public static void playArmorEquipSound(Player player, ItemStack itemStack) {
+    public static void playArmorEquipSound(Player player, @NotNull ItemStack itemStack) {
         try {
             if (itemStack.getType().name().startsWith("NETHERITE")) {
                 player.playSound(player.getLocation(), Sound.ITEM_ARMOR_EQUIP_NETHERITE, 1, 1);
@@ -152,7 +153,7 @@ public final class InventoryUtil {
                                                      + "CHAINMAIL_BOOTS");
     }
 
-    public static String inventoryToString(Inventory inventory) {
+    public static @NotNull String inventoryToString(@NotNull Inventory inventory) {
         List<String> stringList = new ArrayList<>();
 
         for (ItemStack itemStack : inventory.getContents()) {
@@ -166,7 +167,7 @@ public final class InventoryUtil {
         return String.join("|", stringList);
     }
 
-    public static Inventory stringToInventory(InventoryHolder inventoryHolder, String string, String title, Graves plugin) {
+    public static @NotNull Inventory stringToInventory(InventoryHolder inventoryHolder, @NotNull String string, String title, Graves plugin) {
         String[] strings = string.split("\\|");
 
         if (strings.length > 0 && !strings[0].isEmpty()) {

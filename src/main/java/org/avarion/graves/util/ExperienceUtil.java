@@ -1,10 +1,11 @@
 package org.avarion.graves.util;
 
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public final class ExperienceUtil {
 
-    public static int getPlayerExperience(Player player) {
+    public static int getPlayerExperience(@NotNull Player player) {
         int experience = Math.round(getExperienceAtLevel(player.getLevel()) * player.getExp());
         int level = player.getLevel();
 

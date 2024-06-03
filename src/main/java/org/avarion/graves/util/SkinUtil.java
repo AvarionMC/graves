@@ -9,6 +9,8 @@ import org.bukkit.block.Skull;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -39,7 +41,7 @@ public final class SkinUtil {
         }
     }
 
-    public static void setSkullBlockTexture(Skull skull, String name, String base64) {
+    public static void setSkullBlockTexture(@NotNull Skull skull, String name, String base64) {
         GameProfile gameProfile = new GameProfile(UUID.randomUUID(), name);
 
         gameProfile.getProperties().put("textures", new Property("textures", base64));
@@ -83,7 +85,7 @@ public final class SkinUtil {
         return null;
     }
 
-    public static String getTexture(Entity entity) {
+    public static @Nullable String getTexture(Entity entity) {
         if (entity instanceof Player) {
             return getPlayerProperty(entity, property_getValue);
         }
@@ -111,7 +113,7 @@ public final class SkinUtil {
         return getPlayerProperty(entity, property_getSignature);
     }
 
-    public static GameProfile getPlayerGameProfile(Player player) {
+    public static @Nullable GameProfile getPlayerGameProfile(@NotNull Player player) {
         try {
             Object playerObject = player.getClass().getMethod("getHandle").invoke(player);
 
@@ -133,7 +135,7 @@ public final class SkinUtil {
         return null;
     }
 
-    private static void findGameProfileMethod(Object playerObject) {
+    private static void findGameProfileMethod(@NotNull Object playerObject) {
         for (Method method : playerObject.getClass().getMethods()) {
             if (method.getReturnType().getName().endsWith("GameProfile")) {
                 GAMEPROFILE_METHOD = method.getName();

@@ -8,6 +8,8 @@ import org.avarion.graves.util.LocationUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +23,7 @@ public final class BlockManager {
         this.plugin = plugin;
     }
 
-    public BlockData getBlockData(Block block) {
+    public @Nullable BlockData getBlockData(@NotNull Block block) {
         if (plugin.getDataManager().hasChunkData(block.getLocation())) {
             ChunkData chunkData = plugin.getDataManager().getChunkData(block.getLocation());
 
@@ -33,7 +35,7 @@ public final class BlockManager {
         return null;
     }
 
-    public Grave getGraveFromBlock(Block block) {
+    public @Nullable Grave getGraveFromBlock(Block block) {
         BlockData blockData = getBlockData(block);
 
         return blockData != null && CacheManager.graveMap.containsKey(blockData.graveUUID())
@@ -109,21 +111,7 @@ public final class BlockManager {
         }
     }
 
-    public List<BlockData> getBlockDataList(Grave grave) {
-        List<BlockData> blockDataList = new ArrayList<>();
-
-        for (Map.Entry<String, ChunkData> chunkDataEntry : CacheManager.chunkMap.entrySet()) {
-            for (BlockData blockData : new ArrayList<>(chunkDataEntry.getValue().getBlockDataMap().values())) {
-                if (grave.getUUID().equals(blockData.graveUUID())) {
-                    blockDataList.add(blockData);
-                }
-            }
-        }
-
-        return blockDataList;
-    }
-
-    public List<Location> getBlockList(Grave grave) {
+    public @NotNull List<Location> getBlockList(Grave grave) {
         List<Location> locationList = new ArrayList<>();
 
         for (Map.Entry<String, ChunkData> chunkDataEntry : CacheManager.chunkMap.entrySet()) {
@@ -150,7 +138,7 @@ public final class BlockManager {
         }
     }
 
-    public void removeBlock(BlockData blockData) {
+    public void removeBlock(@NotNull BlockData blockData) {
         Location location = blockData.location();
 
         if (plugin.getIntegrationManager().hasItemsAdder() && plugin.getIntegrationManager()

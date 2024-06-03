@@ -14,6 +14,9 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,11 +32,12 @@ public final class ImportManager {
         this.plugin = plugin;
     }
 
-    public List<Grave> importExternalPluginGraves() {
+    @Contract(" -> new")
+    public @NotNull List<Grave> importExternalPluginGraves() {
         return new ArrayList<>(importAngelChest());
     }
 
-    private List<Grave> importAngelChest() {
+    private @NotNull List<Grave> importAngelChest() {
         List<Grave> graveList = new ArrayList<>();
         File angelChest = new File(plugin.getPluginsFolder(), "AngelChest");
 
@@ -58,7 +62,7 @@ public final class ImportManager {
         return graveList;
     }
 
-    public Grave convertAngelChestToGrave(File file) {
+    public @Nullable Grave convertAngelChestToGrave(File file) {
         FileConfiguration angelChest = loadFile(file);
 
         if (angelChest != null) {
@@ -144,7 +148,7 @@ public final class ImportManager {
         return null;
     }
 
-    private FileConfiguration loadFile(File file) {
+    private @Nullable FileConfiguration loadFile(File file) {
         if (YAMLUtil.isValidYAML(file)) {
             try {
                 return YamlConfiguration.loadConfiguration(file);

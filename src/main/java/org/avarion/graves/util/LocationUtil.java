@@ -2,16 +2,20 @@ package org.avarion.graves.util;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public final class LocationUtil {
 
-    public static Location roundLocation(Location location) {
+    @Contract("_ -> new")
+    public static @NotNull Location roundLocation(@NotNull Location location) {
         return new Location(location.getWorld(), Math.round(location.getBlockX()), Math.round(location.getY()), Math.round(location.getBlockZ()));
     }
 
-    public static String locationToString(Location location) {
+    public static @Nullable String locationToString(@NotNull Location location) {
         return location.getWorld() != null ? location.getWorld().getName()
                                              + "|"
                                              + location.getBlockX()
@@ -21,27 +25,29 @@ public final class LocationUtil {
                                              + location.getBlockZ() : null;
     }
 
-    public static String chunkToString(Location location) {
+    public static @Nullable String chunkToString(@NotNull Location location) {
         return location.getWorld() != null ? location.getWorld().getName() + "|" + (location.getBlockX() >> 4) + "|" + (
                 location.getBlockZ()
                 >> 4) : null;
     }
 
-    public static Location chunkStringToLocation(String string) {
+    @Contract("_ -> new")
+    public static @NotNull Location chunkStringToLocation(@NotNull String string) {
         String[] strings = string.split("\\|");
 
         return new Location(Bukkit.getServer().getWorld(strings[0]), Integer.parseInt(strings[1])
                                                                      << 4, 0, Integer.parseInt(strings[2]) << 4);
     }
 
-    public static Location stringToLocation(String string) {
+    @Contract("_ -> new")
+    public static @NotNull Location stringToLocation(@NotNull String string) {
         String[] strings = string.split("\\|");
 
         return new Location(Bukkit.getServer()
                                   .getWorld(strings[0]), Integer.parseInt(strings[1]), Integer.parseInt(strings[2]), Integer.parseInt(strings[3]));
     }
 
-    public static Location getClosestLocation(Location locationBase, List<Location> locationList) {
+    public static Location getClosestLocation(Location locationBase, @NotNull List<Location> locationList) {
         Location locationClosest = null;
 
         for (Location location : locationList) {

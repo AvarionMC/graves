@@ -10,6 +10,8 @@ import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,7 +44,7 @@ public final class GraveyardManager {
         return graveyardMap.get(key);
     }
 
-    public Graveyard createGraveyard(Location location, String name, World world, Graveyard.Type type) {
+    public @NotNull Graveyard createGraveyard(Location location, String name, World world, Graveyard.Type type) {
         Graveyard graveyard = new Graveyard(name, world, type);
 
         graveyard.setSpawnLocation(location);
@@ -73,7 +75,7 @@ public final class GraveyardManager {
         });
     }
 
-    public Map<Location, BlockFace> getGraveyardFreeSpaces(Graveyard graveyard) {
+    public @NotNull Map<Location, BlockFace> getGraveyardFreeSpaces(@NotNull Graveyard graveyard) {
         Map<Location, BlockFace> locationMap = new HashMap<>(graveyard.getGraveLocationMap());
 
         locationMap.entrySet().removeAll(getGraveyardUsedSpaces(graveyard).entrySet());
@@ -81,7 +83,7 @@ public final class GraveyardManager {
         return locationMap;
     }
 
-    public Map<Location, BlockFace> getGraveyardUsedSpaces(Graveyard graveyard) {
+    public @NotNull Map<Location, BlockFace> getGraveyardUsedSpaces(@NotNull Graveyard graveyard) {
         Map<Location, BlockFace> locationMap = new HashMap<>();
 
         for (Map.Entry<Location, BlockFace> entry : graveyard.getGraveLocationMap().entrySet()) {
@@ -93,11 +95,11 @@ public final class GraveyardManager {
         return locationMap;
     }
 
-    public boolean isModifyingGraveyard(Player player) {
+    public boolean isModifyingGraveyard(@NotNull Player player) {
         return modifyingGraveyardMap.containsKey(player.getUniqueId());
     }
 
-    public Graveyard getModifyingGraveyard(Player player) {
+    public Graveyard getModifyingGraveyard(@NotNull Player player) {
         return modifyingGraveyardMap.get(player.getUniqueId());
     }
 
@@ -130,7 +132,7 @@ public final class GraveyardManager {
         }
     }
 
-    public boolean isLocationInGraveyard(Location location, Graveyard graveyard) {
+    public boolean isLocationInGraveyard(Location location, @NotNull Graveyard graveyard) {
         return switch (graveyard.getType()) {
             case WORLDGUARD -> plugin.getIntegrationManager().getWorldGuard() != null && plugin.getIntegrationManager()
                                                                                                .getWorldGuard()
@@ -142,7 +144,7 @@ public final class GraveyardManager {
         };
     }
 
-    public Graveyard getClosestGraveyard(Location location, Entity entity) {
+    public @Nullable Graveyard getClosestGraveyard(Location location, Entity entity) {
         Map<Location, Graveyard> locationGraveyardMap = new HashMap<>();
 
         for (Graveyard graveyard : graveyardMap.values()) {

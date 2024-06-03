@@ -12,6 +12,7 @@ import com.griefdefender.api.registry.CatalogRegistryModule;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -53,7 +54,7 @@ public final class GriefDefender {
                    .build();
     }
 
-    public boolean canCreateGrave(Player player, Location location) {
+    public boolean canCreateGrave(Player player, @NotNull Location location) {
         if (location.getWorld() != null) {
             PlayerData playerData = core.getPlayerData(location.getWorld().getUID(), player.getUniqueId());
 

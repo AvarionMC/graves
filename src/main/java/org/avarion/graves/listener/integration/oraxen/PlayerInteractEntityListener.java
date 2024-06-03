@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class PlayerInteractEntityListener implements Listener {
 
@@ -21,7 +22,7 @@ public class PlayerInteractEntityListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onFurnitureInteract(PlayerInteractEntityEvent event) {
+    public void onFurnitureInteract(@NotNull PlayerInteractEntityEvent event) {
         Entity entity = event.getRightClicked();
 
         if (entity instanceof ItemFrame) {

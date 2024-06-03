@@ -12,6 +12,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.sql.*;
@@ -20,13 +22,12 @@ import java.util.*;
 public final class DataManager {
 
     private final Graves plugin;
-    private Type type;
+    private Type type = DataManager.Type.SQLITE;
     private String url;
     private Connection connection;
 
     public DataManager(Graves plugin) {
         this.plugin = plugin;
-        this.type = DataManager.Type.SQLITE;
 
         loadType(type);
         load();
@@ -160,11 +161,11 @@ public final class DataManager {
         return chunkData;
     }
 
-    public void removeChunkData(ChunkData chunkData) {
+    public void removeChunkData(@NotNull ChunkData chunkData) {
         CacheManager.chunkMap.remove(LocationUtil.chunkToString(chunkData.getLocation()));
     }
 
-    public List<String> getColumnList(String tableName) {
+    public @NotNull List<String> getColumnList(String tableName) {
         List<String> columnList = new ArrayList<>();
         ResultSet resultSet;
 
@@ -189,7 +190,7 @@ public final class DataManager {
         return columnList;
     }
 
-    private void createOrUpdateTable(String tableName, Map<String, String> fields) {
+    private void createOrUpdateTable(String tableName, @NotNull Map<String, String> fields) {
         if (fields.isEmpty()) {
             return;
         }
@@ -389,7 +390,7 @@ public final class DataManager {
         }
     }
 
-    public void addBlockData(BlockData blockData) {
+    public void addBlockData(@NotNull BlockData blockData) {
         getChunkData(blockData.location()).addBlockData(blockData);
 
         String uuidGrave = blockData.graveUUID() != null ? "'" + blockData.graveUUID() + "'" : "NULL";
@@ -423,7 +424,7 @@ public final class DataManager {
                                                                  + "';"));
     }
 
-    public void addHologramData(HologramData hologramData) {
+    public void addHologramData(@NotNull HologramData hologramData) {
         getChunkData(hologramData.getLocation()).addEntityData(hologramData);
 
         String location = "'" + LocationUtil.locationToString(hologramData.getLocation()) + "'";
@@ -445,7 +446,7 @@ public final class DataManager {
                       + ");"));
     }
 
-    public void removeHologramData(List<EntityData> entityDataList) {
+    public void removeHologramData(@NotNull List<EntityData> entityDataList) {
         try {
             Statement statement = connection.createStatement();
 
@@ -461,7 +462,7 @@ public final class DataManager {
         }
     }
 
-    public void addEntityData(EntityData entityData) {
+    public void addEntityData(@NotNull EntityData entityData) {
         getChunkData(entityData.getLocation()).addEntityData(entityData);
 
         String table = entityDataTypeTable(entityData.getType());
@@ -489,7 +490,7 @@ public final class DataManager {
         removeEntityData(Collections.singletonList(entityData));
     }
 
-    public void removeEntityData(List<EntityData> entityDataList) {
+    public void removeEntityData(@NotNull List<EntityData> entityDataList) {
         try {
             Statement statement = connection.createStatement();
 
@@ -515,7 +516,7 @@ public final class DataManager {
         }
     }
 
-    public String entityDataTypeTable(EntityData.Type type) {
+    public String entityDataTypeTable(EntityData.@NotNull Type type) {
         return switch (type) {
             case ARMOR_STAND -> "armorstand";
             case ITEM_FRAME -> "itemframe";
@@ -621,7 +622,7 @@ public final class DataManager {
                       + ");"));
     }
 
-    public void removeGrave(Grave grave) {
+    public void removeGrave(@NotNull Grave grave) {
         removeGrave(grave.getUUID());
     }
 
@@ -645,7 +646,7 @@ public final class DataManager {
                                                                  + "';"));
     }
 
-    public Grave resultSetToGrave(ResultSet resultSet) {
+    public @Nullable Grave resultSetToGrave(@NotNull ResultSet resultSet) {
         try {
             Grave grave = new Grave(UUID.fromString(resultSet.getString("uuid")));
 
@@ -764,7 +765,7 @@ public final class DataManager {
         }
     }
 
-    private ResultSet executeQuery(String sql) {
+    private @Nullable ResultSet executeQuery(String sql) {
         if (!isConnected()) {
             connect();
         }

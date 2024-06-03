@@ -1,5 +1,8 @@
 package org.avarion.graves.util;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -10,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 
 public final class HastebinUtil {
 
-    public static String postDataToHastebin(String data, boolean raw) {
+    public static @Nullable String postDataToHastebin(@NotNull String data, boolean raw) {
         String urlString = "https://www.toptal.com/developers/hastebin/documents/";
         String pasteRawURLString = "https://www.toptal.com/developers/hastebin/raw/";
         String pasteURLString = "https://www.toptal.com/developers/hastebin/";

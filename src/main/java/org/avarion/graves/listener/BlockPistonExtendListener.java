@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class BlockPistonExtendListener implements Listener {
 
@@ -17,7 +18,7 @@ public class BlockPistonExtendListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onBlockPistonExtend(BlockPistonExtendEvent event) {
+    public void onBlockPistonExtend(@NotNull BlockPistonExtendEvent event) {
         Block block = event.getBlock().getRelative(event.getDirection());
 
         if (plugin.getBlockManager().getGraveFromBlock(block) != null) {
