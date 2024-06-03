@@ -1,5 +1,7 @@
 package org.avarion.graves.manager;
 
+import org.bukkit.Bukkit;
+
 public final class VersionManager {
     public final String version;
     public final boolean hasHexColors;
@@ -9,7 +11,7 @@ public final class VersionManager {
     public VersionManager() {
         boolean isMohist = false;
         boolean isBukkit = false;
-        this.version = BukkitVersion.getVersion();
+        this.version = Bukkit.getServer().getBukkitVersion().split("-")[0];
 
         try {
             Class.forName("org.spigotmc.SpigotConfig", false, getClass().getClassLoader());
