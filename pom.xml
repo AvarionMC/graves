@@ -30,6 +30,7 @@
     <build>
         <defaultGoal>clean package</defaultGoal>
         <finalName>${project.name}-${project.version}</finalName>
+        <outputDirectory>e:/minecraft/server/plugins</outputDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -87,26 +88,6 @@
                         <nonFilteredFileExtension>schem</nonFilteredFileExtension>
                     </nonFilteredFileExtensions>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>e:/minecraft/server/plugins</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.build.directory}</directory>
-                                    <includes>
-                                        <include>${project.build.finalName}.jar</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -118,6 +99,7 @@
                     <trimStackTrace>false</trimStackTrace>
                 </configuration>
             </plugin>
+
         </plugins>
         <resources>
             <resource>
