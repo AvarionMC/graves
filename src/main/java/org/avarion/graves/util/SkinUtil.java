@@ -3,10 +3,8 @@ package org.avarion.graves.util;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
-import org.bukkit.Bukkit;
 import org.bukkit.block.Skull;
 import org.bukkit.entity.*;
-import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
