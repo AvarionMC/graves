@@ -30,7 +30,6 @@
     <build>
         <defaultGoal>clean package</defaultGoal>
         <finalName>${project.name}-${project.version}</finalName>
-        <outputDirectory>e:/minecraft/server/plugins</outputDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -54,6 +53,10 @@
                         <relocation>
                             <pattern>com.github.puregero.multilib</pattern>
                             <shadedPattern>${project.groupId}.${project.artifactId}.multilib</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>de.tr7zw.changeme.nbtapi</pattern>
+                            <shadedPattern>${project.groupId}.${project.artifactId}.nbtapi</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
@@ -99,7 +102,6 @@
                     <trimStackTrace>false</trimStackTrace>
                 </configuration>
             </plugin>
-
         </plugins>
         <resources>
             <resource>
@@ -117,14 +119,6 @@
         <repository>
             <id>minecraft-repo</id>
             <url>https://libraries.minecraft.net/</url>
-        </repository>
-        <repository>
-            <id>ranull-repo</id>
-            <url>https://repo.ranull.com/maven/ranull/</url>
-        </repository>
-        <repository>
-            <id>ranull-repo-external</id>
-            <url>https://repo.ranull.com/maven/external/</url>
         </repository>
         <repository>
             <id>clojars-repo</id>
@@ -179,6 +173,15 @@
             <name>Oraxen Repository</name>
             <url>https://repo.oraxen.com/releases/</url>
         </repository>
+        <repository>
+            <id>codemc-repo</id>
+            <url>https://repo.codemc.io/repository/maven-public/</url>
+            <layout>default</layout>
+        </repository>
+        <repository>
+            <id>local-repo</id>
+            <url>file://${project.basedir}/lib</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -204,12 +207,6 @@
             <groupId>com.mojang</groupId>
             <artifactId>authlib</artifactId>
             <version>1.5.25</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.ranull</groupId>
-            <artifactId>skulltextureapi</artifactId>
-            <version>1.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -348,6 +345,11 @@
             <artifactId>annotations</artifactId>
             <version>24.1.0</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.tr7zw</groupId>
+            <artifactId>item-nbt-api</artifactId>
+            <version>2.12.4</version>
         </dependency>
     </dependencies>
 

@@ -2,7 +2,6 @@ package org.avarion.graves.listener.integration.playernpc;
 
 import dev.sergiferry.playernpc.api.NPC;
 import org.avarion.graves.Graves;
-import org.avarion.graves.integration.PlayerNPC;
 import org.avarion.graves.manager.CacheManager;
 import org.avarion.graves.type.Grave;
 import org.avarion.graves.util.UUIDUtil;
