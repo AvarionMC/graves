@@ -35,7 +35,7 @@ and more! While still being lightweight and efficient.
 
 ## Supports
 
-* 1.18.\*, 1.19.\*, 1.20.\*
+* 1.18.\*, 1.19.\*, 1.20.\*, 1.21.\*
 * Spigot, Paper, Purpur, Airplane, Pufferfish, Tuinity, CraftBukkit, CatServer, Mohist, Magma, MultiPaper
 * GeyserMC (Bedrock Players)
 * Forge/Bukkit Hybrid servers (Mohist, Magma, CatServer)
