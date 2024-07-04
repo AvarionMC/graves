@@ -100,3 +100,5 @@ settings:
       enabled: true # Should PlayerNPC integration be enabled.
     itembridge: # https://www.spigotmc.org/resources/itembridge.77080/
       enabled: true # Should ItemBridge integration be enabled.
+    coreprotect: # https://www.spigotmc.org/resources/coreprotect.8631/
+      enabled: true # Should CoreProtect integration be enabled.
