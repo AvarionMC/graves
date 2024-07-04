@@ -21,7 +21,7 @@ public class PlayerDeathListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerDeathEvent(@NotNull PlayerDeathEvent event) {
         List<ItemStack> itemStackList = event.getDrops();
         Iterator<ItemStack> iterator = itemStackList.iterator();
