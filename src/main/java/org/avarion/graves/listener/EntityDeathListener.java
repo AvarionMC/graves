@@ -1,5 +1,13 @@
 package org.avarion.graves.listener;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import org.avarion.graves.Graves;
 import org.avarion.graves.data.BlockData;
 import org.avarion.graves.event.GraveBlockPlaceEvent;
@@ -14,19 +22,17 @@ import org.bukkit.entity.Creature;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
+import org.bukkit.event.Event;
+import org.bukkit.event.EventException;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
+import org.bukkit.plugin.EventExecutor;
 
-import java.util.*;
-
-public class EntityDeathListener implements Listener {
+public class EntityDeathListener implements EventExecutor {
 
     private final Graves plugin;
 
@@ -34,8 +40,12 @@ public class EntityDeathListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onEntityDeath(@NotNull EntityDeathEvent event) {
+    @Override
+    public void execute(Listener listener, Event initEvent) throws EventException {
+        if (!(initEvent instanceof EntityDeathEvent event)) {
+            return;
+        }
+        
         LivingEntity livingEntity = event.getEntity();
         String entityName = plugin.getEntityManager().getEntityName(livingEntity);
         Location location = LocationUtil.roundLocation(livingEntity.getLocation());
