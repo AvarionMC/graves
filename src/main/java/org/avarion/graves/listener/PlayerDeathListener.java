@@ -1,19 +1,19 @@
 package org.avarion.graves.listener;
 
-import org.avarion.graves.Graves;
-import org.avarion.graves.manager.CacheManager;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class PlayerDeathListener implements Listener {
+import org.avarion.graves.Graves;
+import org.avarion.graves.manager.CacheManager;
+import org.bukkit.event.Event;
+import org.bukkit.event.EventException;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.EventExecutor;
+
+public class PlayerDeathListener implements EventExecutor {
 
     private final Graves plugin;
 
@@ -21,9 +21,13 @@ public class PlayerDeathListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onPlayerDeathEvent(@NotNull PlayerDeathEvent event) {
-        List<ItemStack> itemStackList = event.getDrops();
+    @Override
+    public void execute(Listener listener, Event event) throws EventException {
+        if (!(event instanceof PlayerDeathEvent deathEvent)) {
+            return;
+        }
+        
+        List<ItemStack> itemStackList = deathEvent.getDrops();
         Iterator<ItemStack> iterator = itemStackList.iterator();
 
         while (iterator.hasNext()) {
@@ -31,14 +35,14 @@ public class PlayerDeathListener implements Listener {
 
             if (itemStack != null) {
                 if (plugin.getEntityManager().getGraveUUIDFromItemStack(itemStack) != null
-                    && plugin.getConfigBool("compass.destroy", event.getEntity())) {
+                    && plugin.getConfigBool("compass.destroy", deathEvent.getEntity())) {
                     iterator.remove();
                 }
             }
         }
 
         CacheManager.removedItemStackMap
-              .put(event.getEntity().getUniqueId(), new ArrayList<>(itemStackList));
+              .put(deathEvent.getEntity().getUniqueId(), new ArrayList<>(itemStackList));
     }
 
 }
