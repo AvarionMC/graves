@@ -16,53 +16,10 @@ import org.avarion.graves.command.GravesCommand;
 import org.avarion.graves.command.GraveyardsCommand;
 import org.avarion.graves.compatibility.Compatibility;
 import org.avarion.graves.compatibility.CompatibilityBlockData;
-import org.avarion.graves.listener.BlockBreakListener;
-import org.avarion.graves.listener.BlockExplodeListener;
-import org.avarion.graves.listener.BlockFromToListener;
-import org.avarion.graves.listener.BlockPistonExtendListener;
-import org.avarion.graves.listener.BlockPlaceListener;
-import org.avarion.graves.listener.CreatureSpawnListener;
-import org.avarion.graves.listener.EntityDamageByEntityListener;
-import org.avarion.graves.listener.EntityDeathListener;
-import org.avarion.graves.listener.EntityExplodeListener;
-import org.avarion.graves.listener.HangingBreakListener;
-import org.avarion.graves.listener.InventoryClickListener;
-import org.avarion.graves.listener.InventoryCloseListener;
-import org.avarion.graves.listener.InventoryDragListener;
-import org.avarion.graves.listener.InventoryOpenListener;
-import org.avarion.graves.listener.PlayerBucketEmptyListener;
-import org.avarion.graves.listener.PlayerDeathListener;
-import org.avarion.graves.listener.PlayerDropItemListener;
-import org.avarion.graves.listener.PlayerInteractAtEntityListener;
-import org.avarion.graves.listener.PlayerInteractEntityListener;
-import org.avarion.graves.listener.PlayerInteractListener;
-import org.avarion.graves.listener.PlayerJoinListener;
-import org.avarion.graves.listener.PlayerMoveListener;
-import org.avarion.graves.listener.PlayerQuitListener;
-import org.avarion.graves.listener.PlayerRespawnListener;
-import org.avarion.graves.manager.BlockManager;
-import org.avarion.graves.manager.CacheManager;
-import org.avarion.graves.manager.DataManager;
-import org.avarion.graves.manager.EntityDataManager;
-import org.avarion.graves.manager.EntityManager;
-import org.avarion.graves.manager.GUIManager;
-import org.avarion.graves.manager.GraveManager;
-import org.avarion.graves.manager.GraveyardManager;
-import org.avarion.graves.manager.HologramManager;
-import org.avarion.graves.manager.ImportManager;
-import org.avarion.graves.manager.IntegrationManager;
-import org.avarion.graves.manager.ItemStackManager;
-import org.avarion.graves.manager.LocationManager;
-import org.avarion.graves.manager.RecipeManager;
-import org.avarion.graves.manager.VersionManager;
+import org.avarion.graves.listener.*;
+import org.avarion.graves.manager.*;
 import org.avarion.graves.type.Grave;
-import org.avarion.graves.util.FileUtil;
-import org.avarion.graves.util.HastebinUtil;
-import org.avarion.graves.util.ResourceUtil;
-import org.avarion.graves.util.ServerUtil;
-import org.avarion.graves.util.UUIDUtil;
-import org.avarion.graves.util.UpdateUtil;
-import org.avarion.graves.util.YAMLUtil;
+import org.avarion.graves.util.*;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SingleLineChart;
 import org.bukkit.ChatColor;
@@ -250,15 +207,8 @@ public class Graves extends JavaPlugin {
 
     public void registerListeners() {
         // Configurable death listener priority
-        String priorityStr = getConfig().getString("settings.listener-priority.death");
-        EventPriority priority;
-        try {
-            priority = EventPriority.valueOf(priorityStr.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            getLogger().warning("Invalid event priority in config: " + priorityStr + ". Defaulting to HIGHEST.");
-            priority = EventPriority.HIGHEST;
-        }
-        getServer().getPluginManager().registerEvent(PlayerDeathEvent.class, new Listener() {}, priority, new PlayerDeathListener(this), this, true);
+        getServer().getPluginManager().registerEvent(PlayerDeathEvent.class, new Listener() {}, 
+                getEventPriority("death"), new PlayerDeathListener(this), this, true);
         
         // All other non-configurable listeners
         getServer().getPluginManager().registerEvents(new PlayerInteractListener(this), this);
@@ -286,6 +236,17 @@ public class Graves extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new BlockExplodeListener(this), this);
 
         //getServer().getPluginManager().registerEvents(new GraveTestListener(this), this); // Test Listener
+    }
+    
+    // Get priority for a type. Currently only "death" is available
+    private EventPriority getEventPriority(String type) {
+        String priorityStr = getConfig().getString("settings.listener-priority." + type);
+        try {
+            return EventPriority.valueOf(priorityStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            getLogger().warning("Invalid event priority in config for type '" + type + "': " + priorityStr + ". Defaulting to HIGHEST.");
+            return EventPriority.HIGHEST;
+        }
     }
 
     public void unregisterListeners() {
