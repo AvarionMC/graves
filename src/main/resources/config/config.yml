@@ -22,6 +22,16 @@ settings:
   # Data storage system.
   cache:
     type: NORMAL # Cache type.
+    
+  #####################
+  # Listener Priority #
+  #####################
+  # The listener priority of the death event.
+  # Options: LOWEST, LOW, NORMAL, HIGH, HIGHEST, MONITOR
+  # The default option should work with most plugins. Unless you know what you are
+  # doing, you should leave this at HIGHEST.
+  listener-priority:
+    death: HIGHEST    
 
   #########
   # Debug #

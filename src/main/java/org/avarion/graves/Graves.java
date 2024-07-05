@@ -1,6 +1,17 @@
 package org.avarion.graves;
 
-import com.google.common.base.Charsets;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
+
 import org.avarion.graves.command.GravesCommand;
 import org.avarion.graves.command.GraveyardsCommand;
 import org.avarion.graves.compatibility.Compatibility;
@@ -21,16 +32,17 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import com.google.common.base.Charsets;
 
 
 public class Graves extends JavaPlugin {
@@ -194,6 +206,11 @@ public class Graves extends JavaPlugin {
     }
 
     public void registerListeners() {
+        // Configurable death listener priority
+        getServer().getPluginManager().registerEvent(PlayerDeathEvent.class, new Listener() {}, 
+                getEventPriority("death"), new PlayerDeathListener(this), this, true);
+        
+        // All other non-configurable listeners
         getServer().getPluginManager().registerEvents(new PlayerInteractListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerInteractEntityListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerMoveListener(this), this);
@@ -202,10 +219,9 @@ public class Graves extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerRespawnListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerDropItemListener(this), this);
-        getServer().getPluginManager().registerEvents(new PlayerDeathListener(this), this);
-        getServer().getPluginManager().registerEvents(new EntityDeathListener(this), this);
         getServer().getPluginManager().registerEvents(new EntityExplodeListener(this), this);
         getServer().getPluginManager().registerEvents(new EntityDamageByEntityListener(this), this);
+        getServer().getPluginManager().registerEvents(new EntityDeathListener(this), this);
         getServer().getPluginManager().registerEvents(new BlockPlaceListener(this), this);
         getServer().getPluginManager().registerEvents(new BlockBreakListener(this), this);
         getServer().getPluginManager().registerEvents(new BlockFromToListener(this), this);
@@ -220,6 +236,17 @@ public class Graves extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new BlockExplodeListener(this), this);
 
         //getServer().getPluginManager().registerEvents(new GraveTestListener(this), this); // Test Listener
+    }
+    
+    // Get priority for a type. Currently only "death" is available
+    private EventPriority getEventPriority(String type) {
+        String priorityStr = getConfig().getString("settings.listener-priority." + type);
+        try {
+            return EventPriority.valueOf(priorityStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            getLogger().warning("Invalid event priority in config for type '" + type + "': " + priorityStr + ". Defaulting to HIGHEST.");
+            return EventPriority.HIGHEST;
+        }
     }
 
     public void unregisterListeners() {
