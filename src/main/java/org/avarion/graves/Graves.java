@@ -35,7 +35,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Contract;
@@ -207,8 +207,8 @@ public class Graves extends JavaPlugin {
 
     public void registerListeners() {
         // Configurable death listener priority
-        getServer().getPluginManager().registerEvent(PlayerDeathEvent.class, new Listener() {}, 
-                getEventPriority("death"), new PlayerDeathListener(this), this, true);
+        getServer().getPluginManager().registerEvent(EntityDeathEvent.class, new Listener() {}, 
+                getEventPriority("death", EventPriority.MONITOR), new EntityDeathListener(this), this, true);
         
         // All other non-configurable listeners
         getServer().getPluginManager().registerEvents(new PlayerInteractListener(this), this);
@@ -219,9 +219,9 @@ public class Graves extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerRespawnListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerDropItemListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerDeathListener(this), this);
         getServer().getPluginManager().registerEvents(new EntityExplodeListener(this), this);
         getServer().getPluginManager().registerEvents(new EntityDamageByEntityListener(this), this);
-        getServer().getPluginManager().registerEvents(new EntityDeathListener(this), this);
         getServer().getPluginManager().registerEvents(new BlockPlaceListener(this), this);
         getServer().getPluginManager().registerEvents(new BlockBreakListener(this), this);
         getServer().getPluginManager().registerEvents(new BlockFromToListener(this), this);
@@ -239,13 +239,13 @@ public class Graves extends JavaPlugin {
     }
     
     // Get priority for a type. Currently only "death" is available
-    private EventPriority getEventPriority(String type) {
+    private EventPriority getEventPriority(String type, EventPriority defaultPriority) {
         String priorityStr = getConfig().getString("settings.listener-priority." + type);
         try {
             return EventPriority.valueOf(priorityStr.toUpperCase());
         } catch (IllegalArgumentException e) {
-            getLogger().warning("Invalid event priority in config for type '" + type + "': " + priorityStr + ". Defaulting to HIGHEST.");
-            return EventPriority.HIGHEST;
+            getLogger().warning("Invalid event priority in config for type '" + type + "': " + priorityStr + ". Defaulting to " + defaultPriority);
+            return defaultPriority;
         }
     }
 

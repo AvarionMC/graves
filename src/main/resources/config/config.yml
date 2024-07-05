@@ -25,14 +25,14 @@ settings:
     
   #####################
   # Listener Priority #
-  #####################
+  ##################### 
   # The listener priority of the death event.
   # Options: LOWEST, LOW, NORMAL, HIGH, HIGHEST, MONITOR
   # The default option should work with most plugins. Unless you know what you are
-  # doing, you should leave this at HIGHEST.
+  # doing, you should leave these at their defaults.
   listener-priority:
-    death: HIGHEST    
-
+    death: MONITOR
+    
   #########
   # Debug #
   #########
