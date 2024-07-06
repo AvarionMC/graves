@@ -1,38 +1,73 @@
----
-name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
+name: '🐞 Bug report - Python'
+description: Report an issue with Python Polars.
+labels: [bug, needs triage, python]
 
----
+body:
+- type: checkboxes
+  id: checks
+  attributes:
+  label: Checks
+  options:
+  - label: I have checked that this issue has not already been reported.
+  required: true
+  - label: I have confirmed this bug exists on the [latest version](https://www.spigotmc.org/resources/graves.116202/history) of Polars.
+  required: true
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+- type: textarea
+  id: example
+  attributes:
+  label: Reproducible example
+  description: >
+  Please follow [this guide](https://matthewrocklin.com/blog/work/2018/02/28/minimal-bug-reports) on how to
+  provide a minimal, copy-pastable example. Include the (wrong) output if applicable.
+  value: |
+  ```java
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+      ```
+  validations:
+  required: true
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+- type: textarea
+  id: logs
+  attributes:
+  label: Log output
+  description: >
+  Set the environment variable ``POLARS_VERBOSE=1`` before running the query.
+  Paste the output of ``stderr`` here.
+  render: shell
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+- type: textarea
+  id: problem
+  attributes:
+  label: Issue description
+  description: >
+  Provide any additional information you think might be relevant.
+  validations:
+  required: true
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+- type: textarea
+  id: expected-behavior
+  attributes:
+  label: Expected behavior
+  description: >
+  Describe or show a code example of the expected behavior.
+  validations:
+  required: true
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+- type: textarea
+  id: version
+  attributes:
+  label: Installed versions
+  description: >
+  Paste the output of ``pl.show_versions()``
+  value: |
+  <details>
 
-**Additional context**
-Add any other context about the problem here.
+      ```
+      Replace this line with the output of pl.show_versions(). Leave the backticks in place.
+      ```
+
+      </details>
+  validations:
+  required: true
+
