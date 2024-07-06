@@ -302,7 +302,7 @@
         <dependency>
             <groupId>io.th0rgal</groupId>
             <artifactId>oraxen</artifactId>
-            <version>1.172.0</version>
+            <version>1.173.0</version>
             <classifier>dev</classifier>
             <exclusions>
                 <exclusion>
