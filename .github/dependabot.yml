@@ -2,15 +2,22 @@
 version: 2
 updates:
   - package-ecosystem: "github-actions"
-    directory: '/'
+    directory: "/"
     schedule:
       interval: "weekly"
     ignore:
-      - dependency-name: '*'
-        update-types: ['version-update:semver-patch']
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
+      - dependency-name: "org.spigotmc:spigot-api"  # We want to stay on 1.18 for the base version
+        versions: ["*"]
+      - dependency-name: "com.sk89q.worldguard:worldguard-bukkit"  # v7.0.10+ is compiled with a newer Java version.
+        versions: ["*"]
+      - dependency-name: "com.sk89q.worldedit:worldedit-bukkit"  # v7.3.4+ is compiled with a newer Java version.
+        versions: ["*"]
+
     commit-message:
       prefix: ci
-    labels: ['skip changelog']
+    labels: ["skip changelog"]
 
   - package-ecosystem: "maven"
     directory: "/"
