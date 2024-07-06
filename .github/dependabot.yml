@@ -19,8 +19,7 @@ updates:
       interval: "weekly"
     ignore:
       - dependency-name: "org.spigotmc:spigot-api"  # We want to stay on 1.18 for the base version
-        versions: "*"
+        versions: ["< 1.19"]
       - dependency-name: "com.sk89q.worldguard:worldguard-bukkit"  # v7.0.10+ is compiled with a newer Java version.
-        versions: "*"
+        versions: ["< 7.0.10"]
       - dependency-name: "com.sk89q.worldedit:worldedit-bukkit"  # v7.3.4+ is compiled with a newer Java version.
-        versions: "*"
