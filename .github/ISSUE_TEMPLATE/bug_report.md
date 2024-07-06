@@ -1,6 +1,6 @@
-name: '🐞 Bug report - Python'
-description: Report an issue with Python Polars.
-labels: [bug, needs triage, python]
+name: '🐞 Bug report'
+description: Reporting an issue
+labels: [bug, needs triage]
 
 body:
 - type: checkboxes
@@ -8,66 +8,67 @@ body:
   attributes:
   label: Checks
   options:
-  - label: I have checked that this issue has not already been reported.
-  required: true
-  - label: I have confirmed this bug exists on the [latest version](https://www.spigotmc.org/resources/graves.116202/history) of Polars.
-  required: true
+    - label: I have checked that this issue has not already been reported (even among closed issues).
+      required: true
+    - label: I have confirmed this bug exists on
+      the [latest version](https://www.spigotmc.org/resources/graves.116202/history).
+      required: true
 
-- type: textarea
-  id: example
+- type: input
+  id: plugin-version
   attributes:
-  label: Reproducible example
-  description: >
-  Please follow [this guide](https://matthewrocklin.com/blog/work/2018/02/28/minimal-bug-reports) on how to
-  provide a minimal, copy-pastable example. Include the (wrong) output if applicable.
-  value: |
-  ```java
+  label: Version
+  description: Version of your installed plugin (latest is not a version)
+  placeholder: 4.9.x
+  validations:
+  required: true
 
-      ```
+- type: input
+  id: server-version
+  attributes:
+  label: Server version
+  description: Version of your minecraft server (latest is not a version)
+  placeholder: 1.20.x
   validations:
   required: true
 
 - type: textarea
-  id: logs
+  id: plugin-list
   attributes:
-  label: Log output
-  description: >
-  Set the environment variable ``POLARS_VERBOSE=1`` before running the query.
-  Paste the output of ``stderr`` here.
-  render: shell
-
-- type: textarea
-  id: problem
-  attributes:
-  label: Issue description
-  description: >
-  Provide any additional information you think might be relevant.
+  label: Plugin list
+  description: |
+  All plugins running on your server you're experiencing this issue on.
+  Use `/plugins` to list plugins on your backend server.
   validations:
   required: true
 
 - type: textarea
-  id: expected-behavior
+  id: expected-behaviour
   attributes:
   label: Expected behavior
-  description: >
-  Describe or show a code example of the expected behavior.
+  description: What you expected to work and how.
   validations:
   required: true
 
 - type: textarea
-  id: version
+  id: actual-behaviour
   attributes:
-  label: Installed versions
-  description: >
-  Paste the output of ``pl.show_versions()``
-  value: |
-  <details>
-
-      ```
-      Replace this line with the output of pl.show_versions(). Leave the backticks in place.
-      ```
-
-      </details>
+  label: Actual behavior
+  description: What actually happens.
   validations:
   required: true
 
+- type: textarea
+  id: stacktrace
+  attributes:
+  label: Stacktrace if applicable (no screenshots!)
+  description: Copy/paste this out of your server logs.
+  validations:
+  required: false
+
+- type: textarea
+  id: additional-information
+  attributes:
+  label: Additional information
+  validations:
+  required: false
