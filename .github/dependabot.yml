@@ -1,0 +1,18 @@
+# https://docs.github.com/en/code-security/supply-chain-security/keeping-your-dependencies-updated-automatically/configuration-options-for-dependency-updates
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: '/'
+    schedule:
+      interval: "weekly"
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-patch']
+    commit-message:
+      prefix: ci
+    labels: ['skip changelog']
+
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "weekly"
