@@ -1,0 +1,39 @@
+name: 💡 Feature Request
+description: Request for a feature to be implemented.
+labels: ["feature", "needs triage"]
+assignees:
+  - svaningelgem
+
+body:
+- type: checkboxes
+  id: checks
+  attributes:
+    label: Checks
+    options:
+    - label: I am running the [latest version](https://www.spigotmc.org/resources/graves.116202/history) of this plugin.
+      required: true
+    - label: There isn't another issue about this. 
+      required: true
+
+- type: textarea
+  attributes:
+    label: Requested Feature
+    description: |
+      Please describe what you'd like to be added.
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: Why is this needed?
+    description: |
+      Please describe why do you need this feature.
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: Additional Information
+    description: Anything else you want to add.
+  validations:
+    required: false

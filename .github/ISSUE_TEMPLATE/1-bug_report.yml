@@ -1,6 +1,8 @@
 name: '🐞 Bug report'
-description: Reporting an issue
-labels: [bug, needs triage]
+description: Reporting an issue.
+labels: ["bug", "needs triage"]
+assignees:
+  - svaningelgem
 
 body:
 - type: checkboxes
@@ -18,16 +20,16 @@ body:
   attributes:
     label: Version
     description: Version of your installed plugin (latest is not a version)
-  placeholder: 4.9.x
+    placeholder: 4.9.x
   validations:
     required: true
 
 - type: input
   id: server-version
   attributes:
-  label: Server version
-  description: Version of your minecraft server (latest is not a version)
-  placeholder: 1.20.x
+    label: Server version
+    description: Version of your minecraft server (latest is not a version)
+    placeholder: 1.20.x
   validations:
     required: true
 
