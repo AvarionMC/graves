@@ -32,7 +32,8 @@ public class PlayerInteractAtEntityListener implements Listener {
             Grave grave = plugin.getEntityDataManager().getGrave(entity);
 
             if (grave != null) {
-                event.setCancelled(plugin.getGraveManager().openGrave(player, entity.getLocation(), grave));
+                event.setCancelled(true);
+                plugin.getGraveManager().openGrave(player, entity.getLocation(), grave);
             }
         }
     }
