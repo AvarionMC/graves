@@ -737,7 +737,7 @@ public class Graves extends JavaPlugin {
     }
 
     public String getLatestVersion() {
-        return UpdateUtil.getLatestVersion(getSpigotID());
+        return UpdateUtil.getLatestVersion(getSpigotID()).toString();
     }
 
     @SuppressWarnings("SameReturnValue")

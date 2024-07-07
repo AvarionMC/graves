@@ -51,6 +51,7 @@ public final class ItemsAdder extends EntityDataManager {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public void createFurniture(Location location, @NotNull Grave grave) {
         location = LocationUtil.roundLocation(location).add(0.5, 0, 0.5);
 
