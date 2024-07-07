@@ -17,7 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.NoteBlock;
-import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -89,12 +89,9 @@ public final class Oraxen extends EntityDataManager {
                 if (furnitureMechanic != null && location.getWorld() != null) {
                     location.getBlock().setType(Material.AIR);
 
-                    ItemFrame itemFrame = (ItemFrame) furnitureMechanic.place(location, location.getYaw(), BlockFace.UP
-                            // , BlockFaceUtil.getBlockFaceRotation(BlockFaceUtil.getYawBlockFace(location.getYaw()))
-                    );
-
-                    if (itemFrame != null) {
-                        createEntityData(location, itemFrame.getUniqueId(), grave.getUUID(), EntityData.Type.ORAXEN);
+                    Entity entity = furnitureMechanic.place(location, location.getYaw(), BlockFace.UP);
+                    if (entity != null) {
+                        createEntityData(location, entity.getUniqueId(), grave.getUUID(), EntityData.Type.ORAXEN);
                         plugin.debugMessage("Placing Oraxen furniture for "
                                             + grave.getUUID()
                                             + " at "
