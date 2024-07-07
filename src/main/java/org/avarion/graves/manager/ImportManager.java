@@ -62,6 +62,7 @@ public final class ImportManager {
         return graveList;
     }
 
+    @SuppressWarnings("unchecked")
     public @Nullable Grave convertAngelChestToGrave(File file) {
         FileConfiguration angelChest = loadFile(file);
 
