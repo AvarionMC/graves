@@ -241,6 +241,8 @@ public class Graves extends JavaPlugin {
     // Get priority for a type. Currently only "death" is available
     private EventPriority getEventPriority(String type, EventPriority defaultPriority) {
         String priorityStr = getConfig().getString("settings.listener-priority." + type);
+        if ( priorityStr == null ) return defaultPriority;
+
         try {
             return EventPriority.valueOf(priorityStr.toUpperCase());
         } catch (IllegalArgumentException e) {
