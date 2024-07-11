@@ -765,17 +765,7 @@ public final class EntityManager extends EntityDataManager {
 
     @SuppressWarnings("redundant")
     public @NotNull String getEntityName(Entity entity) {
-        if (entity != null) {
-            if (entity instanceof Player) {
-                return entity.getName(); // Need redundancy for legacy support
-            }
-            else {
-                return entity.getName();
-            }
-
-        }
-
-        return "null";
+        return entity != null ? entity.getName() : "null";
     }
 
     public boolean hasDataString(@NotNull Entity entity, String string) {
