@@ -280,36 +280,37 @@ public class Graves extends JavaPlugin {
     }
 
     public void debugMessage(String string, int level) {
-        if (getConfig().getInt("settings.debug.level", 0) >= level) {
-            getLogger().info("Debug: " + string);
+        if (getConfig().getInt("settings.debug.level", 0) < level) {
+            return;
+        }
+        getLogger().info("Debug: " + string);
 
-            for (String admin : getConfig().getStringList("settings.debug.admin")) {
-                Player player = getServer().getPlayer(admin);
-                UUID uuid = UUIDUtil.getUUID(admin);
+        for (String admin : getConfig().getStringList("settings.debug.admin")) {
+            Player player = getServer().getPlayer(admin);
+            UUID uuid = UUIDUtil.getUUID(admin);
 
-                if (uuid != null) {
-                    Player uuidPlayer = getServer().getPlayer(uuid);
+            if (uuid != null) {
+                Player uuidPlayer = getServer().getPlayer(uuid);
 
-                    if (uuidPlayer != null) {
-                        player = uuidPlayer;
-                    }
+                if (uuidPlayer != null) {
+                    player = uuidPlayer;
                 }
+            }
 
-                if (player != null) {
-                    String debug = !integrationManager.hasMultiPaper()
-                                   ? "Debug:"
-                                   : "Debug (" + integrationManager.getMultiPaper().getLocalServerName() + "):";
+            if (player != null) {
+                String debug = !integrationManager.hasMultiPaper()
+                               ? "Debug:"
+                               : "Debug (" + integrationManager.getMultiPaper().getLocalServerName() + "):";
 
-                    player.sendMessage(ChatColor.RED
-                                       + "☠"
-                                       + ChatColor.DARK_GRAY
-                                       + " » "
-                                       + ChatColor.RED
-                                       + debug
-                                       + ChatColor.RESET
-                                       + " "
-                                       + string);
-                }
+                player.sendMessage(ChatColor.RED
+                                   + "☠"
+                                   + ChatColor.DARK_GRAY
+                                   + " » "
+                                   + ChatColor.RED
+                                   + debug
+                                   + ChatColor.RESET
+                                   + " "
+                                   + string);
             }
         }
     }
