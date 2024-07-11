@@ -17,7 +17,7 @@ import java.util.*;
 public final class SkinUtil {
     private static final Map<String, String> knownTextures = SkinUtil.Textures.MAP;
 
-    private static String GAMEPROFILE_METHOD;
+    private static String gameProfileMethod;
     private static Method property_getValue;
     private static Method property_getSignature;
 
@@ -133,12 +133,12 @@ public final class SkinUtil {
         try {
             Object playerObject = player.getClass().getMethod("getHandle").invoke(player);
 
-            if (GAMEPROFILE_METHOD == null) {
+            if (gameProfileMethod == null) {
                 findGameProfileMethod(playerObject);
             }
 
-            if (GAMEPROFILE_METHOD != null && !GAMEPROFILE_METHOD.isEmpty()) {
-                Method gameProfile = playerObject.getClass().getMethod(GAMEPROFILE_METHOD);
+            if (gameProfileMethod != null && !gameProfileMethod.isEmpty()) {
+                Method gameProfile = playerObject.getClass().getMethod(gameProfileMethod);
 
                 gameProfile.setAccessible(true);
 
@@ -154,13 +154,13 @@ public final class SkinUtil {
     private static void findGameProfileMethod(@NotNull Object playerObject) {
         for (Method method : playerObject.getClass().getMethods()) {
             if (method.getReturnType().getName().endsWith("GameProfile")) {
-                GAMEPROFILE_METHOD = method.getName();
+                gameProfileMethod = method.getName();
 
                 return;
             }
         }
 
-        GAMEPROFILE_METHOD = "";
+        gameProfileMethod = "";
     }
 
     private static class Textures {
