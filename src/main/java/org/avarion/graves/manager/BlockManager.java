@@ -167,11 +167,13 @@ public final class BlockManager {
 
             if (blockData.replaceData() != null) {
                 blockData.location()
-                         .getBlock().setBlockData(plugin.getServer().createBlockData(blockData.replaceData()));
+                         .getBlock()
+                         .setBlockData(plugin.getServer().createBlockData(blockData.replaceData()));
             }
 
             plugin.getDataManager().removeBlockData(location);
-            plugin.debugMessage("Replacing grave block for " + blockData.graveUUID()
+            plugin.debugMessage("Replacing grave block for "
+                                + blockData.graveUUID()
                                 + " at "
                                 + location.getWorld()
                                           .getName()

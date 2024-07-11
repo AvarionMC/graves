@@ -42,8 +42,7 @@ public final class LocationManager {
 
     public @Nullable Location getSafeTeleportLocation(Entity entity, @NotNull Location location, Grave grave, Graves plugin) {
         if (location.getWorld() != null) {
-            if (plugin.getConfigBool("teleport.unsafe", grave)
-                || isLocationSafePlayer(location)) {
+            if (plugin.getConfigBool("teleport.unsafe", grave) || isLocationSafePlayer(location)) {
                 return location;
             }
             else if (plugin.getConfigBool("teleport.top", grave)) {
@@ -77,8 +76,7 @@ public final class LocationManager {
                     return getLavaTop(location, livingEntity, grave);
                 }
                 else {
-                    Location graveLocation = (block.getType().isAir()
-                                              || MaterialUtil.isWater(block.getType())) ? (
+                    Location graveLocation = (block.getType().isAir() || MaterialUtil.isWater(block.getType())) ? (
                             plugin.getConfigBool("placement.ground", grave)
                             ? getGround(location, livingEntity, grave)
                             : null) : getRoof(location, livingEntity, grave);
@@ -218,13 +216,11 @@ public final class LocationManager {
     public boolean canBuild(LivingEntity livingEntity, Location location, List<String> permissionList) {
         if (livingEntity instanceof Player player) {
 
-            return (!plugin.getConfigBool("placement.can-build", player, permissionList)
-                    || plugin.getCompatibility().canBuild(player, location, plugin)) && (!plugin.getIntegrationManager()
-                                                                                                .hasProtectionLib() || (
-                    !plugin.getConfigBool("placement.can-build-protectionlib", player, permissionList)
-                                                                                                 || plugin.getIntegrationManager()
-                                                                                                          .getProtectionLib()
-                                                                                                          .canBuild(location, player)));
+            return (!plugin.getConfigBool("placement.can-build", player, permissionList) || plugin.getCompatibility()
+                                                                                                  .canBuild(player, location, plugin))
+                   && (!plugin.getIntegrationManager().hasProtectionLib()
+                       || (!plugin.getConfigBool("placement.can-build-protectionlib", player, permissionList)
+                           || plugin.getIntegrationManager().getProtectionLib().canBuild(location, player)));
         }
 
         return true;
@@ -238,7 +234,9 @@ public final class LocationManager {
             Block blockBelow = block.getRelative(BlockFace.DOWN);
 
             return !block.getType().isSolid()
-                   && !MaterialUtil.isLava(blockAbove.getType()) && !blockBelow.getType().isAir()
+                   && !MaterialUtil.isLava(blockAbove.getType())
+                   && !blockBelow.getType()
+                                 .isAir()
                    && !MaterialUtil.isLava(blockBelow.getType());
         }
 

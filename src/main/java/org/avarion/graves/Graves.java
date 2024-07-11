@@ -1,17 +1,6 @@
 package org.avarion.graves;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
-
+import com.google.common.base.Charsets;
 import org.avarion.graves.command.GravesCommand;
 import org.avarion.graves.command.GraveyardsCommand;
 import org.avarion.graves.compatibility.Compatibility;
@@ -42,7 +31,9 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.google.common.base.Charsets;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 
 public class Graves extends JavaPlugin {
@@ -207,9 +198,9 @@ public class Graves extends JavaPlugin {
 
     public void registerListeners() {
         // Configurable death listener priority
-        getServer().getPluginManager().registerEvent(EntityDeathEvent.class, new Listener() {}, 
-                getEventPriority("death", EventPriority.MONITOR), new EntityDeathListener(this), this, true);
-        
+        getServer().getPluginManager().registerEvent(EntityDeathEvent.class, new Listener() {
+        }, getEventPriority("death", EventPriority.MONITOR), new EntityDeathListener(this), this, true);
+
         // All other non-configurable listeners
         getServer().getPluginManager().registerEvents(new PlayerInteractListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerInteractEntityListener(this), this);
@@ -237,16 +228,24 @@ public class Graves extends JavaPlugin {
 
         //getServer().getPluginManager().registerEvents(new GraveTestListener(this), this); // Test Listener
     }
-    
+
     // Get priority for a type. Currently only "death" is available
     private EventPriority getEventPriority(String type, EventPriority defaultPriority) {
         String priorityStr = getConfig().getString("settings.listener-priority." + type);
-        if ( priorityStr == null ) return defaultPriority;
+        if (priorityStr == null) {
+            return defaultPriority;
+        }
 
         try {
             return EventPriority.valueOf(priorityStr.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            getLogger().warning("Invalid event priority in config for type '" + type + "': " + priorityStr + ". Defaulting to " + defaultPriority);
+        }
+        catch (IllegalArgumentException e) {
+            getLogger().warning("Invalid event priority in config for type '"
+                                + type
+                                + "': "
+                                + priorityStr
+                                + ". Defaulting to "
+                                + defaultPriority);
             return defaultPriority;
         }
     }

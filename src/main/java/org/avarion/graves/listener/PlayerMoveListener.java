@@ -60,8 +60,8 @@ public class PlayerMoveListener implements Listener {
                     if (blockData != null && CacheManager.graveMap.containsKey(blockData.graveUUID())) {
                         Grave grave = CacheManager.graveMap.get(blockData.graveUUID());
 
-                        if (grave != null && plugin.getConfigBool("block.walk-over", grave)
-                            && plugin.getEntityManager().canOpenGrave(player, grave)) {
+                        if (grave != null && plugin.getConfigBool("block.walk-over", grave) && plugin.getEntityManager()
+                                                                                                     .canOpenGrave(player, grave)) {
                             plugin.getGraveManager().cleanupCompasses(player, grave);
                             plugin.getGraveManager().autoLootGrave(event.getPlayer(), location, grave);
                         }

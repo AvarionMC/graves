@@ -36,8 +36,8 @@ public class PlayerRespawnListener implements Listener {
                                                     .runFunction(player, plugin.getConfigString("respawn.function", player, permissionList, "none"), grave), 1L);
 
             if (plugin.getConfigBool("respawn.compass", player, permissionList)
-                && grave.getLivedTime() <= plugin.getConfigInt("respawn.compass-time", player, permissionList)
-                      * 1000L) {
+                && grave.getLivedTime()
+                   <= plugin.getConfigInt("respawn.compass-time", player, permissionList) * 1000L) {
                 List<Location> locationList = plugin.getGraveManager()
                                                     .getGraveLocationList(event.getRespawnLocation(), grave);
 

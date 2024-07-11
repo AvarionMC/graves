@@ -395,8 +395,7 @@ public final class DataManager {
 
         String uuidGrave = blockData.graveUUID() != null ? "'" + blockData.graveUUID() + "'" : "NULL";
         String location = "'" + LocationUtil.locationToString(blockData.location()) + "'";
-        String replaceMaterial = blockData.replaceMaterial() != null ? "'" + blockData.replaceMaterial() + "'"
-                                 : "NULL";
+        String replaceMaterial = blockData.replaceMaterial() != null ? "'" + blockData.replaceMaterial() + "'" : "NULL";
         String replaceData = blockData.replaceData() != null ? "'" + blockData.replaceData() + "'" : "NULL";
 
         plugin.getServer()
