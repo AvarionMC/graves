@@ -35,13 +35,13 @@ import java.util.Map;
 public final class WorldEdit {
     private final Graves plugin;
     private final Plugin worldEditPlugin;
-    private final com.sk89q.worldedit.WorldEdit worldEdit;
+    private final com.sk89q.worldedit.WorldEdit libInstance;
     private final Map<String, Clipboard> stringClipboardMap;
 
     public WorldEdit(Graves plugin, Plugin worldEditPlugin) {
         this.plugin = plugin;
         this.worldEditPlugin = worldEditPlugin;
-        this.worldEdit = com.sk89q.worldedit.WorldEdit.getInstance();
+        this.libInstance = com.sk89q.worldedit.WorldEdit.getInstance();
         this.stringClipboardMap = new HashMap<>();
 
         saveData();
@@ -257,6 +257,6 @@ public final class WorldEdit {
 
     @Contract("_ -> new")
     private @NotNull EditSession getEditSession(World world) {
-        return worldEdit.newEditSession(BukkitAdapter.adapt(world));
+        return libInstance.newEditSession(BukkitAdapter.adapt(world));
     }
 }
