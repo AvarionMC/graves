@@ -367,40 +367,45 @@ public class Graves extends JavaPlugin {
     }
 
     private void updateChecker() {
-        if (getConfig().getBoolean("settings.update.check")) {
-            getServer().getScheduler().runTaskAsynchronously(this, () -> {
-                String latestVersion = getLatestVersion();
-
-                if (latestVersion != null) {
-                    try {
-                        double pluginVersion = Double.parseDouble(getDescription().getVersion());
-                        double pluginVersionLatest = Double.parseDouble(latestVersion);
-
-                        if (pluginVersion < pluginVersionLatest) {
-                            getLogger().info("Update: Outdated version detected "
-                                             + pluginVersion
-                                             + ", latest version is "
-                                             + pluginVersionLatest
-                                             + ", https://www.spigotmc.org/resources/"
-                                             + getSpigotID()
-                                             + "/");
-                        }
-                    }
-                    catch (NumberFormatException exception) {
-                        if (!getDescription().getVersion().equalsIgnoreCase(latestVersion)) {
-                            getLogger().info("Update: Outdated version detected "
-                                             + getDescription().getVersion()
-                                             + ", latest version is "
-                                             + latestVersion
-                                             + ", https://www.spigotmc.org/resources/"
-                                             + getSpigotID()
-                                             + "/");
-                        }
-                    }
-                }
-            });
+        if (!getConfig().getBoolean("settings.update.check")) {
+            return;
         }
-    }
+
+        getServer().getScheduler().runTaskAsynchronously(this, () -> {
+            String latestVersion = getLatestVersion();
+
+            if (latestVersion == null) {
+                return;
+            }
+
+            try {
+                double pluginVersion = Double.parseDouble(getDescription().getVersion());
+                double pluginVersionLatest = Double.parseDouble(latestVersion);
+
+                if (pluginVersion < pluginVersionLatest) {
+                    getLogger().info("Update: Outdated version detected "
+                                     + pluginVersion
+                                     + ", latest version is "
+                                     + pluginVersionLatest
+                                     + ", https://www.spigotmc.org/resources/"
+                                     + getSpigotID()
+                                     + "/");
+                }
+            }
+            catch (NumberFormatException exception) {
+                if (!getDescription().getVersion().equalsIgnoreCase(latestVersion)) {
+                    getLogger().info("Update: Outdated version detected "
+                                     + getDescription().getVersion()
+                                     + ", latest version is "
+                                     + latestVersion
+                                     + ", https://www.spigotmc.org/resources/"
+                                     + getSpigotID()
+                                     + "/");
+                }
+            }
+        }
+    });
+}
 
     private void compatibilityChecker() {
         compatibility = new CompatibilityBlockData();
