@@ -330,15 +330,22 @@ public final class EntityManager extends EntityDataManager {
                 string = plugin.getConfigString(string, entity.getType(), permissionList);
             }
 
+            if (string == null) {
+                return;
+            }
+
+            string = string.replaceAll("\\s+$", "");
+            if (string.isEmpty()) {
+                return;
+            }
+
             String prefix = plugin.getConfigString("message.prefix", entity.getType(), permissionList);
 
             if (prefix != null && !prefix.isEmpty()) {
                 string = prefix + string;
             }
 
-            if (string != null && !string.isEmpty()) {
-                player.sendMessage(StringUtil.parseString(string, entity, name, location, grave, plugin));
-            }
+            player.sendMessage(StringUtil.parseString(string, entity, name, location, grave, plugin));
         }
     }
 
@@ -486,7 +493,7 @@ public final class EntityManager extends EntityDataManager {
                 else {
                     return (grave.getOwnerUUID().equals(player.getUniqueId())
                             && plugin.getConfigBool("protection.open.missing.owner", grave)) || (!grave.getOwnerUUID()
-                                                                                             .equals(player.getUniqueId())
+                                                                                                       .equals(player.getUniqueId())
                                                                                                  && plugin.getConfigBool("protection.open.missing.other", grave));
                 }
             }
@@ -497,10 +504,9 @@ public final class EntityManager extends EntityDataManager {
     }
 
     public void spawnZombie(Location location, Entity entity, LivingEntity targetEntity, Grave grave) {
-        if ((plugin.getConfigBool("zombie.spawn-owner", grave) && grave.getOwnerUUID()
-                                                                                                    .equals(entity.getUniqueId())
+        if ((plugin.getConfigBool("zombie.spawn-owner", grave) && grave.getOwnerUUID().equals(entity.getUniqueId())
              || plugin.getConfigBool("zombie.spawn-other", grave) && !grave.getOwnerUUID()
-                                                                                                        .equals(entity.getUniqueId()))) {
+                                                                           .equals(entity.getUniqueId()))) {
             spawnZombie(location, targetEntity, grave);
         }
     }
@@ -800,9 +806,8 @@ public final class EntityManager extends EntityDataManager {
     public @Nullable Grave getGraveFromEntityData(@NotNull Entity entity) {
         if (entity.getPersistentDataContainer()
                   .has(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING)) {
-            return CacheManager.graveMap
-                         .get(UUIDUtil.getUUID(entity.getPersistentDataContainer()
-                                                     .get(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING)));
+            return CacheManager.graveMap.get(UUIDUtil.getUUID(entity.getPersistentDataContainer()
+                                                                    .get(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING)));
         }
         else if (entity.hasMetadata("graveUUID")) {
             List<MetadataValue> metadataValue = entity.getMetadata("graveUUID");
