@@ -74,8 +74,7 @@ public final class PlayerNPC extends EntityDataManager {
 
     public void createCorpse(UUID uuid, Location location, Grave grave, boolean createEntityData) {
         plugin.getServer().getScheduler().runTask(plugin, () -> {
-            if (plugin.getConfigBool("playernpc.corpse.enabled", grave)
-                && grave.getOwnerType() == EntityType.PLAYER) {
+            if (plugin.getConfigBool("playernpc.corpse.enabled", grave) && grave.getOwnerType() == EntityType.PLAYER) {
                 Player player = plugin.getServer().getPlayer(grave.getOwnerUUID());
                 Location npcLocation = location.clone();
 

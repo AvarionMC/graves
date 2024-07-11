@@ -37,8 +37,7 @@ public class PlayerDeathListener implements Listener {
             }
         }
 
-        CacheManager.removedItemStackMap
-              .put(event.getEntity().getUniqueId(), new ArrayList<>(itemStackList));
+        CacheManager.removedItemStackMap.put(event.getEntity().getUniqueId(), new ArrayList<>(itemStackList));
     }
 
 }

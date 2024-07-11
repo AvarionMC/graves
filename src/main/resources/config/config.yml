@@ -22,7 +22,7 @@ settings:
   # Data storage system.
   cache:
     type: NORMAL # Cache type.
-    
+
   #####################
   # Listener Priority #
   ##################### 
@@ -32,7 +32,7 @@ settings:
   # doing, you should leave these at their defaults.
   listener-priority:
     death: MONITOR
-    
+
   #########
   # Debug #
   #########

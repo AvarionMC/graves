@@ -117,7 +117,7 @@ public final class ItemStackManager extends EntityDataManager {
             ItemMeta itemMeta = itemStack.getItemMeta();
             String name = ChatColor.WHITE
                           + StringUtil.parseString(plugin.getConfigString("gui.menu.list.name", grave), grave, plugin)
-                                                      .replace("%number%", String.valueOf(number));
+                                      .replace("%number%", String.valueOf(number));
             List<String> loreList = new ArrayList<>();
             int customModelData = plugin.getConfigInt("gui.menu.list.model-data", grave, -1);
 
@@ -157,7 +157,7 @@ public final class ItemStackManager extends EntityDataManager {
         if (itemStack.getItemMeta() != null) {
             ItemMeta itemMeta = itemStack.getItemMeta();
             String name = ChatColor.WHITE + StringUtil.parseString(plugin.getConfigString("gui.menu.grave.slot."
-                                                                                    + slot
+                                                                                          + slot
                                                                                           + ".name", grave), grave, plugin);
             List<String> loreList = new ArrayList<>();
             int customModelData = plugin.getConfigInt("gui.menu.grave.slot." + slot + ".model-data", grave, -1);

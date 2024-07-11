@@ -713,14 +713,14 @@ public final class GraveManager {
                 if (itemMeta.hasDisplayName()) {
                     for (String string : plugin.getConfigStringList("ignore.item.name", entity, permissionList)) {
                         if (!string.isEmpty() && itemMeta.getDisplayName()
-                                                          .equals(StringUtil.parseString(string, plugin))) {
+                                                         .equals(StringUtil.parseString(string, plugin))) {
                             return true;
                         }
                     }
 
                     for (String string : plugin.getConfigStringList("ignore.item.name-contains", entity, permissionList)) {
                         if (!string.isEmpty() && itemMeta.getDisplayName()
-                                                          .contains(StringUtil.parseString(string, plugin))) {
+                                                         .contains(StringUtil.parseString(string, plugin))) {
                             return true;
                         }
                     }
