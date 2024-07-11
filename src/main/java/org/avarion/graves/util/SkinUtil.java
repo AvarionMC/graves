@@ -18,19 +18,19 @@ public final class SkinUtil {
     private static final Map<String, String> knownTextures = SkinUtil.Textures.MAP;
 
     private static String gameProfileMethod;
-    private static Method property_getValue;
-    private static Method property_getSignature;
+    private static Method propertyGetValue;
+    private static Method propertyGetSignature;
 
     static {
         // Determine which method to use during class loading
         try {
-            property_getValue = Property.class.getMethod("value");
-            property_getSignature = Property.class.getMethod("signature");
+            propertyGetValue = Property.class.getMethod("value");
+            propertyGetSignature = Property.class.getMethod("signature");
         }
         catch (NoSuchMethodException e) {
             try {
-                property_getValue = Property.class.getMethod("getValue");
-                property_getSignature = Property.class.getMethod("getSignature");
+                propertyGetValue = Property.class.getMethod("getValue");
+                propertyGetSignature = Property.class.getMethod("getSignature");
             }
             catch (NoSuchMethodException ex) {
                 throw new RuntimeException("Failed to find a valid method for Property value/signature retrieval", ex);
@@ -54,7 +54,7 @@ public final class SkinUtil {
         }
     }
 
-    private static String getPlayerProperty(Entity entity, Method call_this) {
+    private static String getPlayerProperty(Entity entity, Method callThis) {
         if (entity instanceof Player) {
             GameProfile gameProfile = getPlayerGameProfile((Player) entity);
 
@@ -70,7 +70,7 @@ public final class SkinUtil {
 
                     Property prop = propertyCollection.stream().findFirst().get();
                     try {
-                        return (String) call_this.invoke(prop);
+                        return (String) callThis.invoke(prop);
                     }
                     catch (IllegalAccessException | InvocationTargetException e) {
                         throw new RuntimeException(e);
@@ -84,7 +84,7 @@ public final class SkinUtil {
 
     public static @NotNull String getTexture(@NotNull Entity entity) {
         if (entity instanceof Player) {
-            return getPlayerProperty(entity, property_getValue);
+            return getPlayerProperty(entity, propertyGetValue);
         }
 
         // Try to find our entity
@@ -126,7 +126,7 @@ public final class SkinUtil {
     }
 
     public static String getSignature(Entity entity) {
-        return getPlayerProperty(entity, property_getSignature);
+        return getPlayerProperty(entity, propertyGetSignature);
     }
 
     public static @Nullable GameProfile getPlayerGameProfile(@NotNull Player player) {
