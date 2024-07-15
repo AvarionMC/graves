@@ -67,13 +67,6 @@ public class PlayerInteractListener implements Listener {
                 Location location = block.getLocation().clone();
                 Location locationRelative = block.getRelative(event.getBlockFace()).getLocation().clone();
 
-                /*
-                location.setPitch(player.getLocation().getPitch());
-                location.setYaw(player.getLocation().getYaw());
-                locationRelative.setPitch(location.getPitch());
-                locationRelative.setYaw(location.getYaw());
-                 */
-
                 if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
                     if (graveyard.hasGraveLocation(location)) {
                         plugin.getGraveyardManager().removeLocationInGraveyard(player, location, graveyard);
