@@ -247,10 +247,8 @@ public final class PlaceholderAPI extends PlaceholderExpansion implements Relati
             return "";
         }
 
-        if (player != null) {
-            if (identifier.equals("count")) {
-                return String.valueOf(plugin.getGraveManager().getGraveCount(player));
-            }
+        if (player != null && identifier.equals("count")) {
+            return String.valueOf(plugin.getGraveManager().getGraveCount(player));
         }
 
         return null;
