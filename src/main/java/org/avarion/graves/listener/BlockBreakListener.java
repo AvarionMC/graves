@@ -25,57 +25,57 @@ public class BlockBreakListener implements Listener {
         Block block = event.getBlock();
         Grave grave = plugin.getBlockManager().getGraveFromBlock(block);
 
-        if (grave != null) {
-            if (plugin.getConfigBool("grave.break", grave)) {
-                if (plugin.getEntityManager().canOpenGrave(player, grave)) {
-                    GraveBreakEvent graveBreakEvent = new GraveBreakEvent(block, player, grave);
+        if (grave == null) {
+            return;
+        }
 
-                    graveBreakEvent.setDropItems(plugin.getConfigBool("drop.break", grave));
-                    plugin.getServer().getPluginManager().callEvent(graveBreakEvent);
+        if (!plugin.getConfigBool("grave.break", grave)) {
+            event.setCancelled(true);
+            return;
+        }
 
-                    if (!graveBreakEvent.isCancelled()) {
-                        if (plugin.getConfigBool("drop.auto-loot.enabled", grave)) {
-                            plugin.getGraveManager().autoLootGrave(player, block.getLocation(), grave);
+        if (!plugin.getEntityManager().canOpenGrave(player, grave)) {
+            plugin.getEntityManager().sendMessage("message.protection", player, player.getLocation(), grave);
+            event.setCancelled(true);
+            return;
+        }
 
-                            if (graveBreakEvent.isDropItems() && plugin.getConfigBool("drop.auto-loot.break", grave)) {
-                                plugin.getGraveManager().breakGrave(block.getLocation(), grave);
-                            }
-                            else {
-                                event.setCancelled(true);
+        GraveBreakEvent graveBreakEvent = new GraveBreakEvent(block, player, grave);
 
-                                return;
-                            }
-                        }
-                        else if (graveBreakEvent.isDropItems()) {
-                            plugin.getGraveManager().breakGrave(block.getLocation(), grave);
-                        }
-                        else {
-                            plugin.getGraveManager().removeGrave(grave);
-                        }
+        graveBreakEvent.setDropItems(plugin.getConfigBool("drop.break", grave));
+        plugin.getServer().getPluginManager().callEvent(graveBreakEvent);
 
-                        if (graveBreakEvent.getBlockExp() > 0) {
-                            plugin.getGraveManager().dropGraveExperience(block.getLocation(), grave);
-                        }
+        if (graveBreakEvent.isCancelled()) {
+            event.setCancelled(true);
+            return;
+        }
+        if (plugin.getConfigBool("drop.auto-loot.enabled", grave)) {
+            plugin.getGraveManager().autoLootGrave(player, block.getLocation(), grave);
 
-                        plugin.getGraveManager().closeGrave(grave);
-                        plugin.getGraveManager().playEffect("effect.loot", block.getLocation(), grave);
-                        plugin.getEntityManager().spawnZombie(block.getLocation(), player, player, grave);
-                        plugin.getEntityManager()
-                              .runCommands("event.command.break", player, block.getLocation(), grave);
-                    }
-                    else {
-                        event.setCancelled(true);
-                    }
-                }
-                else {
-                    plugin.getEntityManager().sendMessage("message.protection", player, player.getLocation(), grave);
-                    event.setCancelled(true);
-                }
+            if (graveBreakEvent.isDropItems() && plugin.getConfigBool("drop.auto-loot.break", grave)) {
+                plugin.getGraveManager().breakGrave(block.getLocation(), grave);
             }
             else {
                 event.setCancelled(true);
+
+                return;
             }
         }
-    }
 
+        else if (graveBreakEvent.isDropItems()) {
+            plugin.getGraveManager().breakGrave(block.getLocation(), grave);
+        }
+        else {
+            plugin.getGraveManager().removeGrave(grave);
+        }
+
+        if (graveBreakEvent.getBlockExp() > 0) {
+            plugin.getGraveManager().dropGraveExperience(block.getLocation(), grave);
+        }
+
+        plugin.getGraveManager().closeGrave(grave);
+        plugin.getGraveManager().playEffect("effect.loot", block.getLocation(), grave);
+        plugin.getEntityManager().spawnZombie(block.getLocation(), player, player, grave);
+        plugin.getEntityManager().runCommands("event.command.break", player, block.getLocation(), grave);
+    }
 }
