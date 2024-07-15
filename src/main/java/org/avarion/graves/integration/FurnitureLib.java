@@ -218,6 +218,7 @@ public final class FurnitureLib extends EntityDataManager {
 
         @Override
         public void onFurnitureLateSpawn(ObjectID objectID) {
+            // We shouldn't do anything here. Not even call the super method! That one shouldn't do anything anymore now.
         }
 
     }
