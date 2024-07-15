@@ -425,15 +425,13 @@ public final class GravesCommand implements CommandExecutor, TabCompleter {
             }
         }
 
-        if (sender.hasPermission("graves.givetoken")) {
-            if (plugin.getConfig().getBoolean("settings.token")) {
-                sender.sendMessage(ChatColor.RED
-                                   + "/graves givetoken {player} {amount} "
-                                   + ChatColor.DARK_GRAY
-                                   + "-"
-                                   + ChatColor.RESET
-                                   + " Give grave token");
-            }
+        if (sender.hasPermission("graves.givetoken") && plugin.getConfig().getBoolean("settings.token")) {
+            sender.sendMessage(ChatColor.RED
+                               + "/graves givetoken {player} {amount} "
+                               + ChatColor.DARK_GRAY
+                               + "-"
+                               + ChatColor.RESET
+                               + " Give grave token");
         }
 
         if (sender.hasPermission("graves.reload")) {
