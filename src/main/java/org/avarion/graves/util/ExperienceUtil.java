@@ -5,6 +5,10 @@ import org.jetbrains.annotations.NotNull;
 
 public final class ExperienceUtil {
 
+    private ExperienceUtil() {
+        // Don't do anything here
+    }
+
     public static int getPlayerExperience(@NotNull Player player) {
         int experience = Math.round(getExperienceAtLevel(player.getLevel()) * player.getExp());
         int level = player.getLevel();
