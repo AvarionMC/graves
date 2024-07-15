@@ -15,4 +15,8 @@ public final class CacheManager {
     static public final Map<String, ChunkData> chunkMap = new HashMap<>();
     static public final Map<UUID, Location> lastLocationMap = new HashMap<>();
     static public final Map<UUID, List<ItemStack>> removedItemStackMap = new HashMap<>();
+
+    private CacheManager() {
+        // Nothing to see here...
+    }
 }
