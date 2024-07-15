@@ -24,18 +24,10 @@ public class PlayerDeathListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerDeathEvent(@NotNull PlayerDeathEvent event) {
         List<ItemStack> itemStackList = event.getDrops();
-        Iterator<ItemStack> iterator = itemStackList.iterator();
 
-        while (iterator.hasNext()) {
-            ItemStack itemStack = iterator.next();
-
-            if (itemStack != null) {
-                if (plugin.getEntityManager().getGraveUUIDFromItemStack(itemStack) != null
-                    && plugin.getConfigBool("compass.destroy", event.getEntity())) {
-                    iterator.remove();
-                }
-            }
-        }
+        itemStackList.removeIf(itemStack -> itemStack != null
+                                            && plugin.getEntityManager().getGraveUUIDFromItemStack(itemStack) != null
+                                            && plugin.getConfigBool("compass.destroy", event.getEntity()));
 
         CacheManager.removedItemStackMap.put(event.getEntity().getUniqueId(), new ArrayList<>(itemStackList));
     }
