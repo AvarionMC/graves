@@ -219,12 +219,9 @@ public final class EntityManager extends EntityDataManager {
     }
 
     public boolean canTeleport(Entity entity, Location location) {
-        return (!plugin.getIntegrationManager().hasWorldGuard() || plugin.getIntegrationManager()
-                                                                         .getWorldGuard()
-                                                                         .canTeleport(entity, location))
-               && (!plugin.getIntegrationManager().hasGriefDefender() || plugin.getIntegrationManager()
-                                                                               .getGriefDefender()
-                                                                               .canTeleport(entity, location));
+        return !plugin.getIntegrationManager().hasWorldGuard() || plugin.getIntegrationManager()
+                                                                        .getWorldGuard()
+                                                                        .canTeleport(entity, location);
     }
 
     public void playWorldSound(String string, @NotNull Player player) {

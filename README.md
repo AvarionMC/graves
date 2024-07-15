@@ -55,7 +55,6 @@ and more! While still being lightweight and efficient.
 * PlayerNPC (Corpses)
 
 * Towny
-* GriefDefender
 * ItemBridge
 * MineDown
 * MiniMessage
