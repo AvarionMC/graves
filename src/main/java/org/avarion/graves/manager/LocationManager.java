@@ -76,10 +76,15 @@ public final class LocationManager {
                     return getLavaTop(location, livingEntity, grave);
                 }
                 else {
-                    Location graveLocation = (block.getType().isAir() || MaterialUtil.isWater(block.getType())) ? (
-                            plugin.getConfigBool("placement.ground", grave)
-                            ? getGround(location, livingEntity, grave)
-                            : null) : getRoof(location, livingEntity, grave);
+                    Location graveLocation;
+                    if (block.getType().isAir() || MaterialUtil.isWater(block.getType())) {
+                        graveLocation = plugin.getConfigBool("placement.ground", grave)
+                                        ? getGround(location, livingEntity, grave)
+                                        : null;
+                    }
+                    else {
+                        graveLocation = getRoof(location, livingEntity, grave);
+                    }
 
                     if (graveLocation != null) {
                         return graveLocation;
