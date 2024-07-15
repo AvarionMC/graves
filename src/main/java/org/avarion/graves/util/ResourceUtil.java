@@ -98,24 +98,24 @@ public final class ResourceUtil {
             InputStream inputStream = entry.getValue();
             File outputFile = new File(outputPath + File.separator + path.replaceFirst(inputPath, ""));
 
-            if (!outputFile.exists() || overwrite) {
-                if (createDirectories(outputFile)) {
-                    try (OutputStream outputStream = Files.newOutputStream(outputFile.toPath())) {
-                        byte[] bytes = new byte[1024];
-                        int len;
+            if ((!outputFile.exists() || overwrite) && createDirectories(outputFile)) {
+                try (OutputStream outputStream = Files.newOutputStream(outputFile.toPath())) {
+                    byte[] bytes = new byte[1024];
+                    int len;
 
-                        while ((len = entry.getValue().read(bytes)) > 0) {
-                            outputStream.write(bytes, 0, len);
-                        }
+                    while ((len = entry.getValue().read(bytes)) > 0) {
+                        outputStream.write(bytes, 0, len);
+                    }
 
-                        inputStream.close();
-                    }
-                    catch (IOException ignored) {
-                    }
+                    inputStream.close();
+                }
+                catch (IOException ignored) {
                 }
             }
         }
     }
+
+}
 
     private static boolean createDirectories(@NotNull File file) {
         File parentFile = file.getParentFile();
