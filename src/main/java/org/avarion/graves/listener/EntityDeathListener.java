@@ -467,8 +467,6 @@ public class EntityDeathListener implements EventExecutor {
                         int offsetZ = 0;
 
                         switch (entry.getValue()) {
-                            case DEATH -> {
-                            }
                             case NORMAL -> {
                                 offsetX = plugin.getConfigInt("placement.offset.x", grave);
                                 offsetY = plugin.getConfigInt("placement.offset.y", grave);
@@ -479,6 +477,7 @@ public class EntityDeathListener implements EventExecutor {
                                 offsetY = plugin.getConfig().getInt("settings.graveyard.offset.y");
                                 offsetZ = plugin.getConfig().getInt("settings.graveyard.offset.z");
                             }
+                            // case DEATH does nothing (ie: keeps coordinates as-is)
                         }
 
                         location.add(offsetX, offsetY, offsetZ);
