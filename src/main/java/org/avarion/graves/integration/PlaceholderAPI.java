@@ -256,7 +256,7 @@ public final class PlaceholderAPI extends PlaceholderExpansion implements Relati
 
     @Override
     public String onPlaceholderRequest(Player playerOne, Player playerTwo, String identifier) {
-        return onPlaceholderRequest(playerOne, identifier); // TODO
+        return onPlaceholderRequest(playerOne, identifier);
     }
 
 }
