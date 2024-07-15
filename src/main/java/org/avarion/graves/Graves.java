@@ -283,6 +283,7 @@ public class Graves extends JavaPlugin {
         if (getConfig().getInt("settings.debug.level", 0) < level) {
             return;
         }
+
         getLogger().info("Debug: " + string);
 
         for (String admin : getConfig().getStringList("settings.debug.admin")) {

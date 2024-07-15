@@ -89,7 +89,7 @@ public final class WorldGuard {
                                                                             .getRegionContainer()
                                                                             .createQuery()
                                                                             .testState(BukkitAdapter.adapt(location), WorldGuardPlugin.inst()
-                                                                                                                                     .wrapPlayer((Player) entity), createFlag);
+                                                                                                                                      .wrapPlayer((Player) entity), createFlag);
     }
 
     public boolean canCreateGrave(Location location) {
@@ -104,7 +104,7 @@ public final class WorldGuard {
                                                                             .getRegionContainer()
                                                                             .createQuery()
                                                                             .testState(BukkitAdapter.adapt(location), WorldGuardPlugin.inst()
-                                                                                                                                     .wrapPlayer((Player) entity), teleportFlag);
+                                                                                                                                      .wrapPlayer((Player) entity), teleportFlag);
     }
 
     public boolean canTeleport(Location location) {

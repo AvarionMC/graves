@@ -763,7 +763,6 @@ public final class EntityManager extends EntityDataManager {
         return equipmentSlotItemStackMap;
     }
 
-    @SuppressWarnings("redundant")
     public @NotNull String getEntityName(Entity entity) {
         return entity != null ? entity.getName() : "null";
     }
