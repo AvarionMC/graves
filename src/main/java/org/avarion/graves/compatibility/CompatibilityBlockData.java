@@ -37,12 +37,9 @@ public final class CompatibilityBlockData implements Compatibility {
             String replaceData = location.getBlock().getBlockData().clone().getAsString(true);
 
             // Levelled
-            if (block.getBlockData() instanceof Levelled leveled) {
-
-                if (leveled.getLevel() != 0) {
-                    replaceMaterial = null;
-                    replaceData = null;
-                }
+            if (block.getBlockData() instanceof Levelled leveled && leveled.getLevel() != 0) {
+                replaceMaterial = null;
+                replaceData = null;
             }
 
             // Air
@@ -124,17 +121,12 @@ public final class CompatibilityBlockData implements Compatibility {
     public @NotNull ItemStack getSkullItemStack(Grave grave, Graves plugin) {
         ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
 
-        if (itemStack.getItemMeta() != null) {
-            if (grave.getOwnerType() == EntityType.PLAYER) {
-                OfflinePlayer offlinePlayer = plugin.getServer().getOfflinePlayer(grave.getOwnerUUID());
-                SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
+        if (itemStack.getItemMeta() != null && grave.getOwnerType() == EntityType.PLAYER) {
+            OfflinePlayer offlinePlayer = plugin.getServer().getOfflinePlayer(grave.getOwnerUUID());
+            SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
 
-                skullMeta.setOwningPlayer(offlinePlayer);
-                itemStack.setItemMeta(skullMeta);
-            }
-            else {
-                // TODO ENTITY
-            }
+            skullMeta.setOwningPlayer(offlinePlayer);
+            itemStack.setItemMeta(skullMeta);
         }
 
         return itemStack;
