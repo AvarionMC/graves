@@ -11,10 +11,10 @@ import java.util.Map;
 import java.util.UUID;
 
 public final class CacheManager {
-    static public final Map<UUID, Grave> graveMap = new HashMap<>();
-    static public final Map<String, ChunkData> chunkMap = new HashMap<>();
-    static public final Map<UUID, Location> lastLocationMap = new HashMap<>();
-    static public final Map<UUID, List<ItemStack>> removedItemStackMap = new HashMap<>();
+    public static final Map<UUID, Grave> graveMap = new HashMap<>();
+    public static final Map<String, ChunkData> chunkMap = new HashMap<>();
+    public static final Map<UUID, Location> lastLocationMap = new HashMap<>();
+    public static final Map<UUID, List<ItemStack>> removedItemStackMap = new HashMap<>();
 
     private CacheManager() {
         // Nothing to see here...
