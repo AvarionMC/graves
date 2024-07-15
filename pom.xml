@@ -137,10 +137,6 @@
             <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
         <repository>
-            <id>griefdefender-repo</id>
-            <url>https://repo.glaremasters.me/repository/bloodshot/</url>
-        </repository>
-        <repository>
             <id>jeff-media-repo</id>
             <url>https://hub.jeff-media.com/nexus/repository/jeff-media-public/</url>
         </repository>
@@ -267,12 +263,6 @@
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
             <version>2.11.6</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.griefdefender</groupId>
-            <artifactId>api</artifactId>
-            <version>2.0.0-20210822.184639-9</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

@@ -10,6 +10,10 @@ import java.util.List;
 
 public final class PermissionUtil {
 
+    private PermissionUtil() {
+        // Don't do anything here
+    }
+
     public static int getHighestInt(@NotNull Player player, String permission) {
         List<Integer> gravePermissions = new ArrayList<>();
 

@@ -114,14 +114,12 @@ public final class EntityManager extends EntityDataManager {
     }
 
     public UUID getGraveUUIDFromItemStack(ItemStack itemStack) {
-        if (itemStack != null && itemStack.getItemMeta() != null) {
-            if (itemStack.getItemMeta()
-                         .getPersistentDataContainer()
-                         .has(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING)) {
-                return UUIDUtil.getUUID(itemStack.getItemMeta()
-                                                 .getPersistentDataContainer()
-                                                 .get(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING));
-            }
+        if (itemStack != null && itemStack.getItemMeta() != null && itemStack.getItemMeta()
+                                                                             .getPersistentDataContainer()
+                                                                             .has(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING)) {
+            return UUIDUtil.getUUID(itemStack.getItemMeta()
+                                             .getPersistentDataContainer()
+                                             .get(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING));
         }
 
         return null;
@@ -221,12 +219,9 @@ public final class EntityManager extends EntityDataManager {
     }
 
     public boolean canTeleport(Entity entity, Location location) {
-        return (!plugin.getIntegrationManager().hasWorldGuard() || plugin.getIntegrationManager()
-                                                                         .getWorldGuard()
-                                                                         .canTeleport(entity, location))
-               && (!plugin.getIntegrationManager().hasGriefDefender() || plugin.getIntegrationManager()
-                                                                               .getGriefDefender()
-                                                                               .canTeleport(entity, location));
+        return !plugin.getIntegrationManager().hasWorldGuard() || plugin.getIntegrationManager()
+                                                                        .getWorldGuard()
+                                                                        .canTeleport(entity, location);
     }
 
     public void playWorldSound(String string, @NotNull Player player) {
@@ -463,9 +458,11 @@ public final class EntityManager extends EntityDataManager {
 
                 return true;
             }
-        }
 
-        return false;
+            default -> {
+                return false;
+            }
+        }
     }
 
     public boolean canOpenGrave(Player player, @NotNull Grave grave) {
@@ -584,11 +581,8 @@ public final class EntityManager extends EntityDataManager {
                     ((Mob) livingEntity).setTarget(targetEntity);
                 }
 
-                if (livingEntity instanceof Zombie zombie) {
-
-                    if (zombie.isBaby()) {
-                        zombie.setBaby(false);
-                    }
+                if (livingEntity instanceof Zombie zombie && zombie.isBaby()) {
+                    zombie.setBaby(false);
                 }
             }
 

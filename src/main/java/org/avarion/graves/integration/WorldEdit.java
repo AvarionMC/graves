@@ -133,14 +133,12 @@ public final class WorldEdit {
                 Location rightTopCorner = location;
 
                 switch (blockFace) {
-                    case NORTH:
-                        leftTopCorner = location.clone()
-                                                .add(offset.x() - region.getWidth(), offset.y()
-                                                                                     - region.getHeight(), 0);
-                    case WEST:
-                        leftTopCorner = location.clone()
-                                                .add(region.getWidth() - offset.x(), offset.y()
-                                                                                     - region.getHeight(), 0);
+                    case NORTH -> leftTopCorner = location.clone()
+                                                          .add(offset.x() - region.getWidth(), offset.y()
+                                                                                               - region.getHeight(), 0);
+                    case WEST -> leftTopCorner = location.clone()
+                                                         .add(region.getWidth() - offset.x(), offset.y()
+                                                                                              - region.getHeight(), 0);
                 }
 
                 corner.getBlock().setType(Material.BEDROCK);
@@ -163,7 +161,7 @@ public final class WorldEdit {
     }
 
     public void getAreaSchematic(Location location, float yaw, File file) {
-
+        // Not implementing now
     }
 
     public Clipboard pasteSchematic(Location location, String name) {

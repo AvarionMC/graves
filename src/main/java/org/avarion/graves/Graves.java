@@ -665,7 +665,7 @@ public class Graves extends JavaPlugin {
     }
 
     private @NotNull FileConfiguration getConfigFiles(@NotNull File folder) {
-        FileConfiguration fileConfiguration = new YamlConfiguration();
+        FileConfiguration yamlConfiguration = new YamlConfiguration();
         File[] files = folder.listFiles();
 
         if (files != null) {
@@ -682,15 +682,15 @@ public class Graves extends JavaPlugin {
             for (File file : fileList) {
                 if (YAMLUtil.isValidYAML(file)) {
                     if (file.isDirectory()) {
-                        fileConfiguration.addDefaults(getConfigFiles(file));
+                        yamlConfiguration.addDefaults(getConfigFiles(file));
                     }
                     else {
                         FileConfiguration savedFileConfiguration = getConfigFile(file);
 
                         if (savedFileConfiguration != null) {
-                            fileConfiguration.addDefaults(savedFileConfiguration);
-                            bakeDefaults(fileConfiguration);
-                            loadResourceDefaults(fileConfiguration, "config" + File.separator + file.getName());
+                            yamlConfiguration.addDefaults(savedFileConfiguration);
+                            bakeDefaults(yamlConfiguration);
+                            loadResourceDefaults(yamlConfiguration, "config" + File.separator + file.getName());
                         }
                         else {
                             warningMessage("Unable to load config " + file.getName());
@@ -700,22 +700,22 @@ public class Graves extends JavaPlugin {
             }
         }
 
-        return fileConfiguration;
+        return yamlConfiguration;
     }
 
-    private FileConfiguration getConfigFile(File file) {
-        FileConfiguration fileConfiguration = null;
-
-        if (YAMLUtil.isValidYAML(file)) {
-            try {
-                fileConfiguration = YamlConfiguration.loadConfiguration(file);
-            }
-            catch (IllegalArgumentException exception) {
-                exception.printStackTrace();
-            }
+    private @Nullable FileConfiguration getConfigFile(File file) {
+        if (!YAMLUtil.isValidYAML(file)) {
+            return null;
         }
 
-        return fileConfiguration;
+        try {
+            return YamlConfiguration.loadConfiguration(file);
+        }
+        catch (IllegalArgumentException exception) {
+            exception.printStackTrace();
+        }
+
+        return null;
     }
 
     @Contract(" -> new")

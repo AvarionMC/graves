@@ -8,7 +8,6 @@ load: POSTWORLD
 
 loadbefore:
   - GriefPrevention
-  - GriefDefender
   - Towny
 
 softdepend:
@@ -16,7 +15,6 @@ softdepend:
   - ProtocolLib
   - WorldEdit
   - WorldGuard
-  - GriefDefender
   - PlaceholderAPI
   - FurnitureLib
   - FurnitureEngine

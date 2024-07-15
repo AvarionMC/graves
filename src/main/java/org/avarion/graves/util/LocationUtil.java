@@ -10,6 +10,10 @@ import java.util.List;
 
 public final class LocationUtil {
 
+    private LocationUtil() {
+        // Don't do anything here
+    }
+
     @Contract("_ -> new")
     public static @NotNull Location roundLocation(@NotNull Location location) {
         return new Location(location.getWorld(), Math.round(location.getBlockX()), Math.round(location.getY()), Math.round(location.getBlockZ()));

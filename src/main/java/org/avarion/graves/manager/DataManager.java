@@ -22,14 +22,13 @@ import java.util.*;
 public final class DataManager {
 
     private final Graves plugin;
-    private Type type = DataManager.Type.SQLITE;
     private String url;
     private Connection connection;
 
     public DataManager(Graves plugin) {
         this.plugin = plugin;
 
-        loadType(type);
+        loadSQLiteDriver();
         load();
     }
 
@@ -94,36 +93,23 @@ public final class DataManager {
     }
 
     public void reload() {
-        reload(type);
-    }
-
-    public void reload(Type type) {
         closeConnection();
-        loadType(type);
+        loadSQLiteDriver();
         load();
     }
 
-    public void loadType(Type type) {
-        this.type = type;
+    public void loadSQLiteDriver() {
+        migrateRootDataSubData();
 
-        if (type == Type.MYSQL) {  // TODO MYSQL
-            this.url = null;
+        this.url = "jdbc:sqlite:" + plugin.getDataFolder() + File.separator + "data" + File.separator + "data.db";
 
-            ClassUtil.loadClass("com.mysql.jdbc.Driver");
-        }
-        else {
-            migrateRootDataSubData();
-
-            this.url = "jdbc:sqlite:" + plugin.getDataFolder() + File.separator + "data" + File.separator + "data.db";
-
-            ClassUtil.loadClass("org.sqlite.JDBC");
-            executeUpdate("PRAGMA journal_mode=" + plugin.getConfig()
-                                                         .getString("settings.storage.sqlite.journal-mode", "WAL")
-                                                         .toUpperCase() + ";");
-            executeUpdate("PRAGMA synchronous=" + plugin.getConfig()
-                                                        .getString("settings.storage.sqlite.synchronous", "OFF")
-                                                        .toUpperCase() + ";");
-        }
+        ClassUtil.loadClass("org.sqlite.JDBC");
+        executeUpdate("PRAGMA journal_mode=" + plugin.getConfig()
+                                                     .getString("settings.storage.sqlite.journal-mode", "WAL")
+                                                     .toUpperCase() + ";");
+        executeUpdate("PRAGMA synchronous=" + plugin.getConfig()
+                                                    .getString("settings.storage.sqlite.synchronous", "OFF")
+                                                    .toUpperCase() + ";");
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -169,12 +155,7 @@ public final class DataManager {
         List<String> columnList = new ArrayList<>();
         ResultSet resultSet;
 
-        if (type == Type.MYSQL) {
-            resultSet = null; // TODO MYSQL
-        }
-        else {
-            resultSet = executeQuery("PRAGMA table_info(" + tableName + ");");
-        }
+        resultSet = executeQuery("PRAGMA table_info(" + tableName + ");");
 
         if (resultSet != null) {
             try {
@@ -781,7 +762,7 @@ public final class DataManager {
     }
 
     public enum Type {
-        SQLITE, MYSQL
+        SQLITE
     }
 
 }

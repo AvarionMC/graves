@@ -247,10 +247,8 @@ public final class PlaceholderAPI extends PlaceholderExpansion implements Relati
             return "";
         }
 
-        if (player != null) {
-            if (identifier.equals("count")) {
-                return String.valueOf(plugin.getGraveManager().getGraveCount(player));
-            }
+        if (player != null && identifier.equals("count")) {
+            return String.valueOf(plugin.getGraveManager().getGraveCount(player));
         }
 
         return null;
@@ -258,7 +256,7 @@ public final class PlaceholderAPI extends PlaceholderExpansion implements Relati
 
     @Override
     public String onPlaceholderRequest(Player playerOne, Player playerTwo, String identifier) {
-        return onPlaceholderRequest(playerOne, identifier); // TODO
+        return onPlaceholderRequest(playerOne, identifier);
     }
 
 }
