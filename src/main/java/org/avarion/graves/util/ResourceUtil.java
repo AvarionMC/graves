@@ -16,6 +16,11 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 public final class ResourceUtil {
+
+    private ResourceUtil() {
+        // Don't do anything here
+    }
+
     public static void copyResources(String inputPath, String outputPath, JavaPlugin plugin) {
         copyResources(inputPath, outputPath, true, plugin);
     }
