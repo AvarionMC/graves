@@ -108,7 +108,6 @@ public final class ResourceUtil {
                             outputStream.write(bytes, 0, len);
                         }
 
-                        outputStream.close();
                         inputStream.close();
                     }
                     catch (IOException ignored) {
