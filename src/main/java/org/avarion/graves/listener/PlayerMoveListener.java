@@ -28,44 +28,44 @@ public class PlayerMoveListener implements Listener {
     public void onPlayerMove(@NotNull PlayerMoveEvent event) {
         Player player = event.getPlayer();
 
-        if (player.getGameMode() != GameMode.SPECTATOR) {
-            if (event.getTo() != null && (event.getTo().getBlockX() != event.getFrom().getBlockX()
-                                          || event.getTo().getBlockY() != event.getFrom().getBlockY()
-                                          || event.getTo().getBlockZ() != event.getFrom().getBlockZ())) {
-                Location location = LocationUtil.roundLocation(player.getLocation());
+        if (player.getGameMode() == GameMode.SPECTATOR || event.getTo() == null || event.getTo()
+                                                                                        .toVector()
+                                                                                        .equals(event.getFrom()
+                                                                                                     .toVector())) {
+            return;
+        }
 
-                if (plugin.getLocationManager().isInsideBorder(location)
-                    && location.getBlock()
-                               .getRelative(BlockFace.DOWN)
-                               .getType()
-                               .isSolid()
-                    && plugin.getLocationManager().isLocationSafePlayer(location)) {
-                    plugin.getLocationManager().setLastSolidLocation(player, location.clone());
-                }
+        Location location = LocationUtil.roundLocation(player.getLocation());
 
-                if (location.getWorld() != null && plugin.getDataManager().hasChunkData(location)) {
-                    ChunkData chunkData = plugin.getDataManager().getChunkData(location);
-                    BlockData blockData = null;
+        if (plugin.getLocationManager().isInsideBorder(location) && location.getBlock()
+                                                                            .getRelative(BlockFace.DOWN)
+                                                                            .getType()
+                                                                            .isSolid() && plugin.getLocationManager()
+                                                                                                .isLocationSafePlayer(location)) {
+            plugin.getLocationManager().setLastSolidLocation(player, location.clone());
+        }
 
-                    if (chunkData.getBlockDataMap().containsKey(location)) {
-                        blockData = chunkData.getBlockDataMap().get(location);
-                    }
-                    else if (chunkData.getBlockDataMap().containsKey(location.clone().add(0, 1, 0))) {
-                        blockData = chunkData.getBlockDataMap().get(location.clone().add(0, 1, 0));
-                    }
-                    else if (chunkData.getBlockDataMap().containsKey(location.clone().subtract(0, 1, 0))) {
-                        blockData = chunkData.getBlockDataMap().get(location.clone().subtract(0, 1, 0));
-                    }
+        if (location.getWorld() != null && plugin.getDataManager().hasChunkData(location)) {
+            ChunkData chunkData = plugin.getDataManager().getChunkData(location);
+            BlockData blockData = null;
 
-                    if (blockData != null && CacheManager.graveMap.containsKey(blockData.graveUUID())) {
-                        Grave grave = CacheManager.graveMap.get(blockData.graveUUID());
+            if (chunkData.getBlockDataMap().containsKey(location)) {
+                blockData = chunkData.getBlockDataMap().get(location);
+            }
+            else if (chunkData.getBlockDataMap().containsKey(location.clone().add(0, 1, 0))) {
+                blockData = chunkData.getBlockDataMap().get(location.clone().add(0, 1, 0));
+            }
+            else if (chunkData.getBlockDataMap().containsKey(location.clone().subtract(0, 1, 0))) {
+                blockData = chunkData.getBlockDataMap().get(location.clone().subtract(0, 1, 0));
+            }
 
-                        if (grave != null && plugin.getConfigBool("block.walk-over", grave) && plugin.getEntityManager()
-                                                                                                     .canOpenGrave(player, grave)) {
-                            plugin.getGraveManager().cleanupCompasses(player, grave);
-                            plugin.getGraveManager().autoLootGrave(event.getPlayer(), location, grave);
-                        }
-                    }
+            if (blockData != null && CacheManager.graveMap.containsKey(blockData.graveUUID())) {
+                Grave grave = CacheManager.graveMap.get(blockData.graveUUID());
+
+                if (grave != null && plugin.getConfigBool("block.walk-over", grave) && plugin.getEntityManager()
+                                                                                             .canOpenGrave(player, grave)) {
+                    plugin.getGraveManager().cleanupCompasses(player, grave);
+                    plugin.getGraveManager().autoLootGrave(event.getPlayer(), location, grave);
                 }
             }
         }
