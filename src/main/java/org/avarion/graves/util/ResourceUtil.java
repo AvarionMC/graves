@@ -115,8 +115,6 @@ public final class ResourceUtil {
         }
     }
 
-}
-
     private static boolean createDirectories(@NotNull File file) {
         File parentFile = file.getParentFile();
 
