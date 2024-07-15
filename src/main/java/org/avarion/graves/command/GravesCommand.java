@@ -469,66 +469,73 @@ public final class GravesCommand implements CommandExecutor, TabCompleter {
         List<String> stringList = new ArrayList<>();
 
         if (args.length == 1) {
-            stringList.add("help");
-
-            if (commandSender.hasPermission("graves.gui")) {
-                stringList.add("list");
-                stringList.add("gui");
-            }
-
-            if (commandSender.hasPermission("graves.reload")) {
-                stringList.add("reload");
-            }
-
-            if (commandSender.hasPermission("graves.dump")) {
-                stringList.add("dump");
-            }
-
-            if (commandSender.hasPermission("graves.debug")) {
-                stringList.add("debug");
-            }
-
-            if (commandSender.hasPermission("graves.cleanup")) {
-                stringList.add("cleanup");
-            }
-
-            if (commandSender.hasPermission("graves.purge")) {
-                stringList.add("purge");
-            }
-
-            if (plugin.getRecipeManager() != null && commandSender.hasPermission("graves.givetoken")) {
-                stringList.add("givetoken");
-            }
+            addCompletionForOneArgument(commandSender, stringList);
         }
         else if (args.length > 1) {
-            if ((args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("gui"))
-                && commandSender.hasPermission("graves.gui.other")) {
-                plugin.getServer().getOnlinePlayers().forEach((player -> stringList.add(player.getName())));
-            }
-            else if (args[0].equals("debug") && commandSender.hasPermission("graves.debug")) {
-                stringList.add("0");
-                stringList.add("1");
-                stringList.add("2");
-            }
-            else if (args[0].equals("purge") && commandSender.hasPermission("graves.purge")) {
-                if (args.length == 2) {
-                    stringList.add("graves");
-                    stringList.add("holograms");
-                }
-            }
-            else if (plugin.getRecipeManager() != null
-                     && args[0].equalsIgnoreCase("givetoken")
-                     && commandSender.hasPermission("graves.givetoken")) {
-                if (args.length == 2) {
-                    plugin.getServer().getOnlinePlayers().forEach((player -> stringList.add(player.getName())));
-                }
-                else if (args.length == 3) {
-                    stringList.addAll(plugin.getRecipeManager().getTokenList());
-                }
-            }
+            addCompletionForMultipleArguments(commandSender, args, stringList);
         }
 
         return stringList;
     }
 
+    private void addCompletionForMultipleArguments(@NotNull CommandSender commandSender, @NotNull String @NotNull [] args, List<String> stringList) {
+        if ((args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("gui"))
+            && commandSender.hasPermission("graves.gui.other")) {
+            plugin.getServer().getOnlinePlayers().forEach((player -> stringList.add(player.getName())));
+        }
+        else if (args[0].equals("debug") && commandSender.hasPermission("graves.debug")) {
+            stringList.add("0");
+            stringList.add("1");
+            stringList.add("2");
+        }
+        else if (args[0].equals("purge") && commandSender.hasPermission("graves.purge")) {
+            if (args.length == 2) {
+                stringList.add("graves");
+                stringList.add("holograms");
+            }
+        }
+        else if (plugin.getRecipeManager() != null
+                 && args[0].equalsIgnoreCase("givetoken")
+                 && commandSender.hasPermission("graves.givetoken")) {
+            if (args.length == 2) {
+                plugin.getServer().getOnlinePlayers().forEach((player -> stringList.add(player.getName())));
+            }
+            else if (args.length == 3) {
+                stringList.addAll(plugin.getRecipeManager().getTokenList());
+            }
+        }
+    }
+
+    private void addCompletionForOneArgument(@NotNull CommandSender commandSender, @NotNull List<String> stringList) {
+        stringList.add("help");
+
+        if (commandSender.hasPermission("graves.gui")) {
+            stringList.add("list");
+            stringList.add("gui");
+        }
+
+        if (commandSender.hasPermission("graves.reload")) {
+            stringList.add("reload");
+        }
+
+        if (commandSender.hasPermission("graves.dump")) {
+            stringList.add("dump");
+        }
+
+        if (commandSender.hasPermission("graves.debug")) {
+            stringList.add("debug");
+        }
+
+        if (commandSender.hasPermission("graves.cleanup")) {
+            stringList.add("cleanup");
+        }
+
+        if (commandSender.hasPermission("graves.purge")) {
+            stringList.add("purge");
+        }
+
+        if (plugin.getRecipeManager() != null && commandSender.hasPermission("graves.givetoken")) {
+            stringList.add("givetoken");
+        }
+    }
 }
