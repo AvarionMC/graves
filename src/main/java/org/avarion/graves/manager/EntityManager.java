@@ -114,14 +114,12 @@ public final class EntityManager extends EntityDataManager {
     }
 
     public UUID getGraveUUIDFromItemStack(ItemStack itemStack) {
-        if (itemStack != null && itemStack.getItemMeta() != null) {
-            if (itemStack.getItemMeta()
+        if (itemStack != null && itemStack.getItemMeta() != null && itemStack.getItemMeta()
                          .getPersistentDataContainer()
                          .has(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING)) {
                 return UUIDUtil.getUUID(itemStack.getItemMeta()
                                                  .getPersistentDataContainer()
                                                  .get(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING));
-            }
         }
 
         return null;
@@ -463,9 +461,11 @@ public final class EntityManager extends EntityDataManager {
 
                 return true;
             }
-        }
 
-        return false;
+            default -> {
+                return false;
+            }
+        }
     }
 
     public boolean canOpenGrave(Player player, @NotNull Grave grave) {
