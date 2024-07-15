@@ -703,19 +703,19 @@ public class Graves extends JavaPlugin {
         return yamlConfiguration;
     }
 
-    private FileConfiguration getConfigFile(File file) {
-        FileConfiguration fileConfiguration = null;
-
-        if (YAMLUtil.isValidYAML(file)) {
-            try {
-                fileConfiguration = YamlConfiguration.loadConfiguration(file);
-            }
-            catch (IllegalArgumentException exception) {
-                exception.printStackTrace();
-            }
+    private @Nullable FileConfiguration getConfigFile(File file) {
+        if (!YAMLUtil.isValidYAML(file)) {
+            return null;
         }
 
-        return fileConfiguration;
+        try {
+            return YamlConfiguration.loadConfiguration(file);
+        }
+        catch (IllegalArgumentException exception) {
+            exception.printStackTrace();
+        }
+
+        return null;
     }
 
     @Contract(" -> new")
