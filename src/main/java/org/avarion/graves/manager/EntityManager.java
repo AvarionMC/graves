@@ -115,11 +115,11 @@ public final class EntityManager extends EntityDataManager {
 
     public UUID getGraveUUIDFromItemStack(ItemStack itemStack) {
         if (itemStack != null && itemStack.getItemMeta() != null && itemStack.getItemMeta()
-                         .getPersistentDataContainer()
-                         .has(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING)) {
-                return UUIDUtil.getUUID(itemStack.getItemMeta()
-                                                 .getPersistentDataContainer()
-                                                 .get(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING));
+                                                                             .getPersistentDataContainer()
+                                                                             .has(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING)) {
+            return UUIDUtil.getUUID(itemStack.getItemMeta()
+                                             .getPersistentDataContainer()
+                                             .get(new NamespacedKey(plugin, "graveUUID"), PersistentDataType.STRING));
         }
 
         return null;
@@ -584,11 +584,8 @@ public final class EntityManager extends EntityDataManager {
                     ((Mob) livingEntity).setTarget(targetEntity);
                 }
 
-                if (livingEntity instanceof Zombie zombie) {
-
-                    if (zombie.isBaby()) {
-                        zombie.setBaby(false);
-                    }
+                if (livingEntity instanceof Zombie zombie && zombie.isBaby()) {
+                    zombie.setBaby(false);
                 }
             }
 

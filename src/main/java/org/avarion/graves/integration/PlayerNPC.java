@@ -53,7 +53,8 @@ public final class PlayerNPC extends EntityDataManager {
     public void createCorpses() {
         for (ChunkData chunkData : CacheManager.chunkMap.values()) {
             for (EntityData entityData : chunkData.getEntityDataMap().values()) {
-                if (entityData.getType() == EntityData.Type.PLAYERNPC && CacheManager.graveMap.containsKey(entityData.getUUIDGrave())) {
+                if (entityData.getType() == EntityData.Type.PLAYERNPC
+                    && CacheManager.graveMap.containsKey(entityData.getUUIDGrave())) {
                     Grave grave = CacheManager.graveMap.get(entityData.getUUIDGrave());
 
                     if (grave != null) {
