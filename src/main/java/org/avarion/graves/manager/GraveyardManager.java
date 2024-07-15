@@ -128,7 +128,6 @@ public final class GraveyardManager {
             }
 
             player.sendMessage("stop modifying graveyard " + graveyard.getName());
-            // TODO SAVE GRAVEYARD
         }
     }
 
