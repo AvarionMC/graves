@@ -63,25 +63,29 @@ public final class WorldEdit {
         File schematicsFile = new File(plugin.getDataFolder() + File.separator + "schematics");
         File[] listFiles = schematicsFile.listFiles();
 
-        if (listFiles != null) {
-            for (File file : listFiles) {
-                if (file.isFile() && file.getName().contains(".schem")) {
-                    String name = file.getName().toLowerCase().replace(".schematic", "").replace(".schem", "");
-                    ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(file);
+        if (listFiles == null) {
+            return;
+        }
 
-                    if (clipboardFormat != null) {
-                        try (ClipboardReader clipboardReader = clipboardFormat.getReader(new FileInputStream(file))) {
-                            stringClipboardMap.put(name, clipboardReader.read());
-                            plugin.debugMessage("Loading schematic " + name, 1);
-                        }
-                        catch (IOException exception) {
-                            exception.printStackTrace();
-                        }
-                    }
-                    else {
-                        plugin.warningMessage("Unable to load schematic " + name);
-                    }
-                }
+        for (File file : listFiles) {
+            if (!file.isFile() || !file.getName().contains(".schem")) {
+                continue;
+            }
+
+            String name = file.getName().toLowerCase().replace(".schematic", "").replace(".schem", "");
+            ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(file);
+
+            if (clipboardFormat == null) {
+                plugin.warningMessage("Unable to load schematic " + name);
+                continue;
+            }
+
+            try (ClipboardReader clipboardReader = clipboardFormat.getReader(new FileInputStream(file))) {
+                stringClipboardMap.put(name, clipboardReader.read());
+                plugin.debugMessage("Loading schematic " + name, 1);
+            }
+            catch (IOException exception) {
+                exception.printStackTrace();
             }
         }
     }
