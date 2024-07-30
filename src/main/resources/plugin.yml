@@ -7,7 +7,6 @@ author: Ranull, svaningelgem
 load: POSTWORLD
 
 loadbefore:
-  - GriefPrevention
   - Towny
 
 softdepend:
