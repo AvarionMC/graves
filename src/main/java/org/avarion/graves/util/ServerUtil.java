@@ -13,6 +13,10 @@ import java.util.stream.Collectors;
 
 public final class ServerUtil {
 
+    private ServerUtil() {
+        // Don't do anything here
+    }
+
     public static @NotNull String getServerDumpInfo(@NotNull Graves plugin) {
         List<String> stringList = new ArrayList<>();
 
