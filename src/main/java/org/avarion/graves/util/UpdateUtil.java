@@ -12,6 +12,10 @@ import java.net.URL;
 import java.util.Scanner;
 
 public class UpdateUtil {
+    private UpdateUtil() {
+
+    }
+
     public static void run(Graves plugin, int pluginId) {
         Version lastVersion = getLatestVersion(pluginId);
         if (lastVersion == null) {
