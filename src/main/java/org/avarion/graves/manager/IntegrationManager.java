@@ -1,6 +1,6 @@
 package org.avarion.graves.manager;
 
-import net.coreprotect.CoreProtect;
+import io.th0rgal.oraxen.api.OraxenItems;
 import net.milkbowl.vault.economy.Economy;
 import org.avarion.graves.Graves;
 import org.avarion.graves.integration.*;
@@ -447,10 +447,19 @@ public final class IntegrationManager {
     }
 
     private void loadOraxen() {
+        oraxen = null;
+
         if (plugin.getConfig().getBoolean("settings.integration.oraxen.enabled")) {
             Plugin oraxenPlugin = plugin.getServer().getPluginManager().getPlugin("Oraxen");
 
             if (oraxenPlugin != null && oraxenPlugin.isEnabled()) {
+                final String name = plugin.getConfig("oraxen.furniture.name", null, null)
+                                          .getString("oraxen.furniture.name");
+                if (!OraxenItems.exists(name)) {
+                    plugin.integrationMessage("Item '" + name + "' not found.");
+                    return;
+                }
+
                 oraxen = new Oraxen(plugin, oraxenPlugin);
 
                 plugin.integrationMessage("Hooked into "
@@ -460,9 +469,6 @@ public final class IntegrationManager {
                                                         .getVersion()
                                           + ".");
             }
-        }
-        else {
-            oraxen = null;
         }
     }
 
@@ -593,12 +599,12 @@ public final class IntegrationManager {
         }
 
         Plugin cpPlugin = plugin.getServer().getPluginManager().getPlugin("CoreProtect");
-        if ( cpPlugin == null || !cpPlugin.isEnabled()) {
+        if (cpPlugin == null || !cpPlugin.isEnabled()) {
             return;
         }
 
         var cpVersion = new Version(cpPlugin.getDescription().getVersion());
-        if ( cpVersion.major < 22 || (cpVersion.major == 22 && cpVersion.minor < 4) ) {
+        if (cpVersion.major < 22 || (cpVersion.major == 22 && cpVersion.minor < 4)) {
             plugin.getLogger()
                   .warning("CoreProtect integration needs at least CoreProtect v22.4+, you have: "
                            + cpPlugin.getDescription().getVersion());

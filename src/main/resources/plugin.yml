@@ -27,6 +27,7 @@ softdepend:
   - ItemBridge
   - PlayerNPC
   - Skript
+  - CoreProtect
 
 commands:
   graves:

@@ -1,5 +1,6 @@
 package org.avarion.graves.integration;
 
+import io.th0rgal.oraxen.api.OraxenFurniture;
 import io.th0rgal.oraxen.mechanics.MechanicFactory;
 import io.th0rgal.oraxen.mechanics.MechanicsManager;
 import io.th0rgal.oraxen.mechanics.provided.gameplay.furniture.FurnitureMechanic;
@@ -81,36 +82,39 @@ public final class Oraxen extends EntityDataManager {
     }
 
     public void createFurniture(Location location, Grave grave) {
-        if (plugin.getConfigBool("oraxen.furniture.enabled", grave)) {
-            try {
-                String name = plugin.getConfigString("oraxen.furniture.name", grave, "");
-                FurnitureMechanic furnitureMechanic = getFurnitureMechanic(name);
+        if (!plugin.getConfigBool("oraxen.furniture.enabled", grave)) {
+            return;
+        }
 
-                if (furnitureMechanic != null && location.getWorld() != null) {
-                    location.getBlock().setType(Material.AIR);
+        try {
+            String name = plugin.getConfigString("oraxen.furniture.name", grave, "");
+            FurnitureMechanic furnitureMechanic = getFurnitureMechanic(name);
 
-                    Entity entity = furnitureMechanic.place(location, location.getYaw(), BlockFace.UP);
-                    if (entity != null) {
-                        createEntityData(location, entity.getUniqueId(), grave.getUUID(), EntityData.Type.ORAXEN);
-                        plugin.debugMessage("Placing Oraxen furniture for "
-                                            + grave.getUUID()
-                                            + " at "
-                                            + location.getWorld().getName()
-                                            + ", "
-                                            + (location.getBlockX() + 0.5)
-                                            + "x, "
-                                            + (location.getBlockY() + 0.5)
-                                            + "y, "
-                                            + (location.getBlockZ() + 0.5)
-                                            + "z", 1);
-                    }
+            if (furnitureMechanic != null && location.getWorld() != null) {
+                location.getBlock().setType(Material.AIR);
+
+                Entity entity = furnitureMechanic.place(location, location.getYaw(), BlockFace.UP);
+                if (entity != null) {
+                    createEntityData(location, entity.getUniqueId(), grave.getUUID(), EntityData.Type.ORAXEN);
+                    plugin.debugMessage("Placing Oraxen furniture for "
+                                        + grave.getUUID()
+                                        + " at "
+                                        + location.getWorld()
+                                                  .getName()
+                                        + ", "
+                                        + (location.getBlockX() + 0.5)
+                                        + "x, "
+                                        + (location.getBlockY() + 0.5)
+                                        + "y, "
+                                        + (location.getBlockZ() + 0.5)
+                                        + "z", 1);
                 }
             }
-            catch (NoSuchMethodError ignored) {
-                plugin.warningMessage("This version of Minecraft does not support "
-                                      + oraxenPlugin.getName()
-                                      + " furniture");
-            }
+        }
+        catch (NoSuchMethodError ignored) {
+            plugin.warningMessage("This version of Minecraft does not support "
+                                  + oraxenPlugin.getName()
+                                  + " furniture");
         }
     }
 
