@@ -11,12 +11,12 @@ import java.util.UUID;
 public class GraveList implements InventoryHolder {
 
     private final UUID uuid;
-    private final List<Grave> graveList;
+    private final List<Grave> items;
     private Inventory inventory;
 
     public GraveList(UUID uuid, List<Grave> graveList) {
         this.uuid = uuid;
-        this.graveList = graveList;
+        this.items = graveList;
     }
 
     @NotNull
@@ -34,7 +34,7 @@ public class GraveList implements InventoryHolder {
     }
 
     public Grave getGrave(int slot) {
-        return slot >= 0 && graveList.size() > slot ? graveList.get(slot) : null;
+        return slot >= 0 && items.size() > slot ? items.get(slot) : null;
     }
 
 }

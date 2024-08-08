@@ -8,6 +8,10 @@ import org.jetbrains.annotations.NotNull;
 
 public final class BlockFaceUtil {
 
+    private BlockFaceUtil() {
+        // Don't do anything here
+    }
+
     @Contract(pure = true)
     public static BlockFace getSimpleBlockFace(@NotNull BlockFace blockFace) {
         return switch (blockFace) {

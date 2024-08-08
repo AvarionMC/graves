@@ -25,20 +25,20 @@ import java.util.List;
 public final class WorldGuard {
 
     private final JavaPlugin plugin;
-    private final com.sk89q.worldguard.WorldGuard worldGuard;
+    private final com.sk89q.worldguard.WorldGuard libInstance;
     private final StateFlag createFlag;
     private final StateFlag teleportFlag;
 
     public WorldGuard(JavaPlugin plugin) {
         this.plugin = plugin;
-        this.worldGuard = com.sk89q.worldguard.WorldGuard.getInstance();
+        this.libInstance = com.sk89q.worldguard.WorldGuard.getInstance();
         this.createFlag = getFlag("graves-create");
         this.teleportFlag = getFlag("graves-teleport");
     }
 
     private @Nullable StateFlag getFlag(String string) {
         if (plugin.getServer().getPluginManager().isPluginEnabled("WorldGuard")) {
-            Flag<?> flag = worldGuard.getFlagRegistry().get(string);
+            Flag<?> flag = libInstance.getFlagRegistry().get(string);
 
             if (flag instanceof StateFlag) {
                 return (StateFlag) flag;
@@ -48,12 +48,12 @@ public final class WorldGuard {
             try {
                 StateFlag flag = new StateFlag(string, true);
 
-                worldGuard.getFlagRegistry().register(flag);
+                libInstance.getFlagRegistry().register(flag);
 
                 return flag;
             }
             catch (FlagConflictException exception) {
-                Flag<?> flag = worldGuard.getFlagRegistry().get(string);
+                Flag<?> flag = libInstance.getFlagRegistry().get(string);
 
                 if (flag instanceof StateFlag) {
                     return (StateFlag) flag;
@@ -66,9 +66,9 @@ public final class WorldGuard {
 
     public boolean hasCreateGrave(@NotNull Location location) {
         if (location.getWorld() != null && createFlag != null) {
-            RegionManager regionManager = worldGuard.getPlatform()
-                                                    .getRegionContainer()
-                                                    .get(BukkitAdapter.adapt(location.getWorld()));
+            RegionManager regionManager = libInstance.getPlatform()
+                                                     .getRegionContainer()
+                                                     .get(BukkitAdapter.adapt(location.getWorld()));
 
             if (regionManager != null) {
                 ApplicableRegionSet applicableRegions = regionManager.getApplicableRegions(BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
@@ -85,37 +85,37 @@ public final class WorldGuard {
     }
 
     public boolean canCreateGrave(Entity entity, Location location) {
-        return entity instanceof Player && createFlag != null && worldGuard.getPlatform()
-                                                                           .getRegionContainer()
-                                                                           .createQuery()
-                                                                           .testState(BukkitAdapter.adapt(location), WorldGuardPlugin.inst()
-                                                                                                                                     .wrapPlayer((Player) entity), createFlag);
+        return entity instanceof Player && createFlag != null && libInstance.getPlatform()
+                                                                            .getRegionContainer()
+                                                                            .createQuery()
+                                                                            .testState(BukkitAdapter.adapt(location), WorldGuardPlugin.inst()
+                                                                                                                                      .wrapPlayer((Player) entity), createFlag);
     }
 
     public boolean canCreateGrave(Location location) {
-        return createFlag != null && worldGuard.getPlatform()
-                                               .getRegionContainer()
-                                               .createQuery()
-                                               .testState(BukkitAdapter.adapt(location), (RegionAssociable) null, createFlag);
+        return createFlag != null && libInstance.getPlatform()
+                                                .getRegionContainer()
+                                                .createQuery()
+                                                .testState(BukkitAdapter.adapt(location), (RegionAssociable) null, createFlag);
     }
 
     public boolean canTeleport(Entity entity, Location location) {
-        return entity instanceof Player && createFlag != null && worldGuard.getPlatform()
-                                                                           .getRegionContainer()
-                                                                           .createQuery()
-                                                                           .testState(BukkitAdapter.adapt(location), WorldGuardPlugin.inst()
-                                                                                                                                     .wrapPlayer((Player) entity), teleportFlag);
+        return entity instanceof Player && createFlag != null && libInstance.getPlatform()
+                                                                            .getRegionContainer()
+                                                                            .createQuery()
+                                                                            .testState(BukkitAdapter.adapt(location), WorldGuardPlugin.inst()
+                                                                                                                                      .wrapPlayer((Player) entity), teleportFlag);
     }
 
     public boolean canTeleport(Location location) {
-        return createFlag != null && worldGuard.getPlatform()
-                                               .getRegionContainer()
-                                               .createQuery()
-                                               .testState(BukkitAdapter.adapt(location), (RegionAssociable) null, teleportFlag);
+        return createFlag != null && libInstance.getPlatform()
+                                                .getRegionContainer()
+                                                .createQuery()
+                                                .testState(BukkitAdapter.adapt(location), (RegionAssociable) null, teleportFlag);
     }
 
     public @Nullable World getRegionWorld(String region) {
-        for (RegionManager regionManager : worldGuard.getPlatform().getRegionContainer().getLoaded()) {
+        for (RegionManager regionManager : libInstance.getPlatform().getRegionContainer().getLoaded()) {
             if (regionManager.getRegions().containsKey(region)) {
                 return plugin.getServer().getWorld(regionManager.getName());
             }
@@ -125,7 +125,7 @@ public final class WorldGuard {
     }
 
     public boolean isMember(String region, Player player) {
-        for (RegionManager regionManager : worldGuard.getPlatform().getRegionContainer().getLoaded()) {
+        for (RegionManager regionManager : libInstance.getPlatform().getRegionContainer().getLoaded()) {
             if (regionManager.getRegions().containsKey(region)) {
                 ProtectedRegion protectedRegion = regionManager.getRegion(region);
 
@@ -140,9 +140,9 @@ public final class WorldGuard {
 
     public boolean isInsideRegion(@NotNull Location location, String region) {
         if (location.getWorld() != null) {
-            RegionManager regionManager = worldGuard.getPlatform()
-                                                    .getRegionContainer()
-                                                    .get(BukkitAdapter.adapt(location.getWorld()));
+            RegionManager regionManager = libInstance.getPlatform()
+                                                     .getRegionContainer()
+                                                     .get(BukkitAdapter.adapt(location.getWorld()));
 
             if (regionManager != null) {
                 ApplicableRegionSet applicableRegions = regionManager.getApplicableRegions(BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
@@ -159,9 +159,9 @@ public final class WorldGuard {
     }
 
     public @Nullable Location calculateRoughLocation(@NotNull Graveyard graveyard) {
-        RegionManager regionManager = worldGuard.getPlatform()
-                                                .getRegionContainer()
-                                                .get(BukkitAdapter.adapt(graveyard.getWorld()));
+        RegionManager regionManager = libInstance.getPlatform()
+                                                 .getRegionContainer()
+                                                 .get(BukkitAdapter.adapt(graveyard.getWorld()));
 
         if (regionManager != null) {
             ProtectedRegion protectedRegion = regionManager.getRegion(graveyard.getName());
@@ -185,9 +185,9 @@ public final class WorldGuard {
         List<String> regionNameList = new ArrayList<>();
 
         if (location.getWorld() != null) {
-            RegionManager regionManager = worldGuard.getPlatform()
-                                                    .getRegionContainer()
-                                                    .get(BukkitAdapter.adapt(location.getWorld()));
+            RegionManager regionManager = libInstance.getPlatform()
+                                                     .getRegionContainer()
+                                                     .get(BukkitAdapter.adapt(location.getWorld()));
 
             if (regionManager != null) {
                 ApplicableRegionSet applicableRegions = regionManager.getApplicableRegions(BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ()));

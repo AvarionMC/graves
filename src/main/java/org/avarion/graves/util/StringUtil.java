@@ -18,7 +18,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class StringUtil {
+
     private static final Pattern hexColorPattern = Pattern.compile("&#[a-fA-F0-9]{6}");
+
+    private StringUtil() {
+        // Don't do anything here
+    }
 
     public static String format(@NotNull String string) {
         return capitalizeFully(string.replace("_", " "));

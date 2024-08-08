@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 public final class ItemBridge implements ItemBridgeListener {
 
     private final Graves plugin;
-    private com.jojodmo.itembridge.ItemBridge itemBridge;
+    private com.jojodmo.itembridge.ItemBridge libInstance;
 
     public ItemBridge(Graves plugin) {
         this.plugin = plugin;
@@ -20,15 +20,15 @@ public final class ItemBridge implements ItemBridgeListener {
     }
 
     private void unregister() {
-        if (itemBridge != null) {
-            itemBridge.removeListener(this);
+        if (libInstance != null) {
+            libInstance.removeListener(this);
         }
     }
 
     private void register() {
-        itemBridge = new com.jojodmo.itembridge.ItemBridge(plugin, "graves", "grave");
+        libInstance = new com.jojodmo.itembridge.ItemBridge(plugin, "graves", "grave");
 
-        itemBridge.registerListener(this);
+        libInstance.registerListener(this);
     }
 
     @Override

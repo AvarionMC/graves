@@ -22,7 +22,6 @@ public final class IntegrationManager {
     private WorldEdit worldEdit;
     private WorldGuard worldGuard;
     private Towny towny;
-    private GriefDefender griefDefender;
     private FurnitureLib furnitureLib;
     private FurnitureEngine furnitureEngine;
     private ProtectionLib protectionLib;
@@ -52,7 +51,6 @@ public final class IntegrationManager {
         loadWorldEdit();
         loadWorldGuard();
         loadTowny();
-        //loadGriefDefender(); // TODO
         loadFurnitureLib();
         loadFurnitureEngine();
         loadProtectionLib();
@@ -65,7 +63,6 @@ public final class IntegrationManager {
         loadItemBridge();
         loadPlaceholderAPI();
         loadCoreProtect();
-        //loadSkript(); // TODO
         loadCompatibilityWarnings();
     }
 
@@ -117,10 +114,6 @@ public final class IntegrationManager {
 
     public Towny getTowny() {
         return towny;
-    }
-
-    public GriefDefender getGriefDefender() {
-        return griefDefender;
     }
 
     public FurnitureLib getFurnitureLib() {
@@ -185,10 +178,6 @@ public final class IntegrationManager {
 
     public boolean hasTowny() {
         return towny != null;
-    }
-
-    public boolean hasGriefDefender() {
-        return griefDefender != null;
     }
 
     public boolean hasFurnitureLib() {
@@ -370,27 +359,6 @@ public final class IntegrationManager {
         }
         else {
             worldEdit = null;
-        }
-    }
-
-    private void loadGriefDefender() {
-        if (plugin.getConfig().getBoolean("settings.integration.griefdefender.enabled")) {
-            Plugin griefDefenderPlugin = plugin.getServer().getPluginManager().getPlugin("GriefDefender");
-
-            if (griefDefenderPlugin != null && griefDefenderPlugin.isEnabled()) {
-                griefDefender = new GriefDefender();
-
-                //griefDefender.registerFlag();
-
-                plugin.integrationMessage("Hooked into "
-                                          + griefDefenderPlugin.getName()
-                                          + " "
-                                          + griefDefenderPlugin.getDescription().getVersion()
-                                          + ".");
-            }
-        }
-        else {
-            griefDefender = null;
         }
     }
 
