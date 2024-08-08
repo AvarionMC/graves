@@ -57,10 +57,16 @@ public class Graves extends JavaPlugin {
     private FileConfiguration fileConfiguration;
 
     @Override
-    public void onEnable() {
+    public void onLoad() {
         saveDefaultConfig();
 
         integrationManager = new IntegrationManager(this);
+
+        integrationManager.loadWorldGuard();
+    }
+
+    @Override
+    public void onEnable() {
         integrationManager.load();
 
         versionManager = new VersionManager();
