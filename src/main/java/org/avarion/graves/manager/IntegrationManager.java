@@ -1,11 +1,17 @@
 package org.avarion.graves.manager;
 
+import net.coreprotect.CoreProtect;
+import net.coreprotect.CoreProtectAPI;
 import net.milkbowl.vault.economy.Economy;
 import org.avarion.graves.Graves;
 import org.avarion.graves.integration.*;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
+
+class FakeCoreProtectAPI extends CoreProtectAPI {
+
+}
 
 public final class IntegrationManager {
 
@@ -27,6 +33,7 @@ public final class IntegrationManager {
     private ItemBridge itemBridge;
     private PlayerNPC playerNPC;
     private PlaceholderAPI placeholderAPI;
+    private CoreProtectAPI coreProtect = new FakeCoreProtectAPI();
 
     public IntegrationManager(Graves plugin) {
         this.plugin = plugin;
@@ -55,6 +62,7 @@ public final class IntegrationManager {
         loadPlayerNPC();
         loadItemBridge();
         loadPlaceholderAPI();
+        loadCoreProtect();
         loadCompatibilityWarnings();
     }
 
@@ -142,6 +150,10 @@ public final class IntegrationManager {
 
     public PlayerNPC getPlayerNPC() {
         return playerNPC;
+    }
+
+    public CoreProtectAPI getCoreProtect() {
+        return coreProtect;
     }
 
     public boolean hasMultiPaper() {
@@ -576,6 +588,35 @@ public final class IntegrationManager {
         else {
             placeholderAPI = null;
         }
+    }
+
+    private void loadCoreProtect() {
+        if (!plugin.getConfig().getBoolean("settings.integration.coreprotect.enabled")) {
+            return;
+        }
+
+        Plugin cpPlugin = plugin.getServer().getPluginManager().getPlugin("CoreProtect");
+
+        // Check that CoreProtect is loaded
+        if (!(cpPlugin instanceof CoreProtect)) {
+            return;
+        }
+
+        // Check that the API is enabled
+        CoreProtectAPI tmp = ((CoreProtect) cpPlugin).getAPI();
+        if (!tmp.isEnabled()) {
+            return;
+        }
+
+        // Check that a compatible version of the API is loaded
+        if (tmp.APIVersion() < 10) {
+            plugin.getLogger()
+                  .warning("CoreProtect integration needs at least CoreProtect v22.4+, you have: "
+                           + cpPlugin.getDescription().getVersion());
+            return;
+        }
+
+        coreProtect = tmp;
     }
 
     @SuppressWarnings("deprecation")
