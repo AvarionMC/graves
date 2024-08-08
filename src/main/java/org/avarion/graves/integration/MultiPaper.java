@@ -124,6 +124,7 @@ public final class MultiPaper {
         MultiLib.onString(plugin, "graves:grave_create", data -> {
             String[] dataSplit = data.split("\\|");
             Grave grave = (Grave) Base64Util.base64ToObject(dataSplit[0]);
+            @SuppressWarnings("unchecked")
             List<ItemStack> itemStackList = (List<ItemStack>) Base64Util.base64ToObject(dataSplit[1]);
 
             if (grave != null && itemStackList != null) {

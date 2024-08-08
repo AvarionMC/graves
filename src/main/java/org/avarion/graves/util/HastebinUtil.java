@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
@@ -23,7 +24,7 @@ public final class HastebinUtil {
         String pasteURLString = "https://www.toptal.com/developers/hastebin/";
 
         try {
-            URL url = new URL(urlString);
+            URL url = URI.create(urlString).toURL();
             HttpsURLConnection httpsURLConnection = (HttpsURLConnection) url.openConnection();
 
             httpsURLConnection.setDoOutput(true);

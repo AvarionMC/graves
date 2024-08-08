@@ -626,6 +626,7 @@ public final class DataManager {
                                                                  + "';"));
     }
 
+    @SuppressWarnings("unchecked")
     public @Nullable Grave resultSetToGrave(@NotNull ResultSet resultSet) {
         try {
             Grave grave = new Grave(UUID.fromString(resultSet.getString("uuid")));
