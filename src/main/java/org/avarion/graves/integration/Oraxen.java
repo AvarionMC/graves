@@ -1,6 +1,6 @@
 package org.avarion.graves.integration;
 
-import io.th0rgal.oraxen.api.OraxenFurniture;
+import io.th0rgal.oraxen.api.OraxenItems;
 import io.th0rgal.oraxen.mechanics.MechanicFactory;
 import io.th0rgal.oraxen.mechanics.MechanicsManager;
 import io.th0rgal.oraxen.mechanics.provided.gameplay.furniture.FurnitureMechanic;
@@ -174,4 +174,14 @@ public final class Oraxen extends EntityDataManager {
         return mechanicFactory != null ? (NoteBlockMechanic) mechanicFactory.getMechanic(string) : null;
     }
 
+    public boolean checkEntity() {
+        final String name = plugin.getConfig("oraxen.furniture.name", null, null).getString("oraxen.furniture.name");
+
+        if ( OraxenItems.exists(name) ) {
+            return true;
+        }
+
+        plugin.integrationMessage("[Oraxen] Item '" + name + "' not found.");
+        return false;
+    }
 }

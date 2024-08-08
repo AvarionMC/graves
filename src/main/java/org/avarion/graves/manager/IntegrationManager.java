@@ -1,13 +1,10 @@
 package org.avarion.graves.manager;
 
-import io.th0rgal.oraxen.api.OraxenItems;
-import net.milkbowl.vault.economy.Economy;
 import org.avarion.graves.Graves;
 import org.avarion.graves.integration.*;
 import org.avarion.graves.util.Version;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.RegisteredServiceProvider;
 
 public final class IntegrationManager {
 
@@ -235,27 +232,22 @@ public final class IntegrationManager {
     }
 
     private void loadVault() {
-        if (plugin.getConfig().getBoolean("settings.integration.vault.enabled")) {
-            Plugin vaultPlugin = plugin.getServer().getPluginManager().getPlugin("Vault");
+        vault = null;
 
-            if (vaultPlugin != null && vaultPlugin.isEnabled()) {
-                RegisteredServiceProvider<Economy> registeredServiceProvider = plugin.getServer()
-                                                                                     .getServicesManager()
-                                                                                     .getRegistration(Economy.class);
-
-                if (registeredServiceProvider != null) {
-                    vault = new Vault(registeredServiceProvider.getProvider());
-
-                    plugin.integrationMessage("Hooked into "
-                                              + vaultPlugin.getName()
-                                              + " "
-                                              + vaultPlugin.getDescription().getVersion()
-                                              + ".");
-                }
-            }
+        if (!plugin.getConfig().getBoolean("settings.integration.vault.enabled")) {
+            return;
         }
-        else {
-            vault = null;
+
+        Plugin vaultPlugin = plugin.getServer().getPluginManager().getPlugin("Vault");
+        if (vaultPlugin == null || !vaultPlugin.isEnabled()) {
+            return;
+        }
+
+        var tmpVault = new Vault(plugin);
+        if (tmpVault.hasServiceProvider()) {
+            plugin.integrationMessage("Hooked into " + vaultPlugin.getName() + " " + vaultPlugin.getDescription()
+                                                                                                .getVersion() + ".");
+            vault = tmpVault;
         }
     }
 
@@ -453,14 +445,11 @@ public final class IntegrationManager {
             Plugin oraxenPlugin = plugin.getServer().getPluginManager().getPlugin("Oraxen");
 
             if (oraxenPlugin != null && oraxenPlugin.isEnabled()) {
-                final String name = plugin.getConfig("oraxen.furniture.name", null, null)
-                                          .getString("oraxen.furniture.name");
-                if (!OraxenItems.exists(name)) {
-                    plugin.integrationMessage("Item '" + name + "' not found.");
+                oraxen = new Oraxen(plugin, oraxenPlugin);
+                if (!oraxen.checkEntity()) {
+                    oraxen = null;
                     return;
                 }
-
-                oraxen = new Oraxen(plugin, oraxenPlugin);
 
                 plugin.integrationMessage("Hooked into "
                                           + oraxenPlugin.getName()
