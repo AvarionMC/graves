@@ -6,6 +6,10 @@ import org.jetbrains.annotations.NotNull;
 
 public final class ColorUtil {
 
+    private ColorUtil() {
+        // Don't do anything here
+    }
+
     @Contract(pure = true)
     public static Color getColor(@NotNull String string) {
         return switch (string.toUpperCase()) {

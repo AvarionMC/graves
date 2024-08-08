@@ -1,13 +1,5 @@
 package org.avarion.graves.listener;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import org.avarion.graves.Graves;
 import org.avarion.graves.data.BlockData;
 import org.avarion.graves.event.GraveBlockPlaceEvent;
@@ -32,6 +24,8 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.EventExecutor;
 
+import java.util.*;
+
 public class EntityDeathListener implements EventExecutor {
 
     private final Graves plugin;
@@ -45,7 +39,7 @@ public class EntityDeathListener implements EventExecutor {
         if (!(initEvent instanceof EntityDeathEvent event)) {
             return;
         }
-        
+
         LivingEntity livingEntity = event.getEntity();
         String entityName = plugin.getEntityManager().getEntityName(livingEntity);
         Location location = LocationUtil.roundLocation(livingEntity.getLocation());
@@ -55,8 +49,7 @@ public class EntityDeathListener implements EventExecutor {
 
         // Removed items
         if (CacheManager.removedItemStackMap.containsKey(livingEntity.getUniqueId())) {
-            removedItemStackList.addAll(CacheManager.removedItemStackMap
-                                              .get(livingEntity.getUniqueId()));
+            removedItemStackList.addAll(CacheManager.removedItemStackMap.get(livingEntity.getUniqueId()));
             CacheManager.removedItemStackMap.remove(livingEntity.getUniqueId());
         }
 
@@ -474,8 +467,6 @@ public class EntityDeathListener implements EventExecutor {
                         int offsetZ = 0;
 
                         switch (entry.getValue()) {
-                            case DEATH -> {
-                            }
                             case NORMAL -> {
                                 offsetX = plugin.getConfigInt("placement.offset.x", grave);
                                 offsetY = plugin.getConfigInt("placement.offset.y", grave);
@@ -486,6 +477,7 @@ public class EntityDeathListener implements EventExecutor {
                                 offsetY = plugin.getConfig().getInt("settings.graveyard.offset.y");
                                 offsetZ = plugin.getConfig().getInt("settings.graveyard.offset.z");
                             }
+                            // case DEATH does nothing (ie: keeps coordinates as-is)
                         }
 
                         location.add(offsetX, offsetY, offsetZ);

@@ -9,6 +9,10 @@ import java.lang.reflect.Method;
 
 public final class ReflectionUtil {
 
+    private ReflectionUtil() {
+        // Don't do anything here
+    }
+
     public static void swingMainHand(@NotNull Player player) {
         try {
             Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);

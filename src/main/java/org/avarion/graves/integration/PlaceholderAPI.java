@@ -164,9 +164,8 @@ public final class PlaceholderAPI extends PlaceholderExpansion implements Relati
             UUID uuid = UUIDUtil.getUUID(identifier.replace("level_", ""));
 
             if (uuid != null && CacheManager.graveMap.containsKey(uuid)) {
-                return String.valueOf(ExperienceUtil.getLevelFromExperience(CacheManager.graveMap
-                                                                                  .get(uuid)
-                                                                                  .getExperience()));
+                return String.valueOf(ExperienceUtil.getLevelFromExperience(CacheManager.graveMap.get(uuid)
+                                                                                                 .getExperience()));
             }
 
             return "";
@@ -203,8 +202,7 @@ public final class PlaceholderAPI extends PlaceholderExpansion implements Relati
                 UUID uuid = UUIDUtil.getUUID(identifier.replace("time_alive_remaining_", ""));
 
                 if (uuid != null && CacheManager.graveMap.containsKey(uuid)) {
-                    return String.valueOf(CacheManager.graveMap.get(uuid).getTimeAliveRemaining()
-                                          / 1000);
+                    return String.valueOf(CacheManager.graveMap.get(uuid).getTimeAliveRemaining() / 1000);
                 }
             }
 
@@ -223,8 +221,7 @@ public final class PlaceholderAPI extends PlaceholderExpansion implements Relati
                 UUID uuid = UUIDUtil.getUUID(identifier.replace("time_protection_remaining_", ""));
 
                 if (uuid != null && CacheManager.graveMap.containsKey(uuid)) {
-                    return String.valueOf(CacheManager.graveMap.get(uuid).getTimeProtectionRemaining()
-                                          / 1000);
+                    return String.valueOf(CacheManager.graveMap.get(uuid).getTimeProtectionRemaining() / 1000);
                 }
             }
 
@@ -250,10 +247,8 @@ public final class PlaceholderAPI extends PlaceholderExpansion implements Relati
             return "";
         }
 
-        if (player != null) {
-            if (identifier.equals("count")) {
-                return String.valueOf(plugin.getGraveManager().getGraveCount(player));
-            }
+        if (player != null && identifier.equals("count")) {
+            return String.valueOf(plugin.getGraveManager().getGraveCount(player));
         }
 
         return null;
@@ -261,7 +256,7 @@ public final class PlaceholderAPI extends PlaceholderExpansion implements Relati
 
     @Override
     public String onPlaceholderRequest(Player playerOne, Player playerTwo, String identifier) {
-        return onPlaceholderRequest(playerOne, identifier); // TODO
+        return onPlaceholderRequest(playerOne, identifier);
     }
 
 }

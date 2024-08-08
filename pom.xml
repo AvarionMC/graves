@@ -170,10 +170,6 @@
             <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
         <repository>
-            <id>griefdefender-repo</id>
-            <url>https://repo.glaremasters.me/repository/bloodshot/</url>
-        </repository>
-        <repository>
             <id>jeff-media-repo</id>
             <url>https://hub.jeff-media.com/nexus/repository/jeff-media-public/</url>
         </repository>
@@ -287,7 +283,7 @@
         <dependency>
             <groupId>com.palmergames.bukkit.towny</groupId>
             <artifactId>towny</artifactId>
-            <version>0.100.3.4</version>
+            <version>0.100.3.11</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -303,15 +299,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.griefdefender</groupId>
-            <artifactId>api</artifactId>
-            <version>2.0.0-20210822.184639-9</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>com.github.SkriptLang</groupId>
             <artifactId>Skript</artifactId>
-            <version>2.9.0-pre1</version>
+            <version>2.9.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

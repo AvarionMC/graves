@@ -31,7 +31,7 @@ import java.util.UUID;
 public final class FurnitureLib extends EntityDataManager {
 
     private final Graves plugin;
-    private final de.Ste3et_C0st.FurnitureLib.main.FurnitureLib furnitureLib;
+    private final de.Ste3et_C0st.FurnitureLib.main.FurnitureLib libInstance;
     private final ProjectClickListener projectClickListener;
     private final ProjectBreakListener projectBreakListener;
 
@@ -39,7 +39,7 @@ public final class FurnitureLib extends EntityDataManager {
         super(plugin);
 
         this.plugin = plugin;
-        this.furnitureLib = de.Ste3et_C0st.FurnitureLib.main.FurnitureLib.getInstance();
+        this.libInstance = de.Ste3et_C0st.FurnitureLib.main.FurnitureLib.getInstance();
         this.projectClickListener = new ProjectClickListener(plugin, this);
         this.projectBreakListener = new ProjectBreakListener(this);
 
@@ -63,23 +63,23 @@ public final class FurnitureLib extends EntityDataManager {
     }
 
     public boolean canBuild(Location location, Player player) {
-        return furnitureLib.getPermManager().useProtectionLib() && furnitureLib.getPermManager()
-                                                                               .canBuild(player, location);
+        return libInstance.getPermManager().useProtectionLib() && libInstance.getPermManager()
+                                                                             .canBuild(player, location);
     }
 
     public void createFurniture(Location location, Grave grave) {
         if (plugin.getConfigBool("furniturelib.enabled", grave)) {
             String name = plugin.getConfigString("furniturelib.name", grave, "");
-            Project project = furnitureLib.getFurnitureManager().getProject(name);
+            Project project = libInstance.getFurnitureManager().getProject(name);
 
             if (project != null && project.haveModelSchematic()) {
                 location.getBlock().setType(Material.AIR);
 
                 ObjectID objectID = new ObjectID(project.getName(), project.getPlugin().getName(), location);
 
-                location.setYaw(furnitureLib.getLocationUtil()
-                                            .FaceToYaw(LocationUtil.yawToFace(location.getYaw()).getOppositeFace()));
-                furnitureLib.spawn(project, objectID);
+                location.setYaw(libInstance.getLocationUtil()
+                                           .FaceToYaw(LocationUtil.yawToFace(location.getYaw()).getOppositeFace()));
+                libInstance.spawn(project, objectID);
                 objectID.setUUID(UUID.randomUUID());
                 objectID.getBlockList()
                         .stream()
@@ -90,7 +90,7 @@ public final class FurnitureLib extends EntityDataManager {
                     objectID.getPacketList().forEach((fEntity) -> setSkull(fEntity, grave));
                 }
 
-                furnitureLib.getFurnitureManager().addObjectID(objectID);
+                libInstance.getFurnitureManager().addObjectID(objectID);
                 createEntityData(objectID.getStartLocation(), objectID.getUUID(), grave.getUUID(), EntityData.Type.FURNITURELIB);
             }
             else {
@@ -111,9 +111,9 @@ public final class FurnitureLib extends EntityDataManager {
         List<EntityData> removeEntityDataList = new ArrayList<>();
 
         for (EntityData entityData : entityDataList) {
-            for (ObjectID objectID : furnitureLib.getFurnitureManager().getObjectList()) {
+            for (ObjectID objectID : libInstance.getFurnitureManager().getObjectList()) {
                 if (objectID.getUUID() != null && objectID.getUUID().equals(entityData.getUUIDEntity())) {
-                    furnitureLib.getFurnitureManager().remove(objectID);
+                    libInstance.getFurnitureManager().remove(objectID);
                     removeEntityDataList.add(entityData);
                 }
             }
@@ -209,15 +209,16 @@ public final class FurnitureLib extends EntityDataManager {
 
         @Override
         public void applyPluginFunctions() {
-            furnitureLib.getFurnitureManager()
-                        .getProjects()
-                        .stream()
-                        .filter(project -> project.getPlugin().getName().equals(getPlugin().getDescription().getName()))
-                        .forEach(Project::applyFunction);
+            libInstance.getFurnitureManager()
+                       .getProjects()
+                       .stream()
+                       .filter(project -> project.getPlugin().getName().equals(getPlugin().getDescription().getName()))
+                       .forEach(Project::applyFunction);
         }
 
         @Override
         public void onFurnitureLateSpawn(ObjectID objectID) {
+            // We shouldn't do anything here. Not even call the super method! That one shouldn't do anything anymore now.
         }
 
     }

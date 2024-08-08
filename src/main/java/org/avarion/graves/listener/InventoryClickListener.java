@@ -26,9 +26,7 @@ public class InventoryClickListener implements Listener {
         InventoryHolder inventoryHolder = event.getInventory().getHolder();
 
         if (inventoryHolder != null) {
-            if (inventoryHolder instanceof Grave) {
-                Grave grave = (Grave) inventoryHolder;
-
+            if (inventoryHolder instanceof Grave grave) {
                 plugin.getServer()
                       .getScheduler()
                       .runTaskLater(plugin, () -> plugin.getDataManager()

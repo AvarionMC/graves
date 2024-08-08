@@ -14,6 +14,8 @@ body:
       required: true
     - label: I have confirmed this bug exists on the [latest version](https://www.spigotmc.org/resources/graves.116202/history).
       required: true
+    - label: I just click random checkboxes without actually reading them.
+      required: false
 
 - type: input
   id: plugin-version
@@ -64,6 +66,13 @@ body:
   attributes:
     label: Stacktrace if applicable (no screenshots!)
     description: Copy/paste this out of your server logs.
+    value: |
+      <details>
+      <summary>Add stacktrace below:</summary>
+      ```python
+      
+      ```
+      </details>
   validations:
     required: false
 

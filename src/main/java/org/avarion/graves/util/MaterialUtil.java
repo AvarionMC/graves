@@ -4,6 +4,11 @@ import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 
 public final class MaterialUtil {
+
+    private MaterialUtil() {
+        // Don't do anything here
+    }
+
     public static boolean isLava(@NotNull Material material) {
         return isLava(material.name());
     }

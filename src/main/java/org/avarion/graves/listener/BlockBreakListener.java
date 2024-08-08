@@ -35,7 +35,6 @@ public class BlockBreakListener implements Listener {
 
                     if (!graveBreakEvent.isCancelled()) {
                         if (plugin.getConfigBool("drop.auto-loot.enabled", grave)) {
-                            player.sendMessage("here");
                             plugin.getGraveManager().autoLootGrave(player, block.getLocation(), grave);
 
                             if (graveBreakEvent.isDropItems() && plugin.getConfigBool("drop.auto-loot.break", grave)) {

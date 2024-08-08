@@ -35,13 +35,13 @@ import java.util.Map;
 public final class WorldEdit {
     private final Graves plugin;
     private final Plugin worldEditPlugin;
-    private final com.sk89q.worldedit.WorldEdit worldEdit;
+    private final com.sk89q.worldedit.WorldEdit libInstance;
     private final Map<String, Clipboard> stringClipboardMap;
 
     public WorldEdit(Graves plugin, Plugin worldEditPlugin) {
         this.plugin = plugin;
         this.worldEditPlugin = worldEditPlugin;
-        this.worldEdit = com.sk89q.worldedit.WorldEdit.getInstance();
+        this.libInstance = com.sk89q.worldedit.WorldEdit.getInstance();
         this.stringClipboardMap = new HashMap<>();
 
         saveData();
@@ -133,14 +133,12 @@ public final class WorldEdit {
                 Location rightTopCorner = location;
 
                 switch (blockFace) {
-                    case NORTH:
-                        leftTopCorner = location.clone()
-                                                .add(offset.x() - region.getWidth(), offset.y()
-                                                                                     - region.getHeight(), 0);
-                    case WEST:
-                        leftTopCorner = location.clone()
-                                                .add(region.getWidth() - offset.x(), offset.y()
-                                                                                     - region.getHeight(), 0);
+                    case NORTH -> leftTopCorner = location.clone()
+                                                          .add(offset.x() - region.getWidth(), offset.y()
+                                                                                               - region.getHeight(), 0);
+                    case WEST -> leftTopCorner = location.clone()
+                                                         .add(region.getWidth() - offset.x(), offset.y()
+                                                                                              - region.getHeight(), 0);
                 }
 
                 corner.getBlock().setType(Material.BEDROCK);
@@ -163,7 +161,7 @@ public final class WorldEdit {
     }
 
     public void getAreaSchematic(Location location, float yaw, File file) {
-
+        // Not implementing now
     }
 
     public Clipboard pasteSchematic(Location location, String name) {
@@ -257,6 +255,6 @@ public final class WorldEdit {
 
     @Contract("_ -> new")
     private @NotNull EditSession getEditSession(World world) {
-        return worldEdit.newEditSession(BukkitAdapter.adapt(world));
+        return libInstance.newEditSession(BukkitAdapter.adapt(world));
     }
 }

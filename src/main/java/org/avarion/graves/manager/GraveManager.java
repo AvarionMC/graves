@@ -240,26 +240,11 @@ public final class GraveManager {
 
     public void removeEntityData(@NotNull EntityData entityData) {
         switch (entityData.getType()) {
-            case HOLOGRAM -> {
-                plugin.getHologramManager().removeHologram(entityData);
-
-            }
-            case FURNITURELIB -> {
-                plugin.getIntegrationManager().getFurnitureLib().removeEntityData(entityData);
-
-            }
-            case FURNITUREENGINE -> {
-                plugin.getIntegrationManager().getFurnitureEngine().removeEntityData(entityData);
-
-            }
-            case ITEMSADDER -> {
-                plugin.getIntegrationManager().getItemsAdder().removeEntityData(entityData);
-
-            }
-            case ORAXEN -> {
-                plugin.getIntegrationManager().getOraxen().removeEntityData(entityData);
-
-            }
+            case HOLOGRAM -> plugin.getHologramManager().removeHologram(entityData);
+            case FURNITURELIB -> plugin.getIntegrationManager().getFurnitureLib().removeEntityData(entityData);
+            case FURNITUREENGINE -> plugin.getIntegrationManager().getFurnitureEngine().removeEntityData(entityData);
+            case ITEMSADDER -> plugin.getIntegrationManager().getItemsAdder().removeEntityData(entityData);
+            case ORAXEN -> plugin.getIntegrationManager().getOraxen().removeEntityData(entityData);
         }
     }
 
@@ -277,11 +262,10 @@ public final class GraveManager {
             if (player.getOpenInventory() != null) { // Mohist, might return null even when Bukkit shouldn't.
                 InventoryHolder inventoryHolder = player.getOpenInventory().getTopInventory().getHolder();
 
-                if (inventoryHolder instanceof GraveMenu graveMenu) {
-
-                    if (graveMenu.getGrave().getUUID().equals(grave.getUUID())) {
-                        player.closeInventory();
-                    }
+                if (inventoryHolder instanceof GraveMenu graveMenu && graveMenu.getGrave()
+                                                                               .getUUID()
+                                                                               .equals(grave.getUUID())) {
+                    player.closeInventory();
                 }
             }
         }
@@ -713,14 +697,14 @@ public final class GraveManager {
                 if (itemMeta.hasDisplayName()) {
                     for (String string : plugin.getConfigStringList("ignore.item.name", entity, permissionList)) {
                         if (!string.isEmpty() && itemMeta.getDisplayName()
-                                                          .equals(StringUtil.parseString(string, plugin))) {
+                                                         .equals(StringUtil.parseString(string, plugin))) {
                             return true;
                         }
                     }
 
                     for (String string : plugin.getConfigStringList("ignore.item.name-contains", entity, permissionList)) {
                         if (!string.isEmpty() && itemMeta.getDisplayName()
-                                                          .contains(StringUtil.parseString(string, plugin))) {
+                                                         .contains(StringUtil.parseString(string, plugin))) {
                             return true;
                         }
                     }
