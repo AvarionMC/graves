@@ -1,17 +1,10 @@
 package org.avarion.graves.manager;
 
-import net.coreprotect.CoreProtect;
-import net.coreprotect.CoreProtectAPI;
-import net.milkbowl.vault.economy.Economy;
 import org.avarion.graves.Graves;
 import org.avarion.graves.integration.*;
+import org.avarion.graves.util.Version;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.RegisteredServiceProvider;
-
-class FakeCoreProtectAPI extends CoreProtectAPI {
-
-}
 
 public final class IntegrationManager {
 
@@ -33,7 +26,7 @@ public final class IntegrationManager {
     private ItemBridge itemBridge;
     private PlayerNPC playerNPC;
     private PlaceholderAPI placeholderAPI;
-    private CoreProtectAPI coreProtect = new FakeCoreProtectAPI();
+    private CoreProtectAPI coreProtect;
 
     public IntegrationManager(Graves plugin) {
         this.plugin = plugin;
@@ -45,6 +38,7 @@ public final class IntegrationManager {
     }
 
     public void load() {
+        loadWorldGuard();
         loadMultiPaper();
         loadVault();
         loadProtocolLib();
@@ -238,27 +232,22 @@ public final class IntegrationManager {
     }
 
     private void loadVault() {
-        if (plugin.getConfig().getBoolean("settings.integration.vault.enabled")) {
-            Plugin vaultPlugin = plugin.getServer().getPluginManager().getPlugin("Vault");
+        vault = null;
 
-            if (vaultPlugin != null && vaultPlugin.isEnabled()) {
-                RegisteredServiceProvider<Economy> registeredServiceProvider = plugin.getServer()
-                                                                                     .getServicesManager()
-                                                                                     .getRegistration(Economy.class);
-
-                if (registeredServiceProvider != null) {
-                    vault = new Vault(registeredServiceProvider.getProvider());
-
-                    plugin.integrationMessage("Hooked into "
-                                              + vaultPlugin.getName()
-                                              + " "
-                                              + vaultPlugin.getDescription().getVersion()
-                                              + ".");
-                }
-            }
+        if (!plugin.getConfig().getBoolean("settings.integration.vault.enabled")) {
+            return;
         }
-        else {
-            vault = null;
+
+        Plugin vaultPlugin = plugin.getServer().getPluginManager().getPlugin("Vault");
+        if (vaultPlugin == null || !vaultPlugin.isEnabled()) {
+            return;
+        }
+
+        var tmpVault = new Vault(plugin);
+        if (tmpVault.hasServiceProvider()) {
+            plugin.integrationMessage("Hooked into " + vaultPlugin.getName() + " " + vaultPlugin.getDescription()
+                                                                                                .getVersion() + ".");
+            vault = tmpVault;
         }
     }
 
@@ -450,11 +439,17 @@ public final class IntegrationManager {
     }
 
     private void loadOraxen() {
+        oraxen = null;
+
         if (plugin.getConfig().getBoolean("settings.integration.oraxen.enabled")) {
             Plugin oraxenPlugin = plugin.getServer().getPluginManager().getPlugin("Oraxen");
 
             if (oraxenPlugin != null && oraxenPlugin.isEnabled()) {
                 oraxen = new Oraxen(plugin, oraxenPlugin);
+                if (!oraxen.checkEntity()) {
+                    oraxen = null;
+                    return;
+                }
 
                 plugin.integrationMessage("Hooked into "
                                           + oraxenPlugin.getName()
@@ -463,9 +458,6 @@ public final class IntegrationManager {
                                                         .getVersion()
                                           + ".");
             }
-        }
-        else {
-            oraxen = null;
         }
     }
 
@@ -570,23 +562,23 @@ public final class IntegrationManager {
             placeholderAPI.unregister();
         }
 
-        if (plugin.getConfig().getBoolean("settings.integration.placeholderapi.enabled")) {
-            Plugin placeholderAPIPlugin = plugin.getServer().getPluginManager().getPlugin("PlaceholderAPI");
+        placeholderAPI = null;
 
-            if (placeholderAPIPlugin != null && placeholderAPIPlugin.isEnabled()) {
-                placeholderAPI = new PlaceholderAPI(plugin);
-
-                placeholderAPI.register();
-
-                plugin.integrationMessage("Hooked into "
-                                          + placeholderAPIPlugin.getName()
-                                          + " "
-                                          + placeholderAPIPlugin.getDescription().getVersion()
-                                          + ".");
-            }
+        if (!plugin.getConfig().getBoolean("settings.integration.placeholderapi.enabled")) {
+            return;
         }
-        else {
-            placeholderAPI = null;
+
+        Plugin placeholderAPIPlugin = plugin.getServer().getPluginManager().getPlugin("PlaceholderAPI");
+        if (placeholderAPIPlugin != null && placeholderAPIPlugin.isEnabled()) {
+            placeholderAPI = new PlaceholderAPI(plugin);
+
+            placeholderAPI.register();
+
+            plugin.integrationMessage("Hooked into "
+                                      + placeholderAPIPlugin.getName()
+                                      + " "
+                                      + placeholderAPIPlugin.getDescription().getVersion()
+                                      + ".");
         }
     }
 
@@ -596,27 +588,20 @@ public final class IntegrationManager {
         }
 
         Plugin cpPlugin = plugin.getServer().getPluginManager().getPlugin("CoreProtect");
-
-        // Check that CoreProtect is loaded
-        if (!(cpPlugin instanceof CoreProtect)) {
+        if (cpPlugin == null || !cpPlugin.isEnabled()) {
             return;
         }
 
-        // Check that the API is enabled
-        CoreProtectAPI tmp = ((CoreProtect) cpPlugin).getAPI();
-        if (!tmp.isEnabled()) {
-            return;
-        }
-
-        // Check that a compatible version of the API is loaded
-        if (tmp.APIVersion() < 10) {
+        var cpVersion = new Version(cpPlugin.getDescription().getVersion());
+        if (cpVersion.major < 22 || (cpVersion.major == 22 && cpVersion.minor < 4)) {
             plugin.getLogger()
                   .warning("CoreProtect integration needs at least CoreProtect v22.4+, you have: "
                            + cpPlugin.getDescription().getVersion());
             return;
         }
 
-        coreProtect = tmp;
+
+        coreProtect = new CoreProtectAPI(plugin);
     }
 
     @SuppressWarnings("deprecation")

@@ -11,7 +11,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Scanner;
 
-public class UpdateUtil {
+public final class UpdateUtil {
     private UpdateUtil() {
 
     }

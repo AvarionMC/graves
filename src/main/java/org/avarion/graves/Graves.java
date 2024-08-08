@@ -56,7 +56,6 @@ public class Graves extends JavaPlugin {
     private Compatibility compatibility;
     private FileConfiguration fileConfiguration;
 
-
     @Override
     public void onLoad() {
         saveDefaultConfig();
@@ -590,7 +589,7 @@ public class Graves extends JavaPlugin {
         return getConfig(config, grave.getOwnerType(), grave.getPermissionList());
     }
 
-    private ConfigurationSection getConfig(String config, EntityType entityType, List<String> permissionList) {
+    public ConfigurationSection getConfig(String config, EntityType entityType, List<String> permissionList) {
         if (permissionList != null && !permissionList.isEmpty()) {
             for (String permission : permissionList) {
                 String section = "settings.permission." + permission;
