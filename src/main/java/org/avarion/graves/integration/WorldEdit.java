@@ -35,13 +35,13 @@ import java.util.Map;
 public final class WorldEdit {
     private final Graves plugin;
     private final Plugin worldEditPlugin;
-    private final com.sk89q.worldedit.WorldEdit worldEdit;
+    private final com.sk89q.worldedit.WorldEdit libInstance;
     private final Map<String, Clipboard> stringClipboardMap;
 
     public WorldEdit(Graves plugin, Plugin worldEditPlugin) {
         this.plugin = plugin;
         this.worldEditPlugin = worldEditPlugin;
-        this.worldEdit = com.sk89q.worldedit.WorldEdit.getInstance();
+        this.libInstance = com.sk89q.worldedit.WorldEdit.getInstance();
         this.stringClipboardMap = new HashMap<>();
 
         saveData();
@@ -63,25 +63,29 @@ public final class WorldEdit {
         File schematicsFile = new File(plugin.getDataFolder() + File.separator + "schematics");
         File[] listFiles = schematicsFile.listFiles();
 
-        if (listFiles != null) {
-            for (File file : listFiles) {
-                if (file.isFile() && file.getName().contains(".schem")) {
-                    String name = file.getName().toLowerCase().replace(".schematic", "").replace(".schem", "");
-                    ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(file);
+        if (listFiles == null) {
+            return;
+        }
 
-                    if (clipboardFormat != null) {
-                        try (ClipboardReader clipboardReader = clipboardFormat.getReader(new FileInputStream(file))) {
-                            stringClipboardMap.put(name, clipboardReader.read());
-                            plugin.debugMessage("Loading schematic " + name, 1);
-                        }
-                        catch (IOException exception) {
-                            exception.printStackTrace();
-                        }
-                    }
-                    else {
-                        plugin.warningMessage("Unable to load schematic " + name);
-                    }
-                }
+        for (File file : listFiles) {
+            if (!file.isFile() || !file.getName().contains(".schem")) {
+                continue;
+            }
+
+            String name = file.getName().toLowerCase().replace(".schematic", "").replace(".schem", "");
+            ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(file);
+
+            if (clipboardFormat == null) {
+                plugin.warningMessage("Unable to load schematic " + name);
+                continue;
+            }
+
+            try (ClipboardReader clipboardReader = clipboardFormat.getReader(new FileInputStream(file))) {
+                stringClipboardMap.put(name, clipboardReader.read());
+                plugin.debugMessage("Loading schematic " + name, 1);
+            }
+            catch (IOException exception) {
+                exception.printStackTrace();
             }
         }
     }
@@ -133,14 +137,12 @@ public final class WorldEdit {
                 Location rightTopCorner = location;
 
                 switch (blockFace) {
-                    case NORTH:
-                        leftTopCorner = location.clone()
-                                                .add(offset.x() - region.getWidth(), offset.y()
-                                                                                     - region.getHeight(), 0);
-                    case WEST:
-                        leftTopCorner = location.clone()
-                                                .add(region.getWidth() - offset.x(), offset.y()
-                                                                                     - region.getHeight(), 0);
+                    case NORTH -> leftTopCorner = location.clone()
+                                                          .add(offset.x() - region.getWidth(), offset.y()
+                                                                                               - region.getHeight(), 0);
+                    case WEST -> leftTopCorner = location.clone()
+                                                         .add(region.getWidth() - offset.x(), offset.y()
+                                                                                              - region.getHeight(), 0);
                 }
 
                 corner.getBlock().setType(Material.BEDROCK);
@@ -163,7 +165,7 @@ public final class WorldEdit {
     }
 
     public void getAreaSchematic(Location location, float yaw, File file) {
-
+        // Not implementing now
     }
 
     public Clipboard pasteSchematic(Location location, String name) {
@@ -257,6 +259,6 @@ public final class WorldEdit {
 
     @Contract("_ -> new")
     private @NotNull EditSession getEditSession(World world) {
-        return worldEdit.newEditSession(BukkitAdapter.adapt(world));
+        return libInstance.newEditSession(BukkitAdapter.adapt(world));
     }
 }

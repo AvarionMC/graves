@@ -53,15 +53,14 @@ public final class PlayerNPC extends EntityDataManager {
     public void createCorpses() {
         for (ChunkData chunkData : CacheManager.chunkMap.values()) {
             for (EntityData entityData : chunkData.getEntityDataMap().values()) {
-                if (entityData.getType() == EntityData.Type.PLAYERNPC) {
-                    if (CacheManager.graveMap.containsKey(entityData.getUUIDGrave())) {
-                        Grave grave = CacheManager.graveMap.get(entityData.getUUIDGrave());
+                if (entityData.getType() == EntityData.Type.PLAYERNPC
+                    && CacheManager.graveMap.containsKey(entityData.getUUIDGrave())) {
+                    Grave grave = CacheManager.graveMap.get(entityData.getUUIDGrave());
 
-                        if (grave != null) {
-                            plugin.getIntegrationManager()
-                                  .getPlayerNPC()
-                                  .createCorpse(entityData.getUUIDEntity(), entityData.getLocation(), grave, false);
-                        }
+                    if (grave != null) {
+                        plugin.getIntegrationManager()
+                              .getPlayerNPC()
+                              .createCorpse(entityData.getUUIDEntity(), entityData.getLocation(), grave, false);
                     }
                 }
             }
@@ -74,8 +73,7 @@ public final class PlayerNPC extends EntityDataManager {
 
     public void createCorpse(UUID uuid, Location location, Grave grave, boolean createEntityData) {
         plugin.getServer().getScheduler().runTask(plugin, () -> {
-            if (plugin.getConfigBool("playernpc.corpse.enabled", grave)
-                && grave.getOwnerType() == EntityType.PLAYER) {
+            if (plugin.getConfigBool("playernpc.corpse.enabled", grave) && grave.getOwnerType() == EntityType.PLAYER) {
                 Player player = plugin.getServer().getPlayer(grave.getOwnerUUID());
                 Location npcLocation = location.clone();
 

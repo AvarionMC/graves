@@ -101,9 +101,7 @@ public final class ImportManager {
                 grave.setOwnerTextureSignature(SkinUtil.getSignature(player));
             }
 
-            //grave.setTimeCreation(angelChest.getLong("created", System.currentTimeMillis()));
             grave.setTimeCreation(System.currentTimeMillis());
-            //grave.setTimeAlive(angelChest.getInt("secondsLeft", 0) * 10000L);
             grave.setTimeAlive(plugin.getConfigInt("grave.time", grave) * 1000L);
             grave.setProtection(angelChest.getBoolean("isProtected", false));
             grave.setExperience(angelChest.getInt("experience", 0));

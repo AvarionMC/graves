@@ -14,6 +14,10 @@ import java.nio.charset.StandardCharsets;
 
 public final class HastebinUtil {
 
+    private HastebinUtil() {
+        // Don't do anything here
+    }
+
     public static @Nullable String postDataToHastebin(@NotNull String data, boolean raw) {
         String urlString = "https://www.toptal.com/developers/hastebin/documents/";
         String pasteRawURLString = "https://www.toptal.com/developers/hastebin/raw/";

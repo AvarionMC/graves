@@ -13,6 +13,10 @@ import java.util.*;
 
 public final class InventoryUtil {
 
+    private InventoryUtil() {
+        // Don't do anything here
+    }
+
     public static int getInventorySize(int size) {
         if (size <= 9) {
             return 9;

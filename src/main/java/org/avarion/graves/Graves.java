@@ -1,17 +1,6 @@
 package org.avarion.graves;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
-
+import com.google.common.base.Charsets;
 import org.avarion.graves.command.GravesCommand;
 import org.avarion.graves.command.GraveyardsCommand;
 import org.avarion.graves.compatibility.Compatibility;
@@ -42,7 +31,9 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.google.common.base.Charsets;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 
 public class Graves extends JavaPlugin {
@@ -202,14 +193,14 @@ public class Graves extends JavaPlugin {
 
         Metrics metrics = new Metrics(this, getMetricsID());
 
-        metrics.addCustomChart(new SingleLineChart("graves", () -> CacheManager.graveMap.size()));
+        metrics.addCustomChart(new SingleLineChart("graves", CacheManager.graveMap::size));
     }
 
     public void registerListeners() {
         // Configurable death listener priority
-        getServer().getPluginManager().registerEvent(EntityDeathEvent.class, new Listener() {}, 
-                getEventPriority("death", EventPriority.MONITOR), new EntityDeathListener(this), this, true);
-        
+        getServer().getPluginManager().registerEvent(EntityDeathEvent.class, new Listener() {
+        }, getEventPriority("death", EventPriority.MONITOR), new EntityDeathListener(this), this, true);
+
         // All other non-configurable listeners
         getServer().getPluginManager().registerEvents(new PlayerInteractListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerInteractEntityListener(this), this);
@@ -237,14 +228,24 @@ public class Graves extends JavaPlugin {
 
         //getServer().getPluginManager().registerEvents(new GraveTestListener(this), this); // Test Listener
     }
-    
+
     // Get priority for a type. Currently only "death" is available
     private EventPriority getEventPriority(String type, EventPriority defaultPriority) {
         String priorityStr = getConfig().getString("settings.listener-priority." + type);
+        if (priorityStr == null) {
+            return defaultPriority;
+        }
+
         try {
             return EventPriority.valueOf(priorityStr.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            getLogger().warning("Invalid event priority in config for type '" + type + "': " + priorityStr + ". Defaulting to " + defaultPriority);
+        }
+        catch (IllegalArgumentException e) {
+            getLogger().warning("Invalid event priority in config for type '"
+                                + type
+                                + "': "
+                                + priorityStr
+                                + ". Defaulting to "
+                                + defaultPriority);
             return defaultPriority;
         }
     }
@@ -279,36 +280,38 @@ public class Graves extends JavaPlugin {
     }
 
     public void debugMessage(String string, int level) {
-        if (getConfig().getInt("settings.debug.level", 0) >= level) {
-            getLogger().info("Debug: " + string);
+        if (getConfig().getInt("settings.debug.level", 0) < level) {
+            return;
+        }
 
-            for (String admin : getConfig().getStringList("settings.debug.admin")) {
-                Player player = getServer().getPlayer(admin);
-                UUID uuid = UUIDUtil.getUUID(admin);
+        getLogger().info("Debug: " + string);
 
-                if (uuid != null) {
-                    Player uuidPlayer = getServer().getPlayer(uuid);
+        for (String admin : getConfig().getStringList("settings.debug.admin")) {
+            Player player = getServer().getPlayer(admin);
+            UUID uuid = UUIDUtil.getUUID(admin);
 
-                    if (uuidPlayer != null) {
-                        player = uuidPlayer;
-                    }
+            if (uuid != null) {
+                Player uuidPlayer = getServer().getPlayer(uuid);
+
+                if (uuidPlayer != null) {
+                    player = uuidPlayer;
                 }
+            }
 
-                if (player != null) {
-                    String debug = !integrationManager.hasMultiPaper()
-                                   ? "Debug:"
-                                   : "Debug (" + integrationManager.getMultiPaper().getLocalServerName() + "):";
+            if (player != null) {
+                String debug = !integrationManager.hasMultiPaper()
+                               ? "Debug:"
+                               : "Debug (" + integrationManager.getMultiPaper().getLocalServerName() + "):";
 
-                    player.sendMessage(ChatColor.RED
-                                       + "☠"
-                                       + ChatColor.DARK_GRAY
-                                       + " » "
-                                       + ChatColor.RED
-                                       + debug
-                                       + ChatColor.RESET
-                                       + " "
-                                       + string);
-                }
+                player.sendMessage(ChatColor.RED
+                                   + "☠"
+                                   + ChatColor.DARK_GRAY
+                                   + " » "
+                                   + ChatColor.RED
+                                   + debug
+                                   + ChatColor.RESET
+                                   + " "
+                                   + string);
             }
         }
     }
@@ -327,10 +330,6 @@ public class Graves extends JavaPlugin {
 
     public void testMessage(String string) {
         getLogger().info("Test: " + string);
-    }
-
-    public void updateMessage(String string) {
-        getLogger().info("Update: " + string);
     }
 
     public void integrationMessage(String string) {
@@ -365,39 +364,43 @@ public class Graves extends JavaPlugin {
     }
 
     private void updateChecker() {
-        if (getConfig().getBoolean("settings.update.check")) {
-            getServer().getScheduler().runTaskAsynchronously(this, () -> {
-                String latestVersion = getLatestVersion();
-
-                if (latestVersion != null) {
-                    try {
-                        double pluginVersion = Double.parseDouble(getDescription().getVersion());
-                        double pluginVersionLatest = Double.parseDouble(latestVersion);
-
-                        if (pluginVersion < pluginVersionLatest) {
-                            getLogger().info("Update: Outdated version detected "
-                                             + pluginVersion
-                                             + ", latest version is "
-                                             + pluginVersionLatest
-                                             + ", https://www.spigotmc.org/resources/"
-                                             + getSpigotID()
-                                             + "/");
-                        }
-                    }
-                    catch (NumberFormatException exception) {
-                        if (!getDescription().getVersion().equalsIgnoreCase(latestVersion)) {
-                            getLogger().info("Update: Outdated version detected "
-                                             + getDescription().getVersion()
-                                             + ", latest version is "
-                                             + latestVersion
-                                             + ", https://www.spigotmc.org/resources/"
-                                             + getSpigotID()
-                                             + "/");
-                        }
-                    }
-                }
-            });
+        if (!getConfig().getBoolean("settings.update.check")) {
+            return;
         }
+
+        getServer().getScheduler().runTaskAsynchronously(this, () -> {
+            String latestVersion = getLatestVersion();
+
+            if (latestVersion == null) {
+                return;
+            }
+
+            try {
+                double pluginVersion = Double.parseDouble(getDescription().getVersion());
+                double pluginVersionLatest = Double.parseDouble(latestVersion);
+
+                if (pluginVersion < pluginVersionLatest) {
+                    getLogger().info("Update: Outdated version detected "
+                                     + pluginVersion
+                                     + ", latest version is "
+                                     + pluginVersionLatest
+                                     + ", https://www.spigotmc.org/resources/"
+                                     + getSpigotID()
+                                     + "/");
+                }
+            }
+            catch (NumberFormatException exception) {
+                if (!getDescription().getVersion().equalsIgnoreCase(latestVersion)) {
+                    getLogger().info("Update: Outdated version detected "
+                                     + getDescription().getVersion()
+                                     + ", latest version is "
+                                     + latestVersion
+                                     + ", https://www.spigotmc.org/resources/"
+                                     + getSpigotID()
+                                     + "/");
+                }
+            }
+        });
     }
 
     private void compatibilityChecker() {
@@ -587,14 +590,6 @@ public class Graves extends JavaPlugin {
         return getConfig(config, grave.getOwnerType(), grave.getPermissionList());
     }
 
-    private ConfigurationSection getConfig(String config, @NotNull Entity entity, @Nullable List<String> permissionList) {
-        return getConfig(config, entity.getType(), permissionList);
-    }
-
-    private ConfigurationSection getConfig(String config, @NotNull Entity entity) {
-        return getConfig(config, entity.getType(), getPermissionList(entity));
-    }
-
     private ConfigurationSection getConfig(String config, EntityType entityType, List<String> permissionList) {
         if (permissionList != null && !permissionList.isEmpty()) {
             for (String permission : permissionList) {
@@ -670,7 +665,7 @@ public class Graves extends JavaPlugin {
     }
 
     private @NotNull FileConfiguration getConfigFiles(@NotNull File folder) {
-        FileConfiguration fileConfiguration = new YamlConfiguration();
+        FileConfiguration yamlConfiguration = new YamlConfiguration();
         File[] files = folder.listFiles();
 
         if (files != null) {
@@ -687,15 +682,15 @@ public class Graves extends JavaPlugin {
             for (File file : fileList) {
                 if (YAMLUtil.isValidYAML(file)) {
                     if (file.isDirectory()) {
-                        fileConfiguration.addDefaults(getConfigFiles(file));
+                        yamlConfiguration.addDefaults(getConfigFiles(file));
                     }
                     else {
                         FileConfiguration savedFileConfiguration = getConfigFile(file);
 
                         if (savedFileConfiguration != null) {
-                            fileConfiguration.addDefaults(savedFileConfiguration);
-                            bakeDefaults(fileConfiguration);
-                            loadResourceDefaults(fileConfiguration, "config" + File.separator + file.getName());
+                            yamlConfiguration.addDefaults(savedFileConfiguration);
+                            bakeDefaults(yamlConfiguration);
+                            loadResourceDefaults(yamlConfiguration, "config" + File.separator + file.getName());
                         }
                         else {
                             warningMessage("Unable to load config " + file.getName());
@@ -705,22 +700,22 @@ public class Graves extends JavaPlugin {
             }
         }
 
-        return fileConfiguration;
+        return yamlConfiguration;
     }
 
-    private FileConfiguration getConfigFile(File file) {
-        FileConfiguration fileConfiguration = null;
-
-        if (YAMLUtil.isValidYAML(file)) {
-            try {
-                fileConfiguration = YamlConfiguration.loadConfiguration(file);
-            }
-            catch (IllegalArgumentException exception) {
-                exception.printStackTrace();
-            }
+    private @Nullable FileConfiguration getConfigFile(File file) {
+        if (!YAMLUtil.isValidYAML(file)) {
+            return null;
         }
 
-        return fileConfiguration;
+        try {
+            return YamlConfiguration.loadConfiguration(file);
+        }
+        catch (IllegalArgumentException exception) {
+            exception.printStackTrace();
+        }
+
+        return null;
     }
 
     @Contract(" -> new")

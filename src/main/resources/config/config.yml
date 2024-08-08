@@ -22,7 +22,7 @@ settings:
   # Data storage system.
   cache:
     type: NORMAL # Cache type.
-    
+
   #####################
   # Listener Priority #
   ##################### 
@@ -32,7 +32,7 @@ settings:
   # doing, you should leave these at their defaults.
   listener-priority:
     death: MONITOR
-    
+
   #########
   # Debug #
   #########
@@ -82,8 +82,7 @@ settings:
       enabled: true # Should WorldGuard integration be enabled.
     towny: # https://www.spigotmc.org/resources/towny-advanced.72694/
       enabled: true # Should Towny integration be enabled.
-    griefdefender: # https://www.spigotmc.org/resources/griefdefender.68900/
-      enabled: true # Should GriefDefender integration be enabled.
+
     furniturelib: # https://www.spigotmc.org/resources/furniturelibary.9368/
       enabled: true # Should FurnitureLib integration be enabled.
     furnitureengine: # https://www.spigotmc.org/resources/furnitureengine.97134/
@@ -110,3 +109,5 @@ settings:
       enabled: true # Should PlayerNPC integration be enabled.
     itembridge: # https://www.spigotmc.org/resources/itembridge.77080/
       enabled: true # Should ItemBridge integration be enabled.
+    coreprotect: # https://www.spigotmc.org/resources/coreprotect.8631/
+      enabled: true # Should CoreProtect integration be enabled.
