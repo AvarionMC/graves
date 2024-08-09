@@ -27,6 +27,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -367,27 +368,30 @@ public class Graves extends JavaPlugin {
     }
 
     private void updateChecker() {
-        if (!getConfig().getBoolean("settings.update.check")) {
-            return;
-        }
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!getConfig().getBoolean("settings.update.check")) {
+                    return;
+                }
 
-        getServer().getScheduler().runTaskAsynchronously(this, () -> {
-            final Version latestVersion = getLatestVersion();
+                final Version latestVersion = getLatestVersion();
 
-            if (latestVersion == null) {
-                return;
+                if (latestVersion == null) {
+                    return;
+                }
+
+                if (getVersion().compareTo(latestVersion) < 0) {
+                    getLogger().info("Update: Outdated version detected "
+                                     + getVersion()
+                                     + ", latest version is "
+                                     + latestVersion
+                                     + ", https://www.spigotmc.org/resources/"
+                                     + getSpigotID()
+                                     + "/");
+                }
             }
-
-            if (getVersion().compareTo(latestVersion) < 0) {
-                getLogger().info("Update: Outdated version detected "
-                                 + getVersion()
-                                 + ", latest version is "
-                                 + latestVersion
-                                 + ", https://www.spigotmc.org/resources/"
-                                 + getSpigotID()
-                                 + "/");
-            }
-        });
+        }.runTaskTimer(this, 0, 24 * 60 * 60 * 20); // run on a daily schedule
     }
 
     private void compatibilityChecker() {
