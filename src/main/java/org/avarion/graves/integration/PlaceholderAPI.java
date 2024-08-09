@@ -48,7 +48,7 @@ public final class PlaceholderAPI extends PlaceholderExpansion implements Relati
     @NotNull
     @Override
     public String getVersion() {
-        return plugin.getDescription().getVersion();
+        return plugin.getVersion().toString();
     }
 
     @Override

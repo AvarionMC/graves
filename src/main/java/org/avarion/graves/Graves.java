@@ -56,8 +56,12 @@ public class Graves extends JavaPlugin {
     private Compatibility compatibility;
     private FileConfiguration fileConfiguration;
 
+    private static Version myVersion;
+
     @Override
     public void onLoad() {
+        myVersion = new Version(getDescription().getVersion());
+
         saveDefaultConfig();
 
         integrationManager = new IntegrationManager(this);
@@ -368,36 +372,20 @@ public class Graves extends JavaPlugin {
         }
 
         getServer().getScheduler().runTaskAsynchronously(this, () -> {
-            String latestVersion = getLatestVersion();
+            final Version latestVersion = getLatestVersion();
 
             if (latestVersion == null) {
                 return;
             }
 
-            try {
-                double pluginVersion = Double.parseDouble(getDescription().getVersion());
-                double pluginVersionLatest = Double.parseDouble(latestVersion);
-
-                if (pluginVersion < pluginVersionLatest) {
-                    getLogger().info("Update: Outdated version detected "
-                                     + pluginVersion
-                                     + ", latest version is "
-                                     + pluginVersionLatest
-                                     + ", https://www.spigotmc.org/resources/"
-                                     + getSpigotID()
-                                     + "/");
-                }
-            }
-            catch (NumberFormatException exception) {
-                if (!getDescription().getVersion().equalsIgnoreCase(latestVersion)) {
-                    getLogger().info("Update: Outdated version detected "
-                                     + getDescription().getVersion()
-                                     + ", latest version is "
-                                     + latestVersion
-                                     + ", https://www.spigotmc.org/resources/"
-                                     + getSpigotID()
-                                     + "/");
-                }
+            if (getVersion().compareTo(latestVersion) < 0) {
+                getLogger().info("Update: Outdated version detected "
+                                 + getVersion()
+                                 + ", latest version is "
+                                 + latestVersion
+                                 + ", https://www.spigotmc.org/resources/"
+                                 + getSpigotID()
+                                 + "/");
             }
         });
     }
@@ -726,12 +714,12 @@ public class Graves extends JavaPlugin {
         return getDataFolder().getParentFile();
     }
 
-    public String getVersion() {
-        return getDescription().getVersion();
+    public @NotNull Version getVersion() {
+        return myVersion;
     }
 
-    public String getLatestVersion() {
-        return UpdateUtil.getLatestVersion(getSpigotID()).toString();
+    public @Nullable Version getLatestVersion() {
+        return UpdateUtil.getLatestVersion(getSpigotID());
     }
 
     @SuppressWarnings("SameReturnValue")
