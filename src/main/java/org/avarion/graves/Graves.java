@@ -27,6 +27,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -56,8 +57,12 @@ public class Graves extends JavaPlugin {
     private Compatibility compatibility;
     private FileConfiguration fileConfiguration;
 
+    private Version myVersion = null;
+
     @Override
     public void onLoad() {
+        myVersion = new Version(getDescription().getVersion());
+
         saveDefaultConfig();
 
         integrationManager = new IntegrationManager(this);
@@ -363,35 +368,22 @@ public class Graves extends JavaPlugin {
     }
 
     private void updateChecker() {
-        if (!getConfig().getBoolean("settings.update.check")) {
-            return;
-        }
-
-        getServer().getScheduler().runTaskAsynchronously(this, () -> {
-            String latestVersion = getLatestVersion();
-
-            if (latestVersion == null) {
-                return;
-            }
-
-            try {
-                double pluginVersion = Double.parseDouble(getDescription().getVersion());
-                double pluginVersionLatest = Double.parseDouble(latestVersion);
-
-                if (pluginVersion < pluginVersionLatest) {
-                    getLogger().info("Update: Outdated version detected "
-                                     + pluginVersion
-                                     + ", latest version is "
-                                     + pluginVersionLatest
-                                     + ", https://www.spigotmc.org/resources/"
-                                     + getSpigotID()
-                                     + "/");
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!getConfig().getBoolean("settings.update.check")) {
+                    return;
                 }
-            }
-            catch (NumberFormatException exception) {
-                if (!getDescription().getVersion().equalsIgnoreCase(latestVersion)) {
+
+                final Version latestVersion = getLatestVersion();
+
+                if (latestVersion == null) {
+                    return;
+                }
+
+                if (getVersion().compareTo(latestVersion) < 0) {
                     getLogger().info("Update: Outdated version detected "
-                                     + getDescription().getVersion()
+                                     + getVersion()
                                      + ", latest version is "
                                      + latestVersion
                                      + ", https://www.spigotmc.org/resources/"
@@ -399,7 +391,7 @@ public class Graves extends JavaPlugin {
                                      + "/");
                 }
             }
-        });
+        }.runTaskTimer(this, 0, 24 * 60 * 60 * 20); // run on a daily schedule
     }
 
     private void compatibilityChecker() {
@@ -726,12 +718,12 @@ public class Graves extends JavaPlugin {
         return getDataFolder().getParentFile();
     }
 
-    public String getVersion() {
-        return getDescription().getVersion();
+    public @NotNull Version getVersion() {
+        return myVersion;
     }
 
-    public String getLatestVersion() {
-        return UpdateUtil.getLatestVersion(getSpigotID()).toString();
+    public @Nullable Version getLatestVersion() {
+        return UpdateUtil.getLatestVersion(getSpigotID());
     }
 
     @SuppressWarnings("SameReturnValue")

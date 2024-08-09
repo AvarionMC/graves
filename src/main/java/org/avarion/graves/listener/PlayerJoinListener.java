@@ -1,6 +1,7 @@
 package org.avarion.graves.listener;
 
 import org.avarion.graves.Graves;
+import org.avarion.graves.util.Version;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,44 +24,25 @@ public class PlayerJoinListener implements Listener {
 
         if (plugin.getConfig().getBoolean("settings.update.check") && player.hasPermission("graves.update.notify")) {
             plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-                String latestVersion = plugin.getLatestVersion();
+                final Version latestVersion = plugin.getLatestVersion();
 
-                if (latestVersion != null) {
-                    try {
-                        double pluginVersion = Double.parseDouble(plugin.getVersion());
-                        double pluginVersionLatest = Double.parseDouble(latestVersion);
+                if (latestVersion == null) {
+                    return;
+                }
 
-                        if (pluginVersion < pluginVersionLatest) {
-                            player.sendMessage(ChatColor.RED
-                                               + "☠"
-                                               + ChatColor.DARK_GRAY
-                                               + " » "
-                                               + ChatColor.RESET
-                                               + "Outdated version detected "
-                                               + pluginVersion
-                                               + ", latest version is "
-                                               + pluginVersionLatest
-                                               + ", https://www.spigotmc.org/resources/"
-                                               + plugin.getSpigotID()
-                                               + "/");
-                        }
-                    }
-                    catch (NumberFormatException exception) {
-                        if (!plugin.getVersion().equalsIgnoreCase(latestVersion)) {
-                            player.sendMessage(ChatColor.RED
-                                               + "☠"
-                                               + ChatColor.DARK_GRAY
-                                               + " » "
-                                               + ChatColor.RESET
-                                               + "Outdated version detected "
-                                               + plugin.getVersion()
-                                               + ", latest version is "
-                                               + latestVersion
-                                               + ", https://www.spigotmc.org/resources/"
-                                               + plugin.getSpigotID()
-                                               + "/");
-                        }
-                    }
+                if (plugin.getVersion().compareTo(latestVersion) < 0) {
+                    player.sendMessage(ChatColor.RED
+                                       + "☠"
+                                       + ChatColor.DARK_GRAY
+                                       + " » "
+                                       + ChatColor.RESET
+                                       + "Outdated version detected "
+                                       + plugin.getVersion()
+                                       + ", latest version is "
+                                       + latestVersion
+                                       + ", https://www.spigotmc.org/resources/"
+                                       + plugin.getSpigotID()
+                                       + "/");
                 }
             });
         }
