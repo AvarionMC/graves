@@ -57,7 +57,7 @@ public class Graves extends JavaPlugin {
     private Compatibility compatibility;
     private FileConfiguration fileConfiguration;
 
-    private static Version myVersion;
+    private Version myVersion = null;
 
     @Override
     public void onLoad() {
