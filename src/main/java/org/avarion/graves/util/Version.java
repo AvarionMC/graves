@@ -11,7 +11,7 @@ public class Version implements Comparable<Version> {
     public final int minor;
     public final int patch;
 
-    private final static Pattern versionPattern = Pattern.compile("^(?:v|version|ver|\\s)*(\\d+)(?:\\.(\\d+))?(?:\\.(\\d+))?");
+    private final static Pattern versionPattern = Pattern.compile("^\\s*(?:version|ver|v)?\\s*(\\d+)(?:\\.(\\d+))?(?:\\.(\\d+))?");
 
     public Version(@Nullable String version) {
         Matcher matcher = versionPattern.matcher(version == null ? "" : version);
