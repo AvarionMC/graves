@@ -213,6 +213,10 @@
             <url>https://maven.playpro.com</url>
         </repository>
         <repository>
+            <id>jeff-media-public</id>
+            <url>https://repo.jeff-media.com/public/</url>
+        </repository>
+        <repository>
             <id>local-repo</id>
             <url>file://${project.basedir}/lib</url>
         </repository>
