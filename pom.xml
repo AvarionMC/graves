@@ -213,6 +213,10 @@
             <url>https://maven.playpro.com</url>
         </repository>
         <repository>
+            <id>jeff-media-public</id>
+            <url>https://repo.jeff-media.com/public/</url>
+        </repository>
+        <repository>
             <id>local-repo</id>
             <url>file://${project.basedir}/lib</url>
         </repository>
@@ -228,7 +232,7 @@
         <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
