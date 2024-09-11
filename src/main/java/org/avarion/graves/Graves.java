@@ -381,7 +381,7 @@ public class Graves extends JavaPlugin {
                     return;
                 }
 
-                if (getVersion().compareTo(latestVersion) < 0) {
+                if (getVersion().isOutdated(latestVersion)) {
                     getLogger().info("Update: Outdated version detected "
                                      + getVersion()
                                      + ", latest version is "

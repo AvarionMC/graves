@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Version implements Comparable<Version> {
+public class Version {
     public final int major;
     public final int minor;
     public final int patch;
@@ -28,35 +28,32 @@ public class Version implements Comparable<Version> {
         }
     }
 
-    @Override
-    public int compareTo(Version other) {
-        if (this.major != other.major) {
-            return Integer.compare(this.major, other.major);
-        }
-        if (this.minor != other.minor) {
-            return Integer.compare(this.minor, other.minor);
-        }
-        return Integer.compare(this.patch, other.patch);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null || getClass() != obj.getClass()) {
+    /**
+     * Is `other` greater than me?
+     * ==> other > this?
+     */
+    public boolean isOutdated(Version other) {
+        if (other == null) {
             return false;
         }
-        Version other = (Version) obj;
-        return major == other.major && minor == other.minor && patch == other.patch;
-    }
 
-    @Override
-    public int hashCode() {
-        int result = major;
-        result = 31 * result + minor;
-        result = 31 * result + patch;
-        return result;
+        if (other.major > this.major) {
+            return true;
+        }
+        if (other.major < this.major) {
+            return false;
+        }
+
+        // Major versions are equal, check minor
+        if (other.minor > this.minor) {
+            return true;
+        }
+        if (other.minor < this.minor) {
+            return false;
+        }
+
+        // Major and minor versions are equal, check patch
+        return other.patch > this.patch;
     }
 
     @Override
