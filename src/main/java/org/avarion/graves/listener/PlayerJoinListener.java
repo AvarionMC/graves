@@ -30,7 +30,7 @@ public class PlayerJoinListener implements Listener {
                     return;
                 }
 
-                if (plugin.getVersion().compareTo(latestVersion) < 0) {
+                if (plugin.getVersion().isOutdated(latestVersion)) {
                     player.sendMessage(ChatColor.RED
                                        + "☠"
                                        + ChatColor.DARK_GRAY
