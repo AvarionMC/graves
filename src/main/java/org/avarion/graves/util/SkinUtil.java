@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -39,17 +40,27 @@ public final class SkinUtil {
     }
 
     public static void setSkullBlockTexture(@NotNull Skull skull, String name, String base64) {
-        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), name);
+        // 1.20.6 has skull.profile : type "GameProfile"
+        // 1.21.1 has skull.profile : type "ResolvableProfile"
 
+        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), name);
         gameProfile.getProperties().put("textures", new Property("textures", base64));
 
         try {
             Field profileField = skull.getClass().getDeclaredField("profile");
-
             profileField.setAccessible(true);
-            profileField.set(skull, gameProfile);
+
+            Class<?> profileType = profileField.getType();
+            if (profileType.getSimpleName().equals("ResolvableProfile")) {
+                Constructor<?> constructor = profileType.getConstructor(GameProfile.class);
+                Object profile = constructor.newInstance(gameProfile);
+                profileField.set(skull, profile);
+            }
+            else {
+                profileField.set(skull, gameProfile);
+            }
         }
-        catch (NoSuchFieldException | IllegalAccessException exception) {
+        catch (NoSuchFieldException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | InstantiationException exception) {
             exception.printStackTrace();
         }
     }
