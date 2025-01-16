@@ -180,11 +180,15 @@ public final class GraveManager {
             }
 
             int count = plugin.getConfigInt("particle.count", grave);
+            String extraParam = plugin.getConfigString("particle.extra", grave);
+            boolean isExtraSet = extraParam == null || extraParam.isBlank() || extraParam.equalsIgnoreCase("null");
+            double extra = isExtraSet ? plugin.getConfigDbl("particle.extra", grave) : 0;
             double offsetX = plugin.getConfigDbl("particle.offset.x", grave);
             double offsetY = plugin.getConfigDbl("particle.offset.y", grave);
             double offsetZ = plugin.getConfigDbl("particle.offset.z", grave);
             location = location.clone().add(offsetX + 0.5, offsetY + 0.5, offsetZ + 0.5);
 
+            Object data = null;
             if (location.getWorld() != null) {
                 switch (particle.name()) {
                     case "REDSTONE" -> {
@@ -193,11 +197,26 @@ public final class GraveManager {
                         if (color == null) {
                             color = Color.RED;
                         }
-                        location.getWorld()
-                                .spawnParticle(particle, location, count, new Particle.DustOptions(color, size));
+                        data = new Particle.DustOptions(color, size);
                     }
-                    case "SHRIEK" -> location.getWorld().spawnParticle(particle, location, count, 1);
-                    default -> location.getWorld().spawnParticle(particle, location, count);
+                    case "SHRIEK" -> data = 1;
+                }
+
+                if (isExtraSet) {
+                    if (data != null) {
+                        location.getWorld().spawnParticle(particle, location, count, 0.0, 0.0, 0.0, extra, data);
+                    }
+                    else {
+                        location.getWorld().spawnParticle(particle, location, count, 0.0, 0.0, 0.0, extra);
+                    }
+                }
+                else {
+                    if (data != null) {
+                        location.getWorld().spawnParticle(particle, location, count, data);
+                    }
+                    else {
+                        location.getWorld().spawnParticle(particle, location, count);
+                    }
                 }
             }
         }
