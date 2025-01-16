@@ -150,16 +150,40 @@ settings:
       # Particle #
       ############
       particle:
-        enabled: true # Enable the particles feature.
-        type: "ENCHANTMENT_TABLE" # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
-        count: 4 # Amount of particles.
-        dust-size: 4 # Only applies to REDSTONE.
-        dust-color: "RED" # only applies to REDSTONE, https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Color.html
+        # Master toggle for the particle effect system
+        enabled: true
+
+        # The particle effect to display. See full list at:
+        # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
+        type: "ENCHANTMENT_TABLE"
+
+        # Number of particles to spawn in each burst
+        count: 4
+
+        # Size of REDSTONE dust particles (ignored for other particle types)
+        dust-size: 4
+
+        # Color of REDSTONE dust particles. Valid colors listed at:
+        # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Color.html
+        dust-color: "RED"
+
         offset:
-          x: 0 # Particle offset X.
-          y: 0 # Particle offset Y.
-          z: 0 # Particle offset Z.
-        extra: null  # This is another parameter that is available, which most of the time controls the speed (between 0 & 1)
+          # Distance from spawn point where particles can appear
+          # Larger values create a more spread-out effect
+          x: 0  # Horizontal spread (left/right)
+          y: 0  # Vertical spread (up/down)
+          z: 0  # Depth spread (front/back)
+
+        delta:
+          # Random position variation within the spawn area
+          # Higher values increase randomness of particle positions
+          x: 0  # Left/right randomization
+          y: 0  # Up/down randomization
+          z: 0  # Front/back randomization
+
+        # Controls particle behavior, typically affects movement speed
+        # Values between 0.0 (slow/stationary) and 1.0 (fast/dynamic)
+        extra: 1.0
 
       ###########
       # Compass #

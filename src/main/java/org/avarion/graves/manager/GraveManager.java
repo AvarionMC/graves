@@ -203,14 +203,18 @@ public final class GraveManager {
 
         int count = plugin.getConfigInt("particle.count", grave);
         String extraParam = plugin.getConfigString("particle.extra", grave);
-        boolean isExtraSet = extraParam != null && !extraParam.isBlank() && !extraParam.equalsIgnoreCase("null");
+        boolean isExtraSet = extraParam != null && !extraParam.isBlank();
         double extra = isExtraSet ? plugin.getConfigDbl("particle.extra", grave) : 0;
 
+        double deltaX = plugin.getConfigDbl("particle.delta.x", grave);
+        double deltaY = plugin.getConfigDbl("particle.delta.y", grave);
+        double deltaZ = plugin.getConfigDbl("particle.delta.z", grave);
+
         if (isExtraSet && data != null) {
-            world.spawnParticle(particle, location, count, 0.0, 0.0, 0.0, extra, data);
+            world.spawnParticle(particle, location, count, deltaX, deltaY, deltaZ, extra, data);
         }
         else if (isExtraSet) {
-            world.spawnParticle(particle, location, count, 0.0, 0.0, 0.0, extra);
+            world.spawnParticle(particle, location, count, deltaX, deltaY, deltaZ, extra);
         }
         else if (data != null) {
             world.spawnParticle(particle, location, count, data);
