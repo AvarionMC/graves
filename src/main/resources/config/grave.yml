@@ -159,7 +159,7 @@ settings:
           x: 0 # Particle offset X.
           y: 0 # Particle offset Y.
           z: 0 # Particle offset Z.
-        extra: null
+        extra: null  # This is another parameter that is available, which most of the time controls the speed (between 0 & 1)
 
       ###########
       # Compass #
