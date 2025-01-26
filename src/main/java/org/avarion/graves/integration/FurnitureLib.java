@@ -1,10 +1,12 @@
 package org.avarion.graves.integration;
 
+
 import de.Ste3et_C0st.FurnitureLib.Crafting.Project;
 import de.Ste3et_C0st.FurnitureLib.Utilitis.LocationUtil;
 import de.Ste3et_C0st.FurnitureLib.main.FurniturePlugin;
 import de.Ste3et_C0st.FurnitureLib.main.ObjectID;
 import de.Ste3et_C0st.FurnitureLib.main.entity.fEntity;
+import de.Ste3et_C0st.FurnitureLib.main.entity.fInventory;
 import org.avarion.graves.Graves;
 import org.avarion.graves.data.EntityData;
 import org.avarion.graves.listener.integration.furniturelib.ProjectBreakListener;
@@ -24,7 +26,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -87,7 +88,7 @@ public final class FurnitureLib extends EntityDataManager {
                         .forEach((signLocation) -> setSign(signLocation.getBlock(), plugin.getConfigStringList("furniturelib.line", grave), grave));
 
                 if (plugin.getConfigBool("furniturelib.head.replace", grave)) {
-                    objectID.getPacketList().forEach((fEntity) -> setSkull(fEntity, grave));
+                    objectID.getPacketList().forEach(fEntity -> setSkull(fEntity, grave));
                 }
 
                 libInstance.getFurnitureManager().addObjectID(objectID);
@@ -101,10 +102,6 @@ public final class FurnitureLib extends EntityDataManager {
 
     public void removeFurniture(Grave grave) {
         removeFurniture(getLoadedEntityDataList(grave));
-    }
-
-    public void removeFurniture(EntityData entityData) {
-        removeFurniture(Collections.singletonList(entityData));
     }
 
     public void removeFurniture(@NotNull List<EntityData> entityDataList) {
@@ -144,40 +141,42 @@ public final class FurnitureLib extends EntityDataManager {
         List<String> materialList = plugin.getConfigStringList("furniturelib.head.material", grave);
         ItemStack itemStack = plugin.getCompatibility().getSkullItemStack(grave, plugin);
 
-        if (fEntity.getItemInMainHand() != null
-            && materialList.contains(fEntity.getItemInMainHand().getType().name())
-            && isSkullTextureBlank(fEntity.getItemInMainHand())) {
-            fEntity.setItemInMainHand(itemStack);
+        fInventory inventory = new fInventory(fEntity.getEntityID());
+
+        if (inventory.getItemInMainHand() != null
+            && materialList.contains(inventory.getItemInMainHand().getType().name())
+            && isSkullTextureBlank(inventory.getItemInMainHand())) {
+            inventory.setItemInMainHand(itemStack);
         }
 
-        if (fEntity.getItemInOffHand() != null
-            && materialList.contains(fEntity.getItemInOffHand().getType().name())
-            && isSkullTextureBlank(fEntity.getItemInOffHand())) {
-            fEntity.setItemInOffHand(itemStack);
+        if (inventory.getItemInOffHand() != null
+            && materialList.contains(inventory.getItemInOffHand().getType().name())
+            && isSkullTextureBlank(inventory.getItemInOffHand())) {
+            inventory.setItemInOffHand(itemStack);
         }
 
-        if (fEntity.getHelmet() != null
-            && materialList.contains(fEntity.getHelmet().getType().name())
-            && isSkullTextureBlank(fEntity.getHelmet())) {
-            fEntity.setHelmet(itemStack);
+        if (inventory.getHelmet() != null
+            && materialList.contains(inventory.getHelmet().getType().name())
+            && isSkullTextureBlank(inventory.getHelmet())) {
+            inventory.setHelmet(itemStack);
         }
 
-        if (fEntity.getChestPlate() != null
-            && materialList.contains(fEntity.getChestPlate().getType().name())
-            && isSkullTextureBlank(fEntity.getChestPlate())) {
-            fEntity.setChestPlate(itemStack);
+        if (inventory.getChestPlate() != null
+            && materialList.contains(inventory.getChestPlate().getType().name())
+            && isSkullTextureBlank(inventory.getChestPlate())) {
+            inventory.setChestPlate(itemStack);
         }
 
-        if (fEntity.getLeggings() != null
-            && materialList.contains(fEntity.getLeggings().getType().name())
-            && isSkullTextureBlank(fEntity.getLeggings())) {
-            fEntity.setLeggings(itemStack);
+        if (inventory.getLeggings() != null
+            && materialList.contains(inventory.getLeggings().getType().name())
+            && isSkullTextureBlank(inventory.getLeggings())) {
+            inventory.setLeggings(itemStack);
         }
 
-        if (fEntity.getBoots() != null
-            && materialList.contains(fEntity.getBoots().getType().name())
-            && isSkullTextureBlank(fEntity.getBoots())) {
-            fEntity.setBoots(itemStack);
+        if (inventory.getBoots() != null
+            && materialList.contains(inventory.getBoots().getType().name())
+            && isSkullTextureBlank(inventory.getBoots())) {
+            inventory.setBoots(itemStack);
         }
     }
 
