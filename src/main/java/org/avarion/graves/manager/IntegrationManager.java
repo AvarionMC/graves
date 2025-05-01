@@ -617,7 +617,7 @@ public final class IntegrationManager {
             Plugin simpleClaimSystemPlugin = plugin.getServer().getPluginManager().getPlugin("SimpleClaimSystem");
 
             if (simpleClaimSystemPlugin != null && simpleClaimSystemPlugin.isEnabled()) {
-                simpleClaimSystem = new SimpleClaimSystem(simpleClaimSystemPlugin);
+                simpleClaimSystem = new SimpleClaimSystem((fr.xyness.SCS.SimpleClaimSystem)simpleClaimSystemPlugin);
 
                 plugin.integrationMessage("Hooked into "
                                           + simpleClaimSystemPlugin.getName()
