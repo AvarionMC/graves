@@ -231,7 +231,7 @@ public final class IntegrationManager {
 
                 plugin.infoMessage("MultiPaper detected, enabling MultiLib.");
             }
-            catch (ClassNotFoundException ignored) {
+            catch (ClassNotFoundException _) {
             }
         }
         else {
@@ -295,7 +295,7 @@ public final class IntegrationManager {
                                               + worldGuardPlugin.getDescription().getVersion()
                                               + ".");
                 }
-                catch (ClassNotFoundException ignored) {
+                catch (ClassNotFoundException _) {
                     plugin.integrationMessage(worldGuardPlugin.getName()
                                               + " "
                                               + worldGuardPlugin.getDescription()
@@ -345,7 +345,7 @@ public final class IntegrationManager {
                                               + worldEditPlugin.getDescription().getVersion()
                                               + ".");
                 }
-                catch (ClassNotFoundException ignored) {
+                catch (ClassNotFoundException _) {
                     plugin.integrationMessage(worldEditPlugin.getName()
                                               + " "
                                               + worldEditPlugin.getDescription()
@@ -394,7 +394,7 @@ public final class IntegrationManager {
                                               + furnitureEnginePlugin.getDescription().getVersion()
                                               + ".");
                 }
-                catch (ClassNotFoundException ignored) {
+                catch (ClassNotFoundException _) {
                     plugin.integrationMessage(furnitureEnginePlugin.getName()
                                               + " "
                                               + furnitureEnginePlugin.getDescription().getVersion()
@@ -479,7 +479,7 @@ public final class IntegrationManager {
 
                 plugin.integrationMessage("Hooked into MiniMessage.");
             }
-            catch (ClassNotFoundException ignored) {
+            catch (ClassNotFoundException _) {
             }
         }
         else {
