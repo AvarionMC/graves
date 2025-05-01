@@ -221,11 +221,21 @@ public final class LocationManager {
     public boolean canBuild(LivingEntity livingEntity, Location location, List<String> permissionList) {
         if (livingEntity instanceof Player player) {
 
-            return (!plugin.getConfigBool("placement.can-build", player, permissionList) || plugin.getCompatibility()
-                                                                                                  .canBuild(player, location, plugin))
-                   && (!plugin.getIntegrationManager().hasProtectionLib()
-                       || (!plugin.getConfigBool("placement.can-build-protectionlib", player, permissionList)
-                           || plugin.getIntegrationManager().getProtectionLib().canBuild(location, player)));
+            // Check if the player has permission to build
+            boolean canBuild = !plugin.getConfigBool("placement.can-build", player, permissionList)
+                               || plugin.getCompatibility().canBuild(player, location, plugin);
+
+            // Check if the player can build in a claim using ProtectionLib
+            boolean canBuildProtectionLib = !plugin.getIntegrationManager().hasProtectionLib()
+                                            || !plugin.getConfigBool("placement.can-build-protectionlib", player, permissionList)
+                                            || plugin.getIntegrationManager().getProtectionLib().canBuild(location, player);
+
+            // Check if the player can build in a claim using SimpleClaimSystem
+            boolean canBuildSCS = !plugin.getIntegrationManager().hasSimpleClaimSystem()
+                                  || !plugin.getConfigBool("placement.can-build-simpleclaimsystem", player, permissionList)
+                                  || plugin.getIntegrationManager().getSimpleClaimSystem().canBuild(player, location);
+
+            return canBuild && canBuildProtectionLib && canBuildSCS;
         }
 
         return true;

@@ -23,7 +23,7 @@
 
     <properties>
         <revision>0.0.0-SNAPSHOT</revision>
-        <java.version>17</java.version>
+        <java.version>22</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -387,6 +387,12 @@
             <groupId>net.coreprotect</groupId>
             <artifactId>coreprotect</artifactId>
             <version>22.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.Xyness</groupId>
+            <artifactId>SimpleClaimSystem</artifactId>
+            <version>1.12.3.2</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

@@ -27,6 +27,7 @@ public final class IntegrationManager {
     private PlayerNPC playerNPC;
     private PlaceholderAPI placeholderAPI;
     private CoreProtectAPI coreProtect;
+    private SimpleClaimSystem simpleClaimSystem;
 
     public IntegrationManager(Graves plugin) {
         this.plugin = plugin;
@@ -58,6 +59,7 @@ public final class IntegrationManager {
         loadPlaceholderAPI();
         loadCoreProtect();
         loadCompatibilityWarnings();
+        loadSimpleClaimSystem();
     }
 
     public void unload() {
@@ -150,6 +152,10 @@ public final class IntegrationManager {
         return coreProtect;
     }
 
+    public SimpleClaimSystem getSimpleClaimSystem() {
+        return simpleClaimSystem;
+    }
+
     public boolean hasMultiPaper() {
         return multiPaper != null;
     }
@@ -213,6 +219,8 @@ public final class IntegrationManager {
     public boolean hasPlaceholderAPI() {
         return placeholderAPI != null;
     }
+
+    public boolean hasSimpleClaimSystem() { return simpleClaimSystem != null; }
 
     private void loadMultiPaper() {
         if (plugin.getConfig().getBoolean("settings.integration.multipaper.enabled")) {
@@ -602,6 +610,25 @@ public final class IntegrationManager {
 
 
         coreProtect = new CoreProtectAPI(plugin);
+    }
+
+    private void loadSimpleClaimSystem() {
+        if (plugin.getConfig().getBoolean("settings.integration.simpleclaimsystem.enabled", true)) {
+            Plugin simpleClaimSystemPlugin = plugin.getServer().getPluginManager().getPlugin("SimpleClaimSystem");
+
+            if (simpleClaimSystemPlugin != null && simpleClaimSystemPlugin.isEnabled()) {
+                simpleClaimSystem = new SimpleClaimSystem((fr.xyness.SCS.SimpleClaimSystem)simpleClaimSystemPlugin);
+
+                plugin.integrationMessage("Hooked into "
+                                          + simpleClaimSystemPlugin.getName()
+                                          + " "
+                                          + simpleClaimSystemPlugin.getDescription().getVersion()
+                                          + ".");
+            }
+
+        } else {
+            simpleClaimSystem = null;
+        }
     }
 
     @SuppressWarnings("deprecation")
