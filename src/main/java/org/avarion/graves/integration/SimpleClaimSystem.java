@@ -18,12 +18,11 @@ public final class SimpleClaimSystem {
     public boolean canBuild(Player player, Location target) {
         // Check if the target is in a claim
         Claim claim = scs.getClaimAtChunk(target.getChunk());
-        if (claim != null) {
-            // Check if the player has permission to build in the claim
-            return !claim.isBanned(player.getUniqueId())
-                   && claim.getPermissionForPlayer("Build", player)
-                   && claim.getPermissionForPlayer("Destroy", player);
-        }
-        return true;
+        // Check if the player has permission to build in the claim
+        return claim == null || (
+               !claim.isBanned(player.getUniqueId())
+               && claim.getPermissionForPlayer("Build", player)
+               && claim.getPermissionForPlayer("Destroy", player)
+        );
     }
 }
