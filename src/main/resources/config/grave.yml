@@ -20,6 +20,7 @@ settings:
       placement:
         can-build: false # Only create graves where the entity can build, should work with all protection plugins.
         can-build-protectionlib: false # Only create graves where the entity can build, (According to ProtectionLib).
+        can-build-simpleclaimsystem: false # Only create graves where the entity can build, (According to SimpleClaimSystem).
         ground: true # If the entity dies in the air should the grave fall to the ground.
         void: true # If the entity dies in the void, should it place a grave in the air if it can't find anywhere else.
         lava-top: true # If the entity dies in lava should the grave it floats to the top.

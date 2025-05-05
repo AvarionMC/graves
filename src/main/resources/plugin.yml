@@ -28,6 +28,7 @@ softdepend:
   - PlayerNPC
   - Skript
   - CoreProtect
+  - SimpleClaimSystem
 
 commands:
   graves:

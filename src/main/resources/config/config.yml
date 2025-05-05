@@ -111,3 +111,5 @@ settings:
       enabled: true # Should ItemBridge integration be enabled.
     coreprotect: # https://www.spigotmc.org/resources/coreprotect.8631/
       enabled: true # Should CoreProtect integration be enabled.
+    simpleclaimsystem: # Source: https://www.spigotmc.org/resources/simpleclaimsystem-%E2%9C%85-1-18-1-21-5-fully-configurable-%E2%9A%99%EF%B8%8F-folia-bedrock-supported-%E2%9A%A1.115568/
+      enabled: true

@@ -58,6 +58,7 @@ and more! While still being lightweight and efficient.
 * ItemBridge
 * MineDown
 * MiniMessage
+* SimpleClaimSystem
 
 ## Screenshots
 
