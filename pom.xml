@@ -322,7 +322,7 @@
         <dependency>
             <groupId>com.github.Ste3et</groupId>
             <artifactId>FurnitureLib</artifactId>
-            <version>v3.2.7</version>
+            <version>v3.2.8</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
