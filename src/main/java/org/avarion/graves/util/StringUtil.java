@@ -3,7 +3,6 @@ package org.avarion.graves.util;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
 import org.avarion.graves.Graves;
 import org.avarion.graves.type.Grave;
 import org.bukkit.Location;
@@ -245,13 +244,26 @@ public final class StringUtil {
     }
 
     private static String capitalizeFully(String string) {
-        try {
-            string = WordUtils.capitalizeFully(string);
-        }
-        catch (NoClassDefFoundError ignored) {
+        if (string == null || string.isEmpty()) {
+            return string;
         }
 
-        return string;
+        StringBuilder result = new StringBuilder();
+        boolean capitalizeNext = true;
+
+        for (char c : string.toCharArray()) {
+            if (Character.isWhitespace(c)) {
+                capitalizeNext = true;
+                result.append(c);
+            } else if (capitalizeNext) {
+                result.append(Character.toUpperCase(c));
+                capitalizeNext = false;
+            } else {
+                result.append(Character.toLowerCase(c));
+            }
+        }
+
+        return result.toString();
     }
 
 }

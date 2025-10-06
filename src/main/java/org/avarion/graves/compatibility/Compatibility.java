@@ -5,6 +5,7 @@ import com.mojang.authlib.properties.Property;
 import org.avarion.graves.Graves;
 import org.avarion.graves.data.BlockData;
 import org.avarion.graves.type.Grave;
+import org.avarion.graves.util.SkinUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -14,7 +15,6 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
 
 public interface Compatibility {
 
@@ -36,17 +36,14 @@ public interface Compatibility {
 
         try {
             Field profileField = skullMeta.getClass().getDeclaredField("profile");
-
             profileField.setAccessible(true);
-
             GameProfile gameProfile = (GameProfile) profileField.get(skullMeta);
 
-            if (gameProfile != null && gameProfile.getProperties().containsKey("textures")) {
-                Collection<Property> propertyCollection = gameProfile.getProperties().get("textures");
-
-                if (!propertyCollection.isEmpty()) {
-                    return propertyCollection.stream().findFirst().get().getValue();
-                }
+            if (gameProfile != null) {
+                return SkinUtil.GET_PROPERTIES.apply(gameProfile).get("textures").stream()
+                                              .findFirst()
+                                              .map(SkinUtil.GET_VALUE)
+                                              .orElse(null);
             }
         }
         catch (NoSuchFieldException | IllegalAccessException exception) {

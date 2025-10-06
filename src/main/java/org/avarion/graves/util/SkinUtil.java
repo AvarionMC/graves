@@ -1,5 +1,7 @@
 package org.avarion.graves.util;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
@@ -8,33 +10,101 @@ import org.bukkit.entity.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.Function;
 
 
 public final class SkinUtil {
     private static final Map<String, String> knownTextures = SkinUtil.Textures.MAP;
 
     private static String gameProfileMethod;
-    private static Method propertyGetValue;
-    private static Method propertyGetSignature;
+    public static final Function<Property, String> GET_VALUE;
+    public static final Function<Property, String> GET_SIGNATURE;
+    public static final Function<GameProfile, PropertyMap> GET_PROPERTIES;
+
+    private static Method getMethod(Class<?> clazz, String... names) {
+        for (String name : names) {
+            try {
+                return clazz.getMethod(name);
+            }
+            catch (NoSuchMethodException ignored) {
+            }
+        }
+        throw new RuntimeException("Failed to find method " + Arrays.toString(names) + " in " + clazz.getSimpleName());
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T, R> @NotNull Function<T, R> methodToFunction(Class<T> clazz, String... names) {
+        Method method = getMethod(clazz, names);
+        return obj -> {
+            try {
+                return (R) method.invoke(obj);
+            }
+            catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
+    }
 
     static {
-        // Determine which method to use during class loading
+        GET_VALUE = methodToFunction(Property.class, "value", "getValue");
+        GET_SIGNATURE = methodToFunction(Property.class, "signature", "getSignature");
+        GET_PROPERTIES = methodToFunction(GameProfile.class, "properties", "getProperties");
+    }
+
+    private static GameProfile createProfile(String name, String base64) {
+        UUID uuid = UUID.randomUUID();
+
+        Property prop = new Property("textures", base64);
         try {
-            propertyGetValue = Property.class.getMethod("value");
-            propertyGetSignature = Property.class.getMethod("signature");
-        }
-        catch (NoSuchMethodException e) {
+            Constructor<GameProfile> constructor = GameProfile.class.getConstructor(
+                    UUID.class,
+                    String.class,
+                    PropertyMap.class
+            );
+
+            Multimap<String, Property> mm = ArrayListMultimap.create();
+            mm.put("textures", prop);
+
+            Constructor<?> createMap = PropertyMap.class.getConstructor(Multimap.class);
+            PropertyMap properties = (PropertyMap) createMap.newInstance(mm);
+
+            return constructor.newInstance(uuid, name, properties);
+        } catch (NoSuchMethodException e) {
+            GameProfile profile = new GameProfile(uuid, name);
             try {
-                propertyGetValue = Property.class.getMethod("getValue");
-                propertyGetSignature = Property.class.getMethod("getSignature");
+                Method getProperties = GameProfile.class.getDeclaredMethod("getProperties");
+                getProperties.setAccessible(true);
+                PropertyMap map = (PropertyMap) getProperties.invoke(profile);
+                map.put("textures", prop);
             }
-            catch (NoSuchMethodException ex) {
-                throw new RuntimeException("Failed to find a valid method for Property value/signature retrieval", ex);
+            catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+                throw new RuntimeException(ex);
+            }
+            return profile;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create GameProfile", e);
+        }
+    }
+
+    private static @Nullable Object getResolvableProfile(@NotNull Class<?> profileType, String name, GameProfile gameProfile) {
+        Constructor<?> constructor = null;
+        try {
+            constructor = profileType.getConstructor(GameProfile.class);
+            return constructor.newInstance(gameProfile);
+        }
+        catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            Method method = null;
+            try {
+                method = profileType.getDeclaredMethod("createUnresolved", String.class);
+                return method.invoke(null, name);
+            }
+            catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+                return null;
             }
         }
     }
@@ -42,9 +112,9 @@ public final class SkinUtil {
     public static void setSkullBlockTexture(@NotNull Skull skull, String name, String base64) {
         // 1.20.6 has skull.profile : type "GameProfile"
         // 1.21.1 has skull.profile : type "ResolvableProfile"
+        // 1.21.9 has an immutable properties inside "GameProfile"
 
-        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), name);
-        gameProfile.getProperties().put("textures", new Property("textures", base64));
+        GameProfile gameProfile = createProfile(name, base64);
 
         try {
             Field profileField = skull.getClass().getDeclaredField("profile");
@@ -52,50 +122,34 @@ public final class SkinUtil {
 
             Class<?> profileType = profileField.getType();
             if (profileType.getSimpleName().equals("ResolvableProfile")) {
-                Constructor<?> constructor = profileType.getConstructor(GameProfile.class);
-                Object profile = constructor.newInstance(gameProfile);
-                profileField.set(skull, profile);
+                Object resolvableProfile = getResolvableProfile(profileType, name, gameProfile);
+                profileField.set(skull, resolvableProfile);
             }
             else {
                 profileField.set(skull, gameProfile);
             }
         }
-        catch (NoSuchFieldException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | InstantiationException exception) {
+        catch (NoSuchFieldException | IllegalAccessException exception) {
             exception.printStackTrace();
         }
     }
 
-    private static String getPlayerProperty(Entity entity, Method callThis) {
+    private static String getPlayerProperty(Entity entity, Function<Property, String> accessor) {
         if (entity instanceof Player) {
             GameProfile gameProfile = getPlayerGameProfile((Player) entity);
-
             if (gameProfile != null) {
-                PropertyMap propertyMap = gameProfile.getProperties();
-
+                PropertyMap propertyMap = GET_PROPERTIES.apply(gameProfile);
                 if (propertyMap.containsKey("textures")) {
-                    Collection<Property> propertyCollection = propertyMap.get("textures");
-
-                    if (propertyCollection.isEmpty()) {
-                        return null;
-                    }
-
-                    Property prop = propertyCollection.stream().findFirst().get();
-                    try {
-                        return (String) callThis.invoke(prop);
-                    }
-                    catch (IllegalAccessException | InvocationTargetException e) {
-                        throw new RuntimeException(e);
-                    }
+                    return propertyMap.get("textures").stream().findFirst().map(accessor).orElse(null);
                 }
             }
         }
-
         return null;
     }
 
     public static @NotNull String getTexture(@NotNull Entity entity) {
         if (entity instanceof Player) {
-            return getPlayerProperty(entity, propertyGetValue);
+            return getPlayerProperty(entity, GET_VALUE);
         }
 
         // Try to find our entity
@@ -137,7 +191,7 @@ public final class SkinUtil {
     }
 
     public static String getSignature(Entity entity) {
-        return getPlayerProperty(entity, propertyGetSignature);
+        return getPlayerProperty(entity, GET_SIGNATURE);
     }
 
     public static @Nullable GameProfile getPlayerGameProfile(@NotNull Player player) {
