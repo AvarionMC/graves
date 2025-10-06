@@ -1,5 +1,7 @@
 package org.avarion.graves.util;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
@@ -36,12 +38,13 @@ public final class SkinUtil {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T, R> Function<T, R> methodToFunction(Class<T> clazz, String... names) {
+    private static <T, R> @NotNull Function<T, R> methodToFunction(Class<T> clazz, String... names) {
         Method method = getMethod(clazz, names);
         return obj -> {
             try {
                 return (R) method.invoke(obj);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 throw new RuntimeException(e);
             }
         };
@@ -53,9 +56,65 @@ public final class SkinUtil {
         GET_PROPERTIES = methodToFunction(GameProfile.class, "properties", "getProperties");
     }
 
+    private static GameProfile createProfile(String name, String base64) {
+        UUID uuid = UUID.randomUUID();
+
+        Property prop = new Property("textures", base64);
+        try {
+            Constructor<GameProfile> constructor = GameProfile.class.getConstructor(
+                    UUID.class,
+                    String.class,
+                    PropertyMap.class
+            );
+
+            Multimap<String, Property> mm = ArrayListMultimap.create();
+            mm.put("textures", prop);
+
+            Constructor<?> createMap = PropertyMap.class.getConstructor(Multimap.class);
+            PropertyMap properties = (PropertyMap) createMap.newInstance(mm);
+
+            return constructor.newInstance(uuid, name, properties);
+        } catch (NoSuchMethodException e) {
+            GameProfile profile = new GameProfile(uuid, name);
+            try {
+                Method getProperties = GameProfile.class.getDeclaredMethod("getProperties");
+                getProperties.setAccessible(true);
+                PropertyMap map = (PropertyMap) getProperties.invoke(profile);
+                map.put("textures", prop);
+            }
+            catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+                throw new RuntimeException(ex);
+            }
+            return profile;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create GameProfile", e);
+        }
+    }
+
+    private static @Nullable Object getResolvableProfile(@NotNull Class<?> profileType, String name, GameProfile gameProfile) {
+        Constructor<?> constructor = null;
+        try {
+            constructor = profileType.getConstructor(GameProfile.class);
+            return constructor.newInstance(gameProfile);
+        }
+        catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            Method method = null;
+            try {
+                method = profileType.getDeclaredMethod("createUnresolved", String.class);
+                return method.invoke(null, name);
+            }
+            catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+                return null;
+            }
+        }
+    }
+
     public static void setSkullBlockTexture(@NotNull Skull skull, String name, String base64) {
-        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), name);
-        GET_PROPERTIES.apply(gameProfile).put("textures", new Property("textures", base64));
+        // 1.20.6 has skull.profile : type "GameProfile"
+        // 1.21.1 has skull.profile : type "ResolvableProfile"
+        // 1.21.9 has an immutable properties inside "GameProfile"
+
+        GameProfile gameProfile = createProfile(name, base64);
 
         try {
             Field profileField = skull.getClass().getDeclaredField("profile");
@@ -63,19 +122,14 @@ public final class SkinUtil {
 
             Class<?> profileType = profileField.getType();
             if (profileType.getSimpleName().equals("ResolvableProfile")) {
-                Constructor<?> constructor = profileType.getConstructor(GameProfile.class);
-                Object profile = constructor.newInstance(gameProfile);
-                profileField.set(skull, profile);
+                Object resolvableProfile = getResolvableProfile(profileType, name, gameProfile);
+                profileField.set(skull, resolvableProfile);
             }
             else {
                 profileField.set(skull, gameProfile);
             }
         }
-        catch (NoSuchFieldException |
-               IllegalAccessException |
-               InvocationTargetException |
-               NoSuchMethodException |
-               InstantiationException exception) {
+        catch (NoSuchFieldException | IllegalAccessException exception) {
             exception.printStackTrace();
         }
     }
@@ -86,10 +140,7 @@ public final class SkinUtil {
             if (gameProfile != null) {
                 PropertyMap propertyMap = GET_PROPERTIES.apply(gameProfile);
                 if (propertyMap.containsKey("textures")) {
-                    return propertyMap.get("textures").stream()
-                                      .findFirst()
-                                      .map(accessor)
-                                      .orElse(null);
+                    return propertyMap.get("textures").stream().findFirst().map(accessor).orElse(null);
                 }
             }
         }
