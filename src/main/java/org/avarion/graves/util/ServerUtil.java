@@ -23,7 +23,7 @@ public final class ServerUtil {
         stringList.add("Implementation Name: " + plugin.getServer().getName());
         stringList.add("Implementation Version: " + plugin.getServer().getVersion());
         stringList.add("Bukkit Version: " + plugin.getServer().getBukkitVersion());
-        stringList.add("NMS Version: " + plugin.getServer().getClass().getPackage().getName().split("\\.")[3]);
+        stringList.add("Full NMS Version: " + plugin.getServer().getClass().getPackage().getName());
         stringList.add("Player Count: " + plugin.getServer().getOnlinePlayers().size());
         stringList.add("Player List: " + plugin.getServer()
                                                .getOnlinePlayers()
