@@ -106,8 +106,12 @@ public final class GUIManager {
         if (entity instanceof Player player) {
             GraveMenu graveMenu = new GraveMenu(grave);
             String title = StringUtil.parseString(plugin.getConfigString("gui.menu.grave.title", player, grave.getPermissionList(), "Grave"), player, plugin);
+            
+            int maxSlot = getMaxConfiguredSlot(grave);
+            int inventorySize = InventoryUtil.getInventorySize(maxSlot + 1);
+            
             Inventory inventory = plugin.getServer()
-                                        .createInventory(graveMenu, InventoryUtil.getInventorySize(5), title);
+                                        .createInventory(graveMenu, inventorySize, title);
 
             setGraveMenuItems(inventory, grave);
             graveMenu.setInventory(inventory);
@@ -136,6 +140,26 @@ public final class GUIManager {
                 }
             }
         }
+    }
+
+    private int getMaxConfiguredSlot(Grave grave) {
+        ConfigurationSection configurationSection = plugin.getConfigSection("gui.menu.grave.slot", grave);
+        int maxSlot = 8;
+        
+        if (configurationSection != null) {
+            for (String string : configurationSection.getKeys(false)) {
+                try {
+                    int slot = Integer.parseInt(string);
+                    if (slot > maxSlot) {
+                        maxSlot = slot;
+                    }
+                } catch (NumberFormatException exception) {
+                    // Already logged in setGraveMenuItems
+                }
+            }
+        }
+        
+        return maxSlot;
     }
 
 }
