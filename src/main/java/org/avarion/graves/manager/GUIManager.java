@@ -12,8 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public final class GUIManager {
 
@@ -123,19 +122,54 @@ public final class GUIManager {
         inventory.clear();
 
         ConfigurationSection configurationSection = plugin.getConfigSection("gui.menu.grave.slot", grave);
+        if (configurationSection == null) {
+            return;
+        }
 
-        if (configurationSection != null) {
-            for (String string : configurationSection.getKeys(false)) {
-                try {
-                    int slot = Integer.parseInt(string);
+        Map<Integer, Integer> slotMapping = buildSlotMapping(configurationSection);
 
-                    inventory.setItem(slot, plugin.getItemStackManager().createGraveMenuItemStack(slot, grave));
-                }
-                catch (NumberFormatException exception) {
-                    plugin.debugMessage(string + " is not an int", 1);
-                }
-            }
+        for (Map.Entry<Integer, Integer> entry : slotMapping.entrySet()) {
+            int configKey = entry.getKey();
+            int actualSlot = entry.getValue();
+            inventory.setItem(actualSlot, plugin.getItemStackManager().createGraveMenuItemStack(configKey, grave));
         }
     }
 
+    static public boolean reportedInvalidSlots = false;
+
+    private @NotNull Map<Integer, Integer> buildSlotMapping(@NotNull ConfigurationSection configurationSection) {
+        Map<Integer, Integer> mapping = new HashMap<>();
+        Set<Integer> usedSlots = new HashSet<>();
+
+        for (String slotKey : configurationSection.getKeys(false)) {
+            String message = null;
+
+            try {
+                int configuredSlot = Integer.parseInt(slotKey);
+
+                if (configuredSlot < 0 || configuredSlot >= 9) {
+                    message = "  - Slot " + configuredSlot + " is out of bounds (must be 0-8). Skipping.";
+                }
+                else if (usedSlots.contains(configuredSlot)) {
+                    message = "  - Slot " + configuredSlot + " is already used. Skipping.";
+                }
+                else {
+                    mapping.put(configuredSlot, configuredSlot);
+                    usedSlots.add(configuredSlot);
+                }
+            }
+            catch (NumberFormatException exception) {
+                message = "  - Slot key '" + slotKey + "' is not an integer. Skipping.";
+            }
+
+            if (message != null && !reportedInvalidSlots) {
+                plugin.getLogger()
+                      .warning("Invalid slot configurations found in gui.menu.grave.slot. Check your config.");
+                plugin.getLogger().warning(message);
+            }
+        }
+
+        reportedInvalidSlots = true;
+        return mapping;
+    }
 }
