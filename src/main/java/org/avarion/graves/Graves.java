@@ -144,6 +144,7 @@ public class Graves extends JavaPlugin {
             fileConfiguration = getConfigFile(singleConfigFile);
             loadResourceDefaults(fileConfiguration, singleConfigFile.getName());
         }
+        GUIManager.reportedInvalidSlots = false;
     }
 
     @Override
