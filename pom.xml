@@ -27,6 +27,7 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <test.server.path>${project.build.directory}/test-server</test.server.path>
     </properties>
 
     <build>
@@ -118,24 +119,26 @@
                 <executions>
                     <execution>
                         <id>copy</id>
-                        <phase>package</phase>
+                        <phase>install</phase>
                         <goals>
                             <goal>copy</goal>
                         </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>${project.packaging}</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${test.server.path}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <artifactItems>
-                        <artifactItem>
-                            <groupId>${project.groupId}</groupId>
-                            <artifactId>${project.artifactId}</artifactId>
-                            <version>${project.version}</version>
-                            <type>${project.packaging}</type>
-                        </artifactItem>
-                    </artifactItems>
-                    <outputDirectory>E:\minecraft\server\plugins</outputDirectory>
-                </configuration>
             </plugin>
+
         </plugins>
         <resources>
             <resource>
