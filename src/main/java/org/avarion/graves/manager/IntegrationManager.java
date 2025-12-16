@@ -631,11 +631,10 @@ public final class IntegrationManager {
         }
     }
 
-    @SuppressWarnings("deprecation")
     private void loadCompatibilityWarnings() {
         if (plugin.getConfig().getBoolean("settings.compatibility.warning")) {
             for (World world : plugin.getServer().getWorlds()) {
-                if (world.getGameRuleValue("keepInventory").equals("true")) {
+                if (Boolean.TRUE.equals(world.getGameRuleValue(org.bukkit.GameRule.KEEP_INVENTORY))) {
                     plugin.compatibilityMessage("World \""
                                                 + world.getName()
                                                 + "\" has keepInventory set to true, Graves will not be created here.");
