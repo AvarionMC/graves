@@ -105,8 +105,28 @@ If you find bugs please report them [here](https://github.com/svaningelgem/grave
 
 ![Server usage](https://bstats.org/signatures/bukkit/AvarionGraves.svg)
 
+## Contributing
+
+### How to build
+
+You can build the project using Maven:
+
+```bash
+mvn clean install
+```
+
+### Testing on a local server
+
+You can automatically copy the built plugin to your local server's plugins directory by specifying the `test.server.path` property:
+
+```bash
+mvn clean install -Dtest.server.path=/path/to/your/server/plugins
+```
+
+By default, the plugin will be copied to `target/test-server`.
+
 ## Links
 
-- **Spigot**: https://www.spigotmc.org/resources/graves.116202/
-- **bStats**: https://bstats.org/plugin/bukkit/AvarionGraves/21607
-- **GitHub**: https://github.com/AvarionMC/graves
+* **Spigot**: <https://www.spigotmc.org/resources/graves.116202/>
+* **bStats**: <https://bstats.org/plugin/bukkit/AvarionGraves/21607>
+* **GitHub**: <https://github.com/AvarionMC/graves>
