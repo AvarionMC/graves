@@ -338,7 +338,7 @@
         <dependency>
             <groupId>io.th0rgal</groupId>
             <artifactId>oraxen</artifactId>
-            <version>1.203.2</version>
+            <version>1.204.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>me.gabytm.util</groupId>
