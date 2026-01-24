@@ -27,7 +27,8 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <test.server.path>${project.build.directory}/test-server</test.server.path>
+        <!-- path pointing to your test server, the file will be placed under the 'plugins' directory -->
+        <test.server.path>${project.basedir}/../server</test.server.path>
     </properties>
 
     <build>
@@ -131,7 +132,7 @@
                                     <version>${project.version}</version>
                                     <type>${project.packaging}</type>
                                     <overWrite>true</overWrite>
-                                    <outputDirectory>${test.server.path}</outputDirectory>
+                                    <outputDirectory>${test.server.path}/plugins</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -229,7 +230,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.18-R0.1-SNAPSHOT</version>
+            <version>1.20.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
