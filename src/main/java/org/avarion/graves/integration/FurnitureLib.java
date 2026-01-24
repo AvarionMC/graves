@@ -18,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
@@ -125,7 +126,7 @@ public final class FurnitureLib extends EntityDataManager {
 
             for (String string : stringList) {
                 if (counter <= 4) {
-                    sign.setLine(counter, StringUtil.parseString(string, block.getLocation(), grave, plugin));
+                    sign.getSide(Side.FRONT).setLine(counter, StringUtil.parseString(string, block.getLocation(), grave, plugin));
                     counter++;
                 }
                 else {
