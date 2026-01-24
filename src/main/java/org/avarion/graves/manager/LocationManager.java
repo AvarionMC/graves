@@ -76,6 +76,14 @@ public final class LocationManager {
                     return getLavaTop(location, livingEntity, grave);
                 }
                 else {
+                    // If a grave already exists at this location, try to find a nearby alternative
+                    if (hasGrave(location)) {
+                        Location nearbyLocation = findNearbyLocation(location, grave);
+                        if (nearbyLocation != null) {
+                            return nearbyLocation;
+                        }
+                    }
+
                     Location graveLocation;
                     if (block.getType().isAir() || MaterialUtil.isWater(block.getType())) {
                         graveLocation = plugin.getConfigBool("placement.ground", grave)
@@ -94,6 +102,54 @@ public final class LocationManager {
         }
 
         return getVoid(location, livingEntity, grave);
+    }
+
+    /**
+     * Finds a nearby safe location for a grave when the exact location is already occupied.
+     * Searches in a spiral pattern around the original location, checking both horizontally
+     * and vertically (up/down) for each position.
+     */
+    private @Nullable Location findNearbyLocation(Location location, Grave grave) {
+        if (location.getWorld() == null) {
+            return null;
+        }
+
+        int maxRadius = plugin.getConfigInt("placement.offset-max-radius", grave, 5);
+
+        // Search in expanding squares around the original location
+        for (int radius = 1; radius <= maxRadius; radius++) {
+            // Check all positions at this radius
+            for (int dx = -radius; dx <= radius; dx++) {
+                for (int dz = -radius; dz <= radius; dz++) {
+                    // Only check positions on the edge of the square (not inside)
+                    if (Math.abs(dx) != radius && Math.abs(dz) != radius) {
+                        continue;
+                    }
+
+                    Location candidate = location.clone().add(dx, 0, dz);
+                    candidate = LocationUtil.roundLocation(candidate);
+
+                    // Check the same Y level first
+                    if (!hasGrave(candidate) && isLocationSafeGrave(candidate)) {
+                        return candidate;
+                    }
+
+                    // Check one block up
+                    Location candidateUp = candidate.clone().add(0, 1, 0);
+                    if (!hasGrave(candidateUp) && isLocationSafeGrave(candidateUp)) {
+                        return candidateUp;
+                    }
+
+                    // Check one block down
+                    Location candidateDown = candidate.clone().add(0, -1, 0);
+                    if (!hasGrave(candidateDown) && isLocationSafeGrave(candidateDown)) {
+                        return candidateDown;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     public Location getTop(Location location, Entity entity, Grave grave) {
