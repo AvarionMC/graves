@@ -31,6 +31,7 @@ settings:
           x: 0 # Placement offset X, this will affect all other offsets.
           y: 0 # Placement offset Y, this will affect all other offsets.
           z: 0 # Placement offset Z, this will affect all other offsets.
+        offset-max-radius: 5
 
       #########
       # World #
