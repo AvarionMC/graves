@@ -1,8 +1,10 @@
 package org.avarion.graves.listener;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.avarion.graves.Graves;
 import org.avarion.graves.util.Version;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -31,18 +33,17 @@ public class PlayerJoinListener implements Listener {
                 }
 
                 if (plugin.getVersion().isOutdated(latestVersion)) {
-                    player.sendMessage(ChatColor.RED
-                                       + "☠"
-                                       + ChatColor.DARK_GRAY
-                                       + " » "
-                                       + ChatColor.RESET
-                                       + "Outdated version detected "
-                                       + plugin.getVersion()
-                                       + ", latest version is "
-                                       + latestVersion
-                                       + ", https://www.spigotmc.org/resources/"
-                                       + plugin.getSpigotID()
-                                       + "/");
+                    player.sendMessage(LegacyComponentSerializer.legacySection().serialize(
+                            Component.text("☠", NamedTextColor.RED)
+                                     .append(Component.text(" » ", NamedTextColor.DARK_GRAY))
+                                     .append(Component.text("Outdated version detected "
+                                                            + plugin.getVersion()
+                                                            + ", latest version is "
+                                                            + latestVersion
+                                                            + ", https://www.spigotmc.org/resources/"
+                                                            + plugin.getSpigotID()
+                                                            + "/"))
+                    ));
                 }
             });
         }
