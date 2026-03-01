@@ -6,6 +6,7 @@ import org.avarion.graves.util.StringUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
@@ -90,7 +91,7 @@ public final class ItemStackManager extends EntityDataManager {
         return itemStack;
     }
 
-    public @NotNull ItemStack createGraveListItemStack(int number, Grave grave) {
+    public @NotNull ItemStack createGraveListItemStack(int number, Grave grave, Player player) {
         Material material;
 
         if (plugin.getConfigBool("gui.menu.list.item.block", grave)) {
@@ -122,7 +123,7 @@ public final class ItemStackManager extends EntityDataManager {
             int customModelData = plugin.getConfigInt("gui.menu.list.model-data", grave, -1);
 
             for (String string : plugin.getConfigStringList("gui.menu.list.lore", grave)) {
-                loreList.add(ChatColor.GRAY + StringUtil.parseString(string, grave.getLocationDeath(), grave, plugin));
+                loreList.add(ChatColor.GRAY + StringUtil.parseString(string, player, grave.getLocationDeath(), grave, plugin));
             }
 
             if (plugin.getConfig().getBoolean("gui.menu.list.glow")) {
@@ -142,7 +143,7 @@ public final class ItemStackManager extends EntityDataManager {
         return itemStack;
     }
 
-    public @NotNull ItemStack createGraveMenuItemStack(int slot, Grave grave) {
+    public @NotNull ItemStack createGraveMenuItemStack(int slot, Grave grave, Player player) {
         String materialString = plugin.getConfigString("gui.menu.grave.slot." + slot + ".material", grave, "PAPER");
         Material material = Material.matchMaterial(materialString);
 
@@ -163,7 +164,7 @@ public final class ItemStackManager extends EntityDataManager {
             int customModelData = plugin.getConfigInt("gui.menu.grave.slot." + slot + ".model-data", grave, -1);
 
             for (String string : plugin.getConfigStringList("gui.menu.grave.slot." + slot + ".lore", grave)) {
-                loreList.add(ChatColor.GRAY + StringUtil.parseString(string, grave.getLocationDeath(), grave, plugin));
+                loreList.add(ChatColor.GRAY + StringUtil.parseString(string, player, grave.getLocationDeath(), grave, plugin));
             }
 
             if (plugin.getConfig().getBoolean("gui.menu.grave.slot." + slot + ".glow")) {
