@@ -224,6 +224,10 @@
             <id>local-repo</id>
             <url>file://${project.basedir}/lib</url>
         </repository>
+        <repository>
+            <id>bluecolored-repo</id>
+            <url>https://repo.bluecolored.de/releases</url>
+        </repository>
     </repositories>
 
     <dependencies>
