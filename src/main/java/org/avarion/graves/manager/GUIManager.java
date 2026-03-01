@@ -11,6 +11,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -47,11 +48,11 @@ public final class GUIManager {
 
                     if (inventory.getHolder() instanceof GraveList) {
                         plugin.getGUIManager()
-                              .setGraveListItems(inventory, ((GraveList) inventory.getHolder()).getUUID());
+                              .setGraveListItems(inventory, ((GraveList) inventory.getHolder()).getUUID(), player);
                     }
                     else if (inventory.getHolder() instanceof GraveMenu) {
                         plugin.getGUIManager()
-                              .setGraveMenuItems(inventory, ((GraveMenu) inventory.getHolder()).getGrave());
+                              .setGraveMenuItems(inventory, ((GraveMenu) inventory.getHolder()).getGrave(), player);
                     }
                 }
             }
@@ -68,7 +69,7 @@ public final class GUIManager {
                 Inventory inventory = plugin.getServer()
                                             .createInventory(graveList, InventoryUtil.getInventorySize(playerGraveList.size()), StringUtil.parseString(plugin.getConfigString("gui.menu.list.title", player, permissionList, "Graves Main Menu"), player, plugin));
 
-                setGraveListItems(inventory, playerGraveList);
+                setGraveListItems(inventory, playerGraveList, player);
                 graveList.setInventory(inventory);
                 player.openInventory(graveList.getInventory());
 
@@ -82,17 +83,17 @@ public final class GUIManager {
         }
     }
 
-    public void setGraveListItems(Inventory inventory, UUID uuid) {
-        setGraveListItems(inventory, plugin.getGraveManager().getGraveList(uuid));
+    public void setGraveListItems(Inventory inventory, UUID uuid, @Nullable Player player) {
+        setGraveListItems(inventory, plugin.getGraveManager().getGraveList(uuid), player);
     }
 
-    public void setGraveListItems(@NotNull Inventory inventory, @NotNull List<Grave> graveList) {
+    public void setGraveListItems(@NotNull Inventory inventory, @NotNull List<Grave> graveList, @Nullable Player player) {
         inventory.clear();
 
         int count = 1;
 
         for (Grave grave : graveList) {
-            inventory.addItem(plugin.getItemStackManager().createGraveListItemStack(count, grave));
+            inventory.addItem(plugin.getItemStackManager().createGraveListItemStack(count, grave, player));
             count++;
         }
     }
@@ -108,7 +109,7 @@ public final class GUIManager {
             Inventory inventory = plugin.getServer()
                                         .createInventory(graveMenu, InventoryUtil.getInventorySize(5), title);
 
-            setGraveMenuItems(inventory, grave);
+            setGraveMenuItems(inventory, grave, player);
             graveMenu.setInventory(inventory);
             player.openInventory(graveMenu.getInventory());
 
@@ -118,7 +119,7 @@ public final class GUIManager {
         }
     }
 
-    public void setGraveMenuItems(@NotNull Inventory inventory, Grave grave) {
+    public void setGraveMenuItems(@NotNull Inventory inventory, Grave grave, @Nullable Player player) {
         inventory.clear();
 
         ConfigurationSection configurationSection = plugin.getConfigSection("gui.menu.grave.slot", grave);
@@ -131,7 +132,7 @@ public final class GUIManager {
         for (Map.Entry<Integer, Integer> entry : slotMapping.entrySet()) {
             int configKey = entry.getKey();
             int actualSlot = entry.getValue();
-            inventory.setItem(actualSlot, plugin.getItemStackManager().createGraveMenuItemStack(configKey, grave));
+            inventory.setItem(actualSlot, plugin.getItemStackManager().createGraveMenuItemStack(configKey, grave, player));
         }
     }
 

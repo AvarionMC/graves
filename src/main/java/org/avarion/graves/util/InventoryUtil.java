@@ -184,8 +184,9 @@ public final class InventoryUtil {
 
                 if (object instanceof ItemStack) {
                     inventory.setItem(counter, (ItemStack) object);
-                    counter++;
                 }
+                // Always increment counter to preserve slot positions
+                counter++;
             }
 
             return inventory;

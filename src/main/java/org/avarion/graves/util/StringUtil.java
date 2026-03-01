@@ -65,8 +65,9 @@ public final class StringUtil {
             }
 
             if (string.contains("%teleport_cost%")) {
+                Location playerLocation = (entity != null) ? entity.getLocation() : location;
                 string = string.replace("%teleport_cost%", String.valueOf(plugin.getEntityManager()
-                                                                                .getTeleportCost(location, grave.getLocationDeath(), grave)));
+                                                                                .getTeleportCost(playerLocation, grave.getLocationDeath(), grave)));
             }
         }
 
