@@ -611,7 +611,9 @@ public final class GraveManager {
             if (storageMode == Grave.StorageMode.EXACT) {
                 List<ItemStack> itemStackListLeftOver = new ArrayList<>();
                 int counter = 0;
-                int inventorySize = player.getInventory().getSize();
+                // Use 41 for full player inventory (36 main + 4 armor + 1 off-hand)
+                // player.getInventory().getSize() only returns 36 (main storage)
+                int inventorySize = 41;
 
                 for (ItemStack itemStack : grave.getInventory().getContents()) {
                     if (itemStack != null) {
