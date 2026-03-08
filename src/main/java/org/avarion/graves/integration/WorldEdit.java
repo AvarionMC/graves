@@ -73,7 +73,12 @@ public final class WorldEdit {
             }
 
             String name = file.getName().toLowerCase().replace(".schematic", "").replace(".schem", "");
-            ClipboardFormat clipboardFormat = ClipboardFormats.findByPath(file.toPath());
+            ClipboardFormat clipboardFormat;
+            try {
+                clipboardFormat = ClipboardFormats.findByPath(file.toPath());
+            } catch (NoSuchMethodError ignored) {
+                clipboardFormat = ClipboardFormats.findByFile(file);
+            }
 
             if (clipboardFormat == null) {
                 plugin.warningMessage("Unable to load schematic " + name);
