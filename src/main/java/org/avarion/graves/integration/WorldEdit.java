@@ -57,6 +57,7 @@ public final class WorldEdit {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public void loadData() {
         stringClipboardMap.clear();
 
