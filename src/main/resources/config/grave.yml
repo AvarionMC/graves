@@ -451,11 +451,17 @@ settings:
       # Death #
       #########
       # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html
+      # The player/entity/environmental toggles control WHO caused the death:
+      #   player: Any death caused by a player (melee, bow, trident, sweep, TNT, etc.)
+      #   entity: Any death caused by a non-player entity (zombie, skeleton, creeper, etc.)
+      #   environmental: Any death not caused by an entity (fall, lava, drowning, etc.)
+      # The reason list is a whitelist that OVERRIDES the toggles above.
+      # WARNING: Setting reason to ALL means graves are ALWAYS created, ignoring the toggles.
       death:
-        player: true # Create a grave if an entity dies to a player.
-        entity: false # Create a grave if an entity dies to an entity.
+        player: true # Create a grave if an entity is killed by a player (all PvP damage types).
+        entity: false # Create a grave if an entity is killed by a non-player entity.
         environmental: false # Create a grave if an entity dies to things such as fall damage, lava and suffocation.
-        reason: # Only create graves for entities that were killed for these reasons.
+        reason: # Only create graves for entities that were killed for these reasons. Overrides player/entity/environmental.
           #- CONTACT
           #- ENTITY_ATTACK
           #- ENTITY_SWEEP_ATTACK
