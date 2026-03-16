@@ -96,6 +96,7 @@ public class Graves extends JavaPlugin {
         getServer().getScheduler().runTask(this, () -> {
             compatibilityChecker();
             updateConfig();
+            validateConfig();
             updateChecker();
         });
     }
@@ -162,6 +163,7 @@ public class Graves extends JavaPlugin {
         saveTextFiles();
         reloadConfig();
         updateConfig();
+        validateConfig();
         unregisterListeners();
         registerListeners();
         dataManager.reload();
@@ -365,6 +367,43 @@ public class Graves extends JavaPlugin {
                            + "), renaming outdated config file.");
             saveDefaultConfig();
             reloadConfig();
+        }
+    }
+
+    private void validateConfig() {
+        warnDeathReasonAll();
+    }
+
+    private void warnDeathReasonAll() {
+        List<String> sectionsToCheck = new ArrayList<>();
+        sectionsToCheck.add("settings.default.default");
+
+        ConfigurationSection entitySection = getConfig().getConfigurationSection("settings.entity");
+        if (entitySection != null) {
+            for (String key : entitySection.getKeys(false)) {
+                sectionsToCheck.add("settings.entity." + key);
+            }
+        }
+
+        ConfigurationSection permSection = getConfig().getConfigurationSection("settings.permission");
+        if (permSection != null) {
+            for (String key : permSection.getKeys(false)) {
+                sectionsToCheck.add("settings.permission." + key);
+            }
+        }
+
+        for (String section : sectionsToCheck) {
+            ConfigurationSection cs = getConfig().getConfigurationSection(section);
+            if (cs == null) continue;
+
+            List<String> reasons = cs.getStringList("death.reason");
+            if (reasons.contains("ALL")) {
+                warningMessage("Config section '"
+                               + section
+                               + "' has death.reason set to ALL, which means graves will ALWAYS be created"
+                               + " regardless of death.player, death.entity, and death.environmental settings."
+                               + " Remove ALL from death.reason if you want those toggles to take effect.");
+            }
         }
     }
 

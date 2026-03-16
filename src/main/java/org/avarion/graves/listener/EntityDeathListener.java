@@ -210,22 +210,29 @@ public class EntityDeathListener implements EventExecutor {
             EntityDamageEvent.DamageCause damageCause = livingEntity.getLastDamageCause().getCause();
             List<String> damageCauseList = plugin.getConfigStringList("death.reason", livingEntity, permissionList);
 
-            if (!damageCauseList.contains("ALL") && !damageCauseList.contains(damageCause.name()) && (damageCause
-                                                                                                      == EntityDamageEvent.DamageCause.ENTITY_ATTACK
-                                                                                                      && ((livingEntity.getKiller()
-                                                                                                           != null
-                                                                                                           && !plugin.getConfigBool("death.player", livingEntity, permissionList))
-                                                                                                          || (livingEntity.getKiller()
-                                                                                                              == null
-                                                                                                              && !plugin.getConfigBool("death.entity", livingEntity, permissionList)))
-                                                                                                      || (damageCause
-                                                                                                          != EntityDamageEvent.DamageCause.ENTITY_ATTACK
-                                                                                                          && !plugin.getConfigBool("death.environmental", livingEntity, permissionList)))) {
-                plugin.debugMessage("Grave not created for "
-                                    + entityName
-                                    + " because they died to an invalid damage cause", 2);
+            if (!damageCauseList.contains("ALL") && !damageCauseList.contains(damageCause.name())) {
+                boolean isPlayerKill = livingEntity.getKiller() != null;
+                boolean isEntityKill = !isPlayerKill
+                                       && livingEntity.getLastDamageCause() instanceof EntityDamageByEntityEvent;
 
-                return;
+                boolean blocked;
+                if (isPlayerKill) {
+                    blocked = !plugin.getConfigBool("death.player", livingEntity, permissionList);
+                }
+                else if (isEntityKill) {
+                    blocked = !plugin.getConfigBool("death.entity", livingEntity, permissionList);
+                }
+                else {
+                    blocked = !plugin.getConfigBool("death.environmental", livingEntity, permissionList);
+                }
+
+                if (blocked) {
+                    plugin.debugMessage("Grave not created for "
+                                        + entityName
+                                        + " because they died to an invalid damage cause", 2);
+
+                    return;
+                }
             }
         }
 
