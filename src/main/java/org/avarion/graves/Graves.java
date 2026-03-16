@@ -371,7 +371,10 @@ public class Graves extends JavaPlugin {
     }
 
     private void validateConfig() {
-        // Check all config sections for death.reason containing ALL
+        warnDeathReasonAll();
+    }
+
+    private void warnDeathReasonAll() {
         List<String> sectionsToCheck = new ArrayList<>();
         sectionsToCheck.add("settings.default.default");
 
