@@ -125,7 +125,7 @@ public class EntityDeathListener implements EventExecutor {
         }
 
         // Empty inventory
-        if (!EntityUtil.hasDeathDrops(event)) {
+        if (event.getDrops().isEmpty() && event.getDroppedExp() <= 0) {
             plugin.debugMessage("Grave not created for " + entityName + " because they had an empty inventory and no experience", 2);
 
             return;
@@ -301,7 +301,7 @@ public class EntityDeathListener implements EventExecutor {
         }
 
         // Grave
-        if (EntityUtil.hasDeathDrops(graveItemStackList, event.getDroppedExp())) {
+        if (!graveItemStackList.isEmpty() || event.getDroppedExp() > 0) {
             Grave grave = new Grave(UUID.randomUUID());
 
             grave.setOwnerType(livingEntity.getType());
