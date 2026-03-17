@@ -301,7 +301,7 @@ public class EntityDeathListener implements EventExecutor {
         }
 
         // Grave
-        if (!graveItemStackList.isEmpty() || EntityUtil.hasDeathDrops(event)) {
+        if (!graveItemStackList.isEmpty() || event.getDroppedExp() > 0) {
             Grave grave = new Grave(UUID.randomUUID());
 
             grave.setOwnerType(livingEntity.getType());
