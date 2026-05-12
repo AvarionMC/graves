@@ -1,6 +1,5 @@
 package org.avarion.graves;
 
-import com.google.common.base.Charsets;
 import org.avarion.graves.command.GravesCommand;
 import org.avarion.graves.command.GraveyardsCommand;
 import org.avarion.graves.compatibility.Compatibility;
@@ -650,7 +649,7 @@ public class Graves extends JavaPlugin {
         InputStream inputStream = getResource(resource);
 
         if (inputStream != null) {
-            fileConfiguration.addDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(inputStream, Charsets.UTF_8)));
+            fileConfiguration.addDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(inputStream, StandardCharsets.UTF_8)));
         }
     }
 

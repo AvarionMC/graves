@@ -1,0 +1,28 @@
+name: Gradle Build
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'adopt'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          # Cache ~/.gradle (modules, build-cache, wrapper). Read/write on
+          # the default branch, read-only on PRs from forks.
+          cache-disabled: false
+
+      - name: Build with Gradle
+        run: ./gradlew --no-daemon build -x copyToTestServer
