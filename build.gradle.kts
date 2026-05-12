@@ -73,7 +73,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.20.1-experimental-SNAPSHOT")
     implementation("org.bstats:bstats-bukkit:3.2.1")
     implementation("com.github.puregero:multilib:1.2.5")
     compileOnly("com.mojang:authlib:1.5.25")
