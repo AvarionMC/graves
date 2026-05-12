@@ -1,4 +1,4 @@
-name: Maven Release
+name: Gradle Release
 
 on:
   release:
@@ -25,6 +25,9 @@ jobs:
           java-version: '25'
           distribution: 'adopt'
 
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
       - name: Set outputs
         id: version
         run: |
@@ -34,20 +37,13 @@ jobs:
           echo "TAG=$TAG" >> "$GITHUB_ENV"
           echo "CURRENT_VERSION=$CURRENT_VERSION" >> "$GITHUB_ENV"
 
-      - name: Cache Maven packages
-        uses: actions/cache@v5
-        with:
-          path: ~/.m2
-          key: m2-cache
-          restore-keys: m2-cache
-          save-always: true
-
-      - name: Deploy the jar file
-        run: mvn --batch-mode -Drevision=${CURRENT_VERSION} clean deploy
+      - name: Publish the jar file
+        run: ./gradlew --no-daemon -Pversion=${CURRENT_VERSION} publish -x copyToTestServer
         env:
+          GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Add jar file to release
-        run: gh release upload "${TAG}" "target/Graves-${CURRENT_VERSION}.jar" --clobber
+        run: gh release upload "${TAG}" "build/libs/Graves-${CURRENT_VERSION}.jar" --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
