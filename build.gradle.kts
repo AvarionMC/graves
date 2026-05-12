@@ -96,7 +96,7 @@ dependencies {
         exclude(group = "com.ticxo", module = "PlayerAnimator")
     }
     compileOnly("com.github.jojodmo:ItemBridge:b0054538c1")
-    compileOnly("net.kyori:adventure-text-minimessage:4.26.1")
+    compileOnly("net.kyori:adventure-text-minimessage:5.1.0")
     compileOnly("net.kyori:adventure-platform-bukkit:4.4.1")
     compileOnly("de.themoep:minedown:1.7.1-SNAPSHOT")
     compileOnly("org.jetbrains:annotations:26.1.0")
