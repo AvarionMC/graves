@@ -1,3 +1,11 @@
 {
-    "$schema": "https://docs.renovatebot.com/renovate-schema.json"
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "packageRules": [
+        {
+            "description": "Ignore major bumps for net.kyori:adventure-* — Adventure 5.x is compileOnly but the server's bundled Adventure (typically 4.x via Paper/Spigot) is what loads at runtime. Compiling against 5.x against a 4.x-bundled runtime risks NoSuchMethodError / ClassNotFoundException. Revisit once 5.x is the standard bundled version.",
+            "matchPackageNames": ["net.kyori:adventure-{/,}**"],
+            "matchUpdateTypes": ["major"],
+            "enabled": false
+        }
+    ]
 }
