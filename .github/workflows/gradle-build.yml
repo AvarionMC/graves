@@ -19,6 +19,10 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          # Cache ~/.gradle (modules, build-cache, wrapper). Read/write on
+          # the default branch, read-only on PRs from forks.
+          cache-disabled: false
 
       - name: Build with Gradle
         run: ./gradlew --no-daemon build -x copyToTestServer

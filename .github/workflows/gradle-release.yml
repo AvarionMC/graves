@@ -27,6 +27,9 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          # Cache ~/.gradle (modules, build-cache, wrapper).
+          cache-disabled: false
 
       - name: Set outputs
         id: version
