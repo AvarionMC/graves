@@ -18,7 +18,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
         with:
           # Cache ~/.gradle (modules, build-cache, wrapper). Read/write on
           # the default branch, read-only on PRs from forks.
