@@ -102,7 +102,7 @@ dependencies {
     compileOnly("org.jetbrains:annotations:26.1.0")
     implementation("de.tr7zw:item-nbt-api-plugin:2.15.7")
     compileOnly("net.coreprotect:coreprotect:23.2")
-    compileOnly("com.github.Xyness:SimpleClaimSystem:1.13.0.8")
+    compileOnly("com.github.Xyness:SimpleClaimSystem:1.13.0.9")
 }
 
 tasks.processResources {
