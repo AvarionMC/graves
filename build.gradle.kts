@@ -91,7 +91,7 @@ dependencies {
     compileOnly("com.github.xerial:sqlite-jdbc:3.45.2.0")
     compileOnly("com.github.Ste3et:FurnitureLib:3.2.8")
     compileOnly("com.github.LoneDev6:api-itemsadder:3.6.1")
-    compileOnly("io.th0rgal:oraxen:1.215.0") {
+    compileOnly("io.th0rgal:oraxen:1.216.0") {
         exclude(group = "me.gabytm.util", module = "actions-spigot")
         exclude(group = "com.ticxo", module = "PlayerAnimator")
     }
