@@ -86,7 +86,7 @@ dependencies {
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.17")
     compileOnly("com.palmergames.bukkit.towny:towny:0.103.0.5")
     compileOnly("de.jeff_media:ChestSortAPI:13.0.0-SNAPSHOT")
-    compileOnly("me.clip:placeholderapi:2.12.2")
+    compileOnly("me.clip:placeholderapi:2.12.3")
     compileOnly("com.github.SkriptLang:Skript:2.16.0-pre1")
     compileOnly("com.github.xerial:sqlite-jdbc:3.45.2.0")
     compileOnly("com.github.Ste3et:FurnitureLib:3.2.8")
