@@ -44,6 +44,14 @@ configurations.compileClasspath.configure {
     // module metadata, which Gradle refuses to resolve. Drop it from the
     // compile classpath — the server has its own copy at runtime.
     exclude(group = "org.apache.logging.log4j")
+    // Same story for Guava and Gson: WorldEdit 7.4.4 and WorldGuard 7.0.17
+    // pin different *strict* versions, which Gradle refuses to reconcile. Both
+    // are provided by the server at runtime; we only need Guava on the compile
+    // classpath (SkinUtil uses Multimap), so force a single version to win.
+    resolutionStrategy {
+        force("com.google.guava:guava:33.6.0-jre")
+        force("com.google.code.gson:gson:2.14.0")
+    }
 }
 
 repositories {
