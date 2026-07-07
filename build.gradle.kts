@@ -44,6 +44,14 @@ configurations.compileClasspath.configure {
     // module metadata, which Gradle refuses to resolve. Drop it from the
     // compile classpath — the server has its own copy at runtime.
     exclude(group = "org.apache.logging.log4j")
+    // Same story for Guava and Gson: WorldEdit 7.4.4 and WorldGuard 7.0.17
+    // pin different *strict* versions, which Gradle refuses to reconcile. Both
+    // are provided by the server at runtime; we only need Guava on the compile
+    // classpath (SkinUtil uses Multimap), so force a single version to win.
+    resolutionStrategy {
+        force("com.google.guava:guava:33.6.0-jre")
+        force("com.google.code.gson:gson:2.14.0")
+    }
 }
 
 repositories {
@@ -82,7 +90,7 @@ dependencies {
     compileOnly("net.milkbowl:vault:1.7.3")
     compileOnly("me.lokka30:treasury:1.2.0")
     compileOnly("net.dmulloy2:ProtocolLib:5.4.0")
-    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.4.3")
+    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.4.4")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.17")
     compileOnly("com.palmergames.bukkit.towny:towny:0.103.0.6")
     compileOnly("de.jeff_media:ChestSortAPI:13.0.0-SNAPSHOT")
