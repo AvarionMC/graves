@@ -5,5 +5,5 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.palmergames.bukkit.towny</groupId>
     <artifactId>towny</artifactId>
-    <version>0.103.0.7</version>
+    <version>0.103.1.0</version>
 </project>
