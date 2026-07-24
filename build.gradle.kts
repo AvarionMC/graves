@@ -63,7 +63,6 @@ repositories {
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
     maven("https://repo.skriptlang.org/releases")
     maven("https://maven.enginehub.org/repo/")
-    maven("https://repo.glaremasters.me/repository/towny/")
     maven("https://repo.minebench.de/")
     maven("https://oss.sonatype.org/content/repositories/snapshots/")
     maven("https://jitpack.io")
@@ -78,6 +77,12 @@ repositories {
         }
     }
     maven("https://repo.bluecolored.de/releases")
+    // Keep glaremasters LAST: it's Towny's official Nexus but is unreliable
+    // (returned 502 for days). Everything it hosts is either vendored in lib/
+    // or sourced from a real repo above, so listing it last means a Gradle 5xx
+    // here never aborts resolution for deps found earlier. Drop it entirely
+    // once a reliable Towny repo exists.
+    maven("https://repo.glaremasters.me/repository/towny/")
 }
 
 dependencies {
