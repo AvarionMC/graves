@@ -49,7 +49,7 @@ configurations.compileClasspath.configure {
     // are provided by the server at runtime; we only need Guava on the compile
     // classpath (SkinUtil uses Multimap), so force a single version to win.
     resolutionStrategy {
-        force("com.google.guava:guava:33.6.0-jre")
+        force("com.google.guava:guava:33.7.0-jre")
         force("com.google.code.gson:gson:2.14.0")
     }
 }
