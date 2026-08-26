@@ -430,7 +430,7 @@ public class Graves extends JavaPlugin {
                                      + "/");
                 }
             }
-        }.runTaskTimer(this, 0, 24 * 60 * 60 * 20); // run on a daily schedule
+        }.runTaskTimerAsynchronously(this, 0, 24 * 60 * 60 * 20); // run on a daily schedule
     }
 
     private void compatibilityChecker() {
