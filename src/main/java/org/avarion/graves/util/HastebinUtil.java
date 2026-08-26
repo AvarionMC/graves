@@ -14,6 +14,9 @@ import java.nio.charset.StandardCharsets;
 
 public final class HastebinUtil {
 
+    private static final int CONNECT_TIMEOUT_MILLIS = 5000;
+    private static final int READ_TIMEOUT_MILLIS = 10000;
+
     private HastebinUtil() {
         // Don't do anything here
     }
@@ -27,16 +30,26 @@ public final class HastebinUtil {
             URL url = URI.create(urlString).toURL();
             HttpsURLConnection httpsURLConnection = (HttpsURLConnection) url.openConnection();
 
+            httpsURLConnection.setConnectTimeout(CONNECT_TIMEOUT_MILLIS);
+            httpsURLConnection.setReadTimeout(READ_TIMEOUT_MILLIS);
             httpsURLConnection.setDoOutput(true);
             httpsURLConnection.setUseCaches(false);
             httpsURLConnection.setRequestMethod("POST");
 
-            DataOutputStream dataOutputStream = new DataOutputStream(httpsURLConnection.getOutputStream());
+            try (DataOutputStream dataOutputStream = new DataOutputStream(httpsURLConnection.getOutputStream())) {
+                dataOutputStream.write(data.getBytes(StandardCharsets.UTF_8));
+            }
 
-            dataOutputStream.write(data.getBytes(StandardCharsets.UTF_8));
+            String response;
 
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(httpsURLConnection.getInputStream()));
-            String response = bufferedReader.readLine();
+            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(httpsURLConnection.getInputStream(),
+                                                                                         StandardCharsets.UTF_8))) {
+                response = bufferedReader.readLine();
+            }
+
+            if (response == null) {
+                return null;
+            }
 
             if (response.contains("\"key\"")) {
                 response = response.substring(response.indexOf(":") + 2, response.length() - 2);
