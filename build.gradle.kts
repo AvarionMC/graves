@@ -114,7 +114,7 @@ dependencies {
     compileOnly("de.themoep:minedown:1.7.1-SNAPSHOT")
     compileOnly("org.jetbrains:annotations:26.1.0")
     implementation("de.tr7zw:item-nbt-api-plugin:2.16.1")
-    compileOnly("net.coreprotect:coreprotect:24.0")
+    compileOnly("net.coreprotect:coreprotect:24.1")
     compileOnly("com.github.Xyness:SimpleClaimSystem:1.13.1")
 }
 
