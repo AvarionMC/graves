@@ -50,7 +50,7 @@ configurations.compileClasspath.configure {
     // classpath (SkinUtil uses Multimap), so force a single version to win.
     resolutionStrategy {
         force("com.google.guava:guava:33.7.2-jre")
-        force("com.google.code.gson:gson:2.14.0")
+        force("com.google.code.gson:gson:2.15.0")
     }
 }
 
